@@ -21,17 +21,31 @@ import java.io.InputStream;
 
 @Component
 public class PatientExportStep {
+	private DataSource dataSource;
 
-	@Autowired
-	public DataSource dataSource;
+	private StepBuilderFactory stepBuilderFactory;
 
-	@Autowired
-	public StepBuilderFactory stepBuilderFactory;
-
-	@Value("classpath:sql/patientInformation.sql")
 	private Resource personReportSqlResource;
 
-	public String personReportSql() {
+	private Resource outputFolder;
+
+	@Autowired
+	public PatientExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource){
+		this.dataSource = dataSource;
+		this.stepBuilderFactory = stepBuilderFactory;
+	}
+
+	@Value("classpath:sql/patientInformation.sql")
+	public void setPersonReportSqlResource(Resource personReportSqlResource) {
+		this.personReportSqlResource = personReportSqlResource;
+	}
+
+	@Value("${outputFolder}/patientInformation.csv")
+	public void setOutputFolder(Resource outputFolder) {
+		this.outputFolder = outputFolder;
+	}
+
+	private String personReportSql() {
 		try(InputStream is = personReportSqlResource.getInputStream()) {
 			return IOUtils.toString(is);
 		}
@@ -58,7 +72,7 @@ public class PatientExportStep {
 
 	private FlatFileItemWriter<String> flatFileItemWriter(){
 		FlatFileItemWriter<String> writer = new FlatFileItemWriter<String>();
-		writer.setResource(new FileSystemResource("patientInformation.csv"));
+		writer.setResource(outputFolder);
 		DelimitedLineAggregator delimitedLineAggregator = new DelimitedLineAggregator();
 		delimitedLineAggregator.setDelimiter(",");
 		delimitedLineAggregator.setFieldExtractor(new PassThroughFieldExtractor());

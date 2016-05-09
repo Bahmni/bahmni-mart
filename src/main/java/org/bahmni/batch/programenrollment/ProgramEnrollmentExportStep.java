@@ -24,16 +24,27 @@ import java.io.InputStream;
 @Component
 public class ProgramEnrollmentExportStep {
 
-	@Autowired
-	public StepBuilderFactory stepBuilderFactory;
+	private StepBuilderFactory stepBuilderFactory;
 
-	@Autowired
-	public DataSource dataSource;
+	private DataSource dataSource;
 
 	@Value("classpath:sql/programEnrollmentReport.sql")
 	private Resource programEnrollmentReportSqlResource;
 
-	public String programEnrollmentReportSql() {
+	private Resource outputFolder;
+
+	@Autowired
+	public ProgramEnrollmentExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource){
+		this.dataSource = dataSource;
+		this.stepBuilderFactory = stepBuilderFactory;
+	}
+
+	@Value("${outputFolder}/programEnrollment.csv")
+	public void setOutputFolder(Resource outputFolder) {
+		this.outputFolder = outputFolder;
+	}
+
+	private String programEnrollmentReportSql() {
 		try(InputStream is = programEnrollmentReportSqlResource.getInputStream()) {
 			return IOUtils.toString(is);
 		}
@@ -46,12 +57,11 @@ public class ProgramEnrollmentExportStep {
 		return stepBuilderFactory.get("programEnrollment")
 				.<Person,String>chunk(100)
 				.reader(programEnrollmentReader())
-				//                .processor(processor())
 				.writer(programEnrollmentItemWriter())
 				.build();
 	}
 
-	public JdbcCursorItemReader programEnrollmentReader(){
+	private JdbcCursorItemReader programEnrollmentReader(){
 		JdbcCursorItemReader reader = new JdbcCursorItemReader();
 		reader.setDataSource(dataSource);
 		reader.setSql(programEnrollmentReportSql());
@@ -61,7 +71,7 @@ public class ProgramEnrollmentExportStep {
 
 	private ItemWriter<? super String> programEnrollmentItemWriter() {
 		FlatFileItemWriter<String> writer = new FlatFileItemWriter<String>();
-		writer.setResource(new FileSystemResource("programEnrollment.csv"));
+		writer.setResource(outputFolder);
 		DelimitedLineAggregator delimitedLineAggregator = new DelimitedLineAggregator();
 		delimitedLineAggregator.setDelimiter(",");
 		delimitedLineAggregator.setFieldExtractor(new PassThroughFieldExtractor());

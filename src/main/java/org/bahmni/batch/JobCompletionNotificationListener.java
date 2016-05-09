@@ -15,6 +15,8 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 	@Override
 	public void beforeJob(JobExecution jobExecution) {
 		//TODO: Do a setup.. create a folder with a timestamp and make it ready for CSVs
+		//Create a folder in /var/www/endtbexports with timestamp
+		//
 	}
 
 	@Override
