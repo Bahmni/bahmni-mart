@@ -1,7 +1,7 @@
 SELECT
   o.identifier as 'id_emr',
   o.age as 'age',
-  o.code as 'sex',
+  IF(o.gender = 'M',1, IF(o.gender = 'F',2, 3)) AS 'sex',
   o.program_name as 'tbregtype',
   MAX(IF(pat.program_attribute_type_id = '2', IF( pat.datatype LIKE "%Concept%", o.concept_name ,o.attr_value), NULL)) AS `regnum`,
   DATE_FORMAT(o.date_enrolled, '%d/%b/%Y') as 'd_reg',
@@ -11,7 +11,7 @@ FROM
   (SELECT
      pi.identifier,
      floor(datediff(CURDATE(), p.birthdate) / 365) AS age,
-     p.gender as code,
+     p.gender,
      prog.name as program_name,
      attr.attribute_type_id,
      attr.value_reference as attr_value,

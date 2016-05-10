@@ -4,7 +4,7 @@ SELECT
   o.given_name as 'given_name',
   DATE_FORMAT(o.birthdate, '%d/%b/%Y') as 'dob',
   o.age as 'age',
-  o.gender as 'sex',
+  IF(o.gender = 'M',1, IF(o.gender = 'F',2, 3)) AS 'sex',
   GROUP_CONCAT(DISTINCT(IF(pat.name = 'nationalIdentificationNumber', o.attr_value, NULL)) SEPARATOR ',') AS `id_nat`,
   DATE_FORMAT(o.date_created, '%d/%b/%Y') as `creation_date`,
   GROUP_CONCAT(DISTINCT(IF(pat.name = 'patientAddress', o.attr_value, NULL)) SEPARATOR ',') AS `address_line1`,

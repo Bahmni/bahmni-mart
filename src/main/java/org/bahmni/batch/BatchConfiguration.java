@@ -1,7 +1,9 @@
 package org.bahmni.batch;
 
-import org.bahmni.batch.patient.PatientExportStep;
-import org.bahmni.batch.programenrollment.ProgramEnrollmentExportStep;
+import org.bahmni.batch.exports.PatientRegistrationBaseExportStep;
+import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
+
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -28,10 +30,10 @@ public class BatchConfiguration {
     public DataSource dataSource;
 
     @Autowired
-    public PatientExportStep patientExportStep;
+    public PatientRegistrationBaseExportStep personInformationExportStep;
 
     @Autowired
-    public ProgramEnrollmentExportStep programEnrollmentExportStep;
+    public TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
 
     @Bean
     public JobExecutionListener listener() {
@@ -39,11 +41,12 @@ public class BatchConfiguration {
     }
     @Bean
     public Job completeDataExport() {
+
         return jobBuilderFactory.get("completeDataExport")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener())
-                .flow(patientExportStep.getStep())
-                .next(programEnrollmentExportStep.getStep())
+                .flow(personInformationExportStep.getStep())
+                .next(treatmentRegistrationBaseExportStep.getStep())
                 .end()
                 .build();
     }
