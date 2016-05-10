@@ -5,8 +5,10 @@ import org.bahmni.batch.Person;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.PassThroughFieldExtractor;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
@@ -14,6 +16,7 @@ import org.springframework.jdbc.core.ColumnMapRowMapper;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 
 
 public class BaseExportStep {
@@ -27,12 +30,15 @@ public class BaseExportStep {
 
     private String exportName;
 
-    public BaseExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource, Resource sqlResource, Resource outputFolder, String exportName) {
+    private String headers;
+
+    public BaseExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource, Resource sqlResource, Resource outputFolder, String exportName, String headers) {
         this.dataSource = dataSource;
         this.stepBuilderFactory = stepBuilderFactory;
         this.sqlResource = sqlResource;
         this.outputFolder = outputFolder;
         this.exportName = exportName;
+        this.headers = headers;
     }
 
     private String reportSql() {
@@ -66,6 +72,17 @@ public class BaseExportStep {
         delimitedLineAggregator.setDelimiter(",");
         delimitedLineAggregator.setFieldExtractor(new PassThroughFieldExtractor());
         writer.setLineAggregator(delimitedLineAggregator);
+        DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
+        writer.setHeaderCallback(new FlatFileHeaderCallback() {
+            @Override
+            public void writeHeader(Writer writer) throws IOException {
+                writer.write(getHeaders());
+            }
+        });
         return writer;
+    }
+
+    public String getHeaders() {
+        return headers;
     }
 }

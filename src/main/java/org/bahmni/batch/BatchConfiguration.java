@@ -1,6 +1,8 @@
 package org.bahmni.batch;
 
+import org.bahmni.batch.exports.NonTBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.PatientRegistrationBaseExportStep;
+import org.bahmni.batch.exports.TBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
 
 
@@ -30,10 +32,16 @@ public class BatchConfiguration {
     public DataSource dataSource;
 
     @Autowired
-    public PatientRegistrationBaseExportStep personInformationExportStep;
+    public PatientRegistrationBaseExportStep patientRegistrationBaseExportStep;
 
     @Autowired
     public TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
+
+    @Autowired
+    public TBDrugOrderBaseExportStep tbDrugOrderBaseExportStep;
+
+    @Autowired
+    public NonTBDrugOrderBaseExportStep nonTBDrugOrderBaseExportStep;
 
     @Bean
     public JobExecutionListener listener() {
@@ -45,8 +53,10 @@ public class BatchConfiguration {
         return jobBuilderFactory.get("completeDataExport")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener())
-                .flow(personInformationExportStep.getStep())
+                .flow(patientRegistrationBaseExportStep.getStep())
                 .next(treatmentRegistrationBaseExportStep.getStep())
+                .next(tbDrugOrderBaseExportStep.getStep())
+                .next(nonTBDrugOrderBaseExportStep.getStep())
                 .end()
                 .build();
     }
