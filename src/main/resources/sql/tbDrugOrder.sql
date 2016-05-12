@@ -21,17 +21,16 @@ FROM
      IF(Date(orders.scheduled_date) IS NULL, orders.date_activated, orders.scheduled_date) AS startDate,
      IF(Date(orders.date_stopped) IS NULL, orders.auto_expire_date, orders.date_stopped)   AS stopDate,
      pg_attr_type.name                                                                     AS program_attribute_name,
-     coalesce(pg_attr_cn.concept_short_name, pg_attr_cn.concept_full_name,
-              pg_attr.value_reference)                                                     AS program_attribute_value,
+     pg_attr.value_reference                                                               AS program_attribute_value,
      pp.patient_program_id,
      pg_attr.attribute_type_id,
      pp.patient_id,
      prog.program_id,
      orders.order_id,
      stopped_reason.code                                                                   AS 'stopped_order_reason',
-     stopped_order.order_reason_non_coded,
+     CONCAT('\"',stopped_order.order_reason_non_coded, '\"')                              AS  'order_reason_non_coded',
      IF(LOCATE("additionalInstructions", drug_order.dosing_instructions),
-        TRIM(TRAILING '"}' FROM SUBSTRING_INDEX(drug_order.dosing_instructions, '"', -2)),
+        CONCAT('\"',TRIM(TRAILING '"}' FROM SUBSTRING_INDEX(drug_order.dosing_instructions, '"', -2)), '\"'),
         '')                                                                                AS additional_instructions,
      pp.date_enrolled
    FROM patient_program pp
@@ -41,8 +40,6 @@ FROM
      LEFT JOIN program_attribute_type pg_attr_type
        ON pg_attr.attribute_type_id = pg_attr_type.program_attribute_type_id AND
           pg_attr_type.name IN ('Registration Number')
-     LEFT JOIN concept_view pg_attr_cn
-       ON pg_attr.value_reference = pg_attr_cn.concept_id AND pg_attr_type.datatype LIKE "%Concept%"
      JOIN episode_patient_program epp ON pp.patient_program_id = epp.patient_program_id
      JOIN episode_encounter ee ON ee.episode_id = epp.episode_id
      JOIN orders orders ON orders.patient_id = pp.patient_id AND orders.encounter_id = ee.encounter_id AND

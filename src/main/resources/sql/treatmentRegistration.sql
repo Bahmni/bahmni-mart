@@ -3,9 +3,9 @@ SELECT
   o.age as 'age',
   IF(o.gender = 'M',1, IF(o.gender = 'F',2, 3)) AS 'sex',
   o.program_name as 'tbregtype',
-  MAX(IF(pat.program_attribute_type_id = '2', IF( pat.datatype LIKE "%Concept%", o.concept_name ,o.attr_value), NULL)) AS `regnum`,
+  MAX(IF(pat.program_attribute_type_id = '2', o.attr_value, NULL)) AS `regnum`,
   DATE_FORMAT(o.date_enrolled, '%d/%b/%Y') as 'd_reg',
-  MAX(IF(pat.program_attribute_type_id = '6', IF( pat.datatype LIKE "%Concept%", o.concept_name ,o.attr_value), NULL)) AS `reg_facility`,
+  MAX(IF(pat.program_attribute_type_id = '6', CONCAT('\"',o.concept_name, '\"'), NULL)) AS `reg_facility`,
   o.status
 FROM
   (SELECT

@@ -6,7 +6,7 @@ SELECT
   o.route as 'othdrugroute',
   o.frequency as 'othdrugfreq',
   o.duration,
-  o.quantity as 'othtotdrugdose',
+  o.quantity as 'othtotdrugqty',
   o.quantity_units as 'othtotdrugform',
   o.additional_instructions,
   reason_admin.code as 'reas_othdrug',
@@ -23,18 +23,18 @@ FROM
      fre.code as frequency,
      concat(drug_order.duration ,'' '', du.concept_full_name) as duration,
      IF(orders.auto_expire_date IS NULL,'' '' ,concat(drug_order.quantity)) as quantity,
-      qu.code as 'quantity_units',
+     qu.code as 'quantity_units',
      IF(Date(orders.scheduled_date) IS NULL, orders.date_activated, orders.scheduled_date) as startDate,
      IF(Date(orders.date_stopped) is NULL, orders.auto_expire_date,orders.date_stopped) as stopDate,
      pg_attr_type.name  as program_attribute_name,
-     coalesce(pg_attr_cn.concept_short_name, pg_attr_cn.concept_full_name, pg_attr.value_reference) as program_attribute_value,
+     pg_attr.value_reference as program_attribute_value,
      pp.patient_program_id,
      pg_attr.attribute_type_id,
      pp.patient_id,
      prog.program_id,
      orders.order_id,
      stopped_order.order_reason_non_coded,
-     IF(LOCATE("additionalInstructions",drug_order.dosing_instructions) ,TRIM(TRAILING '"}' FROM SUBSTRING_INDEX(drug_order.dosing_instructions, '"',-2)),'') as additional_instructions,
+     IF(LOCATE("additionalInstructions",drug_order.dosing_instructions) ,CONCAT('\"',TRIM(TRAILING '"}' FROM SUBSTRING_INDEX(drug_order.dosing_instructions, '"',-2)), '\"'),'') as additional_instructions,
      IF(LOCATE("{\"instructions",dosing_instructions) ,TRIM(LEADING '{"instructions":"' FROM SUBSTRING_INDEX(dosing_instructions, '"',+4)),'') as reason_for_administration,
      drug_order.dosing_instructions,
      pp.date_enrolled
@@ -42,7 +42,6 @@ FROM
      JOIN program prog ON pp.program_id = prog.program_id AND prog.name in ('Second-line TB treatment register','Basic management unit TB register')
      LEFT JOIN patient_program_attribute pg_attr ON pp.patient_program_id = pg_attr.patient_program_id
      LEFT JOIN program_attribute_type pg_attr_type ON pg_attr.attribute_type_id = pg_attr_type.program_attribute_type_id and pg_attr_type.name in ('Registration Number')
-     LEFT JOIN concept_view pg_attr_cn ON pg_attr.value_reference = pg_attr_cn.concept_id AND pg_attr_type.datatype LIKE "%Concept%"
      JOIN  episode_patient_program epp on pp.patient_program_id = epp.patient_program_id
      JOIN episode_encounter ee on ee.episode_id = epp.episode_id
      JOIN orders orders ON orders.patient_id = pp.patient_id and orders.encounter_id = ee.encounter_id and orders.voided = 0 and (orders.order_action) != "DISCONTINUE" and orders.concept_id in (select cs.concept_id from concept_set cs join concept_name c on c.name='All Other Drugs' and c.concept_id=cs.concept_set
