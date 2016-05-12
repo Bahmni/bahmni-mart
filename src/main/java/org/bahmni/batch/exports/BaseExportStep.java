@@ -1,15 +1,12 @@
 package org.bahmni.batch.exports;
 
-import org.apache.commons.io.IOUtils;
 import org.bahmni.batch.BatchUtils;
-import org.bahmni.batch.Person;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.PassThroughFieldExtractor;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
@@ -17,7 +14,6 @@ import org.springframework.jdbc.core.ColumnMapRowMapper;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Writer;
 
 

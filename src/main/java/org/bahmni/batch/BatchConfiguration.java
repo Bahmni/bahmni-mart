@@ -52,9 +52,12 @@ public class BatchConfiguration {
     @Value("${outputFolder}")
     public String outputFolder;
 
+    @Autowired
+    public JobCompletionNotificationListener jobCompletionNotificationListener;
+
     @Bean
     public JobExecutionListener listener() {
-        return new JobCompletionNotificationListener();
+        return jobCompletionNotificationListener;
     }
     @Bean
     public Job completeDataExport() {
