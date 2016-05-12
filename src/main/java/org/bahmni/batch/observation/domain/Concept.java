@@ -5,6 +5,8 @@ public class Concept {
 	private String name;
 	private Integer isSet;
 
+	public Concept(){}
+
 	public Concept(Integer id, String name, Integer isSet) {
 		this.id = id;
 		this.name = name;
@@ -27,12 +29,12 @@ public class Concept {
 		this.name = name;
 	}
 
-	public Integer getSet() {
-		return isSet;
+	public void setIsSet(Integer isSet) {
+		this.isSet = isSet;
 	}
 
-	public void setSet(Integer set) {
-		isSet = set;
+	public Integer getIsSet() {
+		return isSet;
 	}
 
 	@Override

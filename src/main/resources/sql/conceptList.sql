@@ -3,4 +3,4 @@ from concept_view parentConcept
   inner join concept_set cs on parentConcept.concept_id = cs.concept_set
   inner join concept_view childConcept on cs.concept_id=childConcept.concept_id
   inner join concept childConceptRaw on childConcept.concept_id = childConceptRaw.concept_id
-where parentConcept.concept_full_name = '?' and childConcept.retired=0;
+where parentConcept.concept_full_name = :parentConceptName and childConcept.retired=0;

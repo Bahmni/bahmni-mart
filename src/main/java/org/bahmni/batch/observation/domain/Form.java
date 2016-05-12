@@ -5,7 +5,9 @@ import java.util.List;
 
 public class Form {
 	private Concept formName;
+
 	private List<Concept> fields = new ArrayList<>();
+
 	private List<Concept> ignoredFields = new ArrayList<>();
 
 	public void setFormName(Concept formName) {
