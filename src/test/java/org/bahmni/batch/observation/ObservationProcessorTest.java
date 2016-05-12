@@ -79,8 +79,11 @@ public class ObservationProcessorTest {
 		when(namedParameterJdbcTemplate.query(eq("get..all..child"),any(Map.class),any(BeanPropertyRowMapper.class)))
 				.thenReturn(obsList);
 
+		Map<String, Object> map = new HashMap<>();
+		map.put("obsGroupId",new Integer(1));
+		map.put("obsId",new Integer(0));
 
-		List<Obs> obsListActual = observationProcessor.process(new Integer(1));
+		List<Obs> obsListActual = observationProcessor.process(map);
 		assertEquals(3, obsListActual.size());
 		assertEquals(new Integer(1), obsListActual.get(0).getParentId());
 		assertEquals(new Integer(1), obsListActual.get(1).getParentId());

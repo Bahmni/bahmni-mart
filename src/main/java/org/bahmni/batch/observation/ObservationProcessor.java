@@ -1,8 +1,8 @@
 package org.bahmni.batch.observation;
 
 import org.bahmni.batch.BatchUtils;
-import org.bahmni.batch.observation.domain.Obs;
 import org.bahmni.batch.observation.domain.Form;
+import org.bahmni.batch.observation.domain.Obs;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,13 +15,14 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
 @Scope(value="prototype")
-public class ObservationProcessor implements ItemProcessor<Integer, List<Obs>> {
+public class ObservationProcessor implements ItemProcessor<Map<String,Object>, List<Obs>> {
 
 	private String obsDetailSql;
 
@@ -42,14 +43,14 @@ public class ObservationProcessor implements ItemProcessor<Integer, List<Obs>> {
 	private FormFieldTransformer formFieldTransformer;
 
 	@Override
-	public List<Obs> process(Integer obsId) throws Exception {
+	public List<Obs> process(Map<String,Object> obsRow) throws Exception {
 		List<Integer> allChildObsGroupIds = new ArrayList<>();
 
-		retrieveChildObsIds(allChildObsGroupIds,allChildObsGroupIds);
+		retrieveChildObsIds(allChildObsGroupIds, Arrays.asList((Integer) obsRow.get("obsId")));
 
 		List<Obs> obsRows = fetchAllLeafObs(allChildObsGroupIds);
 
-		setParentIdInObs(obsRows, obsId);
+		setParentIdInObs(obsRows, (Integer)obsRow.get("obsGroupId"));
 
 		return obsRows;
 	}

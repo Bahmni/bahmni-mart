@@ -1,6 +1,7 @@
 package org.bahmni.batch.exports;
 
 import org.bahmni.batch.BatchUtils;
+import org.bahmni.batch.observation.ObsFieldExtractor;
 import org.bahmni.batch.observation.ObservationProcessor;
 import org.bahmni.batch.observation.domain.Form;
 import org.bahmni.batch.observation.domain.Obs;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -50,19 +52,18 @@ public class ObservationExportStep {
 
     public Step getStep() {
         return stepBuilderFactory.get(form.getFormName().getName())
-                .<Integer,List<Obs>>chunk(100)
+                .<Map<String,Object>,List<Obs>>chunk(100)
                 .reader(obsReader())
                 .processor(observationProcessor())
-//                .writer(obsWriter())
+                .writer(obsWriter())
                 .build();
     }
 
-    private JdbcCursorItemReader obsReader(){
-        //TODO: Need obs_id and obs_group_id as part of the query
-        JdbcCursorItemReader reader = new JdbcCursorItemReader();
+    private JdbcCursorItemReader<Map<String,Object>> obsReader(){
+        JdbcCursorItemReader<Map<String,Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
-        reader.setSql("select obs_id from obs where concept_id="+ form.getFormName().getId());
-        reader.setRowMapper(new SingleColumnRowMapper<Integer>());
+        reader.setSql("select obs_id as obsId,obs_group_id as obsGroupId from obs where concept_id="+ form.getFormName().getId());
+        reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
     }
 
@@ -72,13 +73,17 @@ public class ObservationExportStep {
         return observationProcessor;
     }
 
-    private FlatFileItemWriter<Map<String,Object>> obsWriter() {
-        FlatFileItemWriter<Map<String,Object>> writer = new FlatFileItemWriter<>();
+    private FlatFileItemWriter<List<Obs>> obsWriter() {
+        FlatFileItemWriter<List<Obs>> writer = new FlatFileItemWriter<>();
         writer.setResource(outputFolder);
+
         DelimitedLineAggregator delimitedLineAggregator = new DelimitedLineAggregator();
         delimitedLineAggregator.setDelimiter(",");
-        delimitedLineAggregator.setFieldExtractor(new PassThroughFieldExtractor());
+        delimitedLineAggregator.setFieldExtractor(new ObsFieldExtractor(form));
+
         writer.setLineAggregator(delimitedLineAggregator);
+
+
         //TODO: HeaderCallback needs to be provided
         return writer;
     }

@@ -1,6 +1,7 @@
 package org.bahmni.batch.exports;
 
 import org.apache.commons.io.IOUtils;
+import org.bahmni.batch.BatchUtils;
 import org.bahmni.batch.Person;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -13,6 +14,7 @@ import org.springframework.batch.item.file.transform.PassThroughFieldExtractor;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +34,8 @@ public class BaseExportStep {
 
     private String headers;
 
+    private String sql;
+
     public BaseExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource, Resource sqlResource, Resource outputFolder, String exportName, String headers) {
         this.dataSource = dataSource;
         this.stepBuilderFactory = stepBuilderFactory;
@@ -41,17 +45,10 @@ public class BaseExportStep {
         this.headers = headers;
     }
 
-    private String reportSql() {
-        try (InputStream is = sqlResource.getInputStream()) {
-            return IOUtils.toString(is);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot load " + exportName +".sql .Unable to continue");
-        }
-    }
-
     public Step getStep() {
-        return stepBuilderFactory.get(exportName)
-                .<Person, String>chunk(100)
+        return stepBuilderFactory
+                .get(exportName)
+                .<String, String>chunk(50)
                 .reader(jdbcItemReader())
                 .writer(flatFileItemWriter())
                 .build();
@@ -60,7 +57,7 @@ public class BaseExportStep {
     private JdbcCursorItemReader jdbcItemReader() {
         JdbcCursorItemReader reader = new JdbcCursorItemReader();
         reader.setDataSource(dataSource);
-        reader.setSql(reportSql());
+        reader.setSql(sql);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
     }
@@ -72,7 +69,6 @@ public class BaseExportStep {
         delimitedLineAggregator.setDelimiter(",");
         delimitedLineAggregator.setFieldExtractor(new PassThroughFieldExtractor());
         writer.setLineAggregator(delimitedLineAggregator);
-        DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
         writer.setHeaderCallback(new FlatFileHeaderCallback() {
             @Override
             public void writeHeader(Writer writer) throws IOException {
@@ -84,5 +80,10 @@ public class BaseExportStep {
 
     public String getHeaders() {
         return headers;
+    }
+
+    @PostConstruct
+    public void postConstruct(){
+        this.sql = BatchUtils.convertResourceOutputToString(sqlResource);
     }
 }
