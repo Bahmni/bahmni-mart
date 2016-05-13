@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileSystemResource;
 
 import java.util.List;
 
@@ -67,19 +68,19 @@ public class BatchConfiguration {
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener())
-                .flow(patientRegistrationBaseExportStep.getStep())
-                .next(treatmentRegistrationBaseExportStep.getStep())
-                .next(tbDrugOrderBaseExportStep.getStep())
-                .next(nonTBDrugOrderBaseExportStep.getStep());
+                .flow(patientRegistrationBaseExportStep.getStep());
+//                .next(treatmentRegistrationBaseExportStep.getStep())
+//                .next(tbDrugOrderBaseExportStep.getStep())
+//                .next(nonTBDrugOrderBaseExportStep.getStep());
 
-//        for(Form form: forms){
-//            if(form.getFormName().getName().equals("Followup Template")){
-//                ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
-//                observationExportStep.setForm(form);
-//                observationExportStep.setOutputFolder(new FileSystemResource("target/abc.csv"));//outputFolder+ File.separator+form.getFormName().getName()+FILE_NAME_EXTENSION
-//                completeDataExport = completeDataExport.next(observationExportStep.getStep());
-//            }
-//        }
+        for(Form form: forms){
+            if(form.getFormName().getName().equals("Baseline Template")){
+                ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
+                observationExportStep.setForm(form);
+                observationExportStep.setOutputFolder(new FileSystemResource("target/obs.csv"));//outputFolder+ File.separator+form.getFormName().getName()+FILE_NAME_EXTENSION
+                completeDataExport = completeDataExport.next(observationExportStep.getStep());
+            }
+        }
 
         return completeDataExport
                 .end()

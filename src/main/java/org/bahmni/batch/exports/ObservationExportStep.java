@@ -3,11 +3,13 @@ package org.bahmni.batch.exports;
 import org.bahmni.batch.BatchUtils;
 import org.bahmni.batch.observation.ObsFieldExtractor;
 import org.bahmni.batch.observation.ObservationProcessor;
+import org.bahmni.batch.observation.domain.Concept;
 import org.bahmni.batch.observation.domain.Form;
 import org.bahmni.batch.observation.domain.Obs;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughFieldExtractor;
@@ -22,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
@@ -82,10 +86,27 @@ public class ObservationExportStep {
         delimitedLineAggregator.setFieldExtractor(new ObsFieldExtractor(form));
 
         writer.setLineAggregator(delimitedLineAggregator);
+        writer.setHeaderCallback(new FlatFileHeaderCallback() {
+            @Override
+            public void writeHeader(Writer writer) throws IOException {
+                writer.write(getHeader());
+            }
+        });
 
-
-        //TODO: HeaderCallback needs to be provided
         return writer;
+    }
+
+    private String getHeader() {
+        StringBuilder sb = new StringBuilder();
+        String formName = form.getFormName().getName();
+        sb.append("ID_"+formName).append(",");
+        sb.append("REF_ID_"+formName).append(",");;
+        sb.append("TreatmentNumber_"+formName);
+        for(Concept field : form.getFields()) {
+            sb.append(",");
+            sb.append(field.getName());
+        }
+        return sb.toString();
     }
 
     public void setForm(Form form) {

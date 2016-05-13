@@ -1,6 +1,7 @@
 package org.bahmni.batch.observation;
 
 import org.bahmni.batch.BatchUtils;
+import org.bahmni.batch.observation.domain.Concept;
 import org.bahmni.batch.observation.domain.Form;
 import org.bahmni.batch.observation.domain.Obs;
 import org.springframework.batch.item.ItemProcessor;
@@ -9,11 +10,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.beans.PropertyDescriptor;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -60,7 +67,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 		params.put("childObsIds",allChildObsGroupIds);
 		params.put("leafConceptIds",formFieldTransformer.transformFormToFieldIds(form));
 
-		return jdbcTemplate.query(leafObsSql,params,new BeanPropertyRowMapper<>(Obs.class));
+		return jdbcTemplate.query(leafObsSql, params, new ObsRowMapper(Obs.class));
 	}
 
 	protected void retrieveChildObsIds(List<Integer> allChildObsGroupIds, List<Integer> ids){
@@ -105,6 +112,22 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 	public void setParentIdInObs(List<Obs> childObs, Integer parentObsId) {
 		for(Obs child: childObs){
 			child.setParentId(parentObsId);
+		}
+	}
+
+
+	class ObsRowMapper<T> extends BeanPropertyRowMapper<T> {
+
+		public ObsRowMapper(Class<T> mappedClass ) {
+			super(mappedClass);
+		}
+
+		@Override
+		public T mapRow(ResultSet resultSet, int i) throws SQLException {
+			Obs obs = (Obs)super.mapRow(resultSet,i);
+			Concept concept = new Concept(resultSet.getInt("conceptId"),resultSet.getString("conceptName"),0);
+			obs.setField(concept);
+			return (T) obs;
 		}
 	}
 }
