@@ -31,9 +31,9 @@ public class ObsFieldExtractor implements FieldExtractor<List<Obs>>{
 			obsRow.put(obs.getField(),obs.getValue());
 		}
 
+		row.add(obsList.get(0).getTreatmentNumber());
 		row.add(obsList.get(0).getId());
 		row.add(obsList.get(0).getParentId()); //TODO: this should be optional based on parentConcept available or not
-		row.add(obsList.get(0).getTreatmentNumber());
 
 		for(Concept field: form.getFields()){
 			row.add(obsRow.get(field));

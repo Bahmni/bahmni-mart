@@ -27,9 +27,9 @@ public class ObsFieldExtractorTest {
 
 		Object[] result = fieldExtractor.extract(obsList);
 
-		assertEquals(2,result.length);
-		assertEquals("120",result[0]);
-		assertEquals("80",result[1]);
+		assertEquals(5,result.length);
+		assertEquals("120",result[3]);
+		assertEquals("80",result[4]);
 	}
 
 	public void shouldReturnEmptyArrayWithNoObs(){

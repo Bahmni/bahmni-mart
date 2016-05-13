@@ -57,7 +57,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 
 		List<Obs> obsRows = fetchAllLeafObs(allChildObsGroupIds);
 
-		setParentIdInObs(obsRows, (Integer)obsRow.get("obsGroupId"));
+		setObsIdAndParentObsId(obsRows,(Integer)obsRow.get("obsId"), (Integer)obsRow.get("obsGroupId"));
 
 		return obsRows;
 	}
@@ -109,9 +109,10 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 		this.leafObsSql = BatchUtils.convertResourceOutputToString(leafObsSqlResource);
 	}
 
-	public void setParentIdInObs(List<Obs> childObs, Integer parentObsId) {
+	public void setObsIdAndParentObsId(List<Obs> childObs, Integer obsId,Integer parentObsId) {
 		for(Obs child: childObs){
 			child.setParentId(parentObsId);
+			child.setId(obsId);
 		}
 	}
 

@@ -88,6 +88,10 @@ public class FormListProcessor {
 	}
 
 	private void retrieveFormFields(Form form, Concept concept, List<Concept> addMoreConcepts) {
+		if(concept.getIsSet() == 0){
+			form.addField(concept);
+			return;
+		}
 		List<Concept> childConcepts = getConcepts(concept.getName());
 
 		for(Concept childConcept: childConcepts){
@@ -101,10 +105,6 @@ public class FormListProcessor {
 			return;
 		}
 
-		if(concept.getIsSet() == 0){
-			form.addField(concept);
-			return;
-		}
 
 		retrieveFormFields(form,concept,addMoreConcepts);
 	}

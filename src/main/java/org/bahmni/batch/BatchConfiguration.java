@@ -21,6 +21,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Configuration
@@ -61,7 +64,7 @@ public class BatchConfiguration {
         return jobCompletionNotificationListener;
     }
     @Bean
-    public Job completeDataExport() {
+    public Job completeDataExport() throws URISyntaxException {
 
         List<Form> forms = formListProcessor.retrieveFormList();
 
@@ -74,12 +77,11 @@ public class BatchConfiguration {
 //                .next(nonTBDrugOrderBaseExportStep.getStep());
 
         for(Form form: forms){
-            if(form.getFormName().getName().equals("Baseline Template")){
                 ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
                 observationExportStep.setForm(form);
-                observationExportStep.setOutputFolder(new FileSystemResource("target/obs.csv"));//outputFolder+ File.separator+form.getFormName().getName()+FILE_NAME_EXTENSION
+            String fileName = form.getFormName().getName().replaceAll("\\s","")+FILE_NAME_EXTENSION;
+            observationExportStep.setOutputFolder(new FileSystemResource(new URI(outputFolder).getSchemeSpecificPart()+File.separator+fileName));
                 completeDataExport = completeDataExport.next(observationExportStep.getStep());
-            }
         }
 
         return completeDataExport

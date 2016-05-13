@@ -98,13 +98,13 @@ public class ObservationExportStep {
 
     private String getHeader() {
         StringBuilder sb = new StringBuilder();
-        String formName = form.getFormName().getName();
-        sb.append("ID_"+formName).append(",");
-        sb.append("REF_ID_"+formName).append(",");;
-        sb.append("TreatmentNumber_"+formName);
+        String columnNameExt = "_"+form.getFormName().getName();
+        sb.append("TreatmentNumber"+columnNameExt).append(",");
+        sb.append("ID"+columnNameExt).append(",");
+        sb.append("REF_ID"+columnNameExt).append(",");
         for(Concept field : form.getFields()) {
             sb.append(",");
-            sb.append(field.getName());
+            sb.append(field.getName() + columnNameExt);
         }
         return sb.toString();
     }

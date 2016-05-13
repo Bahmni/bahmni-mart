@@ -48,6 +48,7 @@ public class ObservationProcessorTest {
 		ObservationProcessor observationProcessor = new ObservationProcessor();
 		observationProcessor.setJdbcTemplate(namedParameterJdbcTemplate);
 		observationProcessor.setObsDetailSqlResource(new ByteArrayResource("blah..blah..blah".getBytes()));
+		observationProcessor.setLeafObsSqlResource(new ByteArrayResource("leafobssql".getBytes()));
 		observationProcessor.setForm(null);
 		observationProcessor.postConstruct();
 
