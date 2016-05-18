@@ -13,7 +13,6 @@ public class Concept {
 		this.id = id;
 		this.name = name;
 		this.isSet = isSet;
-		this.title = title;
 	}
 
 	public Concept(Integer id, String name, Integer isSet,String title) {

@@ -13,6 +13,8 @@ public class BahmniForm {
 
 	private Concept formName;
 
+	private String displayName;
+
 	private List<Concept> fields = new ArrayList<>();
 
 	private int depthToParent;
@@ -56,4 +58,11 @@ public class BahmniForm {
 	public void setDepthToParent(int depthToParent) {
 		this.depthToParent = depthToParent;
 	}
+
+	public String getDisplayName() {
+		if(formName == null)
+			return "";
+		return formName.getName().replaceAll("\\s", "") ;
+	}
+
 }

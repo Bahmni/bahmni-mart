@@ -20,7 +20,6 @@ public class ObservationExportStepTest {
 
     }
 
-
     @Test
     public void  shouldHaveOneSelfJoinsWhenDepthIsOne() throws Exception {
         BahmniForm form = new BahmniForm();

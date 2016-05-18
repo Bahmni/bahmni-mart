@@ -1,13 +1,15 @@
 package org.bahmni.batch.exports;
 
+import org.bahmni.batch.form.domain.BahmniForm;
+import org.bahmni.batch.observation.FormSqlGenerator;
 import org.bahmni.batch.observation.ObsFieldExtractor;
 import org.bahmni.batch.observation.ObservationProcessor;
 import org.bahmni.batch.observation.domain.Concept;
-import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.domain.Obs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -17,19 +19,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.Writer;
-import java.sql.Array;
 import java.util.List;
 import java.util.Map;
 
 @Component
 @Scope(value="prototype")
 public class ObservationExportStep {
+
+    private static final Logger log = LoggerFactory.getLogger(ObservationExportStep.class);
 
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
@@ -38,11 +40,8 @@ public class ObservationExportStep {
     private DataSource dataSource;
 
     private Resource outputFolder;
-
+    
     private BahmniForm form;
-
-    @Autowired
-    private  NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
     private ObjectFactory<ObservationProcessor> observationProcessorFactory;
@@ -61,9 +60,13 @@ public class ObservationExportStep {
     }
 
     private JdbcCursorItemReader<Map<String,Object>> obsReader(){
+        String sql = constructSql();
+        log.debug("Sql..");
+        log.debug(sql);
+
         JdbcCursorItemReader<Map<String,Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
-        reader.setSql(constructSql());
+        reader.setSql(sql);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
     }
@@ -72,16 +75,15 @@ public class ObservationExportStep {
         String sql =  "SELECT %s FROM obs obs0 %s";
         int depth = form.getDepthToParent();
         StringBuilder join = new StringBuilder();
-        String selectClause = " obs0.obs_id,";
+        String selectClause = " obs0.obs_id";
         for(int i = 1; i <= depth; i++){
-
             String parentTableAlias =  "obs"+i;
             String childTableAlias = "obs" +(i-1);
             String joinSql = " JOIN obs %s on ( %s.obs_id = %s.obs_group_id )";
 
            join = join.append(String.format(joinSql, new String []{parentTableAlias,parentTableAlias,childTableAlias}));
             if( i == depth)
-                selectClause = selectClause +parentTableAlias+".obs_id as parent_obs_id";
+                selectClause = selectClause + "," + parentTableAlias+".obs_id as parent_obs_id";
         }
         return String.format(sql,new String[]{selectClause,join.toString()});
     }
@@ -113,7 +115,7 @@ public class ObservationExportStep {
 
     private String getHeader() {
         StringBuilder sb = new StringBuilder();
-        String formName = form.getFormName().getName();
+        String formName = form.getDisplayName();
         sb.append("ID_"+formName).append(",");
         sb.append("ID_"+formName).append(",");;
         sb.append("TreatmentId");
@@ -123,6 +125,7 @@ public class ObservationExportStep {
         }
         return sb.toString();
     }
+
 
     public void setForm(BahmniForm form) {
         this.form = form;

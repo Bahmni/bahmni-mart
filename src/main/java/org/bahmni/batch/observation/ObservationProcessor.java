@@ -49,17 +49,15 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 	@Autowired
 	private FormFieldTransformer formFieldTransformer;
 
-	Map<String,List<Obs>> addMoreObs;
-
 	@Override
 	public List<Obs> process(Map<String,Object> obsRow) throws Exception {
 		List<Integer> allChildObsGroupIds = new ArrayList<>();
 
-		retrieveChildObsIds(allChildObsGroupIds, Arrays.asList((Integer) obsRow.get("obsId")));
+		retrieveChildObsIds(allChildObsGroupIds, Arrays.asList((Integer) obsRow.get("obs_id")));
 
 		List<Obs> obsRows = fetchAllLeafObs(allChildObsGroupIds);
 
-		setObsIdAndParentObsId(obsRows,(Integer)obsRow.get("obsId"), (Integer)obsRow.get("parent_obs_id"));
+		setObsIdAndParentObsId(obsRows,(Integer)obsRow.get("obs_id"), (Integer)obsRow.get("parent_obs_id"));
 
 		return obsRows;
 	}
@@ -69,7 +67,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 		params.put("childObsIds",allChildObsGroupIds);
 		params.put("leafConceptIds",formFieldTransformer.transformFormToFieldIds(form));
 
-		return jdbcTemplate.query(leafObsSql, params, new BeanPropertyRowMapper<Obs>(){
+		return jdbcTemplate.query(leafObsSql, params, new BeanPropertyRowMapper<Obs>(Obs.class){
 			@Override
 			public Obs mapRow(ResultSet resultSet, int i) throws SQLException {
 				Obs obs = super.mapRow(resultSet,i);

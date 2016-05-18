@@ -1,6 +1,6 @@
 select o.concept_id as conceptId,
   o.obs_id as id,
-  coalesce(o.value_boolean,DATE_FORMAT(o.value_datetime, '%d/%b/%Y'),o.value_numeric,o.value_text,cv.concept_short_name,cv.concept_full_name) as value ,
+  coalesce(o.value_boolean,DATE_FORMAT(o.value_datetime, '%d/%b/%Y'),o.value_numeric,o.value_text,cv.concept_short_name,cv.concept_full_name) as value,
   ppa.value_reference as treatmentNumber,
   obs_con.concept_full_name as conceptName
 from patient_program pp
