@@ -5,21 +5,28 @@ import org.bahmni.batch.exports.ObservationExportStep;
 import org.bahmni.batch.exports.PatientRegistrationBaseExportStep;
 import org.bahmni.batch.exports.TBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
+import org.bahmni.batch.form.BahmniFormFactory;
+import org.bahmni.batch.form.domain.ObsService;
 import org.bahmni.batch.observation.FormListProcessor;
+import org.bahmni.batch.observation.domain.Concept;
 import org.bahmni.batch.observation.domain.Form;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import java.io.File;
 import java.net.URI;
@@ -28,7 +35,7 @@ import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration {
+public class BatchConfiguration extends DefaultBatchConfigurer {
 
     public static final String FILE_NAME_EXTENSION=".csv";
 
@@ -59,14 +66,23 @@ public class BatchConfiguration {
     @Autowired
     public JobCompletionNotificationListener jobCompletionNotificationListener;
 
+    @Autowired
+    private BahmniFormFactory bahmniFormFactory;
+
+
+
     @Bean
     public JobExecutionListener listener() {
         return jobCompletionNotificationListener;
     }
+
+
     @Bean
     public Job completeDataExport() throws URISyntaxException {
 
-        List<Form> forms = formListProcessor.retrieveFormList();
+//        List<Form> forms = formListProcessor.retrieveFormList();
+
+
 
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport")
                 .incrementer(new RunIdIncrementer())
@@ -88,6 +104,8 @@ public class BatchConfiguration {
                 .end()
                 .build();
     }
+
+
 
 
 }

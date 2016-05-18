@@ -3,8 +3,15 @@ package org.bahmni.batch.observation.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class Form {
 	private Concept formName;
+
+	private Concept parentConcept;
+
+	private int depthToParent;
+
+	private List<Form> children;
 
 	private List<Concept> fields = new ArrayList<>();
 

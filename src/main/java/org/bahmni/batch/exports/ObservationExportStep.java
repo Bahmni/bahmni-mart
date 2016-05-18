@@ -1,6 +1,5 @@
 package org.bahmni.batch.exports;
 
-import org.bahmni.batch.BatchUtils;
 import org.bahmni.batch.observation.ObsFieldExtractor;
 import org.bahmni.batch.observation.ObservationProcessor;
 import org.bahmni.batch.observation.domain.Concept;
@@ -12,17 +11,14 @@ import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
-import org.springframework.batch.item.file.transform.PassThroughFieldExtractor;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
-import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.Writer;
@@ -52,7 +48,6 @@ public class ObservationExportStep {
     public void setOutputFolder(Resource outputFolder) {
         this.outputFolder = outputFolder;
     }
-
 
     public Step getStep() {
         return stepBuilderFactory.get(form.getFormName().getName())
@@ -98,13 +93,13 @@ public class ObservationExportStep {
 
     private String getHeader() {
         StringBuilder sb = new StringBuilder();
-        String columnNameExt = "_"+form.getFormName().getName();
-        sb.append("TreatmentNumber"+columnNameExt).append(",");
-        sb.append("ID"+columnNameExt).append(",");
-        sb.append("REF_ID"+columnNameExt).append(",");
+        String formName = form.getFormName().getName();
+        sb.append("ID_"+formName).append(",");
+        sb.append("ID_"+formName).append(",");;
+        sb.append("TreatmentId");
         for(Concept field : form.getFields()) {
             sb.append(",");
-            sb.append(field.getName() + columnNameExt);
+            sb.append(field.getTitle());
         }
         return sb.toString();
     }

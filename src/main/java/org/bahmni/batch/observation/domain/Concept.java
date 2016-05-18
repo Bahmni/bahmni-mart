@@ -4,6 +4,8 @@ public class Concept {
 	private Integer id;
 	private String name;
 	private Integer isSet;
+	private String title;
+	private Concept parent;
 
 	public Concept(){}
 
@@ -11,6 +13,30 @@ public class Concept {
 		this.id = id;
 		this.name = name;
 		this.isSet = isSet;
+		this.title = title;
+	}
+
+	public Concept(Integer id, String name, Integer isSet,String title) {
+		this.id = id;
+		this.name = name;
+		this.isSet = isSet;
+		this.title = title;
+	}
+
+	public Concept(Integer id, String name, Integer isSet,String title, Concept parent) {
+		this.id = id;
+		this.name = name;
+		this.isSet = isSet;
+		this.title = title;
+		this.parent = parent;
+	}
+
+	public Concept getParent() {
+		return parent;
+	}
+
+	public void setParent(Concept parent) {
+		this.parent = parent;
 	}
 
 	public Integer getId() {
@@ -19,6 +45,14 @@ public class Concept {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getName() {
