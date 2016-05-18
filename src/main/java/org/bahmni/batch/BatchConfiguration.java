@@ -6,6 +6,7 @@ import org.bahmni.batch.exports.PatientRegistrationBaseExportStep;
 import org.bahmni.batch.exports.TBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.batch.form.BahmniFormFactory;
+import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.form.domain.ObsService;
 import org.bahmni.batch.observation.FormListProcessor;
 import org.bahmni.batch.observation.domain.Concept;
@@ -80,10 +81,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
     @Bean
     public Job completeDataExport() throws URISyntaxException {
 
-//        List<Form> forms = formListProcessor.retrieveFormList();
-
-
-
+        List<BahmniForm> forms = formListProcessor.retrieveForms();
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener())
@@ -92,7 +90,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 //                .next(tbDrugOrderBaseExportStep.getStep())
 //                .next(nonTBDrugOrderBaseExportStep.getStep());
 
-        for(Form form: forms){
+        for(BahmniForm form: forms){
                 ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
                 observationExportStep.setForm(form);
             String fileName = form.getFormName().getName().replaceAll("\\s","")+FILE_NAME_EXTENSION;

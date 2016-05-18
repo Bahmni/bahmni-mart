@@ -1,8 +1,8 @@
 package org.bahmni.batch.observation;
 
 import org.bahmni.batch.BatchUtils;
+import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.domain.Concept;
-import org.bahmni.batch.observation.domain.Form;
 import org.bahmni.batch.observation.domain.Obs;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 
 	private String leafObsSql;
 
-	private Form form;
+	private BahmniForm form;
 
 	@Autowired
 	private NamedParameterJdbcTemplate jdbcTemplate;
@@ -49,6 +49,8 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 	@Autowired
 	private FormFieldTransformer formFieldTransformer;
 
+	Map<String,List<Obs>> addMoreObs;
+
 	@Override
 	public List<Obs> process(Map<String,Object> obsRow) throws Exception {
 		List<Integer> allChildObsGroupIds = new ArrayList<>();
@@ -57,7 +59,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 
 		List<Obs> obsRows = fetchAllLeafObs(allChildObsGroupIds);
 
-		setObsIdAndParentObsId(obsRows,(Integer)obsRow.get("obsId"), (Integer)obsRow.get("obsGroupId"));
+		setObsIdAndParentObsId(obsRows,(Integer)obsRow.get("obsId"), (Integer)obsRow.get("parent_obs_id"));
 
 		return obsRows;
 	}
@@ -91,7 +93,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 		}
 	}
 
-	public void setForm(Form form) {
+	public void setForm(BahmniForm form) {
 		this.form = form;
 	}
 

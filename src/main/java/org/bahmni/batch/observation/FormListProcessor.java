@@ -29,6 +29,7 @@ public class FormListProcessor {
 
 	private static final Logger log = LoggerFactory.getLogger(FormListProcessor.class);
 
+	@Autowired
 	private ObsService obsService;
 
 	private NamedParameterJdbcTemplate jdbcTemplate;
@@ -66,7 +67,20 @@ public class FormListProcessor {
 		for(Concept concept: allFormConcepts){
 			forms.add(bahmniFormFactory.createForm(concept,null));
 		}
+		fetchExportFormsList(forms, new ArrayList<BahmniForm>());
 		return forms;
+	}
+
+	public List<BahmniForm> fetchExportFormsList(List<BahmniForm> forms, List<BahmniForm> flattenedList){
+
+		for(BahmniForm form : forms){
+			if(form.getChildren().size()!=0) {
+				flattenedList.addAll(form.getChildren());
+				fetchExportFormsList(form.getChildren(), flattenedList);
+			}
+		}
+
+		return flattenedList;
 	}
 
 }

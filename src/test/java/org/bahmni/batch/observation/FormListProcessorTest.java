@@ -1,5 +1,6 @@
 package org.bahmni.batch.observation;
 
+import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.domain.Concept;
 import org.bahmni.batch.observation.domain.Form;
 import org.junit.Before;
@@ -70,11 +71,11 @@ public class FormListProcessorTest {
 	@Ignore
 	public void shouldRetrieveAllForms(){
 		FormListProcessor formListProcessor = new FormListProcessor();
-		formListProcessor.setConceptListSqlResource(new ByteArrayResource("blah..blah..blah".getBytes()));
-		formListProcessor.setConceptDetailsSqlResource(new ByteArrayResource("getAddMoreConceptDetails".getBytes()));
+//		formListProcessor.setConceptListSqlResource(new ByteArrayResource("blah..blah..blah".getBytes()));
+//		formListProcessor.setConceptDetailsSqlResource(new ByteArrayResource("getAddMoreConceptDetails".getBytes()));
 		formListProcessor.setJdbcTemplate(jdbcTemplate);
-		formListProcessor.setAddMoreConceptNames("\"Operation Notes Template\",\"Discharge Summary, Surgeries and Procedures\",\"Other Notes\"");
-		formListProcessor.postConstruct();
+//		formListProcessor.setAddMoreConceptNames("\"Operation Notes Template\",\"Discharge Summary, Surgeries and Procedures\",\"Other Notes\"");
+//		formListProcessor.postConstruct();
 
 		when(jdbcTemplate.query(eq("blah..blah..blah"),any(MapSqlParameterSource.class), Matchers.<BeanPropertyRowMapper<Concept>>any()))
 				.thenReturn(allConcepts)
@@ -86,7 +87,7 @@ public class FormListProcessorTest {
 
 		when(jdbcTemplate.query(eq("getAddMoreConceptDetails"),any(MapSqlParameterSource.class),Matchers.<BeanPropertyRowMapper<Concept>>any())).thenReturn(addMoreConcepts);
 
-		List<Form> forms = formListProcessor.retrieveFormList();
+		List<BahmniForm> forms = formListProcessor.retrieveForms();
 
 		assertEquals(5,forms.size());
 		assertEquals("History and Examination", forms.get(0).getFormName().getName());
@@ -100,15 +101,15 @@ public class FormListProcessorTest {
 
 		assertEquals("Operation Notes Template", forms.get(2).getFormName().getName());
 		assertEquals("Anesthesia Administered", forms.get(2).getFields().get(0).getName());
-		assertEquals("Other Notes", forms.get(2).getIgnoredFields().get(0).getName());
+//		assertEquals("Other Notes", forms.get(2).getIgnoredFields().get(0).getName());
 
 		assertEquals("Discharge Summary, Surgeries and Procedures", forms.get(3).getFormName().getName());
 		assertEquals(0, forms.get(3).getFields().size());
-		assertEquals(0, forms.get(3).getIgnoredFields().size());
+//		assertEquals(0, forms.get(3).getIgnoredFields().size());
 
 		assertEquals("Other Notes", forms.get(4).getFormName().getName());
 		assertEquals(0, forms.get(4).getFields().size());
-		assertEquals(0, forms.get(4).getIgnoredFields().size());
+//		assertEquals(0, forms.get(4).getIgnoredFields().size());
 
 	}
 

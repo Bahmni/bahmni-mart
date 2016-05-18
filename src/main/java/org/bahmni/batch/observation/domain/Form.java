@@ -12,8 +12,9 @@ public class Form {
 	private int depthToParent;
 
 	private List<Form> children;
-
 	private List<Concept> fields = new ArrayList<>();
+
+	private int depthFromParent = 4;
 
 	private List<Concept> ignoredFields = new ArrayList<>();
 
@@ -39,5 +40,12 @@ public class Form {
 
 	public void addField(Concept concept){
 		fields.add(concept);
+	}
+
+	public int getDepthFromParent() {
+		return depthFromParent;
+	}
+	public void setDepthFromParent(int depthFromParent) {
+		this.depthFromParent = depthFromParent;
 	}
 }

@@ -1,5 +1,6 @@
 package org.bahmni.batch.observation;
 
+import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.domain.Concept;
 import org.bahmni.batch.observation.domain.Form;
 import org.bahmni.batch.observation.domain.Obs;
@@ -12,9 +13,9 @@ import java.util.Map;
 
 public class ObsFieldExtractor implements FieldExtractor<List<Obs>>{
 
-	private Form form;
+	private BahmniForm form;
 
-	public ObsFieldExtractor(Form form){
+	public ObsFieldExtractor(BahmniForm form){
 		this.form = form;
 	}
 

@@ -1,5 +1,6 @@
 package org.bahmni.batch.observation;
 
+import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.domain.Concept;
 import org.bahmni.batch.observation.domain.Form;
 import org.junit.Test;
@@ -12,7 +13,7 @@ public class FormFieldTransformerTest {
 
 	@Test
 	public void shouldTransformFormFieldsToIds(){
-		Form form = new Form();
+		BahmniForm form = new BahmniForm();
 		form.setFormName(new Concept(0,"ParentConcept",1));
 		form.addField(new Concept(1,"headache",0));
 		form.addField(new Concept(2,"systolic",0));
