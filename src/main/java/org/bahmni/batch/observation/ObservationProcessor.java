@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -51,11 +52,13 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 
 	@Override
 	public List<Obs> process(Map<String,Object> obsRow) throws Exception {
-		List<Integer> allChildObsGroupIds = new ArrayList<>();
+		List<Integer> allChildObsIds = new ArrayList<>();
+		allChildObsIds.add((Integer)obsRow.get("obs_id"));
+		if (form.getFormName().getIsSet() == 1) {
+			retrieveChildObsIds(allChildObsIds, allChildObsIds);
+		}
 
-		retrieveChildObsIds(allChildObsGroupIds, Arrays.asList((Integer) obsRow.get("obs_id")));
-
-		List<Obs> obsRows = fetchAllLeafObs(allChildObsGroupIds);
+		List<Obs> obsRows = fetchAllLeafObs(allChildObsIds);
 
 		setObsIdAndParentObsId(obsRows,(Integer)obsRow.get("obs_id"), (Integer)obsRow.get("parent_obs_id"));
 
@@ -78,17 +81,24 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 		});
 	}
 
-	protected void retrieveChildObsIds(List<Integer> allChildObsGroupIds, List<Integer> ids){
-		allChildObsGroupIds.addAll(ids);
+	protected void retrieveChildObsIds(List<Integer> allChildObsIds, List<Integer> ids){
 
 		Map<String,List<Integer>> params = new HashMap<>();
 		params.put("parentObsIds",ids);
 
-		List<Integer> result = jdbcTemplate.query(obsDetailSql,params,new SingleColumnRowMapper<Integer>());
-
-		if(result.size()>0){
-			retrieveChildObsIds(allChildObsGroupIds,result);
+		List<Map<String, Object>> results = jdbcTemplate.query(obsDetailSql,params,new ColumnMapRowMapper());
+		List<Integer> obsGroupIds = new ArrayList<>();
+		for(Map res : results){
+			if(res.get("isSet")==1)
+				obsGroupIds.add((Integer) res.get("obsId"));
+			else{
+				allChildObsIds.add((Integer) res.get("obsId"));
+			}
 		}
+		if (!obsGroupIds.isEmpty()){
+			retrieveChildObsIds(allChildObsIds, obsGroupIds);
+		}
+
 	}
 
 	public void setForm(BahmniForm form) {

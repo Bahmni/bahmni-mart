@@ -13,6 +13,6 @@ join concept_view obs_con on(o.concept_id = obs_con.concept_id)
 left outer join concept codedConcept on o.value_coded = codedConcept.concept_id
 left outer join concept_view cv on (cv.concept_id = codedConcept.concept_id)
 where
-  o.obs_group_id in (:childObsIds)
+  o.obs_id in (:childObsIds)
   and obs_con.concept_id  in (:leafConceptIds)
   and o.voided=0;
