@@ -14,7 +14,7 @@ FROM
   (SELECT
      IF(drug.name IS NULL, drug_order.drug_non_coded, coalesce(drug_code.code, drug.name))                      AS drug,
      drug.name AS drugName,
-     IF(drug_order.dose IS NULL, drug_order.dosing_instructions, drug_order.dose)          AS dose,
+     drug_order.dose                                                                 AS dose,
      dcn.code                                                                             AS units,
      rou.code                                                                              AS route,
      fre.code                                                                             AS frequency,

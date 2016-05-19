@@ -16,7 +16,7 @@ SELECT
 FROM
   (SELECT
      IF(drug.name is NULL,drug_order.drug_non_coded, drug.name) as drugName,
-     IF(drug_order.dose IS NULL , drug_order.dosing_instructions, drug_order.dose) AS dose,
+     drug_order.dose  AS dose,
      drug_order.as_needed,
      dcn.code as units,
      rou.code as route,
