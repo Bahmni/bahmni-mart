@@ -53,12 +53,14 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 	@Override
 	public List<Obs> process(Map<String,Object> obsRow) throws Exception {
 		List<Integer> allChildObsIds = new ArrayList<>();
-		allChildObsIds.add((Integer)obsRow.get("obs_id"));
-		if (form.getFormName().getIsSet() == 1) {
-			retrieveChildObsIds(allChildObsIds, allChildObsIds);
-		}
 
-		List<Obs> obsRows = fetchAllLeafObs(allChildObsIds);
+		if (form.getFormName().getIsSet() == 1) {
+			retrieveChildObsIds(allChildObsIds, Arrays.asList((Integer)obsRow.get("obs_id")));
+		}
+		else
+			allChildObsIds.add((Integer)obsRow.get("obs_id"));
+
+			List<Obs> obsRows = fetchAllLeafObs(allChildObsIds);
 
 		setObsIdAndParentObsId(obsRows,(Integer)obsRow.get("obs_id"), (Integer)obsRow.get("parent_obs_id"));
 
@@ -89,7 +91,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 		List<Map<String, Object>> results = jdbcTemplate.query(obsDetailSql,params,new ColumnMapRowMapper());
 		List<Integer> obsGroupIds = new ArrayList<>();
 		for(Map res : results){
-			if(res.get("isSet")==1)
+			if((boolean)res.get("isSet"))
 				obsGroupIds.add((Integer) res.get("obsId"));
 			else{
 				allChildObsIds.add((Integer) res.get("obsId"));
