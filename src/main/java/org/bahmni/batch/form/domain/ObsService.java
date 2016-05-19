@@ -48,7 +48,7 @@ public class ObsService {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("parentConceptName",parentConceptName);
 
-		return jdbcTemplate.query(conceptListSql, parameters, new BeanPropertyRowMapper<Concept>(Concept.class));
+		return jdbcTemplate.query(conceptListSql, parameters, new BeanPropertyRowMapper<>(Concept.class));
 
 	}
 

@@ -33,8 +33,23 @@ public class ObsFieldExtractorTest {
 		assertEquals("80",result[4]);
 	}
 
-	public void shouldReturnEmptyArrayWithNoObs(){
+	@Test
+	public void ensureThatSplCharsAreHandledInCSVInTheObsValue(){
+		BahmniForm form = new BahmniForm();
+		form.setFormName(new Concept(0,"Blood Pressure",1));
+		form.addField(new Concept(1,"Systolic",0));
+		form.addField(new Concept(2,"Diastolic",0));
 
+		ObsFieldExtractor fieldExtractor = new ObsFieldExtractor(form);
+
+		List<Obs> obsList = new ArrayList<>();
+		obsList.add(new Obs("AB1234",1,0, new Concept(1,"Systolic",0),"abc\ndef\tghi,klm"));
+
+		Object[] result = fieldExtractor.extract(obsList);
+
+		assertEquals(new Integer(1),result[0]);
+		assertEquals("AB1234",result[1]);
+		assertEquals("abc def ghi klm",result[2]);
 	}
 
 }

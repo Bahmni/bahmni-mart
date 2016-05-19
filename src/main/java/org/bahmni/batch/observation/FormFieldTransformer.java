@@ -17,7 +17,6 @@ public class FormFieldTransformer {
 		for(Concept field: form.getFields()){
 			fieldIds.add(field.getId());
 		}
-
 		return fieldIds;
 	}
 

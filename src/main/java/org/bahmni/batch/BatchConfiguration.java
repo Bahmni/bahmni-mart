@@ -8,6 +8,7 @@ import org.bahmni.batch.exports.TBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.FormListProcessor;
+import org.bahmni.batch.observation.domain.Concept;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
@@ -58,7 +59,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	private ObjectFactory<ObservationExportStep> observationExportStepFactory;
 
 	@Value("${outputFolder}")
-	public String outputFolder;
+	public Resource outputFolder;
 
 	@Value("classpath:templates/")
 	private Resource freemarkerTemplateLocation;
@@ -73,27 +74,30 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	}
 
 	@Bean
-	public Job completeDataExport() throws URISyntaxException {
+	public Job completeDataExport() throws IOException {
 
 		List<BahmniForm> forms = formListProcessor.retrieveAllForms();
-//		FlowBuilder<FlowJobBuilder> completeDataExport = null;
-		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport1")
-				.incrementer(new RunIdIncrementer())
-				.listener(listener())
-				.flow(patientRegistrationBaseExportStep.getStep());
+
+		FlowBuilder<FlowJobBuilder> completeDataExport = null;
+//		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport1")
+//				.incrementer(new RunIdIncrementer())
+//				.listener(listener())
+//				.flow(patientRegistrationBaseExportStep.getStep());
 		//                .next(treatmentRegistrationBaseExportStep.getStep())
 		//                .next(tbDrugOrderBaseExportStep.getStep())
 		//                .next(nonTBDrugOrderBaseExportStep.getStep());
 
 		for (BahmniForm form : forms) {
-//			if(form.getFormName().getName().equals("Adverse Events Template")){
+			if(form.getFormName().getName().equals("Baseline Template")){
 				ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
 				observationExportStep.setForm(form);
-				String fileName = form.getFormName().getName().replaceAll("\\s", "") + FILE_NAME_EXTENSION;
-				observationExportStep.setOutputFolder(new FileSystemResource(new URI(outputFolder).getSchemeSpecificPart() + File.separator + fileName));
-				completeDataExport.next(observationExportStep.getStep());
-
-//			}
+				String fileName = form.getDisplayName() + FILE_NAME_EXTENSION;
+				observationExportStep.setOutputFolder(outputFolder.createRelative(fileName));
+				completeDataExport = jobBuilderFactory.get("completeDataExport1")
+						.incrementer(new RunIdIncrementer())
+						.listener(listener())
+						.flow(observationExportStep.getStep());
+			}
 		}
 
 		return completeDataExport.end().build();

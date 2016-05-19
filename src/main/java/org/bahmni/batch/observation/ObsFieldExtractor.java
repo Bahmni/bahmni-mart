@@ -5,6 +5,7 @@ import org.bahmni.batch.observation.domain.Concept;
 import org.bahmni.batch.observation.domain.Form;
 import org.bahmni.batch.observation.domain.Obs;
 import org.springframework.batch.item.file.transform.FieldExtractor;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,14 +33,24 @@ public class ObsFieldExtractor implements FieldExtractor<List<Obs>>{
 			obsRow.put(obs.getField(),obs.getValue());
 		}
 
-		row.add(obsList.get(0).getTreatmentNumber());
 		row.add(obsList.get(0).getId());
-		row.add(obsList.get(0).getParentId()); //TODO: this should be optional based on parentConcept available or not
+
+		if(form.getParent()!=null){
+			row.add(obsList.get(0).getParentId());
+		}
+
+		row.add(obsList.get(0).getTreatmentNumber());
 
 		for(Concept field: form.getFields()){
-			row.add(obsRow.get(field));
+			row.add(massageStringValue(obsRow.get(field)));
 		}
 
 		return row.toArray();
+	}
+
+	private String massageStringValue(String text){
+		if(StringUtils.isEmpty(text))
+			return text;
+		return text.replaceAll("\n"," ").replaceAll("\t"," ").replaceAll(","," ");
 	}
 }
