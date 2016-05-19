@@ -1,7 +1,7 @@
 package org.bahmni.batch.exports;
 
 import org.bahmni.batch.form.domain.BahmniForm;
-import org.bahmni.batch.observation.FormSqlGenerator;
+import org.bahmni.batch.observation.DynamicObsQuery;
 import org.bahmni.batch.observation.ObsFieldExtractor;
 import org.bahmni.batch.observation.ObservationProcessor;
 import org.bahmni.batch.observation.domain.Concept;
@@ -40,7 +40,10 @@ public class ObservationExportStep {
     private DataSource dataSource;
 
     private Resource outputFolder;
-    
+
+    @Autowired
+    private DynamicObsQuery dynamicObsQuery;
+
     private BahmniForm form;
 
     @Autowired
@@ -60,32 +63,13 @@ public class ObservationExportStep {
     }
 
     private JdbcCursorItemReader<Map<String,Object>> obsReader(){
-        String sql = constructSql();
-        log.debug("Sql..");
-        log.debug(sql);
+        String sql = dynamicObsQuery.getSqlQueryForForm(form);
 
         JdbcCursorItemReader<Map<String,Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
-    }
-
-    protected String constructSql() {
-        String sql =  "SELECT %s FROM obs obs0 %s";
-        int depth = form.getDepthToParent();
-        StringBuilder join = new StringBuilder();
-        String selectClause = " obs0.obs_id";
-        for(int i = 1; i <= depth; i++){
-            String parentTableAlias =  "obs"+i;
-            String childTableAlias = "obs" +(i-1);
-            String joinSql = " JOIN obs %s on ( %s.obs_id = %s.obs_group_id )";
-
-           join = join.append(String.format(joinSql, new String []{parentTableAlias,parentTableAlias,childTableAlias}));
-            if( i == depth)
-                selectClause = selectClause + "," + parentTableAlias+".obs_id as parent_obs_id";
-        }
-        return String.format(sql,new String[]{selectClause,join.toString()});
     }
 
     private ObservationProcessor observationProcessor(){

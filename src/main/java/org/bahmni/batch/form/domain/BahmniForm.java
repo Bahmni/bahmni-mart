@@ -13,8 +13,6 @@ public class BahmniForm {
 
 	private Concept formName;
 
-	private String displayName;
-
 	private List<Concept> fields = new ArrayList<>();
 
 	private int depthToParent;

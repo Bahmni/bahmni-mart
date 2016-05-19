@@ -1,13 +1,11 @@
 package org.bahmni.batch;
 
-import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.bahmni.batch.exports.NonTBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.ObservationExportStep;
 import org.bahmni.batch.exports.PatientRegistrationBaseExportStep;
 import org.bahmni.batch.exports.TBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
-import org.bahmni.batch.form.BahmniFormFactory;
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.FormListProcessor;
 import org.springframework.batch.core.Job;
@@ -25,7 +23,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +60,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	@Value("${outputFolder}")
 	public String outputFolder;
 
-	@Value("file:/Users/bharatak/bahmni-code/bahmni-endtb-batch/target/classes/templates")
+	@Value("classpath:templates/")
 	private Resource freemarkerTemplateLocation;
 
 
@@ -79,21 +76,25 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	public Job completeDataExport() throws URISyntaxException {
 
 		List<BahmniForm> forms = formListProcessor.retrieveAllForms();
-		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport1")
-				.incrementer(new RunIdIncrementer())
-				.listener(listener())
-				.flow(patientRegistrationBaseExportStep.getStep());
+		FlowBuilder<FlowJobBuilder> completeDataExport = null;
+//		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport1")
+//				.incrementer(new RunIdIncrementer())
+//				.listener(listener())
+//				.flow(patientRegistrationBaseExportStep.getStep());
 		//                .next(treatmentRegistrationBaseExportStep.getStep())
 		//                .next(tbDrugOrderBaseExportStep.getStep())
 		//                .next(nonTBDrugOrderBaseExportStep.getStep());
 
 		for (BahmniForm form : forms) {
-			if(form.getFormName().getName().equals("Baseline Template")){
+			if(form.getFormName().getName().equals("History and Examination")){
 				ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
 				observationExportStep.setForm(form);
 				String fileName = form.getFormName().getName().replaceAll("\\s", "") + FILE_NAME_EXTENSION;
 				observationExportStep.setOutputFolder(new FileSystemResource(new URI(outputFolder).getSchemeSpecificPart() + File.separator + fileName));
-				completeDataExport = completeDataExport.next(observationExportStep.getStep());
+				completeDataExport = jobBuilderFactory.get("completeDataExport1")
+						.incrementer(new RunIdIncrementer())
+						.listener(listener())
+						.flow(observationExportStep.getStep());
 
 			}
 		}
@@ -102,12 +103,14 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	}
 
 	@Bean
-	public FreeMarkerConfigurationFactoryBean getFreeMarkerConfiguration() throws IOException, TemplateException {
-		FreeMarkerConfigurationFactoryBean freeMarkerConfigurationFactoryBean = new FreeMarkerConfigurationFactoryBean();
-		freeMarkerConfigurationFactoryBean.setConfigLocation(freemarkerTemplateLocation);
-		freeMarkerConfigurationFactoryBean.setPreferFileSystemAccess(false);
-		freeMarkerConfigurationFactoryBean.afterPropertiesSet();
-		return freeMarkerConfigurationFactoryBean;
+	public freemarker.template.Configuration freeMarkerConfiguration() throws IOException {
+		freemarker.template.Configuration freemarkerTemplateConfig = new freemarker.template.Configuration(
+				freemarker.template.Configuration.VERSION_2_3_22);
+		freemarkerTemplateConfig.setDirectoryForTemplateLoading(freemarkerTemplateLocation.getFile());
+		freemarkerTemplateConfig.setDefaultEncoding("UTF-8");
+		freemarkerTemplateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+
+		return freemarkerTemplateConfig;
 	}
 
 }
