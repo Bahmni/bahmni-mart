@@ -100,8 +100,9 @@ public class ObservationExportStep {
     private String getHeader() {
         StringBuilder sb = new StringBuilder();
         String formName = form.getDisplayName();
+        String parentFormName = form.getParentDisplayName();
         sb.append("ID_"+formName).append(",");
-        sb.append("ID_"+formName).append(",");;
+        sb.append("ID_"+parentFormName).append(",");;
         sb.append("TreatmentId");
         for(Concept field : form.getFields()) {
             sb.append(",");
