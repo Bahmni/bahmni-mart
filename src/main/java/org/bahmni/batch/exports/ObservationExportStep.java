@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@Scope(value="prototype")
+@Scope(value = "prototype")
 public class ObservationExportStep {
 
     private static final Logger log = LoggerFactory.getLogger(ObservationExportStep.class);
@@ -55,24 +55,23 @@ public class ObservationExportStep {
 
     public Step getStep() {
         return stepBuilderFactory.get(form.getFormName().getName())
-                .<Map<String,Object>,List<Obs>>chunk(100)
+                .<Map<String, Object>, List<Obs>>chunk(100)
                 .reader(obsReader())
                 .processor(observationProcessor())
                 .writer(obsWriter())
                 .build();
     }
 
-    private JdbcCursorItemReader<Map<String,Object>> obsReader(){
+    private JdbcCursorItemReader<Map<String, Object>> obsReader() {
         String sql = dynamicObsQuery.getSqlQueryForForm(form);
-
-        JdbcCursorItemReader<Map<String,Object>> reader = new JdbcCursorItemReader<>();
+        JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
     }
 
-    private ObservationProcessor observationProcessor(){
+    private ObservationProcessor observationProcessor() {
         ObservationProcessor observationProcessor = observationProcessorFactory.getObject();
         observationProcessor.setForm(form);
         return observationProcessor;
@@ -100,15 +99,16 @@ public class ObservationExportStep {
     private String getHeader() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("ID_"+form.getDisplayName()).append(",");
-        if(form.getParent()!=null){
-            sb.append("ID_"+form.getParent().getDisplayName()).append(",");;
+        sb.append("ID_" + form.getDisplayName()).append(",");
+        if (form.getParent() != null) {
+            sb.append("ID_" + form.getParent().getDisplayName()).append(",");
+            ;
         }
 
         sb.append("TreatmentId");
-        for(Concept field : form.getFields()) {
+        for (Concept field : form.getFields()) {
             sb.append(",");
-            sb.append(field.getTitle());
+            sb.append("\""+field.getTitle());
         }
         return sb.toString();
     }

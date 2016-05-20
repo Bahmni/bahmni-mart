@@ -1,11 +1,7 @@
 package org.bahmni.batch;
 
 import freemarker.template.TemplateExceptionHandler;
-import org.bahmni.batch.exports.NonTBDrugOrderBaseExportStep;
-import org.bahmni.batch.exports.ObservationExportStep;
-import org.bahmni.batch.exports.PatientRegistrationBaseExportStep;
-import org.bahmni.batch.exports.TBDrugOrderBaseExportStep;
-import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
+import org.bahmni.batch.exports.*;
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.FormListProcessor;
 import org.bahmni.batch.observation.domain.Concept;
@@ -53,6 +49,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	private NonTBDrugOrderBaseExportStep nonTBDrugOrderBaseExportStep;
 
 	@Autowired
+	private MetaDataCodeDictionaryExportStep metaDataCodeDictionaryExportStep;
+
+	@Autowired
 	private FormListProcessor formListProcessor;
 
 	@Autowired
@@ -80,19 +79,17 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport2")
 				.incrementer(new RunIdIncrementer())
 				.listener(listener())
-				.flow(patientRegistrationBaseExportStep.getStep());
-		//                .next(treatmentRegistrationBaseExportStep.getStep())
-		//                .next(tbDrugOrderBaseExportStep.getStep())
-		//                .next(nonTBDrugOrderBaseExportStep.getStep());
+				.flow(patientRegistrationBaseExportStep.getStep())
+		                .next(metaDataCodeDictionaryExportStep.getStep())
+		                .next(tbDrugOrderBaseExportStep.getStep())
+		                .next(nonTBDrugOrderBaseExportStep.getStep());
 
 		for (BahmniForm form : forms) {
-//			if(form.getFormName().getName().equals("Baseline Template")){
 				ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
 				observationExportStep.setForm(form);
 				String fileName = form.getDisplayName() + FILE_NAME_EXTENSION;
 				observationExportStep.setOutputFolder(outputFolder.createRelative(fileName));
 				completeDataExport.next(observationExportStep.getStep());
-//			}
 		}
 
 		return completeDataExport.end().build();
