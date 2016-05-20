@@ -108,7 +108,7 @@ public class ObservationExportStep {
         sb.append("TreatmentId");
         for (Concept field : form.getFields()) {
             sb.append(",");
-            sb.append("\""+field.getTitle());
+            sb.append(field.getTitle());
         }
         return sb.toString();
     }
