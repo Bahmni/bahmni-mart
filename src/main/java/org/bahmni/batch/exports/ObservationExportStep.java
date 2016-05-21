@@ -1,5 +1,6 @@
 package org.bahmni.batch.exports;
 
+import org.apache.commons.io.FileUtils;
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.DynamicObsQuery;
 import org.bahmni.batch.observation.ObsFieldExtractor;
@@ -9,19 +10,24 @@ import org.bahmni.batch.observation.domain.Obs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
@@ -33,13 +39,16 @@ public class ObservationExportStep {
 
     private static final Logger log = LoggerFactory.getLogger(ObservationExportStep.class);
 
+    public static final String FILE_NAME_EXTENSION = ".csv";
+
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
     @Autowired
     private DataSource dataSource;
 
-    private Resource outputFolder;
+    @Value("${outputFolder}")
+    public Resource outputFolder;
 
     @Autowired
     private DynamicObsQuery dynamicObsQuery;
@@ -78,8 +87,9 @@ public class ObservationExportStep {
     }
 
     private FlatFileItemWriter<List<Obs>> obsWriter() {
+
         FlatFileItemWriter<List<Obs>> writer = new FlatFileItemWriter<>();
-        writer.setResource(outputFolder);
+        writer.setResource(new FileSystemResource(getOutputFile()));
 
         DelimitedLineAggregator delimitedLineAggregator = new DelimitedLineAggregator();
         delimitedLineAggregator.setDelimiter(",");
@@ -94,6 +104,19 @@ public class ObservationExportStep {
         });
 
         return writer;
+    }
+
+    private File getOutputFile(){
+        File outputFile;
+
+        try {
+            outputFile = new File(outputFolder.getFile(),form.getDisplayName() + FILE_NAME_EXTENSION);
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Unable to create a file in the outputFolder ["+ outputFolder.getFilename()+"]");
+        }
+
+        return outputFile;
     }
 
     private String getHeader() {

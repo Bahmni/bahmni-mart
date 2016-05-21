@@ -20,9 +20,6 @@ public class ObsService {
 
 	private static final Logger log = LoggerFactory.getLogger(ObsService.class);
 
-	@Value("${headerConceptSource}")
-	private String headerConceptSource;
-
 	@Value("classpath:sql/conceptDetails.sql")
 	private Resource conceptDetailsSqlResource;
 
@@ -39,7 +36,6 @@ public class ObsService {
 	public List<Concept> getConceptsByNames(String commaSeparatedConceptNames){
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		parameters.addValue("conceptNames", BatchUtils.convertConceptNamesToSet(commaSeparatedConceptNames));
-		parameters.addValue("headerConceptSource",headerConceptSource);
 
 		return jdbcTemplate.query(conceptDetailsSql,parameters,new BeanPropertyRowMapper<>(Concept.class));
 	}

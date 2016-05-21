@@ -1,5 +1,7 @@
 package org.bahmni.batch;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -10,9 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -21,78 +27,81 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 
     private Resource outputFolder;
 
+	private Resource zipFolder;
+
     @Autowired
-    public JobCompletionNotificationListener(@Value("${outputFolder}") Resource outputFolder) {
+    public JobCompletionNotificationListener(@Value("${outputFolder}") Resource outputFolder,@Value("${zipFolder}") Resource zipFolder) {
         this.outputFolder = outputFolder;
+	    this.zipFolder = zipFolder;
 
     }
 
     private static final Logger log = LoggerFactory.getLogger(JobCompletionNotificationListener.class);
-    private String zipFile;
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
-        File folder = null;
-        try {
-            folder = new File(outputFolder.getURL().getFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        File[] files = folder.listFiles();
+	    try {
+		    FileUtils.deleteQuietly(outputFolder.getFile());
+		    FileUtils.forceMkdir(outputFolder.getFile());
+	    }
+	    catch (IOException e) {
+		    throw new RuntimeException("Cannot create a temporary folder provided as "
+				    + "'outputFolder' configuration ["+ outputFolder.getFilename()+"]",e);
+	    }
 
-        if (files == null)
-            return;
-
-        for (File f : files) {
-            f.delete();
-        }
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
 
-            File folder = null;
-            try {
-                folder = new File(outputFolder.getURL().getFile());
-            String zipFileName = new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".zip";
-            ZipOutputStream zos = null;
-                zos = new ZipOutputStream(new FileOutputStream(outputFolder.getURL().getFile() + "/" + zipFileName));
-            createZipForCsvs(folder, zipFileName, zos);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+	        FileOutputStream fos = null;
+	        ZipOutputStream zos = null;
+	        String zipFileName = new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".zip";
+	        File zipFile = null;
+
+	        try {
+		        FileUtils.forceMkdir(zipFolder.getFile());
+		        zipFile = new File(zipFolder.getFile(),zipFileName);
+		        fos = new FileOutputStream(zipFile);
+		        zos = new ZipOutputStream(fos);
+		        Iterator<File> iterator =  FileUtils.iterateFiles(outputFolder.getFile(),new String[]{ "png","csv" },false);
+		        while(iterator.hasNext()){
+			        File file = iterator.next();
+			        addToZipFile(file,zos);
+		        }
+
+		        jobExecution.getExecutionContext().put("OutputFile",zipFile.getAbsolutePath());
+
+	        } catch (IOException e) {
+		        e.printStackTrace();
+	        }finally {
+		        IOUtils.closeQuietly(zos);
+		        IOUtils.closeQuietly(fos);
+	        }
+
         }
     }
 
-    public void createZipForCsvs(File folder, String zipFileName, ZipOutputStream zos) {
-        try {
+	private void addToZipFile(File file, ZipOutputStream zos) throws IOException {
 
-            for (File file : folder.listFiles()) {
-                if (!file.getName().equals(zipFileName)) {
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(file);
+			ZipEntry zipEntry = new ZipEntry(file.getName());
+			zos.putNextEntry(zipEntry);
 
-                    ZipEntry zipEntry = new ZipEntry(file.getName());
-                    byte[] bytes = new byte[1024];
-                    int length;
+			byte[] bytes = new byte[1024];
+			int length;
+			while ((length = fis.read(bytes)) >= 0) {
+				zos.write(bytes, 0, length);
+			}
 
+			zos.closeEntry();
+			fis.close();
+		} finally{
+			IOUtils.closeQuietly(fis);
+		}
+	}
 
-                    FileInputStream fis = new FileInputStream(file);
-                    zos.putNextEntry(zipEntry);
-
-                    while ((length = fis.read(bytes)) >= 0) {
-                        zos.write(bytes, 0, length);
-                    }
-
-                    zos.closeEntry();
-                }
-            }
-
-            zos.close();
-            log.info("!!! JOB FINISHED! Time to verify the results");
-        } catch (FileNotFoundException e) {
-            log.error(e.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

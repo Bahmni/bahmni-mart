@@ -13,3 +13,7 @@ target/
 hs_err_pid*
 .idea/
 *.iml
+
+temp/
+temp2/
+.DS_Store
