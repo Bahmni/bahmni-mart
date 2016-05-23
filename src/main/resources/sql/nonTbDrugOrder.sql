@@ -1,6 +1,6 @@
 SELECT
-  MAX(IF(o.program_attribute_name = 'Registration Number', o.program_attribute_value, NULL)) AS 'regnum',
-  o.drugName AS 'othdrug',
+  MAX(IF(o.program_attribute_name = 'Registration Number', CONCAT('\"',o.program_attribute_value,'\"'), NULL)) AS 'regnum',
+  CONCAT('\"',o.drugName, '\"') AS 'othdrug',
   IF(o.as_needed = 1, CONCAT('\"',o.dose,' ,(PRN),','\"'), o.dose) as 'othdrugdose',
   o.units as 'othdrugform',
   o.route as 'othdrugroute',

@@ -3,23 +3,23 @@ SELECT
   o.age as 'age',
   IF(o.gender = 'M',1, IF(o.gender = 'F',2, 3)) AS 'sex',
   o.program_name as 'tbregtype',
-  MAX(IF(pat.program_attribute_type_id = '2', o.attr_value, NULL)) AS `regnum`,
+  MAX(IF(pat.program_attribute_type_id = '2', CONCAT('\"',o.attr_value,'\"'), NULL)) AS `regnum`,
   DATE_FORMAT(o.date_enrolled, '%d/%b/%Y') as 'd_reg',
   MAX(IF(pat.program_attribute_type_id = '6', CONCAT('\"',o.concept_name, '\"'), NULL)) AS `reg_facility`,
   o.status
 FROM
   (SELECT
-     pi.identifier,
+     CONCAT('\"',pi.identifier,'\"') as identifier,
      floor(datediff(CURDATE(), p.birthdate) / 365) AS age,
      p.gender,
-     prog.name as program_name,
+     CONCAT('\"',prog.name, '\"') as program_name,
      attr.attribute_type_id,
      attr.value_reference as attr_value,
      pp.date_enrolled as date_enrolled,
      pp.patient_id,
      prog.program_id,
      cn.name as concept_name,
-     outcome_concept.name as status,
+     CONCAT('\"',outcome_concept.name, '\"') as status,
      pp.patient_program_id
    FROM  patient_program pp
      JOIN program prog ON pp.program_id = prog.program_id

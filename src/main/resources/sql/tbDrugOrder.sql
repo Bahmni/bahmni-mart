@@ -1,6 +1,6 @@
 SELECT
-  MAX(IF(o.program_attribute_name = 'Registration Number', o.program_attribute_value, NULL)) AS 'regnum',
-  o.drug                                                                                     AS 'tbdrug',
+  MAX(IF(o.program_attribute_name = 'Registration Number', CONCAT('\"',o.program_attribute_value,'\"'), NULL)) AS 'regnum',
+  CONCAT('\"', o.drug, '\"')                                                                                     AS 'tbdrug',
   o.dose                                                                                     AS 'tbdose',
   o.units                                                                                    AS unit,
   o.route                                                                                    AS 'tbroute',
@@ -13,7 +13,7 @@ SELECT
 FROM
   (SELECT
      IF(drug.name IS NULL, drug_order.drug_non_coded, coalesce(drug_code.code, drug.name))                      AS drug,
-     drug.name AS drugName,
+     CONCAT('\"',drug.name, '\"') AS drugName,
      drug_order.dose                                                                 AS dose,
      dcn.code                                                                             AS units,
      rou.code                                                                              AS route,
