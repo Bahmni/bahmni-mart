@@ -1,4 +1,4 @@
-package org.bahmni.batch.observation;
+package org.bahmni.batch.helper;
 
 import org.bahmni.batch.Application;
 import org.bahmni.batch.form.domain.BahmniForm;
@@ -15,10 +15,10 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @TestPropertySource(locations="classpath:test.properties")
-public class DynamicObsQueryTest {
+public class FreeMarkerEvaluatorTest {
 
 	@Autowired
-	private DynamicObsQuery dynamicObsQuery;
+	private FreeMarkerEvaluator<BahmniForm> dynamicObsQuery;
 
 	@Test
 	public void ensureSqlQueryDoesNotIncludeParentInTopLevelForms(){
@@ -27,7 +27,7 @@ public class DynamicObsQueryTest {
 		parent.setFormName(new Concept(1189,"Vitals",1));
 		parent.setDepthToParent(0);
 
-		String sql = dynamicObsQuery.getSqlQueryForForm(parent);
+		String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl",parent);
 		System.out.println(sql);
 		assertEquals("SELECT obs0.obs_id\n" + "FROM obs obs0\n" + "WHERE obs0.concept_id=1189\n",sql);
 	}
@@ -45,7 +45,7 @@ public class DynamicObsQueryTest {
 		child.setDepthToParent(1);
 
 
-		String sql = dynamicObsQuery.getSqlQueryForForm(child);
+		String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl",child);
 		System.out.println(sql);
 		assertEquals("SELECT obs0.obs_id\n" + "FROM obs obs0\n" + "INNER JOIN obs obs1 on obs0.obs_id=obs1.obs_group_id\n"
 				+ "WHERE obs0.concept_id=10\n" + "AND obs1.concept_id=1\n",sql);
@@ -64,7 +64,7 @@ public class DynamicObsQueryTest {
 		child.setDepthToParent(2);
 
 
-		String sql = dynamicObsQuery.getSqlQueryForForm(child);
+		String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl",child);
 		System.out.println(sql);
 		assertEquals("SELECT obs0.obs_id\n" + "FROM obs obs0\n" + "INNER JOIN obs obs1 on obs0.obs_id=obs1.obs_group_id\n"
 				+ "INNER JOIN obs obs2 on obs1.obs_id=obs2.obs_group_id\n" + "WHERE obs0.concept_id=10\n"

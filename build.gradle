@@ -34,6 +34,7 @@ dependencies {
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.35'
     compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
     compile group: 'commons-io', name: 'commons-io', version: '2.0.1'
+    compile 'commons-lang:commons-lang:2.6'
     compile group: 'org.freemarker', name: 'freemarker', version: '2.3.23'
     compile group: 'org.springframework', name: 'spring-context-support', version: '4.2.6.RELEASE'
     testCompile group: 'junit', name: 'junit', version: '4.12'

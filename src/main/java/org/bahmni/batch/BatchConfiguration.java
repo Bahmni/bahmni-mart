@@ -31,6 +31,8 @@ import java.util.List;
 @EnableBatchProcessing
 public class BatchConfiguration extends DefaultBatchConfigurer {
 
+	public static final String FULL_DATA_EXPORT_JOB_NAME = "endtbExports";
+
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
 
@@ -72,7 +74,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 
 		List<BahmniForm> forms = formListProcessor.retrieveAllForms();
 
-		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get("completeDataExport1")
+		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
 				.incrementer(new RunIdIncrementer())
 				.listener(listener())
 						.flow(patientRegistrationBaseExportStep.getStep())

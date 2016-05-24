@@ -1,18 +1,13 @@
 package org.bahmni.batch.exports;
 
-import org.apache.commons.io.FileUtils;
 import org.bahmni.batch.form.domain.BahmniForm;
-import org.bahmni.batch.observation.DynamicObsQuery;
+import org.bahmni.batch.helper.FreeMarkerEvaluator;
 import org.bahmni.batch.observation.ObsFieldExtractor;
 import org.bahmni.batch.observation.ObservationProcessor;
 import org.bahmni.batch.observation.domain.Concept;
 import org.bahmni.batch.observation.domain.Obs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
@@ -37,8 +32,6 @@ import java.util.Map;
 @Scope(value = "prototype")
 public class ObservationExportStep {
 
-    private static final Logger log = LoggerFactory.getLogger(ObservationExportStep.class);
-
     public static final String FILE_NAME_EXTENSION = ".csv";
 
     @Autowired
@@ -51,7 +44,7 @@ public class ObservationExportStep {
     public Resource outputFolder;
 
     @Autowired
-    private DynamicObsQuery dynamicObsQuery;
+    private FreeMarkerEvaluator<BahmniForm> freeMarkerEvaluator;
 
     private BahmniForm form;
 
@@ -72,7 +65,7 @@ public class ObservationExportStep {
     }
 
     private JdbcCursorItemReader<Map<String, Object>> obsReader() {
-        String sql = dynamicObsQuery.getSqlQueryForForm(form);
+        String sql = freeMarkerEvaluator.evaluate("obsWithParentSql.ftl",form);
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);

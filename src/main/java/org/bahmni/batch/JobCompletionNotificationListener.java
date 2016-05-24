@@ -25,9 +25,13 @@ import java.util.zip.ZipOutputStream;
 @Component
 public class JobCompletionNotificationListener extends JobExecutionListenerSupport {
 
+	public static final String OUTPUT_FILE_NAME_CONTEXT_KEY = "outputFileName";
     private Resource outputFolder;
 
 	private Resource zipFolder;
+
+	@Autowired
+	private ReportGenerator reportGenerator;
 
     @Autowired
     public JobCompletionNotificationListener(@Value("${outputFolder}") Resource outputFolder,@Value("${zipFolder}") Resource zipFolder) {
@@ -43,6 +47,8 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 	    try {
 		    FileUtils.deleteQuietly(outputFolder.getFile());
 		    FileUtils.forceMkdir(outputFolder.getFile());
+		    String zipFileName = BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME + new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) + ".zip";
+		    jobExecution.getExecutionContext().put(OUTPUT_FILE_NAME_CONTEXT_KEY,zipFileName);
 	    }
 	    catch (IOException e) {
 		    throw new RuntimeException("Cannot create a temporary folder provided as "
@@ -57,7 +63,7 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 
 	        FileOutputStream fos = null;
 	        ZipOutputStream zos = null;
-	        String zipFileName = new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".zip";
+	        String zipFileName = jobExecution.getExecutionContext().getString(OUTPUT_FILE_NAME_CONTEXT_KEY);
 	        File zipFile = null;
 
 	        try {
@@ -65,20 +71,24 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 		        zipFile = new File(zipFolder.getFile(),zipFileName);
 		        fos = new FileOutputStream(zipFile);
 		        zos = new ZipOutputStream(fos);
-		        Iterator<File> iterator =  FileUtils.iterateFiles(outputFolder.getFile(),new String[]{ "png","csv" },false);
+		        Iterator<File> iterator =  FileUtils.iterateFiles(outputFolder.getFile(),new String[]{ "csv" },false);
 		        while(iterator.hasNext()){
 			        File file = iterator.next();
 			        addToZipFile(file,zos);
 		        }
 
-		        jobExecution.getExecutionContext().put("OutputFile",zipFile.getAbsolutePath());
+		        File report = new File(zipFolder.getFile(),"report.html");
+		        String reportOutput =  reportGenerator.generateReport();
+		        FileUtils.writeStringToFile(report,reportOutput);
 
 	        } catch (IOException e) {
-		        e.printStackTrace();
+		        throw new RuntimeException("Unable to write the output to the ["+zipFile+"]");
 	        }finally {
 		        IOUtils.closeQuietly(zos);
 		        IOUtils.closeQuietly(fos);
 	        }
+
+
 
         }
     }
