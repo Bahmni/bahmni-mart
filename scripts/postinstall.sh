@@ -28,6 +28,8 @@ fi
 ln -s /opt/bahmni-batch/bin/bahmni-batch /usr/bin/bahmni-batch
 ln -s /opt/bahmni-batch/log /var/log/bahmni-batch
 ln -s /home/bahmni/endtb_export /opt/bahmni-batch/endtb_export
+ln -s /home/bahmni/endtb_export /var/www/bahmni_config/endtb_export
+
 
 # permissions
 chown -R bahmni:bahmni /opt/bahmni-batch
