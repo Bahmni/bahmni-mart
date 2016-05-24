@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Running bahmni-batch..."
+java -jar /opt/bahmni-batch/libs/bahmni-batch-*.jar >> /opt/bahmni-batch/log/bahmni-batch.log
+echo "Done"
