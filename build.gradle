@@ -76,3 +76,7 @@ buildRpm {
     postInstall file("${projectDir}/scripts/postinstall.sh")
     postUninstall file("${projectDir}/scripts/postuninstall.sh")
 }
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.13'
+}
