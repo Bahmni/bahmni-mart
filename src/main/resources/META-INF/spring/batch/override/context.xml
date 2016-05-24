@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xmlns:int-jmx="http://www.springframework.org/schema/integration/jmx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/integration/jmx http://www.springframework.org/schema/integration/jmx/spring-integration-jmx.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--  Use this to set additional properties on beans at run time -->
+    <bean id="customProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath*:/META-INF/spring/batch/override/job.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="ignoreUnresolvablePlaceholders" value="false" />
+        <property name="order" value="2" />
+    </bean>
+
+
+    <!-- Original jobService conflicted with @EnableScheduling -->
+    <bean id="jobService"
+          class="org.springframework.batch.admin.service.SimpleJobServiceFactoryBean">
+        <aop:scoped-proxy proxy-target-class="true" />
+        <property name="jobRepository" ref="jobRepository" />
+        <property name="jobLauncher" ref="jobLauncher" />
+        <property name="jobLocator" ref="jobRegistry" />
+        <property name="dataSource" ref="dataSource" />
+        <property name="jobExplorer" ref="jobExplorer" />
+        <property name="transactionManager" ref="transactionManager" />
+    </bean>
+
+</beans>

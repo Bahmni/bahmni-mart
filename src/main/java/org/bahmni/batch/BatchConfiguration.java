@@ -23,13 +23,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
+import org.springframework.ui.freemarker.SpringTemplateLoader;
 
 import java.io.IOException;
 import java.util.List;
 
 @Configuration
-@EnableBatchProcessing
-public class BatchConfiguration extends DefaultBatchConfigurer {
+public class BatchConfiguration{
 
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
@@ -53,7 +54,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	private ObjectFactory<ObservationExportStep> observationExportStepFactory;
 
 
-	@Value("classpath:templates/")
+	@Value("classpath:/META-INF/spring/batch/templates")
 	private Resource freemarkerTemplateLocation;
 
 	@Autowired

@@ -6,18 +6,20 @@ import org.bahmni.batch.form.domain.BahmniForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+
 public class DynamicObsQuery {
 
 	private static final Logger log = LoggerFactory.getLogger(DynamicObsQuery.class);
 
 	@Autowired
+	@Qualifier("freeMarkerConfiguration")
 	private Configuration configuration;
 
 	public String getSqlQueryForForm(BahmniForm form){
@@ -30,8 +32,6 @@ public class DynamicObsQuery {
 			patientData.put("form", form);
 
 			obsSqlTemplate.process(patientData, stringWriter);
-
-
 		}catch(Exception ex){
 			throw new RuntimeException("Unable to continue generating a sql",ex);
 		}

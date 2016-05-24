@@ -50,7 +50,7 @@ public class ObservationExportStep {
     @Value("${outputFolder}")
     public Resource outputFolder;
 
-    @Autowired
+
     private DynamicObsQuery dynamicObsQuery;
 
     private BahmniForm form;
@@ -72,7 +72,15 @@ public class ObservationExportStep {
     }
 
     private JdbcCursorItemReader<Map<String, Object>> obsReader() {
-        String sql = dynamicObsQuery.getSqlQueryForForm(form);
+        String sql = "select o.concept_id as conceptId,\n" + "       o.obs_id as id,\n"
+                + "       coalesce(o.value_boolean,DATE_FORMAT(o.value_datetime, '%d/%b/%Y'),o.value_numeric,o.value_text,cv.concept_short_name,cv.concept_full_name) as value,\n"
+                + "       'abcd' as treatmentNumber,\n" + "       obs_con.concept_full_name as conceptName\n" + "from\n"
+                + "  obs o\n" + "  join concept_view obs_con on(o.concept_id = obs_con.concept_id)\n"
+                + "  left outer join concept codedConcept on o.value_coded = codedConcept.concept_id\n"
+                + "  left outer join concept_view cv on (cv.concept_id = codedConcept.concept_id)\n" + "where\n"
+                + "  o.obs_group_id in (802833,802834,802837,802839,802842)\n"
+                + "  and obs_con.concept_id  in (1191,1192,1196,1194,1843,1844,2077,2470,2471,1204,1205,5575)\n"
+                + "  and o.voided=0";
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);

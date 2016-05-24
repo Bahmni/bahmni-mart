@@ -17,3 +17,5 @@ hs_err_pid*
 temp/
 temp2/
 .DS_Store
+build/
+.gradle/

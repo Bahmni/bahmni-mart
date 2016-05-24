@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,9 +38,12 @@ public class FormListProcessorTest {
 	@Test
 	public void shouldRetrieveAllForms(){
 		Concept conceptA = new Concept(1, "a", 1);
+		Concept conceptB = new Concept(1, "Bacteriology", 1);
 
-		when(obsService.getChildConcepts(FormListProcessor.ALL_FORMS)).thenReturn(Arrays.asList(
-				conceptA));
+		List<Concept> allForms = new ArrayList<>();
+		allForms.add(conceptA);
+		when(obsService.getChildConcepts(FormListProcessor.ALL_FORMS)).thenReturn(allForms);
+		when(obsService.getConceptsByNames(FormListProcessor.BACTERIOLOGY_CONCEPT_SET)).thenReturn(Arrays.asList(conceptB));
 
 		BahmniForm a11 = new BahmniFormBuilder().withName("a11").build();
 		BahmniForm a12 = new BahmniFormBuilder().withName("a12").build();

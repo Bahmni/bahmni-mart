@@ -15,6 +15,7 @@ import java.util.List;
 public class FormListProcessor {
 
 	public static final String ALL_FORMS = "All Observation Templates";
+	public static final String BACTERIOLOGY_CONCEPT_SET = "Bacteriology Concept Set";
 
 	@Autowired
 	private ObsService obsService;
@@ -25,7 +26,7 @@ public class FormListProcessor {
 
 	public List<BahmniForm> retrieveAllForms(){
 		List<Concept> allFormConcepts = obsService.getChildConcepts(ALL_FORMS);
-		allFormConcepts.add(obsService.getConceptsByNames("Bacteriology Concept Set").get(0));
+		allFormConcepts.add(obsService.getConceptsByNames(BACTERIOLOGY_CONCEPT_SET).get(0));
 
 		List<BahmniForm> forms = new ArrayList<>();
 		for(Concept concept: allFormConcepts){
