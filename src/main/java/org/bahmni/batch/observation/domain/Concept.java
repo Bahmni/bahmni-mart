@@ -50,6 +50,12 @@ public class Concept {
 		return title;
 	}
 
+	public String getFormattedTitle(){
+		if(title == null)
+			return "";
+		return getTitle().replaceAll("\n"," ").replaceAll("\t"," ").replaceAll(",","");
+	}
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
