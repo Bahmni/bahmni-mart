@@ -13,13 +13,13 @@ import java.util.List;
 @Component
 public class BahmniFormFactory {
 
-	@Value("${addMoreConcepts}")
+	@Value("${addMoreAndMultiSelectConcepts}")
 	private String addMoreConceptNames;
 
 	@Autowired
 	private ObsService obsService;
 
-	private List<Concept> addMoreConcepts;
+	private List<Concept> addMoreAndMultiSelectConcepts;
 
 	public BahmniForm createForm(Concept concept, BahmniForm parentForm) {
 		return createForm(concept,parentForm,0);
@@ -46,7 +46,7 @@ public class BahmniFormFactory {
 		depth++;
 		for(Concept childConcept: childConcepts){
 
-			if(addMoreConcepts.contains(childConcept)){
+			if(addMoreAndMultiSelectConcepts.contains(childConcept)){
 				bahmniForm.addChild(createForm(childConcept, bahmniForm, depth));
 			}else if(childConcept.getIsSet() == 0){
 				bahmniForm.addField(childConcept);
@@ -58,7 +58,7 @@ public class BahmniFormFactory {
 
 	@PostConstruct
 	public void postConstruct(){
-		this.addMoreConcepts = obsService.getConceptsByNames(addMoreConceptNames);
+		this.addMoreAndMultiSelectConcepts = obsService.getConceptsByNames(addMoreConceptNames);
 	}
 
 	public void setObsService(ObsService obsService) {

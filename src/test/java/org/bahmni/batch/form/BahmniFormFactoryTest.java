@@ -19,7 +19,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class BahmniFormFactoryTest {
 
-	private List<Concept> addMoreConcepts;
+	private List<Concept> addMoreAndMultiSelectConcepts;
 
 	private List<Concept> allConcepts;
 
@@ -44,12 +44,12 @@ public class BahmniFormFactoryTest {
 	public void setup(){
 		initMocks(this);
 
-		addMoreConcepts = new ArrayList<>();
-		addMoreConcepts.add(new Concept(3365,"Operation Notes Template",1));
-		addMoreConcepts.add(new Concept(1200,"Discharge Summary, Surgeries and Procedures",1));
-		addMoreConcepts.add(new Concept(1206,"Other Notes",1));
-		addMoreConcepts.add(new Concept(7771,"BP",1));
-		addMoreConcepts.add(new Concept(1209,"Notes",0));
+		addMoreAndMultiSelectConcepts = new ArrayList<>();
+		addMoreAndMultiSelectConcepts.add(new Concept(3365,"Operation Notes Template",1));
+		addMoreAndMultiSelectConcepts.add(new Concept(1200,"Discharge Summary, Surgeries and Procedures",1));
+		addMoreAndMultiSelectConcepts.add(new Concept(1206,"Other Notes",1));
+		addMoreAndMultiSelectConcepts.add(new Concept(7771,"BP",1));
+		addMoreAndMultiSelectConcepts.add(new Concept(1209,"Notes",0));
 
 		allConcepts = new ArrayList<>();
 		allConcepts.add(new Concept(1189,"History and Examination",1));
@@ -85,7 +85,7 @@ public class BahmniFormFactoryTest {
 
 		bahmniFormFactory = new BahmniFormFactory();
 		bahmniFormFactory.setObsService(obsService);
-		when(obsService.getConceptsByNames(any(String.class))).thenReturn(addMoreConcepts);
+		when(obsService.getConceptsByNames(any(String.class))).thenReturn(addMoreAndMultiSelectConcepts);
 		bahmniFormFactory.postConstruct();
 
 
