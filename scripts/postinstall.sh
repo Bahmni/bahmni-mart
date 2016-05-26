@@ -32,6 +32,7 @@ ln -s /home/bahmni/endtb_export /var/www/bahmni_config/endtb_export
 
 
 # permissions
+chown -R bahmni:bahmni /usr/bin/bahmni-batch
 chown -R bahmni:bahmni /opt/bahmni-batch
 chown -R bahmni:bahmni /var/log/bahmni-batch
 chown -R bahmni:bahmni /home/bahmni/endtb_export
