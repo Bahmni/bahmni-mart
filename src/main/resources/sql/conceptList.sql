@@ -1,4 +1,4 @@
-select childConcept.concept_id as id,childConcept.concept_full_name as name, childConceptRaw.is_set as isset, COALESCE (cv.code , cn.concept_full_name ,cn.concept_short_name)as title
+select distinct childConcept.concept_id as id,childConcept.concept_full_name as name, childConceptRaw.is_set as isset, COALESCE (cv.code , cn.concept_full_name ,cn.concept_short_name)as title
 from concept_view parentConcept
   inner join concept_set cs on parentConcept.concept_id = cs.concept_set
   inner join concept_view childConcept on cs.concept_id=childConcept.concept_id

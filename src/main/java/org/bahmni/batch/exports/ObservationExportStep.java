@@ -56,7 +56,7 @@ public class ObservationExportStep {
     }
 
     public Step getStep() {
-        return stepBuilderFactory.get(form.getFormName().getName())
+        return stepBuilderFactory.get(getStepName())
                 .<Map<String, Object>, List<Obs>>chunk(100)
                 .reader(obsReader())
                 .processor(observationProcessor())
@@ -134,4 +134,8 @@ public class ObservationExportStep {
         this.form = form;
     }
 
+    public String getStepName() {
+        String formName = form.getFormName().getName();
+        return formName.substring(0,Math.min(formName.length(), 100));
+    }
 }
