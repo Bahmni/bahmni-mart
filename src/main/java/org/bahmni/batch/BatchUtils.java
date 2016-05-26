@@ -26,7 +26,7 @@ public class BatchUtils {
 		if(conceptNames ==null ||conceptNames.isEmpty())
 			return conceptNamesSet;
 
-		String[] tokens = conceptNames.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+		String[] tokens = conceptNames.split("\",\"");
 		for(String token: tokens){
 			conceptNamesSet.add(token.replaceAll("\"",""));
 		}
