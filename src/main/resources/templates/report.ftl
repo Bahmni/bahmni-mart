@@ -1,6 +1,6 @@
 <html>
 <head>
-    <link rel="stylesheet" href="../../bahmni/styles/clinical.css">
+    <link rel="stylesheet" href="../../bahmni_config/openmrs/apps/exports/css/jobResult.css">
 </head>
 
 <body>
