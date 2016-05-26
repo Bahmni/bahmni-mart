@@ -35,7 +35,7 @@
                     <td>${jobResult.dateOfExecution}</td>
                     <td>${jobResult.status}</td>
                     <td>${(jobDetails.message)!}</td>
-                    <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></a></td>
+                    <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download">Download</a></td>
                 </tr>
                 </#list>
                 </tbody>
