@@ -2,12 +2,11 @@ package org.bahmni.batch.observation;
 
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.domain.Concept;
-import org.bahmni.batch.observation.domain.Form;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class FormFieldTransformerTest {
 

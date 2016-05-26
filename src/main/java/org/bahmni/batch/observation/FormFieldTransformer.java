@@ -2,7 +2,6 @@ package org.bahmni.batch.observation;
 
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.observation.domain.Concept;
-import org.bahmni.batch.observation.domain.Form;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
