@@ -5,4 +5,5 @@ from concept_view parentConcept
   inner join concept childConceptRaw on childConcept.concept_id = childConceptRaw.concept_id
   left outer join concept_reference_term_map_view cv on (cv.concept_id = childConceptRaw.concept_id  and cv.concept_map_type_name = 'SAME-AS' and cv.concept_reference_source_name = 'EndTB-Export')
   left outer join concept_view  cn on (cn.concept_id = childConceptRaw.concept_id)
-where parentConcept.concept_full_name = :parentConceptName and childConcept.retired=0;
+where parentConcept.concept_full_name = :parentConceptName and childConcept.retired=0
+order by cs.sort_weight;
