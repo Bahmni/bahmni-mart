@@ -8,7 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -37,9 +39,14 @@ public class FormListProcessorTest {
 	@Test
 	public void shouldRetrieveAllForms(){
 		Concept conceptA = new Concept(1, "a", 1);
+		Concept bacteriologyConceptSet = new Concept(3, "Bateriology Concept Set", 1);
+		List<Concept> conceptList = new ArrayList();
+		conceptList.add(conceptA);
 
-		when(obsService.getChildConcepts(FormListProcessor.ALL_FORMS)).thenReturn(Arrays.asList(
-				conceptA));
+		when(obsService.getChildConcepts(FormListProcessor.ALL_FORMS)).thenReturn(conceptList);
+
+		when(obsService.getConceptsByNames("Bacteriology Concept Set")).thenReturn(Arrays.asList(
+				bacteriologyConceptSet));
 
 		BahmniForm a11 = new BahmniFormBuilder().withName("a11").build();
 		BahmniForm a12 = new BahmniFormBuilder().withName("a12").build();
@@ -55,14 +62,18 @@ public class FormListProcessorTest {
 
 		BahmniForm a = new BahmniFormBuilder().withName("a").withChild(a1).withChild(b1).build();
 
+		BahmniForm bacteriologyResultForm = new BahmniFormBuilder().withName("Bacteriology Result").build();
+		BahmniForm bacteriologyForm = new BahmniFormBuilder().withName("Bateriology Concept Set").withChild(bacteriologyResultForm).build();
+
 		when(bahmniFormFactory.createForm(conceptA,null)).thenReturn(a);
+		when(bahmniFormFactory.createForm(bacteriologyConceptSet,null)).thenReturn(bacteriologyForm);
 
-		List<BahmniForm> expected = Arrays.asList(a,a1,b1,a11,a12,a13,b11,b12,b13);
-
+		List<BahmniForm> expected = Arrays.asList(a,a1,b1,a11,a12,a13,b11,b12,b13,bacteriologyForm,bacteriologyResultForm);
 
 		List<BahmniForm> actual= formListProcessor.retrieveAllForms();
 
-		assertEquals(expected,actual);
+		assertEquals(expected.size(),actual.size());
+		assertEquals(new HashSet(expected),new HashSet(actual));
 
 	}
 
