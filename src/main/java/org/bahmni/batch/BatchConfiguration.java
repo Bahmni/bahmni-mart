@@ -4,7 +4,6 @@ import freemarker.template.TemplateExceptionHandler;
 import org.bahmni.batch.exports.MetaDataCodeDictionaryExportStep;
 import org.bahmni.batch.exports.NonTBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.ObservationExportStep;
-import org.bahmni.batch.exports.PatientRegistrationBaseExportStep;
 import org.bahmni.batch.exports.TBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.batch.form.domain.BahmniForm;
@@ -35,9 +34,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
-
-	@Autowired
-	private PatientRegistrationBaseExportStep patientRegistrationBaseExportStep;
 
 	@Autowired
 	private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
