@@ -1,6 +1,8 @@
 package org.bahmni.batch;
 
 import freemarker.template.TemplateExceptionHandler;
+import org.apache.commons.io.FileUtils;
+import org.bahmni.batch.exception.BatchResourceException;
 import org.bahmni.batch.exports.MetaDataCodeDictionaryExportStep;
 import org.bahmni.batch.exports.NonTBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.ObservationExportStep;
@@ -23,6 +25,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
+import javax.annotation.PreDestroy;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -50,7 +54,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	@Autowired
 	private ObjectFactory<ObservationExportStep> observationExportStepFactory;
 
-
 	@Value("classpath:templates/")
 	private Resource freemarkerTemplateLocation;
 
@@ -59,6 +62,12 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 
 	@Autowired
 	private MetaDataCodeDictionaryExportStep metaDataCodeDictionaryExportStep;
+
+	@Value("${zipFolder}")
+	private Resource zipFolder;
+
+	@Autowired
+	private ReportGenerator reportGenerator;
 
 	@Bean
 	public JobExecutionListener listener() {
@@ -99,4 +108,15 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 		return freemarkerTemplateConfig;
 	}
 
+	@PreDestroy
+	public void generateReport(){
+		try {
+			File report = new File(zipFolder.getFile(),"report.html");
+			String reportOutput =  reportGenerator.generateReport();
+			FileUtils.writeStringToFile(report,reportOutput);
+		}
+		catch (IOException e) {
+			throw new BatchResourceException("Unable to write the report file ["+zipFolder.getFilename()+"]",e);
+		}
+	}
 }

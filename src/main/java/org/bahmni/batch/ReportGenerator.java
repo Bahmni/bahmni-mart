@@ -21,10 +21,10 @@ public class ReportGenerator {
 	@Autowired
 	private FreeMarkerEvaluator<List<JobResult>> evaluator;
 
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
 
 	public String generateReport(){
-		List<JobInstance> jobInstanceList = jobExplorer.findJobInstancesByJobName(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME,1,20);
+		List<JobInstance> jobInstanceList = jobExplorer.findJobInstancesByJobName(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME,0,20);
 		List<JobResult> results = transformJobExecutionsToReport(getJobExecutionsForInstances(jobInstanceList));
 
 		return evaluator.evaluate("report.ftl",results);

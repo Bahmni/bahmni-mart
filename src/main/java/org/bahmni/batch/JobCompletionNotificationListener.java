@@ -26,11 +26,7 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 
 	public static final String OUTPUT_FILE_NAME_CONTEXT_KEY = "outputFileName";
     private Resource outputFolder;
-
 	private Resource zipFolder;
-
-	@Autowired
-	private ReportGenerator reportGenerator;
 
     @Autowired
     public JobCompletionNotificationListener(@Value("${outputFolder}") Resource outputFolder,@Value("${zipFolder}") Resource zipFolder) {
@@ -73,19 +69,12 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 			        addToZipFile(file,zos);
 		        }
 
-		        File report = new File(zipFolder.getFile(),"report.html");
-		        String reportOutput =  reportGenerator.generateReport();
-		        FileUtils.writeStringToFile(report,reportOutput);
-
 	        } catch (IOException e) {
 		        throw new BatchResourceException("Unable to write the output to the ["+zipFile+"]",e);
 	        }finally {
 		        IOUtils.closeQuietly(zos);
 		        IOUtils.closeQuietly(fos);
 	        }
-
-
-
         }
     }
 
