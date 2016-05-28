@@ -49,7 +49,7 @@ public class ReportGeneratorTest {
 		JobExecution jobExecution2a = new JobExecution(21L);
 		jobExecution2a.getExecutionContext().put(JobCompletionNotificationListener.OUTPUT_FILE_NAME_CONTEXT_KEY,"ghi.zip");
 
-		when(jobExplorer.findJobInstancesByJobName(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME,1,20)).thenReturn(
+		when(jobExplorer.findJobInstancesByJobName(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME,0,20)).thenReturn(
 				Arrays.asList(jobInstance1,jobInstance2));
 		when(jobExplorer.getJobExecutions(jobInstance1)).thenReturn(Arrays.asList(jobExecution1a,jobExecution1b));
 		when(jobExplorer.getJobExecutions(jobInstance2)).thenReturn(Arrays.asList(jobExecution2a));

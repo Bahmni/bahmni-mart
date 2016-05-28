@@ -26,7 +26,6 @@
                 <tr>
                     <th>Date</th>
                     <th>Status</th>
-                    <th>Messages</th>
                     <th>Download</th>
                 </tr>
                 </thead>
@@ -34,7 +33,6 @@
                 <#list input as jobResult><tr>
                     <td>${jobResult.dateOfExecution}</td>
                     <td>${jobResult.status}</td>
-                    <td>${(jobDetails.message)!}</td>
                     <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download">Download</a></td>
                 </tr>
                 </#list>
