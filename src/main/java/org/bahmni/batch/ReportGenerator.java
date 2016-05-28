@@ -44,18 +44,10 @@ public class ReportGenerator {
 		for(JobExecution execution: jobExecutions){
 			String zipFileName = execution.getExecutionContext().getString(JobCompletionNotificationListener.OUTPUT_FILE_NAME_CONTEXT_KEY);
 			jobResults.add(new JobResult(dateFormat.format(execution.getCreateTime()),
-					execution.getExitStatus().getExitCode(), zipFileName, getErrorMessageDetail(execution)));
+					execution.getExitStatus().getExitCode(), zipFileName));
 		}
 
 		return jobResults;
-	}
-
-	private String getErrorMessageDetail(JobExecution execution){
-		StringBuilder exceptions = new StringBuilder();
-		for(Throwable throwable: execution.getFailureExceptions()){
-			exceptions.append(ExceptionUtils.getMessage(throwable));
-		}
-		return exceptions.toString();
 	}
 
 	public void setJobExplorer(JobExplorer jobExplorer) {

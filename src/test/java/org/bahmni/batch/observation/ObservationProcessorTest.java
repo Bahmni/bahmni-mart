@@ -34,8 +34,6 @@ public class ObservationProcessorTest {
 
 	private List<Obs> obsList;
 
-	private Concept formConcept;
-
 	private BahmniForm form;
 
 	@Before
@@ -43,8 +41,6 @@ public class ObservationProcessorTest {
 		initMocks(this);
 
 		form = new BahmniForm();
-		formConcept = new Concept(5,"leaf concept",0);
-		form.setFormName(formConcept);
 
 		obsList = new ArrayList<>();
 		obsList.add(new Obs("treatment1",1,null,new Concept(1,"systolic",0),"120"));

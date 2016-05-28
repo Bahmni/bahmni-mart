@@ -5,7 +5,7 @@ import org.bahmni.batch.observation.domain.Concept;
 
 public class BahmniFormBuilder {
 
-	BahmniForm bahmniForm = new BahmniForm();
+	private BahmniForm bahmniForm = new BahmniForm();
 
 	public BahmniFormBuilder withChild(BahmniForm form){
 		bahmniForm.addChild(form);

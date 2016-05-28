@@ -1,5 +1,6 @@
 package org.bahmni.batch.exports;
 
+import org.bahmni.batch.exception.BatchResourceException;
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.helper.FreeMarkerEvaluator;
 import org.bahmni.batch.observation.ObsFieldExtractor;
@@ -106,7 +107,7 @@ public class ObservationExportStep {
             outputFile = new File(outputFolder.getFile(),form.getDisplayName() + FILE_NAME_EXTENSION);
         }
         catch (IOException e) {
-            throw new RuntimeException("Unable to create a file in the outputFolder ["+ outputFolder.getFilename()+"]");
+            throw new BatchResourceException("Unable to create a file in the outputFolder ["+ outputFolder.getFilename()+"]",e);
         }
 
         return outputFile;
@@ -118,7 +119,6 @@ public class ObservationExportStep {
         sb.append("ID_" + form.getDisplayName()).append(",");
         if (form.getParent() != null) {
             sb.append("ID_" + form.getParent().getDisplayName()).append(",");
-            ;
         }
 
         sb.append("TreatmentId");

@@ -1,14 +1,13 @@
 package org.bahmni.batch;
 
 import org.apache.commons.io.IOUtils;
+import org.bahmni.batch.exception.BatchResourceException;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class BatchUtils {
 
@@ -17,7 +16,7 @@ public class BatchUtils {
 			return IOUtils.toString(is);
 		}
 		catch (IOException e) {
-			throw new RuntimeException("Cannot load the provided resource. Unable to continue");
+			throw new BatchResourceException("Cannot load the provided resource. Unable to continue",e);
 		}
 	}
 

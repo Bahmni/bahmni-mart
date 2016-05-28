@@ -2,6 +2,7 @@ package org.bahmni.batch;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.bahmni.batch.exception.BatchResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -37,10 +38,7 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
     public JobCompletionNotificationListener(@Value("${outputFolder}") Resource outputFolder,@Value("${zipFolder}") Resource zipFolder) {
         this.outputFolder = outputFolder;
 	    this.zipFolder = zipFolder;
-
     }
-
-    private static final Logger log = LoggerFactory.getLogger(JobCompletionNotificationListener.class);
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
@@ -51,7 +49,7 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 		    jobExecution.getExecutionContext().put(OUTPUT_FILE_NAME_CONTEXT_KEY,zipFileName);
 	    }
 	    catch (IOException e) {
-		    throw new RuntimeException("Cannot create a temporary folder provided as "
+		    throw new BatchResourceException("Cannot create a temporary folder provided as "
 				    + "'outputFolder' configuration ["+ outputFolder.getFilename()+"]",e);
 	    }
 
@@ -82,7 +80,7 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 		        FileUtils.writeStringToFile(report,reportOutput);
 
 	        } catch (IOException e) {
-		        throw new RuntimeException("Unable to write the output to the ["+zipFile+"]");
+		        throw new BatchResourceException("Unable to write the output to the ["+zipFile+"]",e);
 	        }finally {
 		        IOUtils.closeQuietly(zos);
 		        IOUtils.closeQuietly(fos);

@@ -19,8 +19,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class BahmniFormFactoryTest {
 
-	private List<Concept> addMoreAndMultiSelectConcepts;
-
 	private List<Concept> allConcepts;
 
 	private List<Concept> historyAndExaminationConcepts;
@@ -28,8 +26,6 @@ public class BahmniFormFactoryTest {
 	private List<Concept> vitalsConcepts;
 
 	private List<Concept> chiefComplaintDataConcepts;
-
-	private List<Concept> bpConcepts;
 
 	private List<Concept> operationNotesConcepts;
 
@@ -44,7 +40,7 @@ public class BahmniFormFactoryTest {
 	public void setup(){
 		initMocks(this);
 
-		addMoreAndMultiSelectConcepts = new ArrayList<>();
+		List<Concept> addMoreAndMultiSelectConcepts = new ArrayList<>();
 		addMoreAndMultiSelectConcepts.add(new Concept(3365,"Operation Notes Template",1));
 		addMoreAndMultiSelectConcepts.add(new Concept(1200,"Discharge Summary, Surgeries and Procedures",1));
 		addMoreAndMultiSelectConcepts.add(new Concept(1206,"Other Notes",1));
@@ -66,10 +62,6 @@ public class BahmniFormFactoryTest {
 
 		chiefComplaintDataConcepts = new ArrayList<>();
 		chiefComplaintDataConcepts.add(new Concept(7771,"BP",1));
-
-		bpConcepts = new ArrayList<>();
-		bpConcepts.add(new Concept(7772,"Systolic",0));
-		bpConcepts.add(new Concept(7773,"Diastolic",0));
 
 		vitalsConcepts = new ArrayList<>();
 		vitalsConcepts.add(new Concept(1842,"Vitals Notes",0));

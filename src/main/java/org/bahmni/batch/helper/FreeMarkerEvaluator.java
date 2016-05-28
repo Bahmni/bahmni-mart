@@ -2,7 +2,7 @@ package org.bahmni.batch.helper;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import org.bahmni.batch.form.domain.BahmniForm;
+import org.bahmni.batch.exception.BatchResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class FreeMarkerEvaluator<T> {
 
 
 		}catch(Exception ex){
-			throw new RuntimeException("Unable to continue generating a the template with name ["+templateName+"]",ex);
+			throw new BatchResourceException("Unable to continue generating a the template with name ["+templateName+"]",ex);
 		}
 
 		String result = stringWriter.toString();

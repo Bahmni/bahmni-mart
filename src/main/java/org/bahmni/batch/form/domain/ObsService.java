@@ -18,8 +18,6 @@ import java.util.List;
 @Component
 public class ObsService {
 
-	private static final Logger log = LoggerFactory.getLogger(ObsService.class);
-
 	@Value("classpath:sql/conceptDetails.sql")
 	private Resource conceptDetailsSqlResource;
 

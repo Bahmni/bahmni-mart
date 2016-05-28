@@ -5,13 +5,11 @@ public class JobResult {
 	private String dateOfExecution;
 	private String status;
 	private String zipFileName;
-	private String message;
 
-	public JobResult(String dateOfExecution, String status, String zipFileName, String message) {
+	public JobResult(String dateOfExecution, String status, String zipFileName) {
 		this.dateOfExecution = dateOfExecution;
 		this.status = status;
 		this.zipFileName = zipFileName;
-		this.message = message;
 	}
 
 	public String getDateOfExecution() {
