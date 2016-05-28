@@ -43,15 +43,15 @@ public class BahmniFormFactory {
 		}
 
 		List<Concept> childConcepts = obsService.getChildConcepts(concept.getName());
-		depth++;
+		int childDepth = depth+1;
 		for(Concept childConcept: childConcepts){
 
 			if(addMoreAndMultiSelectConcepts.contains(childConcept)){
-				bahmniForm.addChild(createForm(childConcept, bahmniForm, depth));
+				bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth));
 			}else if(childConcept.getIsSet() == 0){
 				bahmniForm.addField(childConcept);
 			}else{
-				constructFormFields(childConcept,bahmniForm, depth);
+				constructFormFields(childConcept,bahmniForm, childDepth);
 			}
 		}
 	}

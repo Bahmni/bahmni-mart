@@ -58,7 +58,7 @@ public class BahmniForm {
 	public String getDisplayName() {
 		if(formName == null)
 			return "";
-		return formName.getName().replaceAll("\\s", "_").replaceAll(",","").toUpperCase() ;
+		return formName.getName().replaceAll("\\s", "_").replaceAll(",","").replaceAll("/","").toUpperCase() ;
 	}
 
 }
