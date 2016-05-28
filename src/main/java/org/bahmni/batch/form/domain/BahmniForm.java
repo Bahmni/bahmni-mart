@@ -1,7 +1,5 @@
 package org.bahmni.batch.form.domain;
 
-import org.bahmni.batch.observation.domain.Concept;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,5 @@
 package org.bahmni.batch;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.bahmni.batch.helper.FreeMarkerEvaluator;
 import org.bahmni.batch.report.JobResult;
 import org.springframework.batch.core.JobExecution;

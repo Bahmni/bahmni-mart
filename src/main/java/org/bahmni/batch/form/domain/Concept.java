@@ -1,4 +1,4 @@
-package org.bahmni.batch.observation.domain;
+package org.bahmni.batch.form.domain;
 
 public class Concept {
 	private Integer id;

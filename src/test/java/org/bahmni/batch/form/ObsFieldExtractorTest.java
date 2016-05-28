@@ -1,8 +1,8 @@
-package org.bahmni.batch.observation;
+package org.bahmni.batch.form;
 
 import org.bahmni.batch.form.domain.BahmniForm;
-import org.bahmni.batch.observation.domain.Concept;
-import org.bahmni.batch.observation.domain.Obs;
+import org.bahmni.batch.form.domain.Concept;
+import org.bahmni.batch.form.domain.Obs;
 import org.junit.Test;
 
 import java.util.ArrayList;

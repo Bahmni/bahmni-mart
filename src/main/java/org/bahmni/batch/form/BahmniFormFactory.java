@@ -1,8 +1,8 @@
 package org.bahmni.batch.form;
 
 import org.bahmni.batch.form.domain.BahmniForm;
-import org.bahmni.batch.form.domain.ObsService;
-import org.bahmni.batch.observation.domain.Concept;
+import org.bahmni.batch.form.domain.Concept;
+import org.bahmni.batch.form.service.ObsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -1,9 +1,8 @@
-package org.bahmni.batch.observation;
+package org.bahmni.batch.form;
 
-import org.bahmni.batch.form.BahmniFormFactory;
 import org.bahmni.batch.form.domain.BahmniForm;
-import org.bahmni.batch.form.domain.ObsService;
-import org.bahmni.batch.observation.domain.Concept;
+import org.bahmni.batch.form.domain.Concept;
+import org.bahmni.batch.form.service.ObsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

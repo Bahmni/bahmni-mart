@@ -1,8 +1,8 @@
-package org.bahmni.batch.observation;
+package org.bahmni.batch.form;
 
 import org.bahmni.batch.form.domain.BahmniForm;
-import org.bahmni.batch.observation.domain.Concept;
-import org.bahmni.batch.observation.domain.Obs;
+import org.bahmni.batch.form.domain.Concept;
+import org.bahmni.batch.form.domain.Obs;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
@@ -41,6 +41,7 @@ public class ObservationProcessorTest {
 		initMocks(this);
 
 		form = new BahmniForm();
+		form.setFormName(new Concept(1,"formName",0));
 
 		obsList = new ArrayList<>();
 		obsList.add(new Obs("treatment1",1,null,new Concept(1,"systolic",0),"120"));
