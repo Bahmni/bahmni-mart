@@ -3,5 +3,5 @@
 . /etc/openmrs/openmrs.conf
 
 echo "Running bahmni-batch..."
-java -jar /opt/bahmni-batch/libs/bahmni-batch-*.jar >> /opt/bahmni-batch/log/bahmni-batch.log
+java -DOPENMRS_DB_SERVER=${OPENMRS_DB_SERVER} -DOPENMRS_DB_USER=${OPENMRS_DB_USER} -DOPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD} -jar /opt/bahmni-batch/libs/bahmni-batch-*.jar >> /opt/bahmni-batch/log/bahmni-batch.log
 echo "Done"
