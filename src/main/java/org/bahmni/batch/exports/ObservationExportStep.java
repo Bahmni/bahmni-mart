@@ -121,7 +121,7 @@ public class ObservationExportStep {
             sb.append("ID_" + form.getParent().getDisplayName()).append(",");
         }
 
-        sb.append("TreatmentId");
+        sb.append("regnum");
         for (Concept field : form.getFields()) {
             sb.append(",");
             sb.append(field.getFormattedTitle());
