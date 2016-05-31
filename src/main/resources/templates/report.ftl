@@ -1,5 +1,11 @@
 <html>
 <head>
+    <title>Report</title>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes, minimal-ui" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../bahmni/favicon.ico">
     <link rel="stylesheet" href="../../bahmni_config/openmrs/apps/exports/css/jobResult.css">
 </head>
 
@@ -17,7 +23,7 @@
         </header>
     </div>
 </div>
-<div class="opd-wrapper">
+<div class="opd-wrapper bahmni-reports">
     <div class="opd-content-wrapper">
         <section class="section-grid">
             <h2 class="section-title">Endtb Exports</h2>
@@ -33,7 +39,7 @@
                 <#list input as jobResult><tr>
                     <td>${jobResult.dateOfExecution}</td>
                     <td>${jobResult.status}</td>
-                    <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download">Download</a></td>
+                    <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i>Download</a></td>
                 </tr>
                 </#list>
                 </tbody>
