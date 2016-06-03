@@ -31,7 +31,7 @@
                 <thead>
                 <tr>
                     <th>Date</th>
-                    <th>Status</th>
+                    <th>Job Status</th>
                     <th>Download</th>
                 </tr>
                 </thead>
@@ -39,7 +39,7 @@
                 <#list input as jobResult><tr>
                     <td>${jobResult.dateOfExecution}</td>
                     <td>${jobResult.status}</td>
-                    <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i>Download</a></td>
+                    <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i></a></td>
                 </tr>
                 </#list>
                 </tbody>

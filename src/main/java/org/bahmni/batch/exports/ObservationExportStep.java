@@ -116,9 +116,9 @@ public class ObservationExportStep {
     private String getHeader() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("ID_" + form.getDisplayName()).append(",");
+        sb.append("id_" + form.getDisplayName()).append(",");
         if (form.getParent() != null) {
-            sb.append("ID_" + form.getParent().getDisplayName()).append(",");
+            sb.append("id_" + form.getParent().getDisplayName()).append(",");
         }
 
         sb.append("regnum");
