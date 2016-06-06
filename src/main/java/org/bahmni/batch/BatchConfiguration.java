@@ -54,7 +54,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	@Autowired
 	private ObjectFactory<ObservationExportStep> observationExportStepFactory;
 
-	@Value("classpath:templates/")
+	@Value("${templates}")
 	private Resource freemarkerTemplateLocation;
 
 	@Autowired
@@ -80,7 +80,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 		List<BahmniForm> forms = formListProcessor.retrieveAllForms();
 
 		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
-				.incrementer(new RunIdIncrementer())
+				.incrementer(new RunIdIncrementer()).preventRestart()
 				.listener(listener())
 		                .flow(treatmentRegistrationBaseExportStep.getStep())
 						.next(metaDataCodeDictionaryExportStep.getStep())

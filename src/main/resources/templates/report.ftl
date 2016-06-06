@@ -39,7 +39,9 @@
                 <#list input as jobResult><tr>
                     <td>${jobResult.dateOfExecution}</td>
                     <td>${jobResult.status}</td>
-                    <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i></a></td>
+                    <#if jobResult.status == 'COMPLETED'>
+                        <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i></a></td>
+                    </#if>
                 </tr>
                 </#list>
                 </tbody>
