@@ -40,7 +40,7 @@
                     <td>${jobResult.dateOfExecution}</td>
                     <td>${jobResult.status}</td>
                     <#if jobResult.status == 'COMPLETED'>
-                        <td><a href="${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i></a></td>
+                        <td><a href="/openmrs/ws/rest/v1/endtb/export?filename=${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i></a></td>
                     </#if>
                 </tr>
                 </#list>

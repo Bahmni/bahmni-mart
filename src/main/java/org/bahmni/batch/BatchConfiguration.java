@@ -66,6 +66,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	@Value("${zipFolder}")
 	private Resource zipFolder;
 
+	@Value("${bahmniConfigFolder}")
+	private Resource bahmniConfigFolder;
+
 	@Autowired
 	private ReportGenerator reportGenerator;
 
@@ -111,7 +114,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	@PreDestroy
 	public void generateReport(){
 		try {
-			File report = new File(zipFolder.getFile(),"report.html");
+			File report = new File(bahmniConfigFolder.getFile(),"report.html");
 			String reportOutput =  reportGenerator.generateReport();
 			FileUtils.writeStringToFile(report,reportOutput);
 		}
