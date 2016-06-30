@@ -3,7 +3,7 @@ SELECT  CONCAT('\"', cv.concept_full_name, '\"')  AS fully_specified_name,
         CONCAT( '\"',
                 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(cv.description, '"', ' '), '\t', ' '), '\n', ' '), '\r', ' '), ',', ' '),
                 '\"')        AS description,
-        crtv.code                                 AS question_code,
+        crtv.code                                 AS question_header,
         CONCAT('\"', cn.name, '\"')               AS answer,
         crtv_answer.code                          AS answer_code
 FROM    concept_view cv
@@ -21,7 +21,7 @@ FROM    concept_view cv
                                                   crtv_answer.concept_map_type_name = 'SAME-AS' AND
                                                   crtv_answer.concept_reference_source_name = 'EndTB-Export'
 ORDER BY  question ASC,
-  question_code ASC,
+  question_header ASC,
   sort_weight ASC;
 
 
