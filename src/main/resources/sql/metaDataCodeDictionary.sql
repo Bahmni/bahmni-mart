@@ -1,5 +1,6 @@
 SELECT  CONCAT('\"', cv.concept_full_name, '\"')  AS fully_specified_name,
         CONCAT('\"', cv.concept_short_name, '\"') AS question,
+        cv.concept_datatype_name,
         CONCAT( '\"',
                 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(cv.description, '"', ' '), '\t', ' '), '\n', ' '), '\r', ' '), ',', ' '),
                 '\"')        AS description,
@@ -10,8 +11,8 @@ FROM    concept_view cv
   INNER JOIN
   concept_reference_term_map_view crtv ON   cv.concept_id = crtv.concept_id AND
                                             crtv.concept_reference_source_name = 'EndTB-Export' AND
-                                            crtv.concept_map_type_name = 'SAME-AS'
-  JOIN
+                                            crtv.concept_map_type_name = 'SAME-AS' AND cv.concept_datatype_name IN ('Numeric', 'Text', 'Date', 'Boolean', 'Coded')
+  LEFT JOIN
   concept_answer ca ON cv.concept_id = ca.concept_id
   LEFT OUTER JOIN
   concept_name cn ON  ca.answer_concept = cn.concept_id AND
