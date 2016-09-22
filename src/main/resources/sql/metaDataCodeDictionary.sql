@@ -15,7 +15,7 @@ FROM    concept_view cv
   LEFT JOIN
   concept_answer ca ON cv.concept_id = ca.concept_id
   LEFT OUTER JOIN
-  concept_name cn ON  ca.answer_concept = cn.concept_id AND
+  concept_name cn ON  ca.answer_concept = cn.concept_id AND cn.voided = 0 AND
                       cn.concept_name_type = 'FULLY_SPECIFIED'
   LEFT OUTER JOIN
   concept_reference_term_map_view crtv_answer ON  ca.answer_concept = crtv_answer.concept_id AND

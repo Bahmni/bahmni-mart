@@ -34,7 +34,7 @@ FROM
         '')                                                                                AS additional_instructions,
      pp.date_enrolled
    FROM patient_program pp
-     JOIN program prog ON pp.program_id = prog.program_id AND
+     JOIN program prog ON pp.program_id = prog.program_id AND pp.voided = 0 AND
                           prog.name IN ('Second-line TB treatment register', 'Basic management unit TB register')
      LEFT JOIN patient_program_attribute pg_attr ON pp.patient_program_id = pg_attr.patient_program_id
      LEFT JOIN program_attribute_type pg_attr_type
@@ -46,7 +46,7 @@ FROM
                            orders.voided = 0 AND (orders.order_action) != "DISCONTINUE" AND
                            orders.concept_id IN (SELECT cs.concept_id
                                                  FROM concept_set cs JOIN concept_name c
-                                                     ON c.name = 'All TB Drugs' AND c.concept_id = cs.concept_set
+                                                     ON c.name = 'All TB Drugs' AND c.concept_id = cs.concept_set AND c.voided = 0
                            )
      LEFT JOIN orders stopped_order ON stopped_order.patient_id = pp.patient_id AND stopped_order.voided = 0 AND
                                        (stopped_order.order_action) = "DISCONTINUE" AND

@@ -27,10 +27,10 @@ FROM
      JOIN person_name pn ON p.person_id = pn.person_id
      JOIN patient pa ON pp.patient_id = pa.patient_id
      JOIN patient_identifier pi ON pa.patient_id = pi.patient_id
-     LEFT OUTER JOIN patient_program_attribute attr ON pp.patient_program_id = attr.patient_program_id
+     LEFT OUTER JOIN patient_program_attribute attr ON pp.patient_program_id = attr.patient_program_id AND attr.voided = 0
      LEFT OUTER JOIN program_attribute_type attr_type ON attr.attribute_type_id = attr_type.program_attribute_type_id
-     LEFT OUTER JOIN concept_name cn ON cn.concept_id = attr.value_reference
-     LEFT OUTER JOIN concept_name outcome_concept ON outcome_concept.concept_id = pp.outcome_concept_id and outcome_concept.concept_name_type='FULLY_SPECIFIED'
+     LEFT OUTER JOIN concept_name cn ON cn.concept_id = attr.value_reference AND cn.voided =0
+     LEFT OUTER JOIN concept_name outcome_concept ON outcome_concept.concept_id = pp.outcome_concept_id and outcome_concept.concept_name_type='FULLY_SPECIFIED' AND outcome_concept.voided = 0
   ) o
   LEFT OUTER JOIN program_attribute_type pat ON o.attribute_type_id = pat.program_attribute_type_id
 GROUP BY patient_id, patient_program_id

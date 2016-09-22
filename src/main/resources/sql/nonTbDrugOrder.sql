@@ -39,13 +39,13 @@ FROM
      drug_order.dosing_instructions,
      pp.date_enrolled
    FROM  patient_program pp
-     JOIN program prog ON pp.program_id = prog.program_id AND prog.name in ('Second-line TB treatment register','Basic management unit TB register')
-     LEFT JOIN patient_program_attribute pg_attr ON pp.patient_program_id = pg_attr.patient_program_id
+     JOIN program prog ON pp.program_id = prog.program_id AND prog.name in ('Second-line TB treatment register','Basic management unit TB register') AND pp.voided = 0
+     LEFT JOIN patient_program_attribute pg_attr ON pp.patient_program_id = pg_attr.patient_program_id AND pg_attr.voided = 0
      LEFT JOIN program_attribute_type pg_attr_type ON pg_attr.attribute_type_id = pg_attr_type.program_attribute_type_id and pg_attr_type.name in ('Registration Number')
      JOIN  episode_patient_program epp on pp.patient_program_id = epp.patient_program_id
      JOIN episode_encounter ee on ee.episode_id = epp.episode_id
      JOIN orders orders ON orders.patient_id = pp.patient_id and orders.encounter_id = ee.encounter_id and orders.voided = 0 and (orders.order_action) != "DISCONTINUE" and orders.concept_id in (select cs.concept_id from concept_set cs join concept_name c on c.name='All Other Drugs' and c.concept_id=cs.concept_set
-     )
+     AND c.voided = 0)
      LEFT JOIN orders stopped_order ON stopped_order.patient_id = pp.patient_id  and stopped_order.voided = 0 and (stopped_order.order_action) = "DISCONTINUE" and stopped_order.previous_order_id = orders.order_id
      LEFT JOIN drug_order drug_order ON drug_order.order_id = orders.order_id
      LEFT JOIN drug ON drug.concept_id = orders.concept_id
@@ -57,7 +57,7 @@ FROM
      LEFT JOIN concept_reference_term_map_view fre  ON order_frequency.concept_id = fre.concept_id AND fre.concept_reference_source_name='EndTB-Export' and fre.concept_map_type_name= 'SAME-AS'
    ) o
   LEFT OUTER JOIN program_attribute_type pat ON o.attribute_type_id = pat.program_attribute_type_id
-  LEFT JOIN concept_name cn on cn.name=o.reason_for_administration
+  LEFT JOIN concept_name cn on cn.name=o.reason_for_administration and cn.voided = 0
   LEFT JOIN concept_reference_term_map_view reason_admin on reason_admin.concept_id=cn.concept_id AND reason_admin.concept_reference_source_name='EndTB-Export' and reason_admin.concept_map_type_name= 'SAME-AS'
 GROUP BY patient_id, program_id, order_id
 ORDER BY patient_id, date_enrolled;
