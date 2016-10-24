@@ -1,5 +1,6 @@
 SELECT
   o.identifier as 'id_emr',
+  DATE_FORMAT(o.birthdate, '%d/%b/%Y') as 'dob',
   o.age as 'age',
   IF(o.gender = 'M',1, IF(o.gender = 'F',2, 3)) AS 'sex',
   o.program_name as 'tbregtype',
@@ -11,6 +12,7 @@ FROM
   (SELECT
      CONCAT('\"',pi.identifier,'\"') as identifier,
      floor(datediff(CURDATE(), p.birthdate) / 365) AS age,
+     p.birthdate,
      p.gender,
      CONCAT('\"',prog.name, '\"') as program_name,
      attr.attribute_type_id,
