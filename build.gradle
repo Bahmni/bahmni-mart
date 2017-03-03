@@ -48,7 +48,7 @@ jar {
 
 ospackage {
     packageName = 'bahmni-endtb-batch'
-    release = System.getenv('SNAP_PIPELINE_COUNTER') ?: 1
+    release = System.getenv('GO_PIPELINE_COUNTER') ?: 1
     arch = NOARCH
     os = LINUX
     user = 'root'
