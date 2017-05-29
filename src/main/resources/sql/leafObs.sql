@@ -16,4 +16,5 @@ left outer join concept_view cvn on (codedConcept.concept_id = cvn.concept_id)
 where
   o.obs_id in (:childObsIds)
   and obs_con.concept_id  in (:leafConceptIds)
-  and o.voided=0;
+  and o.voided=0
+  AND pp.voided = 0;

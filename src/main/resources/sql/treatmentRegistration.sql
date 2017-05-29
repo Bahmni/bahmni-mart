@@ -24,7 +24,7 @@ FROM
      CONCAT('\"',outcome_concept.name, '\"') as status,
      pp.patient_program_id
    FROM  patient_program pp
-     JOIN program prog ON pp.program_id = prog.program_id
+     JOIN program prog ON pp.program_id = prog.program_id AND pp.voided = 0
      JOIN person p ON pp.patient_id = p.person_id
      JOIN person_name pn ON p.person_id = pn.person_id
      JOIN patient pa ON pp.patient_id = pa.patient_id
