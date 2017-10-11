@@ -34,7 +34,7 @@ import java.util.List;
 @EnableBatchProcessing
 public class BatchConfiguration extends DefaultBatchConfigurer {
 
-	public static final String FULL_DATA_EXPORT_JOB_NAME = "endtbExports";
+	public static final String FULL_DATA_EXPORT_JOB_NAME = "ammanExports";
 
 	@Autowired
 	private JobBuilderFactory jobBuilderFactory;
@@ -85,17 +85,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
 				.incrementer(new RunIdIncrementer()).preventRestart()
 				.listener(listener())
-		                .flow(treatmentRegistrationBaseExportStep.getStep())
-						.next(metaDataCodeDictionaryExportStep.getStep())
-		                .next(tbDrugOrderBaseExportStep.getStep())
-		                .next(nonTBDrugOrderBaseExportStep.getStep());
-
-		for (BahmniForm form : forms) {
-				ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
-				observationExportStep.setForm(form);
-				completeDataExport.next(observationExportStep.getStep());
-		}
-
+		                .flow(treatmentRegistrationBaseExportStep.getStep());
 		return completeDataExport.end().build();
 	}
 

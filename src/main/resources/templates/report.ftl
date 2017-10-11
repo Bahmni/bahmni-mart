@@ -26,7 +26,7 @@
 <div class="opd-wrapper bahmni-reports">
     <div class="opd-content-wrapper">
         <section class="section-grid">
-            <h2 class="section-title">Endtb Exports</h2>
+            <h2 class="section-title">Amman Exports</h2>
             <table class="alt-row">
                 <thead>
                 <tr>
@@ -40,7 +40,7 @@
                     <td>${jobResult.dateOfExecution}</td>
                     <td>${jobResult.status}</td>
                     <#if jobResult.status == 'COMPLETED'>
-                        <td><a href="/openmrs/ws/rest/v1/endtb/export?filename=${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i></a></td>
+                        <td><a href="/openmrs/ws/rest/v1/amman/export?filename=${jobResult.zipFileName}" class="button small report-download"><i class="fa fa-download"></i></a></td>
                     </#if>
                 </tr>
                 </#list>
