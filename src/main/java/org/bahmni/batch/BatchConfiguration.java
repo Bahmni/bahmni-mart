@@ -6,7 +6,7 @@ import org.bahmni.batch.exception.BatchResourceException;
 import org.bahmni.batch.exports.MetaDataCodeDictionaryExportStep;
 import org.bahmni.batch.exports.NonTBDrugOrderBaseExportStep;
 import org.bahmni.batch.exports.ObservationExportStep;
-import org.bahmni.batch.exports.TBDrugOrderBaseExportStep;
+import org.bahmni.batch.exports.DrugOrderBaseExportStep;
 import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.batch.form.FormListProcessor;
 import org.bahmni.batch.form.domain.BahmniForm;
@@ -43,7 +43,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
 
 	@Autowired
-	private TBDrugOrderBaseExportStep tbDrugOrderBaseExportStep;
+	private DrugOrderBaseExportStep drugOrderBaseExportStep;
 
 	@Autowired
 	private NonTBDrugOrderBaseExportStep nonTBDrugOrderBaseExportStep;
@@ -85,7 +85,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
 				.incrementer(new RunIdIncrementer()).preventRestart()
 				.listener(listener())
-		                .flow(treatmentRegistrationBaseExportStep.getStep());
+		                .flow(drugOrderBaseExportStep.getStep());
 		return completeDataExport.end().build();
 	}
 
