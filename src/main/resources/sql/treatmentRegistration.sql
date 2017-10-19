@@ -1,39 +1,22 @@
 SELECT
-  o.identifier as 'id_emr',
-  DATE_FORMAT(o.birthdate, '%d/%b/%Y') as 'dob',
-  o.age as 'age',
-  IF(o.gender = 'M',1, IF(o.gender = 'F',2, 3)) AS 'sex',
-  o.program_name as 'tbregtype',
-  MAX(IF(pat.program_attribute_type_id = '2', CONCAT('\"',o.attr_value,'\"'), NULL)) AS `regnum`,
-  DATE_FORMAT(o.date_enrolled, '%d/%b/%Y') as 'd_reg',
-  MAX(IF(pat.program_attribute_type_id = '6', CONCAT('\"',o.concept_name, '\"'), NULL)) AS `reg_facility`,
-  o.status
-FROM
-  (SELECT
-     CONCAT('\"',pi.identifier,'\"') as identifier,
-     floor(datediff(CURDATE(), p.birthdate) / 365) AS age,
-     p.birthdate,
-     p.gender,
-     CONCAT('\"',prog.name, '\"') as program_name,
-     attr.attribute_type_id,
-     attr.value_reference as attr_value,
-     pp.date_enrolled as date_enrolled,
-     pp.patient_id,
-     prog.program_id,
-     cn.name as concept_name,
-     CONCAT('\"',outcome_concept.name, '\"') as status,
-     pp.patient_program_id
-   FROM  patient_program pp
-     JOIN program prog ON pp.program_id = prog.program_id AND pp.voided = 0
-     JOIN person p ON pp.patient_id = p.person_id
-     JOIN person_name pn ON p.person_id = pn.person_id
-     JOIN patient pa ON pp.patient_id = pa.patient_id
-     JOIN patient_identifier pi ON pa.patient_id = pi.patient_id
-     LEFT OUTER JOIN patient_program_attribute attr ON pp.patient_program_id = attr.patient_program_id AND attr.voided = 0
-     LEFT OUTER JOIN program_attribute_type attr_type ON attr.attribute_type_id = attr_type.program_attribute_type_id
-     LEFT OUTER JOIN concept_name cn ON cn.concept_id = attr.value_reference AND cn.voided =0
-     LEFT OUTER JOIN concept_name outcome_concept ON outcome_concept.concept_id = pp.outcome_concept_id and outcome_concept.concept_name_type='FULLY_SPECIFIED' AND outcome_concept.voided = 0
-  ) o
-  LEFT OUTER JOIN program_attribute_type pat ON o.attribute_type_id = pat.program_attribute_type_id
-GROUP BY patient_id, patient_program_id
-ORDER BY patient_id, date_enrolled;
+  p.patient_id                                     AS patient_id,
+  ps.patient_program_id                            AS `Patient_prg_id`,
+  DATE_FORMAT(person.birthdate, '%d/%m/%Y')        AS dob,
+  TIMESTAMPDIFF(YEAR, person.birthdate, CURDATE()) AS age,
+  person.gender                                    AS sex,
+  program.name                                     AS `Prg_name`,
+  DATE_FORMAT(pp.date_enrolled, '%d/%m/%Y')        AS `Prg_start_dt`,
+  DATE_FORMAT(pp.date_completed, '%d/%m/%Y')       AS `Prg_end_dt`,
+  outcomeConcept.name                              AS `Prg_outcome`,
+  programStateConcept.name                         AS `Prg_state`,
+  DATE_FORMAT(ps.start_date, '%d/%m/%Y')           AS `Prg_state_start`,
+  DATE_FORMAT(ps.end_date, '%d/%m/%Y')             AS `Prg_state_end`
+FROM patient p
+  JOIN person ON p.patient_id = person.person_id AND person.voided IS FALSE AND p.voided IS FALSE
+  JOIN patient_program pp ON p.patient_id = pp.patient_id AND pp.voided IS FALSE
+  JOIN program ON pp.program_id = program.program_id AND program.retired IS FALSE
+  JOIN patient_state ps ON pp.patient_program_id = ps.patient_program_id AND ps.voided IS FALSE
+  JOIN program_workflow_state pws ON ps.state = pws.program_workflow_state_id AND ps.voided IS FALSE AND pws.retired IS FALSE
+  JOIN concept_name programStateConcept ON pws.concept_id = programStateConcept.concept_id AND programStateConcept.voided IS FALSE AND programStateConcept.concept_name_type = 'FULLY_SPECIFIED'
+  LEFT JOIN concept_name outcomeConcept ON pp.outcome_concept_id = outcomeConcept.concept_id AND outcomeConcept.voided IS FALSE AND outcomeConcept.concept_name_type = 'FULLY_SPECIFIED'
+ORDER BY pp.patient_program_id
