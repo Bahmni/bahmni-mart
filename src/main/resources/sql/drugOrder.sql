@@ -1,7 +1,8 @@
 SELECT
   o.patient_id                                                                               AS 'patient_id',
   o.programId                                                                                AS 'program_id',
-  CONCAT('\"', o.drug, '\"')                                                                 AS 'drug',
+  CONCAT('\"', o.drugCode, '\"')                                                             AS 'drug_code',
+  CONCAT('\"', o.drugName, '\"')                                                             AS 'drug_name',
   o.dose                                                                                     AS 'dose',
   o.units                                                                                    AS 'unit',
   o.route                                                                                    AS 'route',
@@ -19,7 +20,8 @@ SELECT
 FROM
   (SELECT
      pp.patient_program_id                                                                        AS 'programId',
-     IF(drug.name IS NULL, drug_order.drug_non_coded, coalesce(drug_code.code, drug.name))        AS 'drug',
+     drug_code.code                                                                               AS 'drugCode',
+     drug.name                                                                                    AS 'drugName',
      drug_order.dose                                                                              AS 'dose',
      drug_order.duration                                                                          AS 'duration',
      durationUnitscn.name                                                                         AS 'durationUnits',
