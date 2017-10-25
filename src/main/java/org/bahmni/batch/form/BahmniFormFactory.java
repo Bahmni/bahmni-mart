@@ -16,10 +16,14 @@ public class BahmniFormFactory {
 	@Value("${addMoreAndMultiSelectConcepts}")
 	private String addMoreConceptNames;
 
+	@Value("${ignoreConcepts}")
+	private String ignoreConceptsNames;
+
 	@Autowired
 	private ObsService obsService;
 
 	private List<Concept> addMoreAndMultiSelectConcepts;
+	private List<Concept> ignoreConcepts;
 
 	public BahmniForm createForm(Concept concept, BahmniForm parentForm) {
 		return createForm(concept,parentForm,0);
@@ -46,7 +50,9 @@ public class BahmniFormFactory {
 		int childDepth = depth+1;
 		for(Concept childConcept: childConcepts){
 
-			if(addMoreAndMultiSelectConcepts.contains(childConcept)){
+			if (ignoreConcepts.contains(childConcept)) {
+				continue;
+			} else if(addMoreAndMultiSelectConcepts.contains(childConcept)){
 				bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth));
 			}else if(childConcept.getIsSet() == 0){
 				bahmniForm.addField(childConcept);
@@ -59,6 +65,7 @@ public class BahmniFormFactory {
 	@PostConstruct
 	public void postConstruct(){
 		this.addMoreAndMultiSelectConcepts = obsService.getConceptsByNames(addMoreConceptNames);
+		this.ignoreConcepts = obsService.getConceptsByNames(ignoreConceptsNames);
 	}
 
 	public void setObsService(ObsService obsService) {

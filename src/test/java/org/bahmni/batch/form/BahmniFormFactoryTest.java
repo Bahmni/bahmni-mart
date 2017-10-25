@@ -7,16 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
-
 public class BahmniFormFactoryTest {
 
 	private List<Concept> allConcepts;
@@ -36,16 +34,25 @@ public class BahmniFormFactoryTest {
 	@Mock
 	private ObsService obsService;
 
+    private String addMoreAndMultiSelectConceptNames;
+    private String ignoreConceptNames;
+
 	@Before
-	public void setup(){
+	public void setup() throws NoSuchFieldException, IllegalAccessException, InstantiationException {
 		initMocks(this);
 
+		addMoreAndMultiSelectConceptNames = "Operation Notes Template, Discharge Summary, Surgeries and Procedures, Other Notes, BP, Notes";
 		List<Concept> addMoreAndMultiSelectConcepts = new ArrayList<>();
 		addMoreAndMultiSelectConcepts.add(new Concept(3365,"Operation Notes Template",1));
 		addMoreAndMultiSelectConcepts.add(new Concept(1200,"Discharge Summary, Surgeries and Procedures",1));
 		addMoreAndMultiSelectConcepts.add(new Concept(1206,"Other Notes",1));
 		addMoreAndMultiSelectConcepts.add(new Concept(7771,"BP",1));
 		addMoreAndMultiSelectConcepts.add(new Concept(1209,"Notes",0));
+
+		ignoreConceptNames = "Video, Audio";
+		List<Concept> ignoreConcepts = new ArrayList<>();
+		ignoreConcepts.add(new Concept(1111,"Video", 0));
+		ignoreConcepts.add(new Concept(1112,"Audio", 0));
 
 		allConcepts = new ArrayList<>();
 		allConcepts.add(new Concept(1189,"History and Examination",1));
@@ -77,13 +84,20 @@ public class BahmniFormFactoryTest {
 
 		bahmniFormFactory = new BahmniFormFactory();
 		bahmniFormFactory.setObsService(obsService);
-		when(obsService.getConceptsByNames(any(String.class))).thenReturn(addMoreAndMultiSelectConcepts);
+		when(obsService.getConceptsByNames(addMoreAndMultiSelectConceptNames)).thenReturn(addMoreAndMultiSelectConcepts);
+		when(obsService.getConceptsByNames(ignoreConceptNames)).thenReturn(ignoreConcepts);
+        setValuesForMemberFields(bahmniFormFactory, "addMoreConceptNames", addMoreAndMultiSelectConceptNames);
+        setValuesForMemberFields(bahmniFormFactory, "ignoreConceptsNames", ignoreConceptNames);
 		bahmniFormFactory.postConstruct();
-
-
 	}
 
-	@Test
+    private void setValuesForMemberFields(Object bahmniFormFactory, String fieldName, String valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+        Field f1 = bahmniFormFactory.getClass().getDeclaredField(fieldName);
+        f1.setAccessible(true);
+        f1.set(bahmniFormFactory, valueForMemberField);
+    }
+
+    @Test
 	public void createBahmniForm(){
 		when(obsService.getChildConcepts("All Observation Templates")).thenReturn(allConcepts);
 		when(obsService.getChildConcepts("History and Examination")).thenReturn(historyAndExaminationConcepts);
@@ -134,6 +148,27 @@ public class BahmniFormFactoryTest {
 		assertEquals(0, bahmniForm.getFields().size());
 
 		assertNull(bahmniForm.getParent());
+
+        verify(obsService, times(1)).getConceptsByNames(addMoreAndMultiSelectConceptNames);
+        verify(obsService, times(1)).getConceptsByNames(ignoreConceptNames);
 	}
 
+    @Test
+    public void shouldIgnoreCreatingAFormWhenTheConceptNameIsInIgnoreConcepts() throws Exception {
+        Concept healthEducation = new Concept(1110, "Health Education", 1);
+        Concept videoConcept = new Concept(1111, "Video", 0);
+        Concept hasTakenCourse = new Concept(1112, "Has patient taken course", 0);
+        hasTakenCourse.setParent(healthEducation);
+        videoConcept.setParent(healthEducation);
+        when(obsService.getChildConcepts("Health Education")).thenReturn(Arrays.asList(hasTakenCourse, videoConcept));
+
+        BahmniForm bahmniForm = bahmniFormFactory.createForm(healthEducation,null);
+
+        assertNotNull(bahmniForm);
+        assertEquals("Health Education", bahmniForm.getFormName().getName());
+        assertEquals(1, bahmniForm.getFields().size());
+        assertEquals(hasTakenCourse, bahmniForm.getFields().get(0));
+        verify(obsService, times(1)).getConceptsByNames(addMoreAndMultiSelectConceptNames);
+        verify(obsService, times(1)).getConceptsByNames(ignoreConceptNames);
+    }
 }

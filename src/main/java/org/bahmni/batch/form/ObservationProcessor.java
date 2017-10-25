@@ -17,11 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Scope(value="prototype")
@@ -47,36 +43,38 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 
 	@Override
 	public List<Obs> process(Map<String,Object> obsRow) throws Exception {
+        List<Integer> fieldIds = formFieldTransformer.transformFormToFieldIds(form);
 		List<Integer> allChildObsIds = new ArrayList<>();
 
 		if (form.getFormName().getIsSet() == 1) {
 			retrieveChildObsIds(allChildObsIds, Arrays.asList((Integer)obsRow.get("obs_id")));
 		}
-		else
-			allChildObsIds.add((Integer)obsRow.get("obs_id"));
-
-			List<Obs> obsRows = fetchAllLeafObs(allChildObsIds);
-
-		setObsIdAndParentObsId(obsRows,(Integer)obsRow.get("obs_id"), (Integer)obsRow.get("parent_obs_id"));
-
-		return obsRows;
+		else {
+			allChildObsIds.add((Integer) obsRow.get("obs_id"));
+		}
+		if(allChildObsIds.size() > 0 && fieldIds.size() > 0) {
+            List<Obs> obsRows = fetchAllLeafObs(allChildObsIds, fieldIds);
+            setObsIdAndParentObsId(obsRows, (Integer) obsRow.get("obs_id"), (Integer) obsRow.get("parent_obs_id"));
+			return obsRows;
+		} else {
+			return new ArrayList<>();
+		}
 	}
 
-	private List<Obs> fetchAllLeafObs(List<Integer> allChildObsGroupIds) {
+	private List<Obs> fetchAllLeafObs(List<Integer> allChildObsGroupIds, List<Integer> fieldIds) {
 		Map<String,List<Integer>> params = new HashMap<>();
 		params.put("childObsIds",allChildObsGroupIds);
-		params.put("leafConceptIds",formFieldTransformer.transformFormToFieldIds(form));
-
-		return jdbcTemplate.query(leafObsSql, params, new BeanPropertyRowMapper<Obs>(Obs.class){
-			@Override
-			public Obs mapRow(ResultSet resultSet, int i) throws SQLException {
-				Obs obs = super.mapRow(resultSet,i);
-				Concept concept = new Concept(resultSet.getInt("conceptId"),resultSet.getString("conceptName"),0,"");
-				obs.setField(concept);
-				return obs;
-			}
-		});
-	}
+		params.put("leafConceptIds", fieldIds);
+        return jdbcTemplate.query(leafObsSql, params, new BeanPropertyRowMapper<Obs>(Obs.class) {
+            @Override
+            public Obs mapRow(ResultSet resultSet, int i) throws SQLException {
+                Obs obs = super.mapRow(resultSet, i);
+                Concept concept = new Concept(resultSet.getInt("conceptId"), resultSet.getString("conceptName"), 0, "");
+                obs.setField(concept);
+                return obs;
+            }
+        });
+    }
 
 	protected void retrieveChildObsIds(List<Integer> allChildObsIds, List<Integer> ids){
 

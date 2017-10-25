@@ -88,6 +88,11 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 			.flow(treatmentRegistrationBaseExportStep.getStep())
 		                .next(drugOrderBaseExportStep.getStep())
 		                .next(metaDataCodeDictionaryExportStep.getStep());
+		for (BahmniForm form : forms) {
+			ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
+			observationExportStep.setForm(form);
+			completeDataExport.next(observationExportStep.getStep());
+		}
 		return completeDataExport.end().build();
 	}
 

@@ -109,12 +109,24 @@ public class ObservationProcessorTest {
 		observationProcessor.setLeafObsSqlResource(new ByteArrayResource("get..all..child".getBytes()));
 		observationProcessor.setFormFieldTransformer(formFieldTransformer);
 
+		Concept systolicConcept = new Concept(1, "systolic", 0);
+		Concept diastolicConcept = new Concept(2, "diastolic", 0);
+		Concept abcdConcept = new Concept(3, "abcd", 0);
+		form.addField(systolicConcept);
+		form.addField(diastolicConcept);
+		obsList = new ArrayList<>();
+		obsList.add(new Obs("treatment1",1,null, systolicConcept,"120"));
+		obsList.add(new Obs("treatment1",2,null, diastolicConcept,"80"));
+		obsList.add(new Obs("treatment1",3,null, abcdConcept,"180"));
+
+		when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(Arrays.asList(1, 2));
+
+
 		observationProcessor.setForm(form);
 		observationProcessor.postConstruct();
 
 		when(namedParameterJdbcTemplate.query(eq("blah..blah..blah"),any(Map.class),any(SingleColumnRowMapper.class)))
-				.thenReturn(Arrays.asList(2,3,4))
-				.thenReturn(Arrays.asList(5,6,7))
+				.thenReturn(Arrays.asList(1,2,3))
 				.thenReturn(new ArrayList());
 
 		when(namedParameterJdbcTemplate.query(eq("get..all..child"),any(Map.class),any(BeanPropertyRowMapper.class)))
