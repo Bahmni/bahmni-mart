@@ -1,6 +1,6 @@
 SELECT
   o.patient_id                                                                               AS 'patient_id',
-  o.programId                                                                                AS 'program_id',
+  o.programId                                                                                AS 'patient_prg_id',
   CONCAT('\"', o.drugCode, '\"')                                                             AS 'drug_code',
   CONCAT('\"', o.drugName, '\"')                                                             AS 'drug_name',
   o.dose                                                                                     AS 'dose',
