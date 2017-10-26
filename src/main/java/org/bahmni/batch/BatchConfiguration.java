@@ -86,7 +86,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 				.incrementer(new RunIdIncrementer()).preventRestart()
 				.listener(listener())
 			.flow(treatmentRegistrationBaseExportStep.getStep())
-		                .next(drugOrderBaseExportStep.getStep());
+		                .next(drugOrderBaseExportStep.getStep())
+		                .next(metaDataCodeDictionaryExportStep.getStep());
 		return completeDataExport.end().build();
 	}
 

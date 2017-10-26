@@ -1,116 +1,82 @@
-SELECT  CONCAT('\"', cv.concept_full_name, '\"')  AS fully_specified_name,
-        CONCAT('\"', cv.concept_short_name, '\"') AS question,
-        cv.concept_datatype_name,
-        CONCAT( '\"',
-                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(cv.description, '"', ' '), '\t', ' '), '\n', ' '), '\r', ' '), ',', ' '),
-                '\"')        AS description,
-        crtv.code                                 AS question_header,
-        CONCAT('\"', cn.name, '\"')               AS answer,
-        crtv_answer.code                          AS answer_code
-FROM    concept_view cv
-  INNER JOIN
-  concept_reference_term_map_view crtv ON   cv.concept_id = crtv.concept_id AND
-                                            crtv.concept_reference_source_name = 'EndTB-Export' AND
-                                            crtv.concept_map_type_name = 'SAME-AS' AND cv.concept_datatype_name IN ('Numeric', 'Text', 'Date', 'Boolean', 'Coded')
-  LEFT JOIN
-  concept_answer ca ON cv.concept_id = ca.concept_id
-  LEFT OUTER JOIN
-  concept_name cn ON  ca.answer_concept = cn.concept_id AND cn.voided = 0 AND
-                      cn.concept_name_type = 'FULLY_SPECIFIED'
-  LEFT OUTER JOIN
-  concept_reference_term_map_view crtv_answer ON  ca.answer_concept = crtv_answer.concept_id AND
-                                                  crtv_answer.concept_map_type_name = 'SAME-AS' AND
-                                                  crtv_answer.concept_reference_source_name = 'EndTB-Export'
-
-
-  UNION
-  select CONCAT('\"', codes.`Non TB Drug frequency`, '\"'), "", "Coded", "", codes.`othdrugfreq`, CONCAT('\"',cv.concept_full_name, '\"'),  crtmv.code
-  from concept  c
-  join concept_view cv ON cv.concept_id = c.concept_id AND c.class_id=20
-  JOIN (SELECT "Non TB Drug frequency", "othdrugfreq" UNION SELECT "TB Drug Frequency","tbdrugfreq" ) as codes
-  JOIN concept_reference_term_map_view crtmv ON crtmv.concept_id= c.concept_id AND crtmv.concept_map_type_name = 'SAME-AS' AND crtmv.concept_reference_source_name = 'EndTB-Export'
-
-  UNION
-  SELECT CONCAT('\"',cv.concept_full_name, '\"'), CONCAT('\"',cv.concept_short_name,'\"'), "Coded", "",
-  IF(cv.concept_full_name = 'All TB Drugs', "tbdrug",
-        IF(cv.concept_full_name='Dosing Instructions',"reas_othdrug",null)),
-  CONCAT('\"',tbDrugs.concept_full_name, '\"'), crtmv.code
-  FROM concept c JOIN concept_view cv ON cv.concept_full_name IN ('All TB Drugs','Dosing Instructions')
-                                       AND c.concept_id = cv.concept_id
-  JOIN concept_set cs ON cs.concept_set = c.concept_id
-  JOIN concept_view tbDrugs ON tbDrugs.concept_id = cs.concept_id
-  JOIN concept_reference_term_map_view crtmv ON crtmv.concept_id= tbDrugs.concept_id  AND
-                                                crtmv.concept_map_type_name = 'SAME-AS' AND  crtmv.concept_reference_source_name = 'EndTB-Export'
+SELECT
+     CONCAT("\"", questionConcept.concept_full_name, "\"")                                  AS `Fully Specified Name`,
+     CONCAT("\"", questionConcept.concept_short_name, "\"")                                 AS `Question`,
+     questionConcept.concept_datatype_name                                                  AS `Qeustion Datatype`,
+     CONCAT("\"", questionConcept.description, "\"")                                        AS `Description`,
+     crtv.code                                                                              AS `Question Header`,
+     CONCAT("\"",answerConcept.answer, "\"")                                                AS `Answer`,
+     crtvForAnswerCode.code                                                                 AS `Answer Code`
+  FROM concept_set cs
+    LEFT JOIN (SELECT
+                    ca.concept_id,
+                    cv.concept_full_name                      AS `answer`,
+                    ca.answer_concept
+              FROM concept_answer ca
+              INNER JOIN concept_view cv ON cv.concept_id = ca.answer_concept) answerConcept ON answerConcept.concept_id = cs.concept_id
+    INNER JOIN concept_view questionConcept ON questionConcept.concept_id = cs.concept_id AND questionConcept.concept_short_name IS NOT NULL
+    LEFT JOIN concept_reference_term_map_view crtvForAnswerCode ON crtvForAnswerCode.concept_id = answerConcept.answer_concept AND crtvForAnswerCode.concept_reference_source_name = 'MSF-INTERNAL'
+    LEFT JOIN concept_reference_term_map_view crtv ON  cs.concept_id = crtv.concept_id AND crtv.concept_map_type_name = 'SAME-AS' AND crtv.concept_reference_source_name = 'MSF-INTERNAL'
 UNION
-SELECT CONCAT('\"',cv.concept_full_name, '\"'), CONCAT('\"',cv.concept_short_name,'\"'), "Coded", "",
-   codesForDosingUnits.othdrugform,
-  CONCAT('\"',tbDrugs.concept_full_name, '\"'), crtmv.code
-FROM concept c JOIN concept_view cv ON cv.concept_full_name IN ('Dosing Units')
-                                       AND c.concept_id = cv.concept_id
-  JOIN concept_set cs ON cs.concept_set = c.concept_id
-  JOIN (SELECT "othdrugform" UNION SELECT "othtotdrugform" UNION SELECT "unit") as codesForDosingUnits
-  JOIN concept_view tbDrugs ON tbDrugs.concept_id = cs.concept_id
-  JOIN concept_reference_term_map_view crtmv ON crtmv.concept_id= tbDrugs.concept_id  AND
-                                                crtmv.concept_map_type_name = 'SAME-AS' AND  crtmv.concept_reference_source_name = 'EndTB-Export'
+SELECT
+      "Drug Code"                                                         AS `Fully Specified Name`,
+      "drug_code"                                                         AS `question`,
+      drugCV.concept_class_name                                           AS `question_datatype`,
+      concat("\"", drugCV.description, "\"")                              AS `description`,
+      "drug_code"                                                         AS `header`,
+      concat("\"", drugCV.concept_full_name, "\"")                        AS `answer`,
+      drugCrtv.code                                                       AS `answer code`
+    FROM concept_view drugCV
+    INNER JOIN concept_reference_term_map_view drugCrtv ON drugCrtv.concept_id = drugCV.concept_id
+                                            AND concept_reference_source_name = 'MSF-INTERNAL' AND drugCV.concept_class_name = 'Drug'
 UNION
-SELECT CONCAT('\"',cv.concept_full_name, '\"'), CONCAT('\"',cv.concept_short_name,'\"'), "Coded", "",
-  codesForRoutes.othdrugroute,
-  CONCAT('\"',tbDrugs.concept_full_name, '\"'), crtmv.code
-FROM concept c JOIN concept_view cv ON cv.concept_full_name IN ('Drug Routes')
-                                       AND c.concept_id = cv.concept_id
-  JOIN concept_set cs ON cs.concept_set = c.concept_id
-  JOIN (SELECT "othdrugroute" UNION SELECT "tbroute") as codesForRoutes
-  JOIN concept_view tbDrugs ON tbDrugs.concept_id = cs.concept_id
-  JOIN concept_reference_term_map_view crtmv ON crtmv.concept_id= tbDrugs.concept_id  AND
-                                                crtmv.concept_map_type_name = 'SAME-AS' AND  crtmv.concept_reference_source_name = 'EndTB-Export'
-
-  UNION
-  SELECT CONCAT('\"',"Non TB Drugs Notes", '\"'),"", "Text","", CONCAT('\"',"additional_instructions",'\"'), "",""
-  UNION
-  SELECT CONCAT('\"',"Additional Instructions", '\"'),"", "Text", "", CONCAT('\"',"addlinstr",'\"'), "",""
-  UNION
-  SELECT CONCAT('\"',"Non TB Drug Start Date", '\"'),"", "Date", "", CONCAT('\"',"d_othdrugstart",'\"'), "",""
-  UNION
-  SELECT CONCAT('\"',"Non TB Drug End Date", '\"'),"", "Date", "", CONCAT('\"',"d_othdrugend",'\"'), "",""
-  UNION
-  SELECT CONCAT('\"',"Treatment Registration Date", '\"'),"", "Date", "", CONCAT('\"',"d_reg",'\"'), "",""
-  UNION
-  SELECT CONCAT('\"',"TB Drug Start Date", '\"'),"", "Date", "", CONCAT('\"',"d_tbdrugstart",'\"'), "",""
-  UNION
-  SELECT CONCAT('\"',"TB Drug End Date", '\"'),"", "Date", "", CONCAT('\"',"d_tbdrugend",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Non TB Drug Start Date", '\"'),"", "Date", "", CONCAT('\"',"d_othdrugstart",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Non TB Drug End Date", '\"'),"", "Date", "", CONCAT('\"',"d_othdrugend",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Age", '\"'),"", "Numeric", "",  CONCAT('\"',"age",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Non TB Drug Duration", '\"'),"", "Text", "", CONCAT('\"',"duration",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Non TB Drugs", '\"'),"", "Text", "", CONCAT('\"',"othdrug",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Non TB Drug Dose", '\"'),"", "Numeric", "", CONCAT('\"',"othdrugdose",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Non TB Drug Quantity", '\"'),"", "Numeric", "", CONCAT('\"',"othtotdrugqty",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Registration Facility", '\"'),"", "Text", "", CONCAT('\"',"reg_facility",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Registration Number", '\"'),"", "Text", "", CONCAT('\"',"regnum",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Male","1"
-  UNION
-  SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Female","2"
-  UNION
-  SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Other","3"
-  UNION
-  SELECT CONCAT('\"',"Status", '\"'),"", "Text", "", CONCAT('\"',"status",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"TB Drug dose", '\"'),"", "Numeric", "", CONCAT('\"',"tbdose",'\"'),"",""
-  UNION
-  SELECT CONCAT('\"',"Treatment Registration type", '\"'),"", "Text", "", CONCAT('\"',"tbregtype",'\"'),"",""
-
-  ORDER BY  fully_specified_name ASC,
-  question ASC,
-  question_header ASC;
-
-
+SELECT CONCAT('\"',"Patient Identifier", '\"'),"", "Text","", CONCAT('\"',"patient_id",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Program Identifier", '\"'),"", "Text","", CONCAT('\"',"patient_prg_id",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Drug Name", '\"'),"", "Text","", CONCAT('\"',"drug_name",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Drug Start Date", '\"'),"", "Date", "", CONCAT('\"',"drug_start",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Drug End Date", '\"'),"", "Date", "", CONCAT('\"',"drug_stop",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Drug dose", '\"'),"", "Numeric", "", CONCAT('\"',"dose",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Additional Instructions", '\"'),"", "Text", "", CONCAT('\"',"additional_instr",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Location Name", '\"'),"", "Text", "", CONCAT('\"',"location",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Drug Duration", '\"'),"", "Numeric", "", CONCAT('\"',"duration",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Direct Observation Therapy", '\"'),"", "Coded", "", CONCAT('\"',"dot",'\"'), "Yes",""
+UNION
+SELECT CONCAT('\"',"Direct Observation Therapy", '\"'),"", "Coded", "", CONCAT('\"',"dot",'\"'), "No",""
+UNION
+SELECT CONCAT('\"',"Drug Dispense", '\"'),"", "Coded", "", CONCAT('\"',"dispense",'\"'), "Yes",""
+UNION
+SELECT CONCAT('\"',"Drug Dispense", '\"'),"", "Coded", "", CONCAT('\"',"dispense",'\"'), "No",""
+UNION
+SELECT CONCAT('\"',"Drug Stop Reason", '\"'),"", "Text", "", CONCAT('\"',"stop_reason",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Drug Stop Notes", '\"'),"", "Text", "", CONCAT('\"',"stop_notes",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Date Of Birth", '\"'),"", "Date", "", CONCAT('\"',"dob",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Patient Age", '\"'),"", "Number", "", CONCAT('\"',"age",'\"'), "",""
+UNION
+SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Male","1"
+UNION
+SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Female","2"
+UNION
+SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Other","3"
+UNION
+SELECT CONCAT('\"',"Program Name", '\"'),"", "Text", "", CONCAT('\"',"prg_name",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Program Start Date", '\"'),"", "Date", "", CONCAT('\"',"prg_start_dt",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Program End Date", '\"'),"", "Date", "", CONCAT('\"',"prg_end_dt",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Program Outcome", '\"'),"", "Text", "", CONCAT('\"',"prg_outcome",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Program State Start Date", '\"'),"", "Date", "", CONCAT('\"',"prg_state_start",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Program State End Date", '\"'),"", "Date", "", CONCAT('\"',"prg_state_end",'\"'),"","";
