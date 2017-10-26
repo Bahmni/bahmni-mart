@@ -85,7 +85,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
 				.incrementer(new RunIdIncrementer()).preventRestart()
 				.listener(listener())
-		                .flow(drugOrderBaseExportStep.getStep());
+			.flow(treatmentRegistrationBaseExportStep.getStep())
+		                .next(drugOrderBaseExportStep.getStep());
 		return completeDataExport.end().build();
 	}
 
