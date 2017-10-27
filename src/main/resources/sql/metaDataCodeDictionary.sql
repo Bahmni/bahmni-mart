@@ -20,14 +20,15 @@ UNION
 SELECT
       "Drug Code"                                                         AS `Fully Specified Name`,
       "drug_code"                                                         AS `question`,
-      drugCV.concept_class_name                                           AS `question_datatype`,
-      concat("\"", drugCV.description, "\"")                              AS `description`,
+      "Drug"                                                              AS `question_datatype`,
+      concat("\"", drugDesc.description, "\"")                              AS `description`,
       "drug_code"                                                         AS `header`,
-      concat("\"", drugCV.concept_full_name, "\"")                        AS `answer`,
+      concat("\"", drugCV.name, "\"")                        AS `answer`,
       drugCrtv.code                                                       AS `answer code`
-    FROM concept_view drugCV
+    FROM drug drugCV
+    LEFT JOIN concept_description drugDesc on drugDesc.concept_id = drugCV.concept_id
     INNER JOIN concept_reference_term_map_view drugCrtv ON drugCrtv.concept_id = drugCV.concept_id
-                                            AND concept_reference_source_name = 'MSF-INTERNAL' AND drugCV.concept_class_name = 'Drug'
+                                            AND concept_reference_source_name = 'MSF-INTERNAL'
 UNION
 SELECT CONCAT('\"',"Patient Identifier", '\"'),"", "Text","", CONCAT('\"',"patient_id",'\"'), "",""
 UNION
