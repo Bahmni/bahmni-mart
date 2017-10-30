@@ -21,7 +21,7 @@ FROM
   (SELECT
      pp.patient_program_id                                                                        AS 'programId',
      drug_code.code                                                                               AS 'drugCode',
-     drug.name                                                                                    AS 'drugName',
+     IF(drug_code.code IS NOT NULL, drug.name, drug_order.drug_non_coded)                         AS 'drugName',
      drug_order.dose                                                                              AS 'dose',
      drug_order.duration                                                                          AS 'duration',
      durationUnitscn.name                                                                         AS 'durationUnits',
@@ -46,13 +46,12 @@ FROM
      JOIN patient_program pp ON pp.patient_id = p.patient_id AND pp.voided IS FALSE
      JOIN encounter e ON e.patient_id = p.patient_id AND e.voided IS FALSE
      JOIN orders ON orders.patient_id = pp.patient_id AND orders.encounter_id = e.encounter_id AND
-                           orders.voided = 0 AND (orders.order_action) != "DISCONTINUE"
+                            orders.voided IS FALSE AND orders.order_action != "DISCONTINUE"
      LEFT JOIN obs ON obs.order_id = orders.order_id AND obs.voided IS FALSE AND obs.concept_id = (SELECT concept_id FROM concept_name WHERE name = "Dispensed" )
      LEFT JOIN orders stopped_order ON stopped_order.patient_id = pp.patient_id AND stopped_order.voided = 0 AND
-                                       (stopped_order.order_action) = "DISCONTINUE" AND
+                                       stopped_order.order_action = "DISCONTINUE" AND
                                        stopped_order.previous_order_id = orders.order_id
      JOIN concept c on c.concept_id = orders.concept_id AND c.retired IS FALSE
-     JOIN concept_class cc on cc.concept_class_id = c.class_id AND cc.name = "Drug"
      LEFT JOIN drug_order drug_order ON drug_order.order_id = orders.order_id
      LEFT JOIN concept_name durationUnitscn ON durationUnitscn.concept_id = drug_order.duration_units AND durationUnitscn.concept_name_type = "FULLY_SPECIFIED" AND durationUnitscn.voided = 0
      LEFT JOIN drug ON drug.concept_id = orders.concept_id
