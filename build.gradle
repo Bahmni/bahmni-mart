@@ -38,6 +38,10 @@ dependencies {
     compile group: 'org.springframework', name: 'spring-context-support', version: '4.2.6.RELEASE'
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+    testCompile group: 'org.powermock', name: 'powermock-core', version: '1.6.4'
+    testCompile "org.powermock:powermock-module-junit4:1.6.4"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
+    testCompile "org.powermock:powermock-api-mockito:1.6.4"
 }
 
 jar {
