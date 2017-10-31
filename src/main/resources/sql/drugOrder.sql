@@ -36,7 +36,7 @@ FROM
      ln.name                                                                                      AS 'location',
      drug_order.as_needed                                                                         AS 'dot',
      obs.value_coded                                                                              AS 'dispense',
-     coalesce(stopped_order_cn.name,stopped_reason.code)                                                                          AS 'stopped_order_reason',
+     coalesce(stopped_reason.code,stopped_order_cn.name)                                                                          AS 'stopped_order_reason',
      stopped_order.order_reason_non_coded                                                         AS  'order_reason_non_coded',
      IF(LOCATE("additionalInstructions", drug_order.dosing_instructions),
         CONCAT('\"',TRIM(TRAILING '"}' FROM SUBSTRING_INDEX(drug_order.dosing_instructions, '"', -2)), '\"'),
