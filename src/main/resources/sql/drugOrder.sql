@@ -36,7 +36,7 @@ FROM
      ln.name                                                                                      AS 'location',
      drug_order.as_needed                                                                         AS 'dot',
      obs.value_coded                                                                              AS 'dispense',
-     stopped_reason.code                                                                          AS 'stopped_order_reason',
+     coalesce(stopped_order_cn.name,stopped_reason.code)                                                                          AS 'stopped_order_reason',
      stopped_order.order_reason_non_coded                                                         AS  'order_reason_non_coded',
      IF(LOCATE("additionalInstructions", drug_order.dosing_instructions),
         CONCAT('\"',TRIM(TRAILING '"}' FROM SUBSTRING_INDEX(drug_order.dosing_instructions, '"', -2)), '\"'),
@@ -63,6 +63,7 @@ FROM
      LEFT JOIN order_frequency ON order_frequency.order_frequency_id = drug_order.frequency
      LEFT JOIN concept_reference_term_map_view fre ON order_frequency.concept_id = fre.concept_id and fre.concept_reference_source_name='MSF-INTERNAL' and fre.concept_map_type_name= 'SAME-AS'
      LEFT JOIN concept_name freqcn ON freqcn.concept_id = order_frequency.concept_id AND freqcn.concept_name_type = "FULLY_SPECIFIED" AND freqcn.voided = 0
+     LEFT JOIN concept_name stopped_order_cn ON stopped_order_cn.concept_id= stopped_order.order_reason AND stopped_order_cn.concept_name_type = "FULLY_SPECIFIED" AND stopped_order_cn.voided = 0
      LEFT JOIN concept_reference_term_map_view stopped_reason ON stopped_order.order_reason = stopped_reason.concept_id and stopped_reason.concept_reference_source_name='MSF-INTERNAL' and stopped_reason.concept_map_type_name= 'SAME-AS'
      LEFT JOIN location ln ON ln.location_id = e.location_id
   ) o
