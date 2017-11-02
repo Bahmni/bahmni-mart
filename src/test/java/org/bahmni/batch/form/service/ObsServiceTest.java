@@ -22,7 +22,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 
 
-@PrepareForTest({BatchUtils.class})
+@PrepareForTest({BatchUtils.class, ObsService.class})
 @RunWith(PowerMockRunner.class)
 public class ObsServiceTest {
 
@@ -33,7 +33,6 @@ public class ObsServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        PowerMockito.mockStatic(BatchUtils.class);
         PowerMockito.mockStatic(BatchUtils.class);
         obsService = new ObsService();
         ClassPathResource conceptDetailsResource = Mockito.mock(ClassPathResource.class);
@@ -51,20 +50,26 @@ public class ObsServiceTest {
     public void shouldGetConceptsByNames() throws Exception {
         String commaSeparatedConceptNames = "Video, Image, Radiology Documents";
         List<String> conceptNamesList = Arrays.asList("Video", "Image", "Radiology Documents");
+        MapSqlParameterSource mapSqlParameterSource = Mockito.mock(MapSqlParameterSource.class);
+        PowerMockito.whenNew(MapSqlParameterSource.class).withNoArguments().thenReturn(mapSqlParameterSource);
         PowerMockito.when(BatchUtils.convertConceptNamesToSet(commaSeparatedConceptNames)).thenReturn(conceptNamesList);
 
         obsService.getConceptsByNames(commaSeparatedConceptNames);
 
-        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1)).query(eq("conceptDetailsSQL"), any(MapSqlParameterSource.class), any(BeanPropertyRowMapper.class));
+        Mockito.verify(mapSqlParameterSource, Mockito.times(1)).addValue("conceptNames", conceptNamesList);
+        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1)).query(eq("conceptDetailsSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
     }
 
     @Test
     public void shouldGetChildConcepts() throws Exception {
         String parentVideoConcept = "Patient Videos";
+        MapSqlParameterSource mapSqlParameterSource = Mockito.mock(MapSqlParameterSource.class);
+        PowerMockito.whenNew(MapSqlParameterSource.class).withNoArguments().thenReturn(mapSqlParameterSource);
 
         obsService.getChildConcepts(parentVideoConcept);
 
-        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1)).query(eq("conceptListSQL"), any(MapSqlParameterSource.class), any(BeanPropertyRowMapper.class));
+        Mockito.verify(mapSqlParameterSource, Mockito.times(1)).addValue("parentConceptName", parentVideoConcept);
+        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1)).query(eq("conceptListSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
     }
 
     private void setValuesForMemberFields(Object observationService, String fieldName, Object valueForMemberField) throws NoSuchFieldException, IllegalAccessException {

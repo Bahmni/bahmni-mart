@@ -1,86 +1,84 @@
 package org.bahmni.batch.helper;
 
-import org.bahmni.batch.Application;
+import freemarker.template.Template;
+import org.bahmni.batch.exception.BatchResourceException;
 import org.bahmni.batch.form.domain.BahmniForm;
-import org.bahmni.batch.form.domain.Concept;
-import org.junit.Ignore;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.junit.Assert.assertEquals;
+import freemarker.template.Configuration;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
-@TestPropertySource(locations="classpath:test.properties")
-@Ignore
+import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+
+import static org.mockito.Mockito.*;
+
+@PrepareForTest({FreeMarkerEvaluator.class})
+@RunWith(PowerMockRunner.class)
 public class FreeMarkerEvaluatorTest {
 
-	@Autowired
-	private FreeMarkerEvaluator<BahmniForm> dynamicObsQuery;
+	FreeMarkerEvaluator freeMarkerEvaluator;
 
-	@Test
-	public void ensureSqlQueryDoesNotIncludeParentInTopLevelForms(){
-		BahmniForm parent = new BahmniForm();
-		parent.setParent(null);
-		parent.setFormName(new Concept(1189,"Vitals",1));
-		parent.setDepthToParent(0);
+	@Mock
+	Configuration configuration;
 
-		String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl",parent);
-		System.out.println(sql);
-		assertEquals("SELECT obs0.obs_id,obs0.obs_id as parent_obs_id\n" +
-				"FROM obs obs0\n" +
-				"WHERE obs0.concept_id=1189\n" +
-				"AND obs0.voided = 0",sql.trim());
+	@Rule
+	ExpectedException expectedException = ExpectedException.none();
+
+	@Before
+	public void setUp() throws Exception {
+		freeMarkerEvaluator = new FreeMarkerEvaluator();
+		setValuesForMemberFields(freeMarkerEvaluator, "configuration", configuration);
 	}
 
 	@Test
-	public void ensureParentWithDepth1IsConstructed(){
-		BahmniForm parent = new BahmniForm();
-		parent.setParent(null);
-		parent.setFormName(new Concept(1,"Vitals",1));
-		parent.setDepthToParent(0);
+	public void shouldEvaluateTemplate() throws Exception {
+		BahmniForm bahmniForm = new BahmniForm();
+		String templateName = "Vital Signs";
+		StringWriter stringWriter = Mockito.mock(StringWriter.class);
+		PowerMockito.whenNew(StringWriter.class).withNoArguments().thenReturn(stringWriter);
+		Template template = Mockito.mock(Template.class);
+		Mockito.when(configuration.getTemplate(templateName)).thenReturn(template);
+		HashMap<String, Object> hashMap = mock(HashMap.class);
+		PowerMockito.whenNew(HashMap.class).withNoArguments().thenReturn(hashMap);
+		String expectedOutput = "outputValue";
+		Mockito.when(stringWriter.toString()).thenReturn(expectedOutput);
 
-		BahmniForm child = new BahmniForm();
-		child.setParent(parent);
-		child.setFormName(new Concept(10,"Systolic",1));
-		child.setDepthToParent(1);
+		String actualOutput = freeMarkerEvaluator.evaluate(templateName, bahmniForm);
 
-
-		String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl",child);
-		System.out.println(sql);
-		assertEquals("SELECT obs0.obs_id,obs1.obs_id as parent_obs_id\n" +
-						"FROM obs obs0\n" +
-						"INNER JOIN obs obs1 on ( obs1.obs_id=obs0.obs_group_id and obs1.voided=0 )\n" +
-						"WHERE obs0.concept_id=10\n" +
-						"AND obs0.voided = 0\n" +
-						"AND obs1.concept_id=1",sql.trim());
+		Assert.assertEquals(expectedOutput, actualOutput);
+		Mockito.verify(configuration, times(1)).getTemplate(templateName);
+		Mockito.verify(hashMap, times(1)).put("input", bahmniForm);
+		Mockito.verify(template, times(1)).process(hashMap, stringWriter);
 	}
 
 	@Test
-	public void ensureParentWithDepth2IsConstructed(){
-		BahmniForm parent = new BahmniForm();
-		parent.setParent(null);
-		parent.setFormName(new Concept(1,"Vitals",1));
-		parent.setDepthToParent(0);
+	public void shouldThrowBatchResourceException() throws Exception {
+		BahmniForm bahmniForm = new BahmniForm();
+		String templateName = "Vital Signs";
+		BatchResourceException batchResourceException = Mockito.mock(BatchResourceException.class);
+		Mockito.when(configuration.getTemplate(templateName)).thenThrow(batchResourceException);
 
-		BahmniForm child = new BahmniForm();
-		child.setParent(parent);
-		child.setFormName(new Concept(10,"Systolic",1));
-		child.setDepthToParent(2);
+		expectedException.expect(BatchResourceException.class);
+		expectedException.expectMessage("Unable to continue generating a the template with name ["+templateName+"]");
 
+		freeMarkerEvaluator.evaluate(templateName, bahmniForm);
+		Mockito.verify(configuration, times(1)).getTemplate(templateName);
+	}
 
-		String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl",child);
-		System.out.println(sql);
-		assertEquals("SELECT obs0.obs_id,obs2.obs_id as parent_obs_id\n" +
-						"FROM obs obs0\n" +
-						"INNER JOIN obs obs1 on ( obs1.obs_id=obs0.obs_group_id and obs1.voided=0 )\n" +
-						"INNER JOIN obs obs2 on ( obs2.obs_id=obs1.obs_group_id and obs2.voided=0 )\n" +
-						"WHERE obs0.concept_id=10\n" +
-						"AND obs0.voided = 0\n" +
-						"AND obs2.concept_id=1",sql.trim());
+	private void setValuesForMemberFields(Object batchConfiguration, String fieldName, Object valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+		Field f1 = batchConfiguration.getClass().getDeclaredField(fieldName);
+		f1.setAccessible(true);
+		f1.set(batchConfiguration, valueForMemberField);
 	}
 }

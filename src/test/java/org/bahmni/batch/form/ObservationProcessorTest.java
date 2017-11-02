@@ -3,6 +3,7 @@ package org.bahmni.batch.form;
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.bahmni.batch.form.domain.Concept;
 import org.bahmni.batch.form.domain.Obs;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -36,12 +37,20 @@ public class ObservationProcessorTest {
 
 	private BahmniForm form;
 
+	private ObservationProcessor observationProcessor;
+
 	@Before
 	public void setup(){
 		initMocks(this);
 
 		form = new BahmniForm();
 		form.setFormName(new Concept(1,"formName",0));
+
+		observationProcessor = new ObservationProcessor();
+		observationProcessor.setJdbcTemplate(namedParameterJdbcTemplate);
+		observationProcessor.setObsDetailSqlResource(new ByteArrayResource("blah..blah..blah".getBytes()));
+		observationProcessor.setLeafObsSqlResource(new ByteArrayResource("get..all..child".getBytes()));
+		observationProcessor.setFormFieldTransformer(formFieldTransformer);
 
 		obsList = new ArrayList<>();
 		obsList.add(new Obs("treatment1",1,null,new Concept(1,"systolic",0),"120"));
@@ -52,10 +61,6 @@ public class ObservationProcessorTest {
 
 	@Test
 	public void shouldRetrieveAllChildObsIds() throws Exception {
-		ObservationProcessor observationProcessor = new ObservationProcessor();
-		observationProcessor.setJdbcTemplate(namedParameterJdbcTemplate);
-		observationProcessor.setObsDetailSqlResource(new ByteArrayResource("blah..blah..blah".getBytes()));
-		observationProcessor.setLeafObsSqlResource(new ByteArrayResource("leafobssql".getBytes()));
 		observationProcessor.setForm(form);
 		observationProcessor.postConstruct();
 
@@ -103,11 +108,6 @@ public class ObservationProcessorTest {
 
 	@Test
 	public void shouldReturnObsListOfAllLeafObs() throws Exception {
-		ObservationProcessor observationProcessor = new ObservationProcessor();
-		observationProcessor.setJdbcTemplate(namedParameterJdbcTemplate);
-		observationProcessor.setObsDetailSqlResource(new ByteArrayResource("blah..blah..blah".getBytes()));
-		observationProcessor.setLeafObsSqlResource(new ByteArrayResource("get..all..child".getBytes()));
-		observationProcessor.setFormFieldTransformer(formFieldTransformer);
 
 		Concept systolicConcept = new Concept(1, "systolic", 0);
 		Concept diastolicConcept = new Concept(2, "diastolic", 0);
@@ -115,9 +115,9 @@ public class ObservationProcessorTest {
 		form.addField(systolicConcept);
 		form.addField(diastolicConcept);
 		obsList = new ArrayList<>();
-		obsList.add(new Obs("treatment1",1,null, systolicConcept,"120"));
-		obsList.add(new Obs("treatment1",2,null, diastolicConcept,"80"));
-		obsList.add(new Obs("treatment1",3,null, abcdConcept,"180"));
+		obsList.add(new Obs("treatment1",1,0, systolicConcept,"120"));
+		obsList.add(new Obs("treatment1",2,0, diastolicConcept,"80"));
+		obsList.add(new Obs("treatment1",3,0, abcdConcept,"180"));
 
 		when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(Arrays.asList(1, 2));
 
@@ -143,4 +143,21 @@ public class ObservationProcessorTest {
 		assertEquals(new Integer(1), obsListActual.get(2).getParentId());
 	}
 
+	@Test
+	public void shouldReturnEmptyListWhenChildObsAndFieldIdsAreEmpty() throws Exception {
+		Concept systolicConcept = new Concept(1, "systolic", 0);
+		form.addField(systolicConcept);
+		observationProcessor.setForm(form);
+		Map<String, Object> obsRow = new HashMap<>();
+		obsRow.put("parent_obs_id",new Integer(1));
+		List<Integer> fieldIds = new ArrayList<>();
+		when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(fieldIds);
+		form.getFormName().setIsSet(1);
+		when(namedParameterJdbcTemplate.query(eq("blah..blah..blah"),any(Map.class),any(ColumnMapRowMapper.class)))
+				.thenReturn(null);
+
+		List<Obs> process = observationProcessor.process(obsRow);
+
+		Assert.assertEquals(0, process.size());
+	}
 }
