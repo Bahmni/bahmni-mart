@@ -76,7 +76,27 @@ SELECT CONCAT('\"',"Program Start Date", '\"'),"", "Date", "", CONCAT('\"',"prg_
 UNION
 SELECT CONCAT('\"',"Program End Date", '\"'),"", "Date", "", CONCAT('\"',"prg_end_dt",'\"'),"",""
 UNION
-SELECT CONCAT('\"',"Program Outcome", '\"'),"", "Text", "", CONCAT('\"',"prg_outcome",'\"'),"",""
+SELECT CONCAT('\"',"Program Outcome", '\"'),"", "Misc", "", CONCAT('\"',"prg_outcome",'\"'),"MBA",""
+UNION
+SELECT CONCAT('\"',"Program Outcome", '\"'),"", "Misc", "", CONCAT('\"',"prg_outcome",'\"'),"Dismissal",""
+UNION
+SELECT CONCAT('\"',"Program Outcome", '\"'),"", "Misc", "", CONCAT('\"',"prg_outcome",'\"'),"Defaulter (D2)",""
+UNION
+SELECT CONCAT('\"',"Program Outcome", '\"'),"", "Misc", "", CONCAT('\"',"prg_outcome",'\"'),"Death",""
+UNION
+SELECT CONCAT('\"',"Program Outcome", '\"'),"", "Misc", "", CONCAT('\"',"prg_outcome",'\"'),"Transfer to Other Structure",""
+UNION
+SELECT CONCAT('\"',"Program Outcome", '\"'),"", "Misc", "", CONCAT('\"',"prg_outcome",'\"'),"Refused",""
+UNION
+SELECT CONCAT('\"',"Program State", '\"'),"", "Misc", "", CONCAT('\"',"Prg_state",'\"'),"Identification",""
+UNION
+SELECT CONCAT('\"',"Program State", '\"'),"", "Misc", "", CONCAT('\"',"Prg_state",'\"'),"Network Follow-up",""
+UNION
+SELECT CONCAT('\"',"Program State", '\"'),"", "Misc", "", CONCAT('\"',"Prg_state",'\"'),"Pre-Operative",""
+UNION
+SELECT CONCAT('\"',"Program State", '\"'),"", "Misc", "", CONCAT('\"',"Prg_state",'\"'),"Surgical / Hospitalisation",""
+UNION
+SELECT CONCAT('\"',"Program State", '\"'),"", "Misc", "", CONCAT('\"',"Prg_state",'\"'),"Rehabilitation",""
 UNION
 SELECT CONCAT('\"',"Program State Start Date", '\"'),"", "Date", "", CONCAT('\"',"prg_state_start",'\"'),"",""
 UNION
