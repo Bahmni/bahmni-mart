@@ -56,7 +56,7 @@ SELECT CONCAT('\"',"Drug Dispense", '\"'),"", "Coded", "", CONCAT('\"',"dispense
 UNION
 SELECT CONCAT('\"',"Drug Dispense", '\"'),"", "Coded", "", CONCAT('\"',"dispense",'\"'), "No",""
 UNION
-SELECT CONCAT('\"',"Drug Stop Reason", '\"'),"", "Text", "", CONCAT('\"',"stop_reason",'\"'), "",""
+SELECT CONCAT('\"',"Drug Stop Reason", '\"'),"", "Text", "", CONCAT('\"',"stop_reason",'\"'), "Refused To Take",""
 UNION
 SELECT CONCAT('\"',"Drug Stop Notes", '\"'),"", "Text", "", CONCAT('\"',"stop_notes",'\"'), "",""
 UNION
@@ -67,8 +67,6 @@ UNION
 SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Male","1"
 UNION
 SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Female","2"
-UNION
-SELECT CONCAT('\"',"Sex", '\"'),"", "Coded", "", CONCAT('\"',"sex",'\"'),"Other","3"
 UNION
 SELECT CONCAT('\"',"Program Name", '\"'),"", "Text", "", CONCAT('\"',"prg_name",'\"'),"",""
 UNION
