@@ -4,10 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.io.FileUtils;
 import org.bahmni.batch.exception.BatchResourceException;
-import org.bahmni.batch.exports.DrugOrderBaseExportStep;
-import org.bahmni.batch.exports.MetaDataCodeDictionaryExportStep;
-import org.bahmni.batch.exports.ObservationExportStep;
-import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
+import org.bahmni.batch.exports.*;
 import org.bahmni.batch.form.FormListProcessor;
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.junit.Assert;
@@ -83,6 +80,9 @@ public class BatchConfigurationTest {
     private MetaDataCodeDictionaryExportStep metaDataCodeDictionaryExportStep;
 
     @Mock
+    private OtExportStep otExportStep;
+
+    @Mock
     private ObjectFactory<ObservationExportStep> observationExportStepFactory;
 
 
@@ -100,6 +100,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep", treatmentRegistrationBaseExportStep);
         setValuesForMemberFields(batchConfiguration, "drugOrderBaseExportStep", drugOrderBaseExportStep);
         setValuesForMemberFields(batchConfiguration, "metaDataCodeDictionaryExportStep", metaDataCodeDictionaryExportStep);
+        setValuesForMemberFields(batchConfiguration, "otExportStep", otExportStep);
         setValuesForMemberFields(batchConfiguration, "observationExportStepFactory", observationExportStepFactory);
     }
 
@@ -166,12 +167,15 @@ public class BatchConfigurationTest {
         JobFlowBuilder jobFlowBuilder = Mockito.mock(JobFlowBuilder.class);
         when(jobBuilder.flow(treatmentStep)).thenReturn(jobFlowBuilder);
         Step drugOrderStep = Mockito.mock(Step.class);
+        Step otExportStep1 = Mockito.mock(Step.class);
+        when(otExportStep.getStep()).thenReturn(otExportStep1);
         when(drugOrderBaseExportStep.getStep()).thenReturn(drugOrderStep);
         FlowBuilder<FlowJobBuilder> completeDataExport = (FlowBuilder<FlowJobBuilder>) mock(FlowBuilder.class);
         when(jobFlowBuilder.next(drugOrderStep)).thenReturn(completeDataExport);
         Step metaDataStep = Mockito.mock(Step.class);
         when(metaDataCodeDictionaryExportStep.getStep()).thenReturn(metaDataStep);
         when(completeDataExport.next(metaDataStep)).thenReturn(completeDataExport);
+        when(completeDataExport.next(otExportStep1)).thenReturn(completeDataExport);
         FlowJobBuilder flowJobBuilder = Mockito.mock(FlowJobBuilder.class);
         when(completeDataExport.end()).thenReturn(flowJobBuilder);
         Job expectedJob = Mockito.mock(Job.class);
@@ -193,6 +197,7 @@ public class BatchConfigurationTest {
         verify(treatmentRegistrationBaseExportStep, times(1)).getStep();
         verify(drugOrderBaseExportStep, times(1)).getStep();
         verify(metaDataCodeDictionaryExportStep, times(1)).getStep();
+        verify(otExportStep, times(1)).getStep();
         verify(observationExportStepFactory, times(2)).getObject();
         verify(medicalHistoryObservationExportStep, times(1)).setForm(medicalHistoryForm);
         verify(fstgObservationExportStep, times(1)).setForm(fstg);

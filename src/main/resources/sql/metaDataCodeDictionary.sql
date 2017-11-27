@@ -98,4 +98,40 @@ SELECT CONCAT('\"',"Program State", '\"'),"", "Misc", "", CONCAT('\"',"Prg_state
 UNION
 SELECT CONCAT('\"',"Program State Start Date", '\"'),"", "Date", "", CONCAT('\"',"prg_state_start",'\"'),"",""
 UNION
-SELECT CONCAT('\"',"Program State End Date", '\"'),"", "Date", "", CONCAT('\"',"prg_state_end",'\"'),"","";
+SELECT CONCAT('\"',"Program State End Date", '\"'),"", "Date", "", CONCAT('\"',"prg_state_end",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Date of surgery", '\"'),"", "Date", "", CONCAT('\"',"date_of_surgery",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Start time", '\"'),"", "Date", "", CONCAT('\"',"surgery_start_time",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Est time", '\"'),"", "Date", "", CONCAT('\"',"surgery_est_time",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Actual time", '\"'),"", "Date", "", CONCAT('\"',"surgery_actual_time",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"OT", '\"'),"", "Coded", "", CONCAT('\"',"ot",'\"'),"OT 1",""
+UNION
+SELECT CONCAT('\"',"OT", '\"'),"", "Coded", "", CONCAT('\"',"ot",'\"'),"OT 2",""
+UNION
+SELECT CONCAT('\"',"OT", '\"'),"", "Coded", "", CONCAT('\"',"ot",'\"'),"OT 3",""
+UNION
+SELECT CONCAT('\"',"Procedures", '\"'),"", "Text", "", CONCAT('\"',"procedures",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Notes", '\"'),"", "Text", "", CONCAT('\"',"surgery_notes",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Text", "", CONCAT('\"',"other_surgeon",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Surgical Assistant", '\"'),"", "Text", "", CONCAT('\"',"surgical_assistant",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Anaesthetist", '\"'),"", "Text", "", CONCAT('\"',"anaesthetist",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Scrub Nurse", '\"'),"", "Text", "", CONCAT('\"',"scrub_nurse",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Circulating Nurse", '\"'),"", "Text", "", CONCAT('\"',"circulating_nurse",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Status", '\"'),"", "Text", "", CONCAT('\"',"surgery_status",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Status change notes", '\"'),"", "Text", "", CONCAT('\"',"status_change_notes",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT(pn.given_name, ' ', pn.family_name),""
+FROM provider p
+INNER JOIN person_name pn ON p.person_id = pn.person_id;
