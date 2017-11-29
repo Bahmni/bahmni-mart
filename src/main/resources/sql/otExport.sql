@@ -6,11 +6,11 @@ SELECT
       sum(surgeries.estTimeMinutes)+ sum(surgeries.cleaningTime)) IS NULL, 0,
   (sum(surgeries.estTimeHours) * 60 +
    sum(surgeries.estTimeMinutes)+
-   sum(surgeries.cleaningTime))) MINUTE), '%H:%i:%s'), '\"')                                  AS `surgery_start_time`,
+   sum(surgeries.cleaningTime))) MINUTE), '%h:%i %p'), '\"')                                  AS `surgery_start_time`,
   CONCAT('\"', (estTimeHours.value * 60) + estTimeMinutes.value + cleaningTime.value, '\"')   AS `surgery_est_time`,
   CONCAT('\"', TIMESTAMPDIFF(MINUTE, sa.actual_start_datetime, sa.actual_end_datetime), '\"') AS `surgery_actual_time`,
   l.name                                                                                      AS `ot`,
-  CONCAT('\"', procedureInfo.value, '\"')                                                     AS `procedure`,
+  CONCAT('\"', procedureInfo.value, '\"')                                                     AS `procedures`,
   CONCAT('\"', notes.value, '\"')                                                             AS `surgery_notes`,
   CONCAT('\"', CONCAT(pn.given_name, ' ', pn.family_name) , '\"')                             AS `surgeon`,
   otherSurgeon.name                                                                           AS `other_surgeon`,
@@ -22,7 +22,7 @@ SELECT
   CONCAT('\"', sa.notes, '\"')                                                                AS `status_change_notes`
 FROM surgical_appointment sa
   INNER JOIN surgical_block sb
-    ON sa.surgical_block_id = sb.surgical_block_id AND sb.voided IS FALSE AND sa.voided IS FALSE
+    ON sa.surgical_block_id = sb.surgical_block_id
   INNER JOIN location l ON sb.location_id = l.location_id
   INNER JOIN provider p ON sb.primary_provider_id = p.provider_id
   INNER JOIN person_name pn ON p.person_id = pn.person_id
