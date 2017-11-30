@@ -14,7 +14,8 @@ hs_err_pid*
 .idea/
 *.iml
 gradle-app.setting
-
+out/
 temp/
 temp2/
+temp3/
 .DS_Store

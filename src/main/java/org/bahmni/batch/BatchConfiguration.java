@@ -59,6 +59,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	@Autowired
 	private MetaDataCodeDictionaryExportStep metaDataCodeDictionaryExportStep;
 
+	@Autowired
+	private BedManagementExportStep bedManagementExportStep;
+
 	@Value("${zipFolder}")
 	private Resource zipFolder;
 
@@ -80,14 +83,15 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	public Job completeDataExport() throws IOException {
 
 		List<BahmniForm> forms = formListProcessor.retrieveAllForms();
-
 		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
 				.incrementer(new RunIdIncrementer()).preventRestart()
 				.listener(listener())
-			.flow(treatmentRegistrationBaseExportStep.getStep())
-		                .next(drugOrderBaseExportStep.getStep())
-						.next(otExportStep.getStep())
-		                .next(metaDataCodeDictionaryExportStep.getStep());
+				.flow(treatmentRegistrationBaseExportStep.getStep())
+				.next(drugOrderBaseExportStep.getStep())
+				.next(otExportStep.getStep())
+				.next(bedManagementExportStep.getStep())
+				.next(metaDataCodeDictionaryExportStep.getStep());
+
 		for (BahmniForm form : forms) {
 			ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
 			observationExportStep.setForm(form);

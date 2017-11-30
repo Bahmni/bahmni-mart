@@ -134,4 +134,48 @@ SELECT CONCAT('\"',"Status change notes", '\"'),"", "Text", "", CONCAT('\"',"sta
 UNION
 SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT(pn.given_name, ' ', pn.family_name),""
 FROM provider p
-INNER JOIN person_name pn ON p.person_id = pn.person_id;
+INNER JOIN person_name pn ON p.person_id = pn.person_id
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Ward",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Ward (2nd floor)",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Ward (3rd floor)",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Rehabilitation Center",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Rehabilitation Center (4th floor)",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Rehabilitation Center (5th floor)",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Kahramana",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Kahramana(1st floor)",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Kahramana(2nd floor)",""
+UNION
+SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Buffer Beds",""
+UNION
+SELECT CONCAT('\"',"Bed Id", '\"'),"", "Text", "", CONCAT('\"',"bed_id",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Action", '\"'),"", "Coded", "", CONCAT('\"',"action",'\"'),"MOVEMENT",""
+UNION
+SELECT CONCAT('\"',"Action", '\"'),"", "Coded", "", CONCAT('\"',"action",'\"'),"DISCHARGE",""
+UNION
+SELECT CONCAT('\"',"Action", '\"'),"", "Coded", "", CONCAT('\"',"action",'\"'),"ADMISSION",""
+UNION
+SELECT CONCAT('\"',"Admission date", '\"'),"", "Date", "", CONCAT('\"',"admission_date",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Discharge date", '\"'),"", "Date", "", CONCAT('\"',"discharge_date",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Bed tag", '\"'),"", "Coded", "", CONCAT('\"',"bed_tag",'\"'),"Lost",""
+UNION
+SELECT CONCAT('\"',"Bed tag", '\"'),"", "Coded", "", CONCAT('\"',"bed_tag",'\"'),"Isolation",""
+UNION
+SELECT CONCAT('\"',"Bed tag", '\"'),"", "Coded", "", CONCAT('\"',"bed_tag",'\"'),"Strict Isolation",""
+UNION
+SELECT CONCAT('\"',"Bed tag", '\"'),"", "Coded", "", CONCAT('\"',"bed_tag",'\"'),"Reserved for CT",""
+UNION
+SELECT CONCAT('\"',"Bed tag start time", '\"'),"", "Date", "", CONCAT('\"',"bed_tag_start",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Bed tag end time", '\"'),"", "Date", "", CONCAT('\"',"bed_tag_end",'\"'),"","";

@@ -13,7 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -35,8 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
@@ -83,8 +80,10 @@ public class BatchConfigurationTest {
     private OtExportStep otExportStep;
 
     @Mock
-    private ObjectFactory<ObservationExportStep> observationExportStepFactory;
+    private BedManagementExportStep bedManagementExportStep;
 
+    @Mock
+    private ObjectFactory<ObservationExportStep> observationExportStepFactory;
 
 
     @Before
@@ -101,6 +100,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "drugOrderBaseExportStep", drugOrderBaseExportStep);
         setValuesForMemberFields(batchConfiguration, "metaDataCodeDictionaryExportStep", metaDataCodeDictionaryExportStep);
         setValuesForMemberFields(batchConfiguration, "otExportStep", otExportStep);
+        setValuesForMemberFields(batchConfiguration, "bedManagementExportStep", bedManagementExportStep);
         setValuesForMemberFields(batchConfiguration, "observationExportStepFactory", observationExportStepFactory);
     }
 
@@ -125,7 +125,7 @@ public class BatchConfigurationTest {
         String zipFileName = "amman-exports-DDMMYYYY.zip";
         when(zipFolder.getFilename()).thenReturn(zipFileName);
         expectedException.expect(BatchResourceException.class);
-        expectedException.expectMessage("Unable to write the report file ["+ zipFileName +"]");
+        expectedException.expectMessage("Unable to write the report file [" + zipFileName + "]");
 
         batchConfiguration.generateReport();
 
@@ -162,20 +162,27 @@ public class BatchConfigurationTest {
         when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
         when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
         when(jobBuilder.listener(any(JobCompletionNotificationListener.class))).thenReturn(jobBuilder);
+
         Step treatmentStep = Mockito.mock(Step.class);
+        Step drugOrderStep = Mockito.mock(Step.class);
+        Step otStep = Mockito.mock(Step.class);
+        Step bedManagementStep = Mockito.mock(Step.class);
+        Step metaDataStep = Mockito.mock(Step.class);
+
         when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(treatmentStep);
+        when(drugOrderBaseExportStep.getStep()).thenReturn(drugOrderStep);
+        when(otExportStep.getStep()).thenReturn(otStep);
+        when(bedManagementExportStep.getStep()).thenReturn(bedManagementStep);
+        when(metaDataCodeDictionaryExportStep.getStep()).thenReturn(metaDataStep);
+
         JobFlowBuilder jobFlowBuilder = Mockito.mock(JobFlowBuilder.class);
         when(jobBuilder.flow(treatmentStep)).thenReturn(jobFlowBuilder);
-        Step drugOrderStep = Mockito.mock(Step.class);
-        Step otExportStep1 = Mockito.mock(Step.class);
-        when(otExportStep.getStep()).thenReturn(otExportStep1);
-        when(drugOrderBaseExportStep.getStep()).thenReturn(drugOrderStep);
         FlowBuilder<FlowJobBuilder> completeDataExport = (FlowBuilder<FlowJobBuilder>) mock(FlowBuilder.class);
         when(jobFlowBuilder.next(drugOrderStep)).thenReturn(completeDataExport);
-        Step metaDataStep = Mockito.mock(Step.class);
-        when(metaDataCodeDictionaryExportStep.getStep()).thenReturn(metaDataStep);
+        when(completeDataExport.next(otStep)).thenReturn(completeDataExport);
+        when(completeDataExport.next(bedManagementStep)).thenReturn(completeDataExport);
         when(completeDataExport.next(metaDataStep)).thenReturn(completeDataExport);
-        when(completeDataExport.next(otExportStep1)).thenReturn(completeDataExport);
+
         FlowJobBuilder flowJobBuilder = Mockito.mock(FlowJobBuilder.class);
         when(completeDataExport.end()).thenReturn(flowJobBuilder);
         Job expectedJob = Mockito.mock(Job.class);
@@ -196,8 +203,9 @@ public class BatchConfigurationTest {
         verify(jobBuilderFactory, times(1)).get("ammanExports");
         verify(treatmentRegistrationBaseExportStep, times(1)).getStep();
         verify(drugOrderBaseExportStep, times(1)).getStep();
-        verify(metaDataCodeDictionaryExportStep, times(1)).getStep();
         verify(otExportStep, times(1)).getStep();
+        verify(bedManagementExportStep, times(1)).getStep();
+        verify(metaDataCodeDictionaryExportStep, times(1)).getStep();
         verify(observationExportStepFactory, times(2)).getObject();
         verify(medicalHistoryObservationExportStep, times(1)).setForm(medicalHistoryForm);
         verify(fstgObservationExportStep, times(1)).setForm(fstg);
