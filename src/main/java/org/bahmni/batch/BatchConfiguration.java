@@ -62,6 +62,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 	@Autowired
 	private BedManagementExportStep bedManagementExportStep;
 
+	@Autowired
+	private AppointmentSchedulingExportStep appointmentSchedulingExportStep;
+
 	@Value("${zipFolder}")
 	private Resource zipFolder;
 
@@ -90,6 +93,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 				.next(drugOrderBaseExportStep.getStep())
 				.next(otExportStep.getStep())
 				.next(bedManagementExportStep.getStep())
+				.next(appointmentSchedulingExportStep.getStep())
 				.next(metaDataCodeDictionaryExportStep.getStep());
 
 		for (BahmniForm form : forms) {

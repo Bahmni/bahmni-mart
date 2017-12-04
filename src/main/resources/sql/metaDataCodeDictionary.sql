@@ -178,4 +178,50 @@ SELECT CONCAT('\"',"Bed tag", '\"'),"", "Coded", "", CONCAT('\"',"bed_tag",'\"')
 UNION
 SELECT CONCAT('\"',"Bed tag start time", '\"'),"", "Date", "", CONCAT('\"',"bed_tag_start",'\"'),"",""
 UNION
-SELECT CONCAT('\"',"Bed tag end time", '\"'),"", "Date", "", CONCAT('\"',"bed_tag_end",'\"'),"","";
+SELECT CONCAT('\"',"Bed tag end time", '\"'),"", "Date", "", CONCAT('\"',"bed_tag_end",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Appointment date", '\"'),"", "Date", "", CONCAT('\"',"appointment_date",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Appointment start time", '\"'),"", "Date", "", CONCAT('\"',"appt_start_time",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Appointment end time", '\"'),"", "Date", "", CONCAT('\"',"appt_end_time",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Last date modified", '\"'),"", "Date", "", CONCAT('\"',"last_date_modified",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Provider", '\"'),"", "Coded", "", CONCAT('\"',"provider",'\"'),CONCAT(pn.given_name, ' ', pn.family_name),""
+FROM provider p
+INNER JOIN person_name pn ON p.person_id = pn.person_id
+UNION
+SELECT CONCAT('\"',"Service", '\"'),"", "Coded", "", CONCAT('\"',"service",'\"'), CONCAT('\"',app_ser.name,'\"'),""
+FROM appointment_service app_ser
+UNION
+SELECT CONCAT('\"',"Service sub type", '\"'),"", "Coded", "", CONCAT('\"',"service_sub_type",'\"'), CONCAT('\"',apt.name,'\"'),""
+FROM appointment_service_type apt
+UNION
+SELECT CONCAT('\"',"Appointment status", '\"'),"", "Coded", "", CONCAT('\"',"appt_status",'\"'),"Completed",""
+UNION
+SELECT CONCAT('\"',"Appointment status", '\"'),"", "Coded", "", CONCAT('\"',"appt_status",'\"'),"Scheduled",""
+UNION
+SELECT CONCAT('\"',"Appointment status", '\"'),"", "Coded", "", CONCAT('\"',"appt_status",'\"'),"Cancelled",""
+UNION
+SELECT CONCAT('\"',"Appointment status", '\"'),"", "Coded", "", CONCAT('\"',"appt_status",'\"'),"CheckedIn",""
+UNION
+SELECT CONCAT('\"',"Appointment status", '\"'),"", "Coded", "", CONCAT('\"',"appt_status",'\"'),"Missed",""
+UNION
+SELECT CONCAT('\"',"Walk in", '\"'),"", "Coded", "", CONCAT('\"',"walk_in",'\"'),"Yes",""
+UNION
+SELECT CONCAT('\"',"Walk in", '\"'),"", "Coded", "", CONCAT('\"',"walk_in",'\"'),"No",""
+UNION
+SELECT CONCAT('\"',"Appointment location", '\"'),"", "Coded", "", CONCAT('\"',"appt_location",'\"'),"OPD",""
+UNION
+SELECT CONCAT('\"',"Appointment location", '\"'),"", "Coded", "", CONCAT('\"',"appt_location",'\"'),"Operating Theatre",""
+UNION
+SELECT CONCAT('\"',"Appointment location", '\"'),"", "Coded", "", CONCAT('\"',"appt_location",'\"'),"Physiotherapy",""
+UNION
+SELECT CONCAT('\"',"Appointment location", '\"'),"", "Coded", "", CONCAT('\"',"appt_location",'\"'),CONCAT('\"','Psycho-Social, Mental Health','\"'),""
+UNION
+SELECT CONCAT('\"',"Appointment location", '\"'),"", "Coded", "", CONCAT('\"',"appt_location",'\"'),"Surgical Ward",""
+UNION
+SELECT CONCAT('\"',"Appointment notes", '\"'),"", "Text", "", CONCAT('\"',"appt_notes",'\"'),"","";
+
+
