@@ -9,6 +9,7 @@ SELECT
    sum(surgeries.cleaningTime))) MINUTE), '%h:%i %p'), '\"')                                  AS `surgery_start_time`,
   CONCAT('\"', (estTimeHours.value * 60) + estTimeMinutes.value + cleaningTime.value, '\"')   AS `surgery_est_time`,
   CONCAT('\"', TIMESTAMPDIFF(MINUTE, sa.actual_start_datetime, sa.actual_end_datetime), '\"') AS `surgery_actual_time`,
+  DATE_FORMAT(sa.date_changed, '%d/%m/%Y')                                                    AS `last_date_modified`,
   l.name                                                                                      AS `ot`,
   CONCAT('\"', procedureInfo.value, '\"')                                                     AS `procedures`,
   CONCAT('\"', notes.value, '\"')                                                             AS `surgery_notes`,

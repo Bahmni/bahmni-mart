@@ -108,6 +108,8 @@ SELECT CONCAT('\"',"Est time", '\"'),"", "Date", "", CONCAT('\"',"surgery_est_ti
 UNION
 SELECT CONCAT('\"',"Actual time", '\"'),"", "Date", "", CONCAT('\"',"surgery_actual_time",'\"'),"",""
 UNION
+SELECT CONCAT('\"',"Last date modified", '\"'),"", "Date", "", CONCAT('\"',"last_date_modified",'\"'),"",""
+UNION
 SELECT CONCAT('\"',"OT", '\"'),"", "Coded", "", CONCAT('\"',"ot",'\"'),"OT 1",""
 UNION
 SELECT CONCAT('\"',"OT", '\"'),"", "Coded", "", CONCAT('\"',"ot",'\"'),"OT 2",""
@@ -118,7 +120,25 @@ SELECT CONCAT('\"',"Procedures", '\"'),"", "Text", "", CONCAT('\"',"procedures",
 UNION
 SELECT CONCAT('\"',"Notes", '\"'),"", "Text", "", CONCAT('\"',"surgery_notes",'\"'),"",""
 UNION
-SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Text", "", CONCAT('\"',"other_surgeon",'\"'),"",""
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Ali Al Ani'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Sufyan Al Qasab'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Hanna Janho'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Ashraf Nabhan'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Rasheed Al Sammarraie'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Muckhaled Naseef'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Ashraf Bustanji'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Ghassan S.Abu-Sittah'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Other Surgeon'),""
+UNION
+SELECT CONCAT('\"',"Other Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"other_surgeon",'\"'),CONCAT('Anaesthetist'),""
 UNION
 SELECT CONCAT('\"',"Surgical Assistant", '\"'),"", "Text", "", CONCAT('\"',"surgical_assistant",'\"'),"",""
 UNION
@@ -132,9 +152,25 @@ SELECT CONCAT('\"',"Status", '\"'),"", "Text", "", CONCAT('\"',"surgery_status",
 UNION
 SELECT CONCAT('\"',"Status change notes", '\"'),"", "Text", "", CONCAT('\"',"status_change_notes",'\"'),"",""
 UNION
-SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT(pn.given_name, ' ', pn.family_name),""
-FROM provider p
-INNER JOIN person_name pn ON p.person_id = pn.person_id
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Ali Al Ani'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Sufyan Al Qasab'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Hanna Janho'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Ashraf Nabhan'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Rasheed Al Sammarraie'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Muckhaled Naseef'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Ashraf Bustanji'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Ghassan S.Abu-Sittah'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Other Surgeon'),""
+UNION
+SELECT CONCAT('\"',"Surgeon", '\"'),"", "Coded", "", CONCAT('\"',"surgeon",'\"'),CONCAT('Anaesthetist'),""
 UNION
 SELECT CONCAT('\"',"Location", '\"'),"", "Coded", "", CONCAT('\"',"location",'\"'),"Ward",""
 UNION
