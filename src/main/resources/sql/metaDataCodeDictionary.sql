@@ -230,9 +230,11 @@ INNER JOIN person_name pn ON p.person_id = pn.person_id
 UNION
 SELECT CONCAT('\"',"Service", '\"'),"", "Coded", "", CONCAT('\"',"service",'\"'), CONCAT('\"',app_ser.name,'\"'),""
 FROM appointment_service app_ser
+WHERE app_ser.voided IS FALSE
 UNION
 SELECT CONCAT('\"',"Service sub type", '\"'),"", "Coded", "", CONCAT('\"',"service_sub_type",'\"'), CONCAT('\"',apt.name,'\"'),""
 FROM appointment_service_type apt
+WHERE apt.voided IS FALSE
 UNION
 SELECT CONCAT('\"',"Appointment status", '\"'),"", "Coded", "", CONCAT('\"',"appt_status",'\"'),"Completed",""
 UNION

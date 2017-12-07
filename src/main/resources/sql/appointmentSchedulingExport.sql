@@ -19,6 +19,7 @@ FROM patient_appointment pa
               FROM provider p
                 INNER JOIN person_name pn ON p.person_id = pn.person_id
             ) providerNames ON pa.provider_id = providerNames.provider_id
-  INNER JOIN appointment_service app_ser ON pa.appointment_service_id = app_ser.appointment_service_id
+  INNER JOIN appointment_service app_ser ON pa.appointment_service_id = app_ser.appointment_service_id AND app_ser.voided IS FALSE
   LEFT JOIN appointment_service_type ast ON pa.appointment_service_type_id = ast.appointment_service_type_id
-  LEFT JOIN location l ON pa.location_id = l.location_id;
+  LEFT JOIN location l ON pa.location_id = l.location_id
+WHERE ast.voided IS FALSE OR ast.voided IS NULL ;
