@@ -106,7 +106,11 @@ SELECT CONCAT('\"',"Start time", '\"'),"", "Date", "", CONCAT('\"',"surgery_star
 UNION
 SELECT CONCAT('\"',"Est time", '\"'),"", "Date", "", CONCAT('\"',"surgery_est_time",'\"'),"",""
 UNION
-SELECT CONCAT('\"',"Actual time", '\"'),"", "Date", "", CONCAT('\"',"surgery_actual_time",'\"'),"",""
+SELECT CONCAT('\"',"Actual start time", '\"'),"", "Date", "", CONCAT('\"',"surgery_actual_start_time",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Actual end time", '\"'),"", "Date", "", CONCAT('\"',"surgery_actual_end_time",'\"'),"",""
+UNION
+SELECT CONCAT('\"',"Actual time", '\"'),"", "Integer", "", CONCAT('\"',"surgery_actual_time",'\"'),"",""
 UNION
 SELECT CONCAT('\"',"Last date modified", '\"'),"", "Date", "", CONCAT('\"',"last_date_modified",'\"'),"",""
 UNION
