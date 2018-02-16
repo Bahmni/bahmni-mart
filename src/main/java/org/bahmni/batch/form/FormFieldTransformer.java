@@ -6,17 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class FormFieldTransformer {
 
 	public List<Integer> transformFormToFieldIds(BahmniForm form){
-		List<Integer> fieldIds = new ArrayList<>();
-
-		for(Concept field: form.getFields()){
-			fieldIds.add(field.getId());
-		}
-		return fieldIds;
+		return form.getFields().stream().map(Concept::getId).collect(Collectors.toList());
 	}
 
 

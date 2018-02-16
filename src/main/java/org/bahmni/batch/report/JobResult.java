@@ -2,37 +2,37 @@ package org.bahmni.batch.report;
 
 public class JobResult {
 
-	private String dateOfExecution;
-	private String status;
-	private String zipFileName;
+    private String dateOfExecution;
+    private String status;
+    private String zipFileName;
 
-	public JobResult(String dateOfExecution, String status, String zipFileName) {
-		this.dateOfExecution = dateOfExecution;
-		this.status = status;
-		this.zipFileName = zipFileName;
-	}
+    public JobResult(String dateOfExecution, String status, String zipFileName) {
+        this.dateOfExecution = dateOfExecution;
+        this.status = status;
+        this.zipFileName = zipFileName;
+    }
 
-	public String getDateOfExecution() {
-		return dateOfExecution;
-	}
+    public String getDateOfExecution() {
+        return dateOfExecution;
+    }
 
-	public void setDateOfExecution(String dateOfExecution) {
-		this.dateOfExecution = dateOfExecution;
-	}
+    public void setDateOfExecution(String dateOfExecution) {
+        this.dateOfExecution = dateOfExecution;
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public String getZipFileName() {
-		return zipFileName;
-	}
+    public String getZipFileName() {
+        return zipFileName;
+    }
 
-	public void setZipFileName(String zipFileName) {
-		this.zipFileName = zipFileName;
-	}
+    public void setZipFileName(String zipFileName) {
+        this.zipFileName = zipFileName;
+    }
 }

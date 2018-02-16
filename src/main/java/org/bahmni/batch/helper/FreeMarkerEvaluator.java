@@ -15,32 +15,26 @@ import java.util.Map;
 @Component
 public class FreeMarkerEvaluator<T> {
 
-	private static final Logger log = LoggerFactory.getLogger(FreeMarkerEvaluator.class);
+    private static final Logger log = LoggerFactory.getLogger(FreeMarkerEvaluator.class);
 
-	@Autowired
-	private Configuration configuration;
+    @Autowired
+    private Configuration configuration;
 
-	public String evaluate(String templateName, T input){
+    public String evaluate(String templateName, T input) {
+        StringWriter stringWriter = new StringWriter();
+        try {
+            Template template = configuration.getTemplate(templateName);
+            Map<String, Object> inputMap = new HashMap<>();
+            inputMap.put("input", input);
+            template.process(inputMap, stringWriter);
+        } catch (Exception exception) {
+            throw new BatchResourceException(String.format("Unable to continue generating a the template with name [%s]", templateName), exception);
+        }
+        String result = stringWriter.toString();
+        log.debug(String.format("The generated template for [%s]", input.toString()));
+        log.debug(result);
 
-		StringWriter stringWriter = new StringWriter();
-		try {
-			Template template = configuration.getTemplate(templateName);
-
-			Map<String, Object> inputMap = new HashMap<>();
-			inputMap.put("input", input);
-
-			template.process(inputMap, stringWriter);
-
-
-		}catch(Exception ex){
-			throw new BatchResourceException("Unable to continue generating a the template with name ["+templateName+"]",ex);
-		}
-
-		String result = stringWriter.toString();
-		log.debug("The generated template for ["+input.toString()+"] is ");
-		log.debug(result);
-
-		return result;
-	}
+        return result;
+    }
 
 }

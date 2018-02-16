@@ -13,62 +13,55 @@ import java.util.List;
 @Component
 public class BahmniFormFactory {
 
-	@Value("${addMoreAndMultiSelectConcepts}")
-	private String addMoreConceptNames;
+    @Value("${addMoreAndMultiSelectConcepts}")
+    private String addMoreConceptNames;
 
-	@Value("${ignoreConcepts}")
-	private String ignoreConceptsNames;
+    @Value("${ignoreConcepts}")
+    private String ignoreConceptsNames;
 
-	@Autowired
-	private ObsService obsService;
+    @Autowired
+    private ObsService obsService;
 
-	private List<Concept> addMoreAndMultiSelectConcepts;
-	private List<Concept> ignoreConcepts;
+    private List<Concept> addMoreAndMultiSelectConcepts;
+    private List<Concept> ignoreConcepts;
 
-	public BahmniForm createForm(Concept concept, BahmniForm parentForm) {
-		return createForm(concept,parentForm,0);
-	}
+    public BahmniForm createForm(Concept concept, BahmniForm parentForm) {
+        return createForm(concept, parentForm, 0);
+    }
 
-	private BahmniForm createForm(Concept concept, BahmniForm parentForm, int depth){
-		BahmniForm bahmniForm = new BahmniForm();
-		bahmniForm.setFormName(concept);
-		bahmniForm.setDepthToParent(depth);
-		bahmniForm.setParent(parentForm);
+    private BahmniForm createForm(Concept concept, BahmniForm parentForm, int depth) {
+        BahmniForm bahmniForm = new BahmniForm();
+        bahmniForm.setFormName(concept);
+        bahmniForm.setDepthToParent(depth);
+        bahmniForm.setParent(parentForm);
 
-		constructFormFields(concept, bahmniForm, 0);
+        constructFormFields(concept, bahmniForm, 0);
+        return bahmniForm;
+    }
 
-		return bahmniForm;
-	}
+    private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth) {
+        if (concept.getIsSet() == 0)
+            bahmniForm.addField(concept);
+        else
+            obsService.getChildConcepts(concept.getName()).forEach(childConcept -> addChild(bahmniForm, childConcept, depth + 1));
+    }
 
-	private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth) {
-		if(concept.getIsSet() == 0){
-			bahmniForm.addField(concept);
-			return;
-		}
+    private void addChild(BahmniForm bahmniForm, Concept childConcept, int childDepth) {
+        if (ignoreConcepts.contains(childConcept))
+            return;
+        else if (addMoreAndMultiSelectConcepts.contains(childConcept))
+            bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth));
+        else
+            constructFormFields(childConcept, bahmniForm, childDepth);
+    }
 
-		List<Concept> childConcepts = obsService.getChildConcepts(concept.getName());
-		int childDepth = depth+1;
-		for(Concept childConcept: childConcepts){
+    @PostConstruct
+    public void postConstruct() {
+        this.addMoreAndMultiSelectConcepts = obsService.getConceptsByNames(addMoreConceptNames);
+        this.ignoreConcepts = obsService.getConceptsByNames(ignoreConceptsNames);
+    }
 
-			if (ignoreConcepts.contains(childConcept)) {
-				continue;
-			} else if(addMoreAndMultiSelectConcepts.contains(childConcept)){
-				bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth));
-			}else if(childConcept.getIsSet() == 0){
-				bahmniForm.addField(childConcept);
-			}else{
-				constructFormFields(childConcept,bahmniForm, childDepth);
-			}
-		}
-	}
-
-	@PostConstruct
-	public void postConstruct(){
-		this.addMoreAndMultiSelectConcepts = obsService.getConceptsByNames(addMoreConceptNames);
-		this.ignoreConcepts = obsService.getConceptsByNames(ignoreConceptsNames);
-	}
-
-	public void setObsService(ObsService obsService) {
-		this.obsService = obsService;
-	}
+    public void setObsService(ObsService obsService) {
+        this.obsService = obsService;
+    }
 }

@@ -4,7 +4,6 @@ import org.bahmni.batch.BatchUtils;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughFieldExtractor;
@@ -13,8 +12,6 @@ import org.springframework.jdbc.core.ColumnMapRowMapper;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.Writer;
 
 
 public class BaseExportStep {
@@ -31,6 +28,7 @@ public class BaseExportStep {
     private String headers;
 
     private String sql;
+    private static final String DELIMITER = ",";
 
     public BaseExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource, Resource sqlResource, Resource outputFolder, String exportName, String headers) {
         this.dataSource = dataSource;
@@ -62,15 +60,10 @@ public class BaseExportStep {
         FlatFileItemWriter<String> writer = new FlatFileItemWriter<String>();
         writer.setResource(outputFolder);
         DelimitedLineAggregator delimitedLineAggregator = new DelimitedLineAggregator();
-        delimitedLineAggregator.setDelimiter(",");
+        delimitedLineAggregator.setDelimiter(DELIMITER);
         delimitedLineAggregator.setFieldExtractor(new PassThroughFieldExtractor());
         writer.setLineAggregator(delimitedLineAggregator);
-        writer.setHeaderCallback(new FlatFileHeaderCallback() {
-            @Override
-            public void writeHeader(Writer writer) throws IOException {
-                writer.write(getHeaders());
-            }
-        });
+        writer.setHeaderCallback(w -> w.write(getHeaders()));
         return writer;
     }
 
@@ -79,7 +72,7 @@ public class BaseExportStep {
     }
 
     @PostConstruct
-    public void postConstruct(){
+    public void postConstruct() {
         this.sql = BatchUtils.convertResourceOutputToString(sqlResource);
     }
 }

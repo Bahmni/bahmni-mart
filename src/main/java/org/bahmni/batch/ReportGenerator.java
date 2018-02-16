@@ -15,45 +15,43 @@ import java.util.List;
 @Component
 public class ReportGenerator {
 
-	@Autowired
-	private JobExplorer jobExplorer;
+    @Autowired
+    private JobExplorer jobExplorer;
 
-	@Autowired
-	private FreeMarkerEvaluator<List<JobResult>> evaluator;
+    @Autowired
+    private FreeMarkerEvaluator<List<JobResult>> evaluator;
 
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
 
-	public String generateReport(){
-		List<JobInstance> jobInstanceList = jobExplorer.findJobInstancesByJobName(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME,0,20);
-		List<JobResult> results = transformJobExecutionsToReport(getJobExecutionsForInstances(jobInstanceList));
+    public String generateReport() {
+        List<JobInstance> jobInstanceList = jobExplorer.findJobInstancesByJobName(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME, 0, 20);
+        return evaluator.evaluate("report.ftl", transformJobExecutionsToReport(getJobExecutionsForInstances(jobInstanceList)));
+    }
 
-		return evaluator.evaluate("report.ftl",results);
-	}
+    private List<JobExecution> getJobExecutionsForInstances(List<JobInstance> jobInstanceList) {
+        List<JobExecution> executions = new ArrayList<>();
+        for (JobInstance jobInstance : jobInstanceList) {
+            executions.addAll(jobExplorer.getJobExecutions(jobInstance));
+        }
+        return executions;
+    }
 
-	private List<JobExecution> getJobExecutionsForInstances(List<JobInstance> jobInstanceList){
-		List<JobExecution> executions = new ArrayList<>();
-		for(JobInstance jobInstance: jobInstanceList){
-			executions.addAll(jobExplorer.getJobExecutions(jobInstance));
-		}
-		return executions;
-	}
+    private List<JobResult> transformJobExecutionsToReport(List<JobExecution> jobExecutions) {
+        List<JobResult> jobResults = new ArrayList<>();
+        for (JobExecution execution : jobExecutions) {
+            String zipFileName = execution.getExecutionContext().getString(JobCompletionNotificationListener.OUTPUT_FILE_NAME_CONTEXT_KEY);
+            jobResults.add(new JobResult(dateFormat.format(execution.getCreateTime()),
+                    execution.getExitStatus().getExitCode(), zipFileName));
+        }
 
-	private List<JobResult> transformJobExecutionsToReport(List<JobExecution> jobExecutions) {
-		List<JobResult> jobResults = new ArrayList<>();
-		for(JobExecution execution: jobExecutions){
-			String zipFileName = execution.getExecutionContext().getString(JobCompletionNotificationListener.OUTPUT_FILE_NAME_CONTEXT_KEY);
-			jobResults.add(new JobResult(dateFormat.format(execution.getCreateTime()),
-					execution.getExitStatus().getExitCode(), zipFileName));
-		}
+        return jobResults;
+    }
 
-		return jobResults;
-	}
+    public void setJobExplorer(JobExplorer jobExplorer) {
+        this.jobExplorer = jobExplorer;
+    }
 
-	public void setJobExplorer(JobExplorer jobExplorer) {
-		this.jobExplorer = jobExplorer;
-	}
-
-	public void setEvaluator(FreeMarkerEvaluator<List<JobResult>> evaluator) {
-		this.evaluator = evaluator;
-	}
+    public void setEvaluator(FreeMarkerEvaluator<List<JobResult>> evaluator) {
+        this.evaluator = evaluator;
+    }
 }

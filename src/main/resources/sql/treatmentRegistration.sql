@@ -16,7 +16,12 @@ FROM patient p
   JOIN patient_program pp ON p.patient_id = pp.patient_id AND pp.voided IS FALSE
   JOIN program ON pp.program_id = program.program_id AND program.retired IS FALSE
   JOIN patient_state ps ON pp.patient_program_id = ps.patient_program_id AND ps.voided IS FALSE
-  JOIN program_workflow_state pws ON ps.state = pws.program_workflow_state_id AND ps.voided IS FALSE AND pws.retired IS FALSE
-  JOIN concept_name programStateConcept ON pws.concept_id = programStateConcept.concept_id AND programStateConcept.voided IS FALSE AND programStateConcept.concept_name_type = 'FULLY_SPECIFIED'
-  LEFT JOIN concept_name outcomeConcept ON pp.outcome_concept_id = outcomeConcept.concept_id AND outcomeConcept.voided IS FALSE AND outcomeConcept.concept_name_type = 'FULLY_SPECIFIED'
+  JOIN program_workflow_state pws
+    ON ps.state = pws.program_workflow_state_id AND ps.voided IS FALSE AND pws.retired IS FALSE
+  JOIN concept_name programStateConcept
+    ON pws.concept_id = programStateConcept.concept_id AND programStateConcept.voided IS FALSE AND
+       programStateConcept.concept_name_type = 'FULLY_SPECIFIED'
+  LEFT JOIN concept_name outcomeConcept
+    ON pp.outcome_concept_id = outcomeConcept.concept_id AND outcomeConcept.voided IS FALSE AND
+       outcomeConcept.concept_name_type = 'FULLY_SPECIFIED'
 ORDER BY pp.patient_program_id

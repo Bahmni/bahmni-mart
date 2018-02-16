@@ -5,60 +5,59 @@ import java.util.List;
 
 public class BahmniForm {
 
-	private List<BahmniForm> children = new ArrayList<>();
+    private List<BahmniForm> children = new ArrayList<>();
 
-	private BahmniForm parent;
+    private BahmniForm parent;
 
-	private Concept formName;
+    private Concept formName;
 
-	private List<Concept> fields = new ArrayList<>();
+    private List<Concept> fields = new ArrayList<>();
 
-	private int depthToParent;
+    private int depthToParent;
 
-	public List<BahmniForm> getChildren() {
-		return children;
-	}
+    public List<BahmniForm> getChildren() {
+        return children;
+    }
 
-	public void addChild(BahmniForm bahmniForm){
-		children.add(bahmniForm);
-	}
+    public void addChild(BahmniForm bahmniForm) {
+        children.add(bahmniForm);
+    }
 
-	public BahmniForm getParent() {
-		return parent;
-	}
+    public BahmniForm getParent() {
+        return parent;
+    }
 
-	public void setParent(BahmniForm parent) {
-		this.parent = parent;
-	}
+    public void setParent(BahmniForm parent) {
+        this.parent = parent;
+    }
 
-	public Concept getFormName() {
-		return formName;
-	}
+    public Concept getFormName() {
+        return formName;
+    }
 
-	public void setFormName(Concept formName) {
-		this.formName = formName;
-	}
+    public void setFormName(Concept formName) {
+        this.formName = formName;
+    }
 
-	public List<Concept> getFields() {
-		return fields;
-	}
+    public List<Concept> getFields() {
+        return fields;
+    }
 
-	public void addField(Concept concept){
-		fields.add(concept);
-	}
+    public void addField(Concept concept) {
+        fields.add(concept);
+    }
 
-	public int getDepthToParent() {
-		return depthToParent;
-	}
+    public int getDepthToParent() {
+        return depthToParent;
+    }
 
-	public void setDepthToParent(int depthToParent) {
-		this.depthToParent = depthToParent;
-	}
+    public void setDepthToParent(int depthToParent) {
+        this.depthToParent = depthToParent;
+    }
 
-	public String getDisplayName() {
-		if(formName == null)
-			return "";
-		return formName.getName().replaceAll("\\s", "_").replaceAll(",","").replaceAll("/","").toLowerCase() ;
-	}
+    public String getDisplayName() {
+        return formName == null ? "" :
+                formName.getName().replaceAll("\\s", "_").replaceAll(",", "").replaceAll("/", "").toLowerCase();
+    }
 
 }

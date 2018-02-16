@@ -30,101 +30,102 @@ import java.util.List;
 @EnableBatchProcessing
 public class BatchConfiguration extends DefaultBatchConfigurer {
 
-	public static final String FULL_DATA_EXPORT_JOB_NAME = "ammanExports";
+    public static final String FULL_DATA_EXPORT_JOB_NAME = "ammanExports";
 
-	@Autowired
-	private JobBuilderFactory jobBuilderFactory;
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
 
-	@Autowired
-	private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
+    @Autowired
+    private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
 
-	@Autowired
-	private DrugOrderBaseExportStep drugOrderBaseExportStep;
+    @Autowired
+    private DrugOrderBaseExportStep drugOrderBaseExportStep;
 
-	@Autowired
-	private NonTBDrugOrderBaseExportStep nonTBDrugOrderBaseExportStep;
+    @Autowired
+    private NonTBDrugOrderBaseExportStep nonTBDrugOrderBaseExportStep;
 
-	@Autowired
-	private FormListProcessor formListProcessor;
+    @Autowired
+    private FormListProcessor formListProcessor;
 
-	@Autowired
-	private ObjectFactory<ObservationExportStep> observationExportStepFactory;
+    @Autowired
+    private ObjectFactory<ObservationExportStep> observationExportStepFactory;
 
-	@Value("${templates}")
-	private Resource freemarkerTemplateLocation;
+    @Value("${templates}")
+    private Resource freemarkerTemplateLocation;
 
-	@Autowired
-	public JobCompletionNotificationListener jobCompletionNotificationListener;
+    @Autowired
+    public JobCompletionNotificationListener jobCompletionNotificationListener;
 
-	@Autowired
-	private MetaDataCodeDictionaryExportStep metaDataCodeDictionaryExportStep;
+    @Autowired
+    private MetaDataCodeDictionaryExportStep metaDataCodeDictionaryExportStep;
 
-	@Autowired
-	private BedManagementExportStep bedManagementExportStep;
+    @Autowired
+    private BedManagementExportStep bedManagementExportStep;
 
-	@Autowired
-	private AppointmentSchedulingExportStep appointmentSchedulingExportStep;
+    @Autowired
+    private AppointmentSchedulingExportStep appointmentSchedulingExportStep;
 
-	@Value("${zipFolder}")
-	private Resource zipFolder;
+    @Value("${zipFolder}")
+    private Resource zipFolder;
 
-	@Value("${bahmniConfigFolder}")
-	private Resource bahmniConfigFolder;
+    @Value("${bahmniConfigFolder}")
+    private Resource bahmniConfigFolder;
 
-	@Autowired
-	private ReportGenerator reportGenerator;
+    @Autowired
+    private ReportGenerator reportGenerator;
 
-	@Autowired
-	private OtExportStep otExportStep;
+    @Autowired
+    private OtExportStep otExportStep;
 
-	@Bean
-	public JobExecutionListener listener() {
-		return jobCompletionNotificationListener;
-	}
+    private static final String DEFAULT_ENCODING = "UTF-8";
 
-	@Bean
-	public Job completeDataExport() throws IOException {
+    @Bean
+    public JobExecutionListener listener() {
+        return jobCompletionNotificationListener;
+    }
 
-		List<BahmniForm> forms = formListProcessor.retrieveAllForms();
-		FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
-				.incrementer(new RunIdIncrementer()).preventRestart()
-				.listener(listener())
-				.flow(treatmentRegistrationBaseExportStep.getStep())
-				.next(drugOrderBaseExportStep.getStep())
-				.next(otExportStep.getStep())
-				.next(bedManagementExportStep.getStep())
-				.next(appointmentSchedulingExportStep.getStep())
-				.next(metaDataCodeDictionaryExportStep.getStep());
+    @Bean
+    public Job completeDataExport() throws IOException {
+        List<BahmniForm> forms = formListProcessor.retrieveAllForms();
+        FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
+                .incrementer(new RunIdIncrementer()).preventRestart()
+                .listener(listener())
+                .flow(treatmentRegistrationBaseExportStep.getStep())
+                .next(drugOrderBaseExportStep.getStep())
+                .next(otExportStep.getStep())
+                .next(bedManagementExportStep.getStep())
+                .next(appointmentSchedulingExportStep.getStep())
+                .next(metaDataCodeDictionaryExportStep.getStep());
 
-		for (BahmniForm form : forms) {
-			ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
-			observationExportStep.setForm(form);
-			completeDataExport.next(observationExportStep.getStep());
-		}
-		return completeDataExport.end().build();
-	}
+        for (BahmniForm form : forms) {
+            ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
+            observationExportStep.setForm(form);
+            completeDataExport.next(observationExportStep.getStep());
+        }
+        return completeDataExport.end().build();
+    }
 
 
-	@Bean
-	public freemarker.template.Configuration freeMarkerConfiguration() throws IOException {
-		freemarker.template.Configuration freemarkerTemplateConfig = new freemarker.template.Configuration(
-				freemarker.template.Configuration.VERSION_2_3_22);
-		freemarkerTemplateConfig.setDirectoryForTemplateLoading(freemarkerTemplateLocation.getFile());
-		freemarkerTemplateConfig.setDefaultEncoding("UTF-8");
-		freemarkerTemplateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+    @Bean
+    public freemarker.template.Configuration freeMarkerConfiguration() throws IOException {
+        freemarker.template.Configuration freemarkerTemplateConfig = new freemarker.template.Configuration(
+                freemarker.template.Configuration.VERSION_2_3_22);
+        freemarkerTemplateConfig.setDirectoryForTemplateLoading(freemarkerTemplateLocation.getFile());
 
-		return freemarkerTemplateConfig;
-	}
+        freemarkerTemplateConfig.setDefaultEncoding(DEFAULT_ENCODING);
+        freemarkerTemplateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
-	@PreDestroy
-	public void generateReport(){
-		try {
-			File report = new File(bahmniConfigFolder.getFile(),"report.html");
-			String reportOutput =  reportGenerator.generateReport();
-			FileUtils.writeStringToFile(report,reportOutput);
-		}
-		catch (IOException e) {
-			throw new BatchResourceException("Unable to write the report file ["+zipFolder.getFilename()+"]",e);
-		}
-	}
+        return freemarkerTemplateConfig;
+    }
+
+    @PreDestroy
+    public void generateReport() {
+        try {
+            File report = new File(bahmniConfigFolder.getFile(), "report.html");
+            String reportOutput = reportGenerator.generateReport();
+            FileUtils.writeStringToFile(report, reportOutput);
+        } catch (IOException e) {
+            throw new BatchResourceException(String.format("Unable to write the report file [%s]", zipFolder.getFilename()), e);
+        }
+    }
 }

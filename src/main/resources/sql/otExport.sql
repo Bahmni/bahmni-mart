@@ -3,19 +3,21 @@ SELECT
   DATE_FORMAT(sb.start_datetime, '%d/%m/%Y')                                                  AS `date_of_surgery`,
   CONCAT('\"', DATE_FORMAT(ADDDATE(sb.start_datetime, INTERVAL
   if((sum(surgeries.estTimeHours) * 60 +
-      sum(surgeries.estTimeMinutes)+ sum(surgeries.cleaningTime)) IS NULL, 0,
-  (sum(surgeries.estTimeHours) * 60 +
-   sum(surgeries.estTimeMinutes)+
-   sum(surgeries.cleaningTime))) MINUTE), '%h:%i %p'), '\"')                                  AS `surgery_start_time`,
+      sum(surgeries.estTimeMinutes) + sum(surgeries.cleaningTime)) IS NULL, 0,
+     (sum(surgeries.estTimeHours) * 60 +
+      sum(surgeries.estTimeMinutes) +
+      sum(surgeries.cleaningTime))) MINUTE), '%h:%i %p'), '\"')                               AS `surgery_start_time`,
   CONCAT('\"', (estTimeHours.value * 60) + estTimeMinutes.value + cleaningTime.value, '\"')   AS `surgery_est_time`,
-  DATE_FORMAT(sa.actual_start_datetime, '%d %b %Y %h:%i %p')                                  AS `surgery_actual_start_time`,
-  DATE_FORMAT(sa.actual_end_datetime, '%d %b %Y %h:%i %p')                                    AS `surgery_actual_end_time`,
+  DATE_FORMAT(sa.actual_start_datetime,
+              '%d %b %Y %h:%i %p')                                                            AS `surgery_actual_start_time`,
+  DATE_FORMAT(sa.actual_end_datetime,
+              '%d %b %Y %h:%i %p')                                                            AS `surgery_actual_end_time`,
   CONCAT('\"', TIMESTAMPDIFF(MINUTE, sa.actual_start_datetime, sa.actual_end_datetime), '\"') AS `surgery_actual_time`,
   DATE_FORMAT(sa.date_changed, '%d/%m/%Y')                                                    AS `last_date_modified`,
   l.name                                                                                      AS `ot`,
   CONCAT('\"', procedureInfo.value, '\"')                                                     AS `procedures`,
   CONCAT('\"', notes.value, '\"')                                                             AS `surgery_notes`,
-  CONCAT('\"', CONCAT(pn.given_name, ' ', pn.family_name) , '\"')                             AS `surgeon`,
+  CONCAT('\"', CONCAT(pn.given_name, ' ', pn.family_name), '\"')                              AS `surgeon`,
   otherSurgeon.name                                                                           AS `other_surgeon`,
   CONCAT('\"', surgicalAssistant.value, '\"')                                                 AS `surgical_assistant`,
   CONCAT('\"', anaesthetist.value, '\"')                                                      AS `anaesthetist`,

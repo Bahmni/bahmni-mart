@@ -1,5 +1,7 @@
-select obs_id as obsId, c.is_set as isSet
-from obs o
-		INNER join concept c on o.concept_id = c.concept_id
-where obs_group_id in (:parentObsIds)
-and o.voided=0;
+SELECT
+  obs_id   AS obsId,
+  c.is_set AS isSet
+FROM obs o
+  INNER JOIN concept c ON o.concept_id = c.concept_id
+WHERE obs_group_id IN (:parentObsIds)
+      AND o.voided = 0;

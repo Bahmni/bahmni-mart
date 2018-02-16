@@ -6,50 +6,39 @@ import org.bahmni.batch.form.domain.Obs;
 import org.springframework.batch.item.file.transform.FieldExtractor;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class ObsFieldExtractor implements FieldExtractor<List<Obs>>{
+public class ObsFieldExtractor implements FieldExtractor<List<Obs>> {
 
-	private BahmniForm form;
+    private BahmniForm form;
 
-	public ObsFieldExtractor(BahmniForm form){
-		this.form = form;
-	}
+    public ObsFieldExtractor(BahmniForm form) {
+        this.form = form;
+    }
 
-	@Override
-	public Object[] extract(List<Obs> obsList) {
-		List<Object> row = new ArrayList<>();
+    @Override
+    public Object[] extract(List<Obs> obsList) {
+        List<Object> row = new ArrayList<>();
 
-		if(obsList.size()==0)
-			return row.toArray();
+        if (obsList.isEmpty())
+            return row.toArray();
 
+        Map<Concept, String> obsRow = new HashMap<>();
+        obsList.forEach(obs -> obsRow.put(obs.getField(),obs.getValue()));
 
-		Map<Concept,String> obsRow = new HashMap<>();
-		for(Obs obs: obsList){
-			obsRow.put(obs.getField(),obs.getValue());
-		}
+        Obs firstObs = obsList.get(0);
+        row.add(firstObs.getId());
 
-		row.add(obsList.get(0).getId());
+        if (form.getParent() != null)
+            row.add(firstObs.getParentId());
 
-		if(form.getParent()!=null){
-			row.add(obsList.get(0).getParentId());
-		}
+        row.add(firstObs.getTreatmentNumber());
+        form.getFields().forEach(field -> row.add(formatObsValue(obsRow.get(field))));
 
-		row.add(obsList.get(0).getTreatmentNumber());
+        return row.toArray();
+    }
 
-		for(Concept field: form.getFields()){
-			row.add(massageStringValue(obsRow.get(field)));
-		}
-
-		return row.toArray();
-	}
-
-	private String massageStringValue(String text){
-		if(StringUtils.isEmpty(text))
-			return text;
-		return text.replaceAll("\n"," ").replaceAll("\t"," ").replaceAll(","," ");
-	}
+    private String formatObsValue(String text) {
+        return StringUtils.isEmpty(text) ? text : text.replaceAll("[\n\t,]", " ");
+    }
 }

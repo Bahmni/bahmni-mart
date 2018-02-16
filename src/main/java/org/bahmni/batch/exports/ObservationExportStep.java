@@ -34,6 +34,7 @@ import java.util.Map;
 public class ObservationExportStep {
 
     public static final String FILE_NAME_EXTENSION = ".csv";
+    private static final String DELIMITER = ",";
 
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
@@ -66,7 +67,7 @@ public class ObservationExportStep {
     }
 
     private JdbcCursorItemReader<Map<String, Object>> obsReader() {
-        String sql = freeMarkerEvaluator.evaluate("obsWithParentSql.ftl",form);
+        String sql = freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form);
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);
@@ -86,28 +87,22 @@ public class ObservationExportStep {
         writer.setResource(new FileSystemResource(getOutputFile()));
 
         DelimitedLineAggregator delimitedLineAggregator = new DelimitedLineAggregator();
-        delimitedLineAggregator.setDelimiter(",");
+        delimitedLineAggregator.setDelimiter(DELIMITER);
         delimitedLineAggregator.setFieldExtractor(new ObsFieldExtractor(form));
 
         writer.setLineAggregator(delimitedLineAggregator);
-        writer.setHeaderCallback(new FlatFileHeaderCallback() {
-            @Override
-            public void writeHeader(Writer writer) throws IOException {
-                writer.write(getHeader());
-            }
-        });
+        writer.setHeaderCallback(w -> w.write(getHeader()));
 
         return writer;
     }
 
-    private File getOutputFile(){
+    private File getOutputFile() {
         File outputFile;
 
         try {
-            outputFile = new File(outputFolder.getFile(),form.getDisplayName() + FILE_NAME_EXTENSION);
-        }
-        catch (IOException e) {
-            throw new BatchResourceException("Unable to create a file in the outputFolder ["+ outputFolder.getFilename()+"]",e);
+            outputFile = new File(outputFolder.getFile(), form.getDisplayName() + FILE_NAME_EXTENSION);
+        } catch (IOException e) {
+            throw new BatchResourceException(String.format("Unable to create a file in the outputFolder [%s]", outputFolder.getFilename()), e);
         }
 
         return outputFile;
@@ -116,16 +111,13 @@ public class ObservationExportStep {
     private String getHeader() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("id_" + form.getDisplayName()).append(",");
+        sb.append("id_").append(form.getDisplayName()).append(DELIMITER);
         if (form.getParent() != null) {
-            sb.append("id_" + form.getParent().getDisplayName()).append(",");
+            sb.append("id_").append(form.getParent().getDisplayName()).append(DELIMITER);
         }
 
         sb.append("patient_id");
-        for (Concept field : form.getFields()) {
-            sb.append(",");
-            sb.append(field.getFormattedTitle());
-        }
+        form.getFields().forEach(field -> sb.append(DELIMITER).append(field.getFormattedTitle()));
         return sb.toString();
     }
 
@@ -136,6 +128,6 @@ public class ObservationExportStep {
 
     public String getStepName() {
         String formName = form.getFormName().getName();
-        return formName.substring(0,Math.min(formName.length(), 100));
+        return formName.substring(0, Math.min(formName.length(), 100));
     }
 }
