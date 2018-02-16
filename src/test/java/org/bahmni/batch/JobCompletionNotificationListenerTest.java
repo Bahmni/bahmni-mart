@@ -18,12 +18,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.core.io.ClassPathResource;
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -79,7 +77,7 @@ public class JobCompletionNotificationListenerTest {
 
         expectedException.expect(BatchResourceException.class);
         String exceptionMessage = "Cannot create a temporary folder provided as " +
-                "'outputFolder' configuration ["+ outputFolder.getFilename()+ "]";
+                "'outputFolder' configuration [" + outputFolder.getFilename() + "]";
         expectedException.expectMessage(exceptionMessage);
 
         jobCompletionNotificationListener.beforeJob(jobExecution);
@@ -164,7 +162,7 @@ public class JobCompletionNotificationListenerTest {
         File outputFile = mock(File.class);
         when(outputFolder.getFile()).thenThrow(new IOException());
         expectedException.expect(BatchResourceException.class);
-        expectedException.expectMessage("Unable to write the output to the ["+zipFile+"]");
+        expectedException.expectMessage("Unable to write the output to the [" + zipFile + "]");
 
         jobCompletionNotificationListener.afterJob(jobExecution);
 

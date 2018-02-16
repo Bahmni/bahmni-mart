@@ -15,7 +15,6 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;

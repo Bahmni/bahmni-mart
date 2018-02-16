@@ -20,65 +20,66 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
 @PrepareForTest(IOUtils.class)
 @RunWith(PowerMockRunner.class)
 public class BatchUtilsTest {
 
-	@Rule
-	ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    ExpectedException expectedException = ExpectedException.none();
 
-	@Before
-	public void setUp() throws Exception {
-		PowerMockito.mockStatic(IOUtils.class);
-	}
+    @Before
+    public void setUp() throws Exception {
+        PowerMockito.mockStatic(IOUtils.class);
+    }
 
-	@Test
-	public void ensureThatTheCommaSeparatedConceptNamesAreConvertedToSet(){
-		List<String> conceptNames = BatchUtils.convertConceptNamesToSet("\"a,b\",\"c\",\"d\"");
+    @Test
+    public void ensureThatTheCommaSeparatedConceptNamesAreConvertedToSet() {
+        List<String> conceptNames = BatchUtils.convertConceptNamesToSet("\"a,b\",\"c\",\"d\"");
 
-		assertEquals(3,conceptNames.size());
-		assertTrue(conceptNames.contains("c"));
-		assertTrue(conceptNames.contains("d"));
-		assertTrue(conceptNames.contains("a,b"));
-	}
+        assertEquals(3, conceptNames.size());
+        assertTrue(conceptNames.contains("c"));
+        assertTrue(conceptNames.contains("d"));
+        assertTrue(conceptNames.contains("a,b"));
+    }
 
 
-	@Test
-	public void ensureThatSetIsNotNullWhenConceptNamesIsEmpty(){
-		List<String> conceptNames = BatchUtils.convertConceptNamesToSet("");
-		assertNotNull(conceptNames);
-		assertEquals(0,conceptNames.size());
-	}
+    @Test
+    public void ensureThatSetIsNotNullWhenConceptNamesIsEmpty() {
+        List<String> conceptNames = BatchUtils.convertConceptNamesToSet("");
+        assertNotNull(conceptNames);
+        assertEquals(0, conceptNames.size());
+    }
 
-	@Test
-	public void ensureThatSetIsNotNullWhenConceptNamesIsNull(){
-		List<String> conceptNames = BatchUtils.convertConceptNamesToSet(null);
-		assertNotNull(conceptNames);
-		assertEquals(0,conceptNames.size());
-	}
+    @Test
+    public void ensureThatSetIsNotNullWhenConceptNamesIsNull() {
+        List<String> conceptNames = BatchUtils.convertConceptNamesToSet(null);
+        assertNotNull(conceptNames);
+        assertEquals(0, conceptNames.size());
+    }
 
-	@Test
-	public void shouldConvertResourceOutputToString() throws Exception {
-		ClassPathResource classPathResource = Mockito.mock(ClassPathResource.class);
-		InputStream inputStream = Mockito.mock(InputStream.class);
-		Mockito.when(classPathResource.getInputStream()).thenReturn(inputStream);
-		String expectedString = "stringEquivalentOfClassPathResource";
-		Mockito.when(IOUtils.toString(inputStream)).thenReturn(expectedString);
+    @Test
+    public void shouldConvertResourceOutputToString() throws Exception {
+        ClassPathResource classPathResource = Mockito.mock(ClassPathResource.class);
+        InputStream inputStream = Mockito.mock(InputStream.class);
+        Mockito.when(classPathResource.getInputStream()).thenReturn(inputStream);
+        String expectedString = "stringEquivalentOfClassPathResource";
+        Mockito.when(IOUtils.toString(inputStream)).thenReturn(expectedString);
 
-		String actualString = BatchUtils.convertResourceOutputToString(classPathResource);
+        String actualString = BatchUtils.convertResourceOutputToString(classPathResource);
 
-		assertEquals(expectedString, actualString);
-		Mockito.verify(classPathResource, Mockito.times(1)).getInputStream();
-	}
+        assertEquals(expectedString, actualString);
+        Mockito.verify(classPathResource, Mockito.times(1)).getInputStream();
+    }
 
-	@Test
-	public void shouldThrowBatchResourceException() throws Exception {
-		expectedException.expect(BatchResourceException.class);
-		expectedException.expectMessage("Cannot load the provided resource. Unable to continue");
+    @Test
+    public void shouldThrowBatchResourceException() throws Exception {
+        expectedException.expect(BatchResourceException.class);
+        expectedException.expectMessage("Cannot load the provided resource. Unable to continue");
 
-		ClassPathResource classPathResource = Mockito.mock(ClassPathResource.class);
-		Mockito.when(classPathResource.getInputStream()).thenThrow(new IOException());
+        ClassPathResource classPathResource = Mockito.mock(ClassPathResource.class);
+        Mockito.when(classPathResource.getInputStream()).thenThrow(new IOException());
 
-		BatchUtils.convertResourceOutputToString(classPathResource);
-	}
+        BatchUtils.convertResourceOutputToString(classPathResource);
+    }
 }
