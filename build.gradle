@@ -16,6 +16,7 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'jacoco'
 
 group = 'org.bahmni.batch'
 version = '1.0.0'
@@ -28,6 +29,27 @@ targetCompatibility = 1.8
 repositories {
     jcenter()
 }
+
+jacoco {
+    toolVersion = "0.7.9"
+}
+
+jacocoTestReport {
+    dependsOn "test"
+}
+
+jacocoTestCoverageVerification {
+    dependsOn "jacocoTestReport"
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.50
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
 
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-batch', version: '1.3.4.RELEASE'
