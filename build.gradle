@@ -17,6 +17,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'jacoco'
+apply plugin: 'checkstyle'
 
 group = 'org.bahmni.batch'
 version = '1.0.0'
@@ -110,4 +111,27 @@ buildRpm {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.5.1'
+}
+
+checkstyle {
+    project.ext.checkstyleVersion = '8.8'
+    project.ext.sevntuChecksVersion = '1.27.0'
+    ignoreFailures = false
+    configFile = file("src/main/resources/checkStyle.xml")
+    showViolations = false
+
+    checkstyleMain {
+        source = sourceSets.main.allSource
+    }
+
+    configurations {
+        checkstyle
+    }
+
+    dependencies{
+        assert project.hasProperty("checkstyleVersion")
+
+        checkstyle "com.puppycrawl.tools:checkstyle:${checkstyleVersion}"
+        checkstyle "com.github.sevntu-checkstyle:sevntu-checks:${sevntuChecksVersion}"
+    }
 }
