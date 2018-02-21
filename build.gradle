@@ -118,7 +118,6 @@ checkstyle {
     project.ext.sevntuChecksVersion = '1.27.0'
     ignoreFailures = false
     configFile = file("src/main/resources/checkStyle.xml")
-    showViolations = false
 
     checkstyleMain {
         source = sourceSets.main.allSource
