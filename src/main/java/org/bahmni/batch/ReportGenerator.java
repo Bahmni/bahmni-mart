@@ -24,8 +24,10 @@ public class ReportGenerator {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
 
     public String generateReport() {
-        List<JobInstance> jobInstanceList = jobExplorer.findJobInstancesByJobName(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME, 0, 20);
-        return evaluator.evaluate("report.ftl", transformJobExecutionsToReport(getJobExecutionsForInstances(jobInstanceList)));
+        List<JobInstance> jobInstanceList = jobExplorer
+                .findJobInstancesByJobName(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME, 0, 20);
+        return evaluator.evaluate("report.ftl",
+                transformJobExecutionsToReport(getJobExecutionsForInstances(jobInstanceList)));
     }
 
     private List<JobExecution> getJobExecutionsForInstances(List<JobInstance> jobInstanceList) {
@@ -39,7 +41,8 @@ public class ReportGenerator {
     private List<JobResult> transformJobExecutionsToReport(List<JobExecution> jobExecutions) {
         List<JobResult> jobResults = new ArrayList<>();
         for (JobExecution execution : jobExecutions) {
-            String zipFileName = execution.getExecutionContext().getString(JobCompletionNotificationListener.OUTPUT_FILE_NAME_CONTEXT_KEY);
+            String zipFileName = execution.getExecutionContext()
+                    .getString(JobCompletionNotificationListener.OUTPUT_FILE_NAME_CONTEXT_KEY);
             jobResults.add(new JobResult(dateFormat.format(execution.getCreateTime()),
                     execution.getExitStatus().getExitCode(), zipFileName));
         }

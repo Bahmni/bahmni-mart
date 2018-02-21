@@ -104,16 +104,21 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "bahmniConfigFolder", bahmniConfigFolder);
         setValuesForMemberFields(batchConfiguration, "reportGenerator", reportGenerator);
         setValuesForMemberFields(batchConfiguration, "zipFolder", zipFolder);
-        setValuesForMemberFields(batchConfiguration, "freemarkerTemplateLocation", freemarkerTemplateLocation);
+        setValuesForMemberFields(batchConfiguration, "freemarkerTemplateLocation",
+                freemarkerTemplateLocation);
         setValuesForMemberFields(batchConfiguration, "formListProcessor", formListProcessor);
         setValuesForMemberFields(batchConfiguration, "jobBuilderFactory", jobBuilderFactory);
-        setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep", treatmentRegistrationBaseExportStep);
+        setValuesForMemberFields(batchConfiguration,
+                "treatmentRegistrationBaseExportStep", treatmentRegistrationBaseExportStep);
         setValuesForMemberFields(batchConfiguration, "drugOrderBaseExportStep", drugOrderBaseExportStep);
-        setValuesForMemberFields(batchConfiguration, "metaDataCodeDictionaryExportStep", metaDataCodeDictionaryExportStep);
+        setValuesForMemberFields(batchConfiguration, "metaDataCodeDictionaryExportStep",
+                metaDataCodeDictionaryExportStep);
         setValuesForMemberFields(batchConfiguration, "otExportStep", otExportStep);
         setValuesForMemberFields(batchConfiguration, "bedManagementExportStep", bedManagementExportStep);
-        setValuesForMemberFields(batchConfiguration, "appointmentSchedulingExportStep", appointmentSchedulingExportStep);
-        setValuesForMemberFields(batchConfiguration, "observationExportStepFactory", observationExportStepFactory);
+        setValuesForMemberFields(batchConfiguration, "appointmentSchedulingExportStep",
+                appointmentSchedulingExportStep);
+        setValuesForMemberFields(batchConfiguration, "observationExportStepFactory",
+                observationExportStepFactory);
     }
 
     @Test
@@ -157,7 +162,8 @@ public class BatchConfigurationTest {
         Assert.assertEquals(configuration, freeMarkerConfiguration);
         verify(configuration, times(1)).setDirectoryForTemplateLoading(configurationFile);
         verify(configuration, times(1)).setDefaultEncoding("UTF-8");
-        verify(configuration, times(1)).setTemplateExceptionHandler(any(TemplateExceptionHandler.class));
+        verify(configuration, times(1))
+                .setTemplateExceptionHandler(any(TemplateExceptionHandler.class));
     }
 
     @Test
@@ -205,7 +211,9 @@ public class BatchConfigurationTest {
 
         ObservationExportStep medicalHistoryObservationExportStep = Mockito.mock(ObservationExportStep.class);
         ObservationExportStep fstgObservationExportStep = Mockito.mock(ObservationExportStep.class);
-        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryObservationExportStep).thenReturn(fstgObservationExportStep);
+        when(observationExportStepFactory.getObject())
+                .thenReturn(medicalHistoryObservationExportStep)
+                .thenReturn(fstgObservationExportStep);
         Step medicalHistoryObservationStep = Mockito.mock(Step.class);
         Step fstgObservationStep = Mockito.mock(Step.class);
         when(medicalHistoryObservationExportStep.getStep()).thenReturn(medicalHistoryObservationStep);
@@ -229,7 +237,10 @@ public class BatchConfigurationTest {
         verify(completeDataExport, times(1)).next(fstgObservationStep);
     }
 
-    private void setValuesForMemberFields(Object batchConfiguration, String fieldName, Object valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+    private void setValuesForMemberFields(
+            Object batchConfiguration,
+            String fieldName, Object valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+
         Field f1 = batchConfiguration.getClass().getDeclaredField(fieldName);
         f1.setAccessible(true);
         f1.set(batchConfiguration, valueForMemberField);

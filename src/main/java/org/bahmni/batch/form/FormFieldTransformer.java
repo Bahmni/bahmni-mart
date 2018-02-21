@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 @Component
 public class FormFieldTransformer {
 
-	public List<Integer> transformFormToFieldIds(BahmniForm form){
-		return form.getFields().stream().map(Concept::getId).collect(Collectors.toList());
-	}
+    public List<Integer> transformFormToFieldIds(BahmniForm form) {
+        return form.getFields().stream().map(Concept::getId).collect(Collectors.toList());
+    }
 
 
 }

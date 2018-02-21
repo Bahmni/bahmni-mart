@@ -28,7 +28,9 @@ public class FreeMarkerEvaluator<T> {
             inputMap.put("input", input);
             template.process(inputMap, stringWriter);
         } catch (Exception exception) {
-            throw new BatchResourceException(String.format("Unable to continue generating a the template with name [%s]", templateName), exception);
+            throw new BatchResourceException(
+                    String.format("Unable to continue generating a the template with name [%s]", templateName),
+                    exception);
         }
         String result = stringWriter.toString();
         log.debug(String.format("The generated template for [%s]", input.toString()));

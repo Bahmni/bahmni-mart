@@ -1,6 +1,5 @@
 package org.bahmni.batch.exports;
 
-
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 @Component
-public class DrugOrderBaseExportStep extends  BaseExportStep{
+public class DrugOrderBaseExportStep extends BaseExportStep {
 
 
     @Autowired
@@ -18,7 +17,7 @@ public class DrugOrderBaseExportStep extends  BaseExportStep{
                                    DataSource dataSource,
                                    @Value("classpath:sql/drugOrder.sql") Resource sqlResource,
                                    @Value("${outputFolder}/drugOrder.csv") Resource outputFolder,
-                                   @Value("${drugOrderHeaders}")String headers) {
+                                   @Value("${drugOrderHeaders}") String headers) {
         super(stepBuilderFactory, dataSource, sqlResource, outputFolder, "drugOrder", headers);
     }
 

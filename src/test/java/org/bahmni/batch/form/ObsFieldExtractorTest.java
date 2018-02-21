@@ -53,7 +53,8 @@ public class ObsFieldExtractorTest {
         String treatmentNumber = "AB1234";
         int obsGroupIdForCsv = 1;
         int rootObsId = 0;
-        obsList.add(new Obs(treatmentNumber, obsGroupIdForCsv, rootObsId, new Concept(1, "Systolic", 0), "abc\ndef\tghi,klm"));
+        obsList.add(new Obs(treatmentNumber, obsGroupIdForCsv, rootObsId,
+                new Concept(1, "Systolic", 0), "abc\ndef\tghi,klm"));
 
         List<Object> result = Arrays.asList(fieldExtractor.extract(obsList));
 

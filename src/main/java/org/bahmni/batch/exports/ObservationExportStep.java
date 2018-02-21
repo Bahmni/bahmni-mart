@@ -102,7 +102,8 @@ public class ObservationExportStep {
         try {
             outputFile = new File(outputFolder.getFile(), form.getDisplayName() + FILE_NAME_EXTENSION);
         } catch (IOException e) {
-            throw new BatchResourceException(String.format("Unable to create a file in the outputFolder [%s]", outputFolder.getFilename()), e);
+            throw new BatchResourceException(String.format("Unable to create a file in the outputFolder [%s]",
+                    outputFolder.getFilename()), e);
         }
 
         return outputFile;

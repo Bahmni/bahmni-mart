@@ -37,7 +37,8 @@ public class ObsServiceTest {
         obsService = new ObsService();
         ClassPathResource conceptDetailsResource = Mockito.mock(ClassPathResource.class);
         ClassPathResource conceptListResource = Mockito.mock(ClassPathResource.class);
-        PowerMockito.when(BatchUtils.convertResourceOutputToString(conceptDetailsResource)).thenReturn("conceptDetailsSQL");
+        PowerMockito.when(BatchUtils.convertResourceOutputToString(conceptDetailsResource))
+                .thenReturn("conceptDetailsSQL");
         PowerMockito.when(BatchUtils.convertResourceOutputToString(conceptListResource)).thenReturn("conceptListSQL");
         setValuesForMemberFields(obsService, "jdbcTemplate", namedParameterJdbcTemplate);
         setValuesForMemberFields(obsService, "conceptDetailsSqlResource", conceptDetailsResource);
@@ -57,7 +58,8 @@ public class ObsServiceTest {
         obsService.getConceptsByNames(commaSeparatedConceptNames);
 
         Mockito.verify(mapSqlParameterSource, Mockito.times(1)).addValue("conceptNames", conceptNamesList);
-        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1)).query(eq("conceptDetailsSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
+        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1))
+                .query(eq("conceptDetailsSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
     }
 
     @Test
@@ -69,10 +71,14 @@ public class ObsServiceTest {
         obsService.getChildConcepts(parentVideoConcept);
 
         Mockito.verify(mapSqlParameterSource, Mockito.times(1)).addValue("parentConceptName", parentVideoConcept);
-        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1)).query(eq("conceptListSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
+        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1))
+                .query(eq("conceptListSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
     }
 
-    private void setValuesForMemberFields(Object observationService, String fieldName, Object valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+    private void setValuesForMemberFields(
+            Object observationService, String fieldName, Object valueForMemberField)
+            throws NoSuchFieldException, IllegalAccessException {
+
         Field f1 = observationService.getClass().getDeclaredField(fieldName);
         f1.setAccessible(true);
         f1.set(observationService, valueForMemberField);

@@ -62,12 +62,14 @@ public class FormListProcessorTest {
         BahmniForm a = new BahmniFormBuilder().withName("a").withChild(a1).withChild(b1).build();
 
         BahmniForm bacteriologyResultForm = new BahmniFormBuilder().withName("Bacteriology Result").build();
-        BahmniForm bacteriologyForm = new BahmniFormBuilder().withName("Bateriology Concept Set").withChild(bacteriologyResultForm).build();
+        BahmniForm bacteriologyForm = new BahmniFormBuilder()
+                .withName("Bateriology Concept Set").withChild(bacteriologyResultForm).build();
 
         when(bahmniFormFactory.createForm(conceptA, null)).thenReturn(a);
         when(bahmniFormFactory.createForm(bacteriologyConceptSet, null)).thenReturn(bacteriologyForm);
 
-        List<BahmniForm> expected = Arrays.asList(a, a1, b1, a11, a12, a13, b11, b12, b13, bacteriologyForm, bacteriologyResultForm);
+        List<BahmniForm> expected = Arrays.asList(a, a1, b1, a11, a12, a13, b11, b12, b13,
+                bacteriologyForm, bacteriologyResultForm);
 
         List<BahmniForm> actual = formListProcessor.retrieveAllForms();
 

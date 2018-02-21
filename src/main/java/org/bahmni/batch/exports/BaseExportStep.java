@@ -30,7 +30,8 @@ public class BaseExportStep {
     private String sql;
     private static final String DELIMITER = ",";
 
-    public BaseExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource, Resource sqlResource, Resource outputFolder, String exportName, String headers) {
+    public BaseExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource, Resource sqlResource,
+                          Resource outputFolder, String exportName, String headers) {
         this.dataSource = dataSource;
         this.stepBuilderFactory = stepBuilderFactory;
         this.sqlResource = sqlResource;

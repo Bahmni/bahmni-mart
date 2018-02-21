@@ -49,7 +49,8 @@ public class BaseExportStepTest {
     @Before
     public void setUp() throws Exception {
         PowerMockito.mockStatic(BatchUtils.class);
-        baseExportStep = new BaseExportStep(stepBuilderFactory, dataSource, sqlResource, outputFolder, exportName, headers);
+        baseExportStep = new BaseExportStep(stepBuilderFactory, dataSource,
+                sqlResource, outputFolder, exportName, headers);
     }
 
     @Test

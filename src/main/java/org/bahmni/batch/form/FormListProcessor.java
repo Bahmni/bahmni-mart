@@ -26,10 +26,12 @@ public class FormListProcessor {
     public List<BahmniForm> retrieveAllForms() {
         List<Concept> allFormConcepts = obsService.getChildConcepts(ALL_FORMS);
         allFormConcepts.add(obsService.getConceptsByNames("Bacteriology Concept Set").get(0));
-        List<BahmniForm> forms = allFormConcepts.stream().map(concept -> bahmniFormFactory.createForm(concept, null)).collect(Collectors.toList());
+        List<BahmniForm> forms = allFormConcepts.stream()
+                .map(concept -> bahmniFormFactory.createForm(concept, null)).collect(Collectors.toList());
 
         List<BahmniForm> flattenedFormList = new ArrayList<>(forms);
-        fetchExportFormsList(forms, flattenedFormList); //TODO: Refactor fetchExportFormsList not to change flattenedFormList inside instead it should return it
+        fetchExportFormsList(forms, flattenedFormList);
+        //TODO: Refactor fetchExportFormsList not to change flattenedFormList inside instead it should return it
         return flattenedFormList;
     }
 

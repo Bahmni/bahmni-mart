@@ -132,7 +132,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
             String reportOutput = reportGenerator.generateReport();
             FileUtils.writeStringToFile(report, reportOutput);
         } catch (IOException e) {
-            throw new BatchResourceException(String.format("Unable to write the report file [%s]", zipFolder.getFilename()), e);
+            throw new BatchResourceException(String.format("Unable to write the report file [%s]",
+                    zipFolder.getFilename()), e);
         }
     }
 }

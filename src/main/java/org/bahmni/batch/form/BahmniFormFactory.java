@@ -43,7 +43,8 @@ public class BahmniFormFactory {
         if (concept.getIsSet() == 0)
             bahmniForm.addField(concept);
         else
-            obsService.getChildConcepts(concept.getName()).forEach(childConcept -> addChild(bahmniForm, childConcept, depth + 1));
+            obsService.getChildConcepts(concept.getName())
+                    .forEach(childConcept -> addChild(bahmniForm, childConcept, depth + 1));
     }
 
     private void addChild(BahmniForm bahmniForm, Concept childConcept, int childDepth) {

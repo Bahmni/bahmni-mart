@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 @Component
-public class OtExportStep extends  BaseExportStep{
+public class OtExportStep extends BaseExportStep {
 
 
     @Autowired
     public OtExportStep(StepBuilderFactory stepBuilderFactory,
-                                   DataSource dataSource,
-                                   @Value("classpath:sql/otExport.sql") Resource sqlResource,
-                                   @Value("${outputFolder}/otExport.csv") Resource outputFolder,
-                                   @Value("${otExportHeaders}")String headers) {
+                        DataSource dataSource,
+                        @Value("classpath:sql/otExport.sql") Resource sqlResource,
+                        @Value("${outputFolder}/otExport.csv") Resource outputFolder,
+                        @Value("${otExportHeaders}") String headers) {
         super(stepBuilderFactory, dataSource, sqlResource, outputFolder, "otExport", headers);
     }
 

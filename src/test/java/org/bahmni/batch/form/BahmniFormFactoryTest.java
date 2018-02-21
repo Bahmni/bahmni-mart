@@ -46,7 +46,8 @@ public class BahmniFormFactoryTest {
     public void setup() throws NoSuchFieldException, IllegalAccessException, InstantiationException {
         initMocks(this);
 
-        addMoreAndMultiSelectConceptNames = "Operation Notes Template, Discharge Summary, Surgeries and Procedures, Other Notes, BP, Notes";
+        addMoreAndMultiSelectConceptNames = "Operation Notes Template, Discharge Summary,"
+                + " Surgeries and Procedures, Other Notes, BP, Notes";
         List<Concept> addMoreAndMultiSelectConcepts = new ArrayList<>();
         addMoreAndMultiSelectConcepts.add(new Concept(3365, "Operation Notes Template", 1));
         addMoreAndMultiSelectConcepts.add(new Concept(1200, "Discharge Summary, Surgeries and Procedures", 1));
@@ -89,14 +90,18 @@ public class BahmniFormFactoryTest {
 
         bahmniFormFactory = new BahmniFormFactory();
         bahmniFormFactory.setObsService(obsService);
-        when(obsService.getConceptsByNames(addMoreAndMultiSelectConceptNames)).thenReturn(addMoreAndMultiSelectConcepts);
+        when(obsService.getConceptsByNames(addMoreAndMultiSelectConceptNames))
+                .thenReturn(addMoreAndMultiSelectConcepts);
         when(obsService.getConceptsByNames(ignoreConceptNames)).thenReturn(ignoreConcepts);
         setValuesForMemberFields(bahmniFormFactory, "addMoreConceptNames", addMoreAndMultiSelectConceptNames);
         setValuesForMemberFields(bahmniFormFactory, "ignoreConceptsNames", ignoreConceptNames);
         bahmniFormFactory.postConstruct();
     }
 
-    private void setValuesForMemberFields(Object bahmniFormFactory, String fieldName, String valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+    private void setValuesForMemberFields(
+            Object bahmniFormFactory, String fieldName,
+            String valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+
         Field f1 = bahmniFormFactory.getClass().getDeclaredField(fieldName);
         f1.setAccessible(true);
         f1.set(bahmniFormFactory, valueForMemberField);
@@ -147,7 +152,8 @@ public class BahmniFormFactoryTest {
         BahmniForm notesForm = otherNotesForm.getChildren().get(0);
         assertEquals(notesForm.getDepthToParent(), 1);
 
-        bahmniForm = bahmniFormFactory.createForm(new Concept(1, "Discharge Summary, Surgeries and Procedures", 1), null);
+        bahmniForm = bahmniFormFactory
+                .createForm(new Concept(1, "Discharge Summary, Surgeries and Procedures", 1), null);
         assertNotNull(bahmniForm);
         assertEquals(0, bahmniForm.getChildren().size());
         assertEquals(0, bahmniForm.getFields().size());
@@ -165,7 +171,8 @@ public class BahmniFormFactoryTest {
         Concept hasTakenCourse = new Concept(1112, "Has patient taken course", 0);
         hasTakenCourse.setParent(healthEducation);
         videoConcept.setParent(healthEducation);
-        when(obsService.getChildConcepts("Health Education")).thenReturn(Arrays.asList(hasTakenCourse, videoConcept));
+        when(obsService.getChildConcepts("Health Education"))
+                .thenReturn(Arrays.asList(hasTakenCourse, videoConcept));
 
         BahmniForm bahmniForm = bahmniFormFactory.createForm(healthEducation, null);
 
