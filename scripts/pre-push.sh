@@ -8,9 +8,8 @@ STATUS=$?
 
 echo "------------UNSTASHING UNTRACKED AND UNSTAGED FILES------------"
 
-if [ ${isStashed} ]
+if [ "$isStashed" ]
  then
-    echo "poping ..."
     git stash pop
 fi
 
