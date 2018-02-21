@@ -1,0 +1,7 @@
+#!/bin/bash
+
+. /etc/bahmni-installer/bahmni.conf
+
+echo "Running bahmni-analytics..."
+java -DOPENMRS_DB_SERVER=${OPENMRS_DB_SERVER} -DOPENMRS_DB_USER=${OPENMRS_DB_USERNAME} -DOPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD} -jar /opt/bahmni-analytics/libs/bahmni-analytics-*.jar >> /opt/bahmni-analytics/log/bahmni-analytics.log
+echo "Done"

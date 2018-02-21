@@ -19,10 +19,10 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 
-group = 'org.bahmni.batch'
+group = 'org.bahmni.analytics'
 version = '1.0.0'
 
-description = "Bahmni Batch for Amman exports"
+description = "Batch job for Bahmni Analytics"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -74,29 +74,29 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.bahmni.batch.Application'
+        attributes 'Main-Class': 'org.bahmni.analytics.Application'
     }
 }
 
 ospackage {
-    packageName = 'bahmni-amman-batch'
+    packageName = 'bahmni-analytics'
     release = System.getenv('GO_PIPELINE_COUNTER') ?: 1
     arch = NOARCH
     os = LINUX
     user = 'root'
 
-    into '/opt/bahmni-batch'
+    into '/opt/bahmni-analytics'
 
     from("${projectDir}/scripts/rpm/") {
         fileMode = 0755
         createDirectoryEntry = true
-        into '/opt/bahmni-batch/bin'
+        into '/opt/bahmni-analytics/bin'
     }
 
     from("${buildDir}/libs") {
         fileMode = 0755
         createDirectoryEntry = true
-        into "/opt/bahmni-batch/libs"
+        into "/opt/bahmni-analytics/libs"
     }
 }
 
