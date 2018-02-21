@@ -4,7 +4,13 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.io.FileUtils;
 import org.bahmni.batch.exception.BatchResourceException;
-import org.bahmni.batch.exports.*;
+import org.bahmni.batch.exports.AppointmentSchedulingExportStep;
+import org.bahmni.batch.exports.BedManagementExportStep;
+import org.bahmni.batch.exports.DrugOrderBaseExportStep;
+import org.bahmni.batch.exports.MetaDataCodeDictionaryExportStep;
+import org.bahmni.batch.exports.ObservationExportStep;
+import org.bahmni.batch.exports.OtExportStep;
+import org.bahmni.batch.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.batch.form.FormListProcessor;
 import org.bahmni.batch.form.domain.BahmniForm;
 import org.junit.Assert;
@@ -15,7 +21,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.batch.core.Job;
@@ -38,7 +43,10 @@ import java.util.ArrayList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.*;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @PrepareForTest({BatchConfiguration.class, FileUtils.class})
 @RunWith(PowerMockRunner.class)
@@ -139,7 +147,7 @@ public class BatchConfigurationTest {
 
     @Test
     public void shouldAddFreeMarkerConfiguration() throws Exception {
-        freemarker.template.Configuration configuration = PowerMockito.mock(freemarker.template.Configuration.class);
+        freemarker.template.Configuration configuration = mock(freemarker.template.Configuration.class);
         whenNew(freemarker.template.Configuration.class).withArguments(any()).thenReturn(configuration);
         File configurationFile = Mockito.mock(File.class);
         when(freemarkerTemplateLocation.getFile()).thenReturn(configurationFile);

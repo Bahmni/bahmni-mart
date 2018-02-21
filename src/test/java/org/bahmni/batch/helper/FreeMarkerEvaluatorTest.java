@@ -1,5 +1,6 @@
 package org.bahmni.batch.helper;
 
+import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.bahmni.batch.exception.BatchResourceException;
 import org.bahmni.batch.form.domain.BahmniForm;
@@ -15,13 +16,12 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import freemarker.template.Configuration;
-
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.powermock.api.mockito.PowerMockito.mock;
 
 @PrepareForTest({FreeMarkerEvaluator.class})
 @RunWith(PowerMockRunner.class)

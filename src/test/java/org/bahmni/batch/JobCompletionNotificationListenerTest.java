@@ -29,7 +29,14 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 @PrepareForTest({JobCompletionNotificationListener.class, FileUtils.class, IOUtils.class})
 @RunWith(PowerMockRunner.class)
@@ -127,7 +134,7 @@ public class JobCompletionNotificationListenerTest {
         verify(jobExecution, times(1)).getExecutionContext();
         verify(executionContext, times(1)).getString(OUTPUT_FILE_NAME_CONTEXT_KEY);
         verify(zipFolder, times(2)).getFile();
-        PowerMockito.verifyStatic(Mockito.times(1));
+        PowerMockito.verifyStatic(times(1));
         FileUtils.iterateFiles(eq(outputFile), any(), eq(false));
 
         verify(zipOutputStream, times(1)).putNextEntry(zipEntry);
@@ -136,11 +143,11 @@ public class JobCompletionNotificationListenerTest {
         verify(zipOutputStream, times(1)).closeEntry();
         verify(fileInputStream, times(1)).close();
 
-        PowerMockito.verifyStatic(Mockito.times(1));
+        PowerMockito.verifyStatic(times(1));
         IOUtils.closeQuietly(zipOutputStream);
-        PowerMockito.verifyStatic(Mockito.times(1));
+        PowerMockito.verifyStatic(times(1));
         IOUtils.closeQuietly(fileOutputStream);
-        PowerMockito.verifyStatic(Mockito.times(1));
+        PowerMockito.verifyStatic(times(1));
         IOUtils.closeQuietly(fileInputStream);
     }
 
@@ -170,9 +177,9 @@ public class JobCompletionNotificationListenerTest {
         verify(jobExecution, times(1)).getExecutionContext();
         verify(executionContext, times(1)).getString(OUTPUT_FILE_NAME_CONTEXT_KEY);
         verify(zipFolder, times(2)).getFile();
-        PowerMockito.verifyStatic(Mockito.times(1));
+        PowerMockito.verifyStatic(times(1));
         IOUtils.closeQuietly(zipOutputStream);
-        PowerMockito.verifyStatic(Mockito.times(1));
+        PowerMockito.verifyStatic(times(1));
         IOUtils.closeQuietly(fileOutputStream);
     }
 }
