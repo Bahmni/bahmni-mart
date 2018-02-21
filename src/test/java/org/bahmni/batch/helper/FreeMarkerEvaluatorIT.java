@@ -31,10 +31,10 @@ public class FreeMarkerEvaluatorIT {
 
         String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl", parent);
         System.out.println(sql);
-        assertEquals("SELECT obs0.obs_id,obs0.obs_id as parent_obs_id\n"
-                + "FROM obs obs0\n"
-                + "WHERE obs0.concept_id=1189\n"
-                + "AND obs0.voided = 0", sql.trim());
+        assertEquals("SELECT obs0.obs_id,obs0.obs_id as parent_obs_id\n" +
+                "FROM obs obs0\n" +
+                "WHERE obs0.concept_id=1189\n" +
+                "AND obs0.voided = 0", sql.trim());
     }
 
     @Test
@@ -52,12 +52,12 @@ public class FreeMarkerEvaluatorIT {
 
         String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl", child);
         System.out.println(sql);
-        assertEquals("SELECT obs0.obs_id,obs1.obs_id as parent_obs_id\n"
-                + "FROM obs obs0\n"
-                + "INNER JOIN obs obs1 on ( obs1.obs_id=obs0.obs_group_id and obs1.voided=0 )\n"
-                + "WHERE obs0.concept_id=10\n"
-                + "AND obs0.voided = 0\n"
-                + "AND obs1.concept_id=1", sql.trim());
+        assertEquals("SELECT obs0.obs_id,obs1.obs_id as parent_obs_id\n" +
+                "FROM obs obs0\n" +
+                "INNER JOIN obs obs1 on ( obs1.obs_id=obs0.obs_group_id and obs1.voided=0 )\n" +
+                "WHERE obs0.concept_id=10\n" +
+                "AND obs0.voided = 0\n" +
+                "AND obs1.concept_id=1", sql.trim());
     }
 
     @Test
@@ -75,12 +75,12 @@ public class FreeMarkerEvaluatorIT {
 
         String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl", child);
         System.out.println(sql);
-        assertEquals("SELECT obs0.obs_id,obs2.obs_id as parent_obs_id\n"
-                + "FROM obs obs0\n"
-                + "INNER JOIN obs obs1 on ( obs1.obs_id=obs0.obs_group_id and obs1.voided=0 )\n"
-                + "INNER JOIN obs obs2 on ( obs2.obs_id=obs1.obs_group_id and obs2.voided=0 )\n"
-                + "WHERE obs0.concept_id=10\n"
-                + "AND obs0.voided = 0\n"
-                + "AND obs2.concept_id=1", sql.trim());
+        assertEquals("SELECT obs0.obs_id,obs2.obs_id as parent_obs_id\n" +
+                "FROM obs obs0\n" +
+                "INNER JOIN obs obs1 on ( obs1.obs_id=obs0.obs_group_id and obs1.voided=0 )\n" +
+                "INNER JOIN obs obs2 on ( obs2.obs_id=obs1.obs_group_id and obs2.voided=0 )\n" +
+                "WHERE obs0.concept_id=10\n" +
+                "AND obs0.voided = 0\n" +
+                "AND obs2.concept_id=1", sql.trim());
     }
 }

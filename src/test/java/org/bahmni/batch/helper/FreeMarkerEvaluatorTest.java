@@ -70,8 +70,8 @@ public class FreeMarkerEvaluatorTest {
         Mockito.when(configuration.getTemplate(templateName)).thenThrow(batchResourceException);
 
         expectedException.expect(BatchResourceException.class);
-        expectedException.expectMessage("Unable to continue generating a the template with name ["
-                + templateName + "]");
+        expectedException.expectMessage(
+                String.format("Unable to continue generating a the template with name [%s]", templateName));
 
         freeMarkerEvaluator.evaluate(templateName, bahmniForm);
         Mockito.verify(configuration, times(1)).getTemplate(templateName);

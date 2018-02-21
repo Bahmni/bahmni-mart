@@ -46,8 +46,8 @@ public class BahmniFormFactoryTest {
     public void setup() throws NoSuchFieldException, IllegalAccessException, InstantiationException {
         initMocks(this);
 
-        addMoreAndMultiSelectConceptNames = "Operation Notes Template, Discharge Summary,"
-                + " Surgeries and Procedures, Other Notes, BP, Notes";
+        addMoreAndMultiSelectConceptNames = "Operation Notes Template, Discharge Summary," +
+                " Surgeries and Procedures, Other Notes, BP, Notes";
         List<Concept> addMoreAndMultiSelectConcepts = new ArrayList<>();
         addMoreAndMultiSelectConcepts.add(new Concept(3365, "Operation Notes Template", 1));
         addMoreAndMultiSelectConcepts.add(new Concept(1200, "Discharge Summary, Surgeries and Procedures", 1));
