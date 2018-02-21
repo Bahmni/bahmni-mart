@@ -83,8 +83,8 @@ public class JobCompletionNotificationListenerTest {
         when(outputFolder.getFile()).thenThrow(new IOException());
 
         expectedException.expect(BatchResourceException.class);
-        String exceptionMessage = "Cannot create a temporary folder provided as " +
-                "'outputFolder' configuration [" + outputFolder.getFilename() + "]";
+        String exceptionMessage = "Cannot create a temporary folder provided as "
+                + "'outputFolder' configuration [" + outputFolder.getFilename() + "]";
         expectedException.expectMessage(exceptionMessage);
 
         jobCompletionNotificationListener.beforeJob(jobExecution);

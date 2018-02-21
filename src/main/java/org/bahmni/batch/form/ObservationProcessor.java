@@ -52,8 +52,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String,Object>, L
 
 		if (form.getFormName().getIsSet() == 1) {
 			retrieveChildObsIds(allChildObsIds, Arrays.asList((Integer)obsRow.get("obs_id")));
-		}
-		else {
+		} else {
 			allChildObsIds.add((Integer) obsRow.get("obs_id"));
 		}
 		if(allChildObsIds.size() > 0 && fieldIds.size() > 0) {

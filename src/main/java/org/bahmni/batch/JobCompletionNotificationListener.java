@@ -41,8 +41,7 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 		    FileUtils.forceMkdir(outputFolder.getFile());
 		    String zipFileName = BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME + new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) + ".zip";
 		    jobExecution.getExecutionContext().put(OUTPUT_FILE_NAME_CONTEXT_KEY,zipFileName);
-	    }
-	    catch (IOException e) {
+	    } catch (IOException e) {
 		    throw new BatchResourceException("Cannot create a temporary folder provided as "
 				    + "'outputFolder' configuration ["+ outputFolder.getFilename()+"]",e);
 	    }
