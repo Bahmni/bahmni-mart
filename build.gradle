@@ -98,6 +98,12 @@ ospackage {
         createDirectoryEntry = true
         into "/opt/bahmni-analytics/libs"
     }
+
+    from("${projectDir}/conf/") {
+        fileMode = 0755
+        createDirectoryEntry = true
+        into "/opt/bahmni-analytics/conf"
+    }
 }
 
 buildRpm {

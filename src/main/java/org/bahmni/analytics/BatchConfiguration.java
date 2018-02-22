@@ -127,13 +127,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 
     @PreDestroy
     public void generateReport() {
-        try {
-            File report = new File(bahmniConfigFolder.getFile(), "report.html");
-            String reportOutput = reportGenerator.generateReport();
-            FileUtils.writeStringToFile(report, reportOutput);
-        } catch (IOException e) {
-            throw new BatchResourceException(String.format("Unable to write the report file [%s]",
-                    zipFolder.getFilename()), e);
-        }
+
     }
 }

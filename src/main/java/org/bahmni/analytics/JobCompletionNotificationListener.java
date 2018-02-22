@@ -37,46 +37,12 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
-        try {
-            FileUtils.deleteQuietly(outputFolder.getFile());
-            FileUtils.forceMkdir(outputFolder.getFile());
-            String zipFileName = BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME +
-                    new SimpleDateFormat("yyyyMMddHHmm").format(new Date()) + ".zip";
-            jobExecution.getExecutionContext().put(OUTPUT_FILE_NAME_CONTEXT_KEY, zipFileName);
-        } catch (IOException e) {
-            throw new BatchResourceException("Cannot create a temporary folder provided as " +
-                    "'outputFolder' configuration [" + outputFolder.getFilename() + "]", e);
-        }
 
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
 
-            FileOutputStream fos = null;
-            ZipOutputStream zos = null;
-            String zipFileName = jobExecution.getExecutionContext().getString(OUTPUT_FILE_NAME_CONTEXT_KEY);
-            File zipFile = null;
-
-            try {
-                FileUtils.forceMkdir(zipFolder.getFile());
-                zipFile = new File(zipFolder.getFile(), zipFileName);
-                fos = new FileOutputStream(zipFile);
-                zos = new ZipOutputStream(fos);
-                Iterator<File> iterator = FileUtils.iterateFiles(outputFolder.getFile(), new String[]{"csv"}, false);
-                while (iterator.hasNext()) {
-                    File file = iterator.next();
-                    addToZipFile(file, zos);
-                }
-
-            } catch (IOException e) {
-                throw new BatchResourceException("Unable to write the output to the [" + zipFile + "]", e);
-            } finally {
-                IOUtils.closeQuietly(zos);
-                IOUtils.closeQuietly(fos);
-            }
-        }
     }
 
     private void addToZipFile(File file, ZipOutputStream zos) throws IOException {
