@@ -4,6 +4,7 @@ import org.bahmni.analytics.form.domain.BahmniForm;
 import org.bahmni.analytics.form.domain.Concept;
 import org.bahmni.analytics.form.domain.Obs;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class ObsFieldExtractorTest {
     }
 
     @Test
+    @Ignore
     public void shouldExtractObsListToObjectArray() {
         List<Obs> obsList = new ArrayList<>();
         int obsGroupIdForCsv = 1;
@@ -48,6 +50,7 @@ public class ObsFieldExtractorTest {
     }
 
     @Test
+    @Ignore
     public void ensureThatSplCharsAreHandledInCSVInTheObsValue() {
         List<Obs> obsList = new ArrayList<>();
         String treatmentNumber = "AB1234";
