@@ -43,7 +43,13 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
 
         tableGeneratorStep.createTables(Arrays.asList(tableData));
         postgresJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
-        assertTrue(true);
+        List<Object> tableDataColumns = postgresJdbcTemplate.queryForList("SELECT column_name FROM " +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='PUBLIC';")
+                .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
+
+        assertEquals(3, tableDataColumns.size());
+        assertEquals(new HashSet<>(Arrays.asList("column_one", "column_two", "column_three")),
+                new HashSet<>(tableDataColumns));
     }
 
     @Test
