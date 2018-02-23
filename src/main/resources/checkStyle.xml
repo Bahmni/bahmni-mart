@@ -10,6 +10,11 @@
     <property name="severity" value="error"/>
     <property name="fileExtensions" value="java, properties, xml"/>
 
+    <module name="SuppressionFilter">
+        <property name="file" value="src/main/resources/suppressions.xml"/>
+        <property name="optional" value="true"/>
+    </module>
+
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
@@ -193,6 +198,11 @@
             <property name="exceptionVariableName" value="expected"/>
         </module>
         <module name="UnusedImports"/>
+        <module name="MethodLength">
+            <property name="tokens" value="METHOD_DEF"/>
+            <property name="max" value="25"/>
+            <property name="countEmpty" value="false"/>
+        </module>
 
     </module>
 
