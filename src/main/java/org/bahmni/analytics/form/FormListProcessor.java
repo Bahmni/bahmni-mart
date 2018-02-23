@@ -25,7 +25,6 @@ public class FormListProcessor {
 
     public List<BahmniForm> retrieveAllForms() {
         List<Concept> allFormConcepts = obsService.getChildConcepts(ALL_FORMS);
-        allFormConcepts.add(obsService.getConceptsByNames("Bacteriology Concept Set").get(0));
         List<BahmniForm> forms = allFormConcepts.stream()
                 .map(concept -> bahmniFormFactory.createForm(concept, null)).collect(Collectors.toList());
 

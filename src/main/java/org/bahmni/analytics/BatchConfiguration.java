@@ -97,18 +97,18 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
                 .incrementer(new RunIdIncrementer()).preventRestart()
                 .listener(listener())
-                .flow(treatmentRegistrationBaseExportStep.getStep())
-                .next(drugOrderBaseExportStep.getStep())
-                .next(otExportStep.getStep())
-                .next(bedManagementExportStep.getStep())
-                .next(appointmentSchedulingExportStep.getStep())
-                .next(metaDataCodeDictionaryExportStep.getStep());
+                .flow(treatmentRegistrationBaseExportStep.getStep());
+//                .next(drugOrderBaseExportStep.getStep())
+//                .next(otExportStep.getStep())
+//                .next(bedManagementExportStep.getStep())
+//                .next(appointmentSchedulingExportStep.getStep())
+//                .next(metaDataCodeDictionaryExportStep.getStep());
 
-        for (BahmniForm form : forms) {
-            ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
-            observationExportStep.setForm(form);
-            completeDataExport.next(observationExportStep.getStep());
-        }
+//        for (BahmniForm form : forms) {
+//            ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
+//            observationExportStep.setForm(form);
+//            completeDataExport.next(observationExportStep.getStep());
+//        }
         return completeDataExport.end().build();
     }
 

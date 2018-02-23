@@ -53,23 +53,24 @@ jacocoTestCoverageVerification {
 check.dependsOn jacocoTestCoverageVerification
 
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-batch', version: '1.3.4.RELEASE'
-    compile group: 'org.springframework.batch', name: 'spring-batch-test', version: '3.0.7.RELEASE'
-    compile group: 'org.springframework', name: 'spring-test', version: '4.2.6.RELEASE'
-    compile group: 'org.hsqldb', name: 'hsqldb', version: '2.3.3'
+    compile('org.springframework.boot:spring-boot-starter')
+    compile("org.springframework.boot:spring-boot-starter-batch")
+    compile("org.springframework.batch:spring-batch-test")
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.35'
+    compile group: 'postgresql', name: 'postgresql', version: '9.1-901-1.jdbc4'
     compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
     compile group: 'commons-io', name: 'commons-io', version: '2.0.1'
     compile 'commons-lang:commons-lang:2.6'
     compile group: 'org.freemarker', name: 'freemarker', version: '2.3.23'
-    compile group: 'org.springframework', name: 'spring-context-support', version: '4.2.6.RELEASE'
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile("org.hsqldb:hsqldb")
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
     testCompile group: 'org.powermock', name: 'powermock-core', version: '1.6.4'
     testCompile "org.powermock:powermock-module-junit4:1.6.4"
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
     testCompile "org.powermock:powermock-api-mockito:1.6.4"
-    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 jar {

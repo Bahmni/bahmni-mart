@@ -35,7 +35,6 @@ public class ObsFieldExtractor implements FieldExtractor<List<Obs>> {
         if (form.getParent() != null)
             row.add(firstObs.getParentId());
 
-        row.add(firstObs.getTreatmentNumber());
         form.getFields().forEach(field -> row.add(formatObsValue(obsRow.get(field))));
 
         return row.toArray();
