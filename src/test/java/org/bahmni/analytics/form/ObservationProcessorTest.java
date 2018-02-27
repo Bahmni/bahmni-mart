@@ -50,12 +50,13 @@ public class ObservationProcessorTest {
         observationProcessor.setJdbcTemplate(namedParameterJdbcTemplate);
         observationProcessor.setObsDetailSqlResource(new ByteArrayResource("blah..blah..blah".getBytes()));
         observationProcessor.setLeafObsSqlResource(new ByteArrayResource("get..all..child".getBytes()));
+        observationProcessor.setFormObsSqlResource(new ByteArrayResource("get..some..child".getBytes()));
         observationProcessor.setFormFieldTransformer(formFieldTransformer);
 
         obsList = new ArrayList<>();
-        obsList.add(new Obs("treatment1", 1, null, new Concept(1, "systolic", 0), "120"));
-        obsList.add(new Obs("treatment1", 1, null, new Concept(1, "diastolic", 0), "80"));
-        obsList.add(new Obs("treatment1", 1, null, new Concept(1, "abcd", 0), "180"));
+        obsList.add(new Obs(1, null, new Concept(1, "systolic", 0), "120"));
+        obsList.add(new Obs(1, null, new Concept(1, "diastolic", 0), "80"));
+        obsList.add(new Obs(1, null, new Concept(1, "abcd", 0), "180"));
 
     }
 
@@ -114,9 +115,9 @@ public class ObservationProcessorTest {
         form.addField(systolicConcept);
         form.addField(diastolicConcept);
         obsList = new ArrayList<>();
-        obsList.add(new Obs("treatment1", 1, 0, systolicConcept, "120"));
-        obsList.add(new Obs("treatment1", 2, 0, diastolicConcept, "80"));
-        obsList.add(new Obs("treatment1", 3, 0, abcdConcept, "180"));
+        obsList.add(new Obs(1, 0, systolicConcept, "120"));
+        obsList.add(new Obs(2, 0, diastolicConcept, "80"));
+        obsList.add(new Obs(3, 0, abcdConcept, "180"));
 
         when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(Arrays.asList(1, 2));
 

@@ -1,29 +1,22 @@
 package org.bahmni.analytics.form.domain;
 
 public class Obs {
-    private String treatmentNumber;
+    private String encounterId;
+    private String patientId;
     private Integer id;
     private Integer parentId;
     private Concept field;
     private String value;
+    private String parentName;
 
     public Obs() {
     }
 
-    public Obs(String treatmentNumber, Integer id, Integer parentId, Concept field, String value) {
-        this.treatmentNumber = treatmentNumber;
+    public Obs(Integer id, Integer parentId, Concept field, String value) {
         this.id = id;
         this.parentId = parentId;
         this.field = field;
         this.value = value;
-    }
-
-    public String getTreatmentNumber() {
-        return treatmentNumber;
-    }
-
-    public void setTreatmentNumber(String treatmentNumber) {
-        this.treatmentNumber = treatmentNumber;
     }
 
     public Integer getId() {
@@ -59,4 +52,27 @@ public class Obs {
     }
 
 
+    public String getEncounterId() {
+        return encounterId;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
+    public void setEncounterId(String encounterId) {
+        this.encounterId = encounterId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
 }

@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public abstract class AbstractBaseBatchIT {
     @Qualifier("postgresJdbcTemplate")
     @Autowired
-    private JdbcTemplate postgresJdbcTemplate;
+    protected JdbcTemplate postgresJdbcTemplate;
 
     @After
     public void tearDown() throws Exception {

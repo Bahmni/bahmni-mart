@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 public class BatchUtils {
 
+    public static int stepNumber = 0;
+
     public static String convertResourceOutputToString(Resource resource) {
         try (InputStream is = resource.getInputStream()) {
             return IOUtils.toString(is);
@@ -29,4 +31,23 @@ public class BatchUtils {
         return Arrays.stream(tokens).map(token -> token.replaceAll("\"", "")).collect(Collectors.toList());
     }
 
+    public static String getPostgresCompatibleValue(String value, String dataType) {
+        if (value == null)
+            return null;
+
+        switch (dataType) {
+          case "text":
+              return getStringForPsql(value.replaceAll("'", "''"));
+          case "date":
+          case "timestamp":
+              return getStringForPsql(value);
+          default:
+              return value;
+        }
+    }
+
+    private static String getStringForPsql(String value) {
+        return String.format("'%s'", value);
+    }
 }
+

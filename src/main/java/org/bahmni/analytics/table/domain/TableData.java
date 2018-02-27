@@ -12,6 +12,10 @@ public class TableData {
         columns = new ArrayList<>();
     }
 
+    public TableData() {
+
+    }
+
     public String getName() {
         return name;
     }

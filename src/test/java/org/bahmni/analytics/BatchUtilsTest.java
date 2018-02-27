@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @PrepareForTest(IOUtils.class)
@@ -81,5 +82,34 @@ public class BatchUtilsTest {
         Mockito.when(classPathResource.getInputStream()).thenThrow(new IOException());
 
         BatchUtils.convertResourceOutputToString(classPathResource);
+    }
+
+
+    @Test
+    public void shouldGiveNullIndependentToType() {
+        assertNull(BatchUtils.getPostgresCompatibleValue(null, "text"));
+        assertNull(BatchUtils.getPostgresCompatibleValue(null, "date"));
+        assertNull(BatchUtils.getPostgresCompatibleValue(null, "timestamp"));
+    }
+
+    @Test
+    public void shouldGivePostgresCompatibleValueForText() {
+        assertEquals("'abc''d'", BatchUtils.getPostgresCompatibleValue("abc'd", "text"));
+    }
+
+    @Test
+    public void shouldGivePSQLCompatibleValueForTimeStamp() {
+        assertEquals("'2012-12-01T00:00:00z'",
+                BatchUtils.getPostgresCompatibleValue("2012-12-01T00:00:00z", "timestamp"));
+    }
+
+    @Test
+    public void shouldGivePSQLCompatibleValueForDate() {
+        assertEquals("'2012-12-01'", BatchUtils.getPostgresCompatibleValue("2012-12-01", "timestamp"));
+    }
+
+    @Test
+    public void shouldGiveTheSameValueForAllOtherTypes() {
+        assertEquals("222", BatchUtils.getPostgresCompatibleValue("222", "numeric"));
     }
 }

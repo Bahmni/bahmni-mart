@@ -34,26 +34,38 @@ public class BahmniFormFactory {
         bahmniForm.setFormName(concept);
         bahmniForm.setDepthToParent(depth);
         bahmniForm.setParent(parentForm);
+        bahmniForm.setRootForm(getRootFormFor(parentForm));
 
-        constructFormFields(concept, bahmniForm, 0);
+        constructFormFields(concept, bahmniForm, depth);
         return bahmniForm;
     }
 
-    private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth) {
-        if (concept.getIsSet() == 0)
-            bahmniForm.addField(concept);
-        else
-            obsService.getChildConcepts(concept.getName())
-                    .forEach(childConcept -> addChild(bahmniForm, childConcept, depth + 1));
+    private BahmniForm getRootFormFor(BahmniForm form) {
+        if (form == null) {
+            return null;
+        } else if (form.getDepthToParent() == 1) {
+            return form;
+        }
+        return getRootFormFor(form.getParent());
     }
 
-    private void addChild(BahmniForm bahmniForm, Concept childConcept, int childDepth) {
-        if (ignoreConcepts.contains(childConcept))
+    private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth) {
+        if (concept.getIsSet() == 0) {
+            bahmniForm.addField(concept);
             return;
-        else if (addMoreAndMultiSelectConcepts.contains(childConcept))
-            bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth));
-        else
-            constructFormFields(childConcept, bahmniForm, childDepth);
+        }
+
+        List<Concept> childConcepts = obsService.getChildConcepts(concept.getName());
+        int childDepth = depth + 1;
+        for (Concept childConcept : childConcepts) {
+            if (ignoreConcepts.contains(childConcept)) {
+                continue;
+            } else if (childConcept.getIsSet() == 0 && !addMoreAndMultiSelectConcepts.contains(childConcept)) {
+                bahmniForm.addField(childConcept);
+            } else {
+                bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth));
+            }
+        }
     }
 
     @PostConstruct

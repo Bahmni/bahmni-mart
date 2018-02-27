@@ -5,5 +5,5 @@
         "http://checkstyle.sourceforge.net/dtds/suppressions_1_2.dtd">
 
 <suppressions>
-    <suppress checks="MethodLength" files=".*Test\.java"/>
+    <suppress checks="MethodLength" files=".*Test|.*IT\.java"/>
 </suppressions>

@@ -89,7 +89,7 @@ public class FormTableMetadataGenerator {
         return columns;
     }
 
-    protected TableData getTableData(BahmniForm form) {
+    public TableData getTableData(BahmniForm form) {
         return tableDataMap.get(getProcessedName(form.getFormName().getName()));
     }
 

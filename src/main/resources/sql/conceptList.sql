@@ -14,5 +14,3 @@ FROM concept_view parentConcept
   LEFT OUTER JOIN concept_view cn ON (cn.concept_id = conceptSet.concept_id)
 WHERE parentConcept.concept_full_name = :parentConceptName AND parentConcept.retired IS FALSE
 ORDER BY setMembers.sort_weight;
-
-/* Copied from tech-spike */
