@@ -9,11 +9,11 @@ public class TableData {
 
     public TableData(String name) {
         this.name = name;
-        columns = new ArrayList<>();
+        this.columns = new ArrayList<TableColumn>();
     }
 
     public TableData() {
-
+        this(null);
     }
 
     public String getName() {
