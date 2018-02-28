@@ -112,7 +112,6 @@ public class BatchConfigurationTest {
         when(jobBuilderFactory.get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME)).thenReturn(jobBuilder);
         when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
         when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
-        when(jobBuilder.listener(any(JobCompletionNotificationListener.class))).thenReturn(jobBuilder);
         Step treatmentStep = Mockito.mock(Step.class);
         when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(treatmentStep);
 
@@ -163,7 +162,6 @@ public class BatchConfigurationTest {
         when(jobBuilderFactory.get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME)).thenReturn(jobBuilder);
         when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
         when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
-        when(jobBuilder.listener(any(JobCompletionNotificationListener.class))).thenReturn(jobBuilder);
         Step treatmentStep = Mockito.mock(Step.class);
         when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(treatmentStep);
 

@@ -1,23 +1,14 @@
 package org.bahmni.analytics.helper;
 
-import org.bahmni.analytics.Application;
+import org.bahmni.analytics.AbstractBaseBatchIT;
 import org.bahmni.analytics.form.domain.BahmniForm;
 import org.bahmni.analytics.form.domain.Concept;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = Application.class)
-@TestPropertySource(locations = "classpath:test.properties")
-@Ignore
-public class FreeMarkerEvaluatorIT {
+public class FreeMarkerEvaluatorIT extends AbstractBaseBatchIT {
 
     @Autowired
     private FreeMarkerEvaluator<BahmniForm> dynamicObsQuery;
@@ -31,10 +22,8 @@ public class FreeMarkerEvaluatorIT {
 
         String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl", parent);
         System.out.println(sql);
-        assertEquals("SELECT obs0.obs_id,obs0.obs_id as parent_obs_id\n" +
-                "FROM obs obs0\n" +
-                "WHERE obs0.concept_id=1189\n" +
-                "AND obs0.voided = 0", sql.trim());
+        assertEquals("SELECT obs0.obs_id FROM obs obs0 WHERE obs0.concept_id =1189 AND obs0.voided = 0",
+                sql.trim());
     }
 
     @Test
@@ -51,13 +40,8 @@ public class FreeMarkerEvaluatorIT {
 
 
         String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl", child);
-        System.out.println(sql);
-        assertEquals("SELECT obs0.obs_id,obs1.obs_id as parent_obs_id\n" +
-                "FROM obs obs0\n" +
-                "INNER JOIN obs obs1 on ( obs1.obs_id=obs0.obs_group_id and obs1.voided=0 )\n" +
-                "WHERE obs0.concept_id=10\n" +
-                "AND obs0.voided = 0\n" +
-                "AND obs1.concept_id=1", sql.trim());
+        assertEquals("SELECT obs0.obs_id FROM obs obs0 WHERE obs0.concept_id =10 AND obs0.voided = 0",
+                sql.trim());
     }
 
     @Test
@@ -70,17 +54,41 @@ public class FreeMarkerEvaluatorIT {
         BahmniForm child = new BahmniForm();
         child.setParent(parent);
         child.setFormName(new Concept(10, "Systolic", 1));
+        child.setRootForm(parent);
         child.setDepthToParent(2);
 
 
         String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl", child);
-        System.out.println(sql);
-        assertEquals("SELECT obs0.obs_id,obs2.obs_id as parent_obs_id\n" +
-                "FROM obs obs0\n" +
-                "INNER JOIN obs obs1 on ( obs1.obs_id=obs0.obs_group_id and obs1.voided=0 )\n" +
-                "INNER JOIN obs obs2 on ( obs2.obs_id=obs1.obs_group_id and obs2.voided=0 )\n" +
-                "WHERE obs0.concept_id=10\n" +
-                "AND obs0.voided = 0\n" +
-                "AND obs2.concept_id=1", sql.trim());
+        assertEquals("SELECT obs0.obs_id , obs1.obs_id as parent_obs_id FROM obs obs0 INNER JOIN obs " +
+                "obs1 on (obs1.obs_id = obs0.obs_group_id and obs1.voided = 0) WHERE obs0.concept_id =10 AND " +
+                "obs0.voided = 0 AND obs1.concept_id =1 AND obs1.concept_id =1", sql.trim());
+    }
+
+    @Test
+    public void ensureParentWithDepthIsMoreThan2Constructed() {
+        BahmniForm geandParent = new BahmniForm();
+        geandParent.setParent(null);
+        geandParent.setFormName(new Concept(1, "Vitals", 1));
+        geandParent.setDepthToParent(0);
+
+        BahmniForm parent = new BahmniForm();
+        parent.setParent(geandParent);
+        parent.setFormName(new Concept(10, "Systolic", 1));
+        parent.setRootForm(geandParent);
+        parent.setDepthToParent(2);
+
+        BahmniForm child = new BahmniForm();
+        child.setParent(parent);
+        child.setFormName(new Concept(12, "Systolic Notes", 0));
+        child.setRootForm(parent);
+        child.setDepthToParent(3);
+
+
+        String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl", child);
+        assertEquals("SELECT obs0.obs_id , obs1.obs_id as parent_obs_id FROM obs obs0 INNER JOIN obs obs1 " +
+                "on (obs1.obs_id = obs0.obs_group_id and obs1.voided = 0) INNER JOIN obs obs2 on " +
+                "(obs2.obs_id = obs1.obs_group_id and obs2.voided = 0) WHERE obs0.concept_id =12 " +
+                "AND obs0.voided = 0 AND obs1.concept_id =10 AND obs2.concept_id =10", sql.trim());
     }
 }
+

@@ -8,7 +8,6 @@ import org.bahmni.analytics.form.domain.BahmniForm;
 import org.bahmni.analytics.table.FormTableMetadataGenerator;
 import org.bahmni.analytics.table.TableGeneratorStep;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -51,17 +50,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
     private Resource freemarkerTemplateLocation;
 
     @Autowired
-    public JobCompletionNotificationListener jobCompletionNotificationListener;
-
-    @Autowired
     private TableGeneratorStep tableGeneratorStep;
 
     private static final String DEFAULT_ENCODING = "UTF-8";
-
-    @Bean
-    public JobExecutionListener listener() {
-        return jobCompletionNotificationListener;
-    }
 
     @Bean
     public Job completeDataExport() throws IOException {
@@ -69,7 +60,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
                 .incrementer(new RunIdIncrementer()).preventRestart()
-                .listener(listener())
                 .flow(treatmentRegistrationBaseExportStep.getStep());
         //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
 
