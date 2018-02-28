@@ -19,10 +19,10 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 
-group = 'org.bahmni.analytics'
+group = 'org.bahmni.mart'
 version = '1.0.0'
 
-description = "Batch job for Bahmni Analytics"
+description = "Batch job for Bahmni Mart"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -75,35 +75,35 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'org.bahmni.analytics.Application'
+        attributes 'Main-Class': 'org.bahmni.mart.Application'
     }
 }
 
 ospackage {
-    packageName = 'bahmni-analytics'
+    packageName = 'bahmni-mart'
     release = System.getenv('GO_PIPELINE_COUNTER') ?: 1
     arch = NOARCH
     os = LINUX
     user = 'root'
 
-    into '/opt/bahmni-analytics'
+    into '/opt/bahmni-mart'
 
     from("${projectDir}/scripts/rpm/") {
         fileMode = 0755
         createDirectoryEntry = true
-        into '/opt/bahmni-analytics/bin'
+        into '/opt/bahmni-mart/bin'
     }
 
     from("${buildDir}/libs") {
         fileMode = 0755
         createDirectoryEntry = true
-        into "/opt/bahmni-analytics/libs"
+        into "/opt/bahmni-mart/libs"
     }
 
     from("${projectDir}/conf/") {
         fileMode = 0755
         createDirectoryEntry = true
-        into "/opt/bahmni-analytics/conf"
+        into "/opt/bahmni-mart/conf"
     }
 }
 

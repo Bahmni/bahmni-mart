@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /opt/bahmni-analytics/conf/bahmni-analytics.conf
+. /opt/bahmni-mart/conf/bahmni-mart.conf
 
 manage_user_and_group() {
     #create bahmni user and group if doesn't exist
@@ -15,27 +15,27 @@ manage_user_and_group() {
     useradd -g bahmni bahmni
 }
 
-create_analytics_directories() {
-    if [ ! -d /opt/bahmni-analytics/log/ ]; then
-        mkdir -p /opt/bahmni-analytics/log/
+create_mart_directories() {
+    if [ ! -d /opt/bahmni-mart/log/ ]; then
+        mkdir -p /opt/bahmni-mart/log/
     fi
 }
 
 link_directories() {
     #create links
-    ln -s /opt/bahmni-analytics/bin/bahmni-analytics /usr/bin/bahmni-analytics
-    ln -s /opt/bahmni-analytics/log /var/log/bahmni-analytics
+    ln -s /opt/bahmni-mart/bin/bahmni-mart /usr/bin/bahmni-mart
+    ln -s /opt/bahmni-mart/log /var/log/bahmni-mart
 }
 
 manage_permissions() {
     # permissions
-    chown -R bahmni:bahmni /usr/bin/bahmni-analytics
-    chown -R bahmni:bahmni /opt/bahmni-analytics
-    chown -R bahmni:bahmni /var/log/bahmni-analytics
+    chown -R bahmni:bahmni /usr/bin/bahmni-mart
+    chown -R bahmni:bahmni /opt/bahmni-mart
+    chown -R bahmni:bahmni /var/log/bahmni-mart
 }
 setup_cronjob() {
     # adding cron job for scheduling the job at 11:30PM everyday
-    crontab -u bahmni -l | { cat; echo "30 23 * * * /usr/bin/bahmni-analytics >/dev/null 2>&1"; } | crontab -u bahmni -
+    crontab -u bahmni -l | { cat; echo "30 23 * * * /usr/bin/bahmni-mart >/dev/null 2>&1"; } | crontab -u bahmni -
 }
 
 init_db() {
@@ -84,7 +84,7 @@ create_postgres_users_and_db() {
 
 
 manage_user_and_group
-create_analytics_directories
+create_mart_directories
 link_directories
 manage_permissions
 setup_cronjob
