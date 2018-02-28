@@ -146,4 +146,42 @@ public class BatchConfigurationTest {
         verify(tableGeneratorStep, atLeastOnce()).createTables(formTableMetadataGenerator.getTables());
         verify(formTableMetadataGenerator, times(2)).addMetadataForForm(any(BahmniForm.class));
     }
+
+    @Test
+    public void shouldCompleteDataExportWithoutObsForms() throws Exception {
+        setValuesForMemberFields(batchConfiguration, "formListProcessor", formListProcessor);
+        setValuesForMemberFields(batchConfiguration, "jobBuilderFactory", jobBuilderFactory);
+        setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
+                treatmentRegistrationBaseExportStep);
+        setValuesForMemberFields(batchConfiguration, "formListProcessor", formListProcessor);
+        setValuesForMemberFields(batchConfiguration, "formTableMetadataGenerator", formTableMetadataGenerator);
+        setValuesForMemberFields(batchConfiguration, "observationExportStepFactory", observationExportStepFactory);
+        setValuesForMemberFields(batchConfiguration, "tableGeneratorStep", tableGeneratorStep);
+
+        when(formListProcessor.retrieveAllForms()).thenReturn(new ArrayList<>());
+        JobBuilder jobBuilder = Mockito.mock(JobBuilder.class);
+        when(jobBuilderFactory.get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME)).thenReturn(jobBuilder);
+        when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
+        when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
+        when(jobBuilder.listener(any(JobCompletionNotificationListener.class))).thenReturn(jobBuilder);
+        Step treatmentStep = Mockito.mock(Step.class);
+        when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(treatmentStep);
+
+        JobFlowBuilder jobFlowBuilder = Mockito.mock(JobFlowBuilder.class);
+        when(jobBuilder.flow(treatmentStep)).thenReturn(jobFlowBuilder);
+        FlowJobBuilder flowJobBuilder = Mockito.mock(FlowJobBuilder.class);
+        when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
+        Job expectedJob = Mockito.mock(Job.class);
+        when(flowJobBuilder.build()).thenReturn(expectedJob);
+
+        Job actualJob = batchConfiguration.completeDataExport();
+
+        assertEquals(expectedJob, actualJob);
+        verify(formListProcessor, times(1)).retrieveAllForms();
+        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
+        verify(observationExportStepFactory, times(0)).getObject();
+        verify(formTableMetadataGenerator, times(1)).getTables();
+        verify(tableGeneratorStep, atLeastOnce()).createTables(formTableMetadataGenerator.getTables());
+        verify(formTableMetadataGenerator, times(0)).addMetadataForForm(any(BahmniForm.class));
+    }
 }

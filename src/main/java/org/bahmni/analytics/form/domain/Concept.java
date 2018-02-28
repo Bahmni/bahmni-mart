@@ -52,10 +52,6 @@ public class Concept {
         return title;
     }
 
-    public String getFormattedTitle() {
-        return title == null ? "" : title.replaceAll("[\n\t]", " ").replaceAll(",", "");
-    }
-
     public void setTitle(String title) {
         this.title = title;
     }

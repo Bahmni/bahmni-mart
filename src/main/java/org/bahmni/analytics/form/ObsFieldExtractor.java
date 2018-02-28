@@ -7,9 +7,9 @@ import org.springframework.batch.item.file.transform.FieldExtractor;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ObsFieldExtractor implements FieldExtractor<List<Obs>> {
 
@@ -26,8 +26,7 @@ public class ObsFieldExtractor implements FieldExtractor<List<Obs>> {
         if (obsList.isEmpty())
             return row.toArray();
 
-        Map<Concept, String> obsRow = new HashMap<>();
-        obsList.forEach(obs -> obsRow.put(obs.getField(),obs.getValue()));
+        Map<Concept, String> obsRow = obsList.stream().collect(Collectors.toMap(Obs::getField, Obs::getValue));
 
         Obs firstObs = obsList.get(0);
         row.add(firstObs.getId());

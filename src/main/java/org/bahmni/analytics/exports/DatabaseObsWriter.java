@@ -33,7 +33,7 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
     @Autowired
     private FreeMarkerEvaluator<ObsRecordExtractorForTable> freeMarkerEvaluatorForTableRecords;
 
-    BahmniForm form;
+    private BahmniForm form;
 
 
     @Override

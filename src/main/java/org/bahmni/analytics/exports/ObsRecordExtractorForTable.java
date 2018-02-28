@@ -2,6 +2,7 @@ package org.bahmni.analytics.exports;
 
 import org.bahmni.analytics.BatchUtils;
 import org.bahmni.analytics.form.domain.Obs;
+import org.bahmni.analytics.table.domain.TableColumn;
 import org.bahmni.analytics.table.domain.TableData;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import static org.bahmni.analytics.table.FormTableMetadataGenerator.getProcessed
 
 public class ObsRecordExtractorForTable {
 
-    private String tableName = "";
+    private String tableName;
 
     private List<Map<String, String>> recordList = new ArrayList<>();
 
@@ -24,58 +25,67 @@ public class ObsRecordExtractorForTable {
 
     public void execute(List<? extends List<Obs>> items, TableData tableData) {
         for (List<Obs> record : items) {
-            if (record.size() == 0) {
-                continue;
+            if (!record.isEmpty()) {
+                Map<String, String> recordMap = new HashMap<>();
+                tableData.getColumns().forEach(tableColumn -> recordMap.put(tableColumn.getName(), null));
+
+                mapRecordsWithColumns(tableData, record, recordMap);
+                mapPatientAndEncounterIds(tableData, record, recordMap);
+
+                recordList.add(recordMap);
             }
-
-            Map<String, String> recordMap = new HashMap<>();
-
-            tableData.getColumns().forEach(tableColumn -> recordMap.put(tableColumn.getName(), null));
-
-            mapRecordsWithColumns(tableData, record, recordMap);
-
-            mapPatientAndEncounterIds(tableData, record, recordMap);
-            recordList.add(recordMap);
         }
     }
 
     private void mapRecordsWithColumns(TableData tableData, List<Obs> record, Map<String, String> recordMap) {
-        record.forEach(obs -> {
-            final String[] value = {""};
-            tableData.getColumns().forEach(tableColumn -> {
-                String tableColumnName = tableColumn.getName();
-                if (tableColumnName.equals(getProcessedName(obs.getField().getName()))) {
-                    value[0] = BatchUtils.getPostgresCompatibleValue(obs.getValue(), tableColumn.getType());
-                    recordMap.replace(tableColumnName, value[0]);
-                } else if (tableColumnName.contains("id_") && recordMap.get(tableColumnName) == null) {
-                    if (tableColumn.getReference() != null && obs.getParentName() != null &&
-                            tableColumnName.equals("id_" + getProcessedName(obs.getParentName()))) {
-                        value[0] = BatchUtils.getPostgresCompatibleValue(obs.getParentId().toString(),
-                                tableColumn.getType());
-                        recordMap.replace(tableColumn.getName(), value[0]);
-                    } else if (tableColumn.getReference() == null) {
-                        value[0] = BatchUtils.getPostgresCompatibleValue(obs.getId().toString(),
-                                tableColumn.getType());
-                        recordMap.replace(tableColumn.getName(), value[0]);
-                    }
-                }
-            });
-        });
+        record.forEach(obs -> tableData.getColumns().forEach(tableColumn -> {
+            String tableColumnName = tableColumn.getName();
+            if (tableColumnName.equals(getProcessedName(obs.getField().getName()))) {
+                replace(recordMap, tableColumnName, obs.getValue(), tableColumn.getType());
+            } else if (tableColumnName.contains("id_") && isNull(recordMap, tableColumnName)) {
+                mapConstraints(recordMap, obs, tableColumn);
+            }
+        }));
+    }
+
+    private boolean isNull(Map<String, String> recordMap, String tableColumnName) {
+        return recordMap.get(tableColumnName) == null;
+    }
+
+    private void mapConstraints(Map<String, String> recordMap, Obs obs, TableColumn tableColumn) {
+        if (isForeignKey(obs, tableColumn)) {
+            replace(recordMap, tableColumn.getName(), obs.getParentId().toString(), tableColumn.getType());
+        } else if (tableColumn.getReference() == null && isConstraintName(tableName, tableColumn.getName())) {
+            replace(recordMap, tableColumn.getName(), obs.getId().toString(), tableColumn.getType());
+        }
+    }
+
+    private boolean isForeignKey(Obs obs, TableColumn tableColumn) {
+        return tableColumn.getReference() != null && obs.getParentName() != null &&
+                isConstraintName(obs.getParentName(), tableColumn.getName());
+    }
+
+    private void replace(Map<String, String> recordMap, String key, String value, String type) {
+        recordMap.replace(key, BatchUtils.getPostgresCompatibleValue(value, type));
+    }
+
+    private boolean isConstraintName(String conceptName, String tableColumnName) {
+        return tableColumnName.equals("id_" + getProcessedName(conceptName));
     }
 
     private void mapPatientAndEncounterIds(TableData tableData, List<Obs> record, Map<String, String> recordMap) {
-        tableData.getColumns().forEach(tableColumn -> {
-            final String[] value = {""};
-            Obs obs = record.get(0);
+        Obs obs = record.get(0);
+        for (TableColumn tableColumn : tableData.getColumns()) {
             String tableColumnName = tableColumn.getName();
-            if (tableColumnName.equals("encounter_id") && recordMap.get(tableColumnName) == null) {
-                value[0] = BatchUtils.getPostgresCompatibleValue(obs.getEncounterId(), tableColumn.getType());
-                recordMap.replace(tableColumnName, value[0]);
-            } else if (tableColumnName.equals("patient_id") && recordMap.get(tableColumnName) == null) {
-                value[0] = BatchUtils.getPostgresCompatibleValue(obs.getPatientId(), tableColumn.getType());
-                recordMap.replace(tableColumnName, value[0]);
+            if (isNull(recordMap, tableColumnName)) {
+                replace(recordMap, tableColumnName, getValue(tableColumnName, obs), tableColumn.getType());
             }
-        });
+        }
+    }
+
+    private String getValue(String columnName, Obs obs) {
+        return "encounter_id".equals(columnName) ? obs.getEncounterId() :
+                "patient_id".equals(columnName) ? obs.getPatientId() : null;
     }
 
     public List<Map<String, String>> getRecordList() {

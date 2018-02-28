@@ -18,6 +18,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -70,12 +71,12 @@ public class ObsRecordExtractorForTableTest {
     public void shouldGiveRecordsGivenTableDataWithPrimaryAndForeignKeys() throws Exception {
         TableData tableData = new TableData();
         tableData.setName("tableName");
-        TableColumn column1 = new TableColumn("id_first", "integer", true, null);
+        TableColumn column1 = new TableColumn("id_tablename", "integer", true, null);
         TableColumn column2 = new TableColumn("id_second", "integer", false,
                 new ForeignKey("id_second", "parent"));
         tableData.setColumns(Arrays.asList(column1, column2));
         Obs obs1 = new Obs();
-        obs1.setField(new Concept(000, "first", 0));
+        obs1.setField(new Concept(000, "tablename", 0));
         obs1.setId(111);
         Obs obs2 = new Obs();
         obs2.setField(new Concept(111, "second", 0));
@@ -87,9 +88,9 @@ public class ObsRecordExtractorForTableTest {
 
         assertNotNull(obsRecordExtractorForTable.getRecordList());
         assertThat(obsRecordExtractorForTable.getRecordList().size(), is(2));
-        assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("id_first"));
+        assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("id_tablename"));
         assertTrue(obsRecordExtractorForTable.getRecordList().get(1).keySet().contains("id_second"));
-        assertEquals("111", obsRecordExtractorForTable.getRecordList().get(0).get("id_first"));
+        assertEquals("111", obsRecordExtractorForTable.getRecordList().get(0).get("id_tablename"));
         assertEquals("123", obsRecordExtractorForTable.getRecordList().get(1).get("id_second"));
     }
 
@@ -101,7 +102,9 @@ public class ObsRecordExtractorForTableTest {
                 new ForeignKey("id_first", "parent1"));
         TableColumn column2 = new TableColumn("id_second", "integer", false,
                 new ForeignKey("id_second", "parent2"));
-        tableData.setColumns(Arrays.asList(column1, column2));
+        TableColumn column3 = new TableColumn("id_test", "integer", false, null);
+
+        tableData.setColumns(Arrays.asList(column1, column2, column3));
         Obs obs1 = new Obs();
         obs1.setField(new Concept(111, "first", 0));
         obs1.setParentId(321);
@@ -120,7 +123,9 @@ public class ObsRecordExtractorForTableTest {
         assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("id_first"));
         assertTrue(obsRecordExtractorForTable.getRecordList().get(1).keySet().contains("id_second"));
         assertEquals("321", obsRecordExtractorForTable.getRecordList().get(0).get("id_first"));
+        assertNull(obsRecordExtractorForTable.getRecordList().get(0).get("id_test"));
         assertEquals("123", obsRecordExtractorForTable.getRecordList().get(1).get("id_second"));
+        assertNull(obsRecordExtractorForTable.getRecordList().get(1).get("id_test"));
     }
 
     @Test

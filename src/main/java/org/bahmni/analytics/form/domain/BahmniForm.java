@@ -57,11 +57,6 @@ public class BahmniForm {
         this.depthToParent = depthToParent;
     }
 
-    public String getDisplayName() {
-        return formName == null ? "" :
-                formName.getName().replaceAll("\\s", "_").replaceAll(",", "").replaceAll("/", "").toLowerCase();
-    }
-
     public void setRootForm(BahmniForm rootForm) {
         this.rootForm = rootForm;
     }

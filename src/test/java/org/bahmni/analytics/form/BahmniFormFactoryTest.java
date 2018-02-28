@@ -45,7 +45,7 @@ public class BahmniFormFactoryTest {
     private String ignoreConceptNames;
 
     @Before
-    public void setup() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws NoSuchFieldException, IllegalAccessException {
         initMocks(this);
 
         addMoreAndMultiSelectConceptNames = "Operation Notes Template, Discharge Summary," +
