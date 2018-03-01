@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -79,14 +80,13 @@ public class BatchConfigurationTest {
         Configuration configuration = PowerMockito.mock(Configuration.class);
         whenNew(Configuration.class).withArguments(any()).thenReturn(configuration);
         File configurationFile = Mockito.mock(File.class);
-        setValuesForMemberFields(batchConfiguration, "freemarkerTemplateLocation", freemarkerTemplateLocation);
         when(freemarkerTemplateLocation.getFile()).thenReturn(configurationFile);
 
         Configuration freeMarkerConfiguration = batchConfiguration.freeMarkerConfiguration();
 
         assertEquals(configuration, freeMarkerConfiguration);
         verify(configuration, times(1)).setDefaultEncoding("UTF-8");
-        verify(configuration, times(1)).setDirectoryForTemplateLoading(configurationFile);
+        verify(configuration, times(1)).setClassForTemplateLoading(any(), eq("/templates"));
         verify(configuration, times(1)).setTemplateExceptionHandler(any(TemplateExceptionHandler.class));
     }
 

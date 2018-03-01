@@ -21,7 +21,6 @@ public class FreeMarkerEvaluatorIT extends AbstractBaseBatchIT {
         parent.setDepthToParent(0);
 
         String sql = dynamicObsQuery.evaluate("obsWithParentSql.ftl", parent);
-        System.out.println(sql);
         assertEquals("SELECT obs0.obs_id FROM obs obs0 WHERE obs0.concept_id =1189 AND obs0.voided = 0",
                 sql.trim());
     }

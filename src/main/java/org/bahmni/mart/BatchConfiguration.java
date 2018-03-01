@@ -16,10 +16,8 @@ import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
@@ -45,9 +43,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 
     @Autowired
     private ObjectFactory<ObservationExportStep> observationExportStepFactory;
-
-    @Value("${templates}")
-    private Resource freemarkerTemplateLocation;
 
     @Autowired
     private TableGeneratorStep tableGeneratorStep;
@@ -80,8 +75,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
     public freemarker.template.Configuration freeMarkerConfiguration() throws IOException {
         freemarker.template.Configuration freemarkerTemplateConfig = new freemarker.template.Configuration(
                 freemarker.template.Configuration.VERSION_2_3_22);
-        freemarkerTemplateConfig.setDirectoryForTemplateLoading(freemarkerTemplateLocation.getFile());
-
+        freemarkerTemplateConfig.setClassForTemplateLoading(this.getClass(),"/templates");
         freemarkerTemplateConfig.setDefaultEncoding(DEFAULT_ENCODING);
         freemarkerTemplateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
