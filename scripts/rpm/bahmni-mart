@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /etc/bahmni-installer/bahmni.conf
+. /opt/bahmni-mart/conf/bahmni-mart.conf
 
 echo "Running bahmni-mart..."
 java -DOPENMRS_DB_SERVER=${OPENMRS_DB_SERVER} -DOPENMRS_DB_USER=${OPENMRS_DB_USERNAME} -DOPENMRS_DB_PASSWORD=${OPENMRS_DB_PASSWORD} -jar /opt/bahmni-mart/libs/bahmni-mart-*.jar >> /opt/bahmni-mart/log/bahmni-mart.log
