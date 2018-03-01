@@ -112,6 +112,9 @@ buildRpm {
 
     requires("cronie")
 
+    requires('postgresql92-server')
+    requires('postgresql92-contrib')
+
     postInstall file("${projectDir}/scripts/postinstall.sh")
     postUninstall file("${projectDir}/scripts/postuninstall.sh")
 }
