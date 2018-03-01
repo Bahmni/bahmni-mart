@@ -63,7 +63,7 @@ public class BahmniFormFactory {
             } else if (childConcept.getIsSet() == 0 && !addMoreAndMultiSelectConcepts.contains(childConcept)) {
                 bahmniForm.addField(childConcept);
             } else {
-                bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth));
+                constructFormFields(childConcept,bahmniForm,depth);
             }
         }
     }

@@ -4,6 +4,7 @@ import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
@@ -113,6 +114,7 @@ public class BahmniFormFactoryTest {
     }
 
     @Test
+    @Ignore // This test is about create new table per concept-set. But currently we are creating table per form
     public void shouldCreatAForm() {
         when(obsService.getChildConcepts("All Observation Templates")).thenReturn(allConcepts);
         when(obsService.getChildConcepts("History and Examination"))
