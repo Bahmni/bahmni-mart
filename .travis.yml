@@ -1,6 +1,12 @@
+sudo: true  
+
 language : java
 jdk:
 - oraclejdk8
+
+services:
+  - docker
+
 jobs:
   include:
     - stage : compile
@@ -11,3 +17,17 @@ jobs:
 stages:
       - compile
       - test
+env:
+  global:
+    - secure: "6AStktU4qju7wZYJgmHxoNo/9zSBeMtpU/Pkjw+9jES9d6jKhexW9gGNIMzp4d3U7bfiZPaEZk1oieqjX11vMNh5J5sMs2gFcsa6rPQSZi71GhVYlqAqHqqXeUZHNgHCMk61oAUSNkJr372nxqY1dITCaAfnsoAmzDeLblGtYKVbM9AcLOqxNvTiRDG+5Y0xOKJlAlqGJg4VuW1BNJ/+ho8Qhm3WsUiuwbTnqrTT9zrPeF5ghSsmWMjAgFuoSC00zS2fbPvuv7j9RMEThWg85kmeJ7wHo3LciG6Rh3WDfL6w4C+Us0RyXBKCm+OJgmh+s7i7oGjR/6JJAuGTW3aHqtQk6if/VxGxQOQdl7xYFYuxCFb+f+Ly59WXVDR+NktWGwnhl4sQaRe81h7QIfZNuOVPTQBmM76ZwJ7EdWmbDokhhpLYDMurqBJsDwzMopJhPv8THS48oqXrCSdV3pfGobMAUiaUOgbLJJkg7ytrxO2Pgdp+b4254sSap/LHN0qsG2cyp77/fmxWw7xRLEjd3/nIt2T9yVewTU+yiL8jSpNT4o2KC/M48pr29ynS7ENBMzu9BimcuEdNFeoECSa5GauiiYEy3rn5zLJcn9UgoYXvCfVheAyslacxXUdjH26XIy6GI9B6y8/dG/K2alqVc9EG0m7PXW8Pc5YckfFD8=" # DOCKER_USER
+    - secure: "DJIvnQ+3Bbn4ND7A29zSl+xOYwhdidaPSgHBHNeb3oDABM6N1BjFPQie6IqlQI3yW9NR5Px921WL3s8er/lfMMoR6qlZBpa3xpgX4ejt3PZwR526/248Tp3L199zIqbur+cwb/OJD+gAL0J/ytFmBJHGLjoF9A5uxAdlQrdCqEO/K0CdX95eyy0sGow+WfhqTmX9jADQWyJI//sARG0cAEmt9CLUqeTcTPgwpxsbrQYpdLhcAFG3+KjQuexrlRaEyJmntFY0OY4WoP1Se3AeXjTnTkq7vzLa6Fs53l/VpPmnpqDGDiW1zpp7Ht8Lhru9PLjpV0z6XI1b1muLtm6BQ/vvcrUEajPGrB0KaQvzz+8rNtRVzOsK8rOtvUk7YuBWSmF40S/JDNq2zzRX/7Vya+Uo1BvJR1jcYnZDCKKwhpuneABTKGZxTZgFlngKzbNpDExf0x8XaWEtrsVRHgqKwkBuTOXKFJj0dnPIJSZmt0Kxi+Brw1/eodNzSZXNl9g3dQi2MrMVuMVwyLO5bm/4b1WOCoVvfMIEyww4JCdXDYiWOb4mf5YnON1l1XE56wKuJyFuQoRMqqJ8McxZPvxHsq8+h0U3Ac0gnTngGhNyFTIygodBx1iAnUbWgzolSMQuHzoktcQjvHrnqLCUJJpfe5Qjzd5DtSEZMdBSw0JV+iU=" # DOCKER_PASS
+    - COMMIT=${TRAVIS_COMMIT::8}
+
+after_success:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO=anallytics/bahmnimart
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO:$COMMIT .
+  - docker tag $REPO:$COMMIT $REPO:$TAG
+  - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
