@@ -7,12 +7,12 @@ ENV java_version 8u131
 ENV java_build b11
 
 #Installing Dependencies
-RUN yum install http://yum.postgresql.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-7.noarch.rpm -y
-RUN yum install postgresql92-server postgresql92-contrib cronie sudo wget initscripts -y
+RUN yum install http://yum.postgresql.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-9.2-7.noarch.rpm -y; yum clean all
+RUN yum install postgresql92-server postgresql92-contrib cronie sudo wget initscripts -y; yum clean all
 
 # Downloading & Config Java 8
 RUN wget --no-check-certificate --no-cookies --header 'Cookie:oraclelicense=accept-securebackup-cookie' "http://download.oracle.com/otn-pub/java/jdk/$java_version-$java_build/d54c1d3a095b4ff2b6607d096fa80163/$java_runtime-$java_version-linux-x64.rpm" -O /tmp/jdk-8-linux-x64.rpm
-RUN yum -y install /tmp/jdk-8-linux-x64.rpm
+RUN yum -y install /tmp/jdk-8-linux-x64.rpm; yum clean all
 RUN alternatives --install /usr/bin/java jar /usr/java/latest/bin/java 200000
 RUN alternatives --install /usr/bin/javaws javaws /usr/java/latest/bin/javaws 200000
 RUN alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 200000
