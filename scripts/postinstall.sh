@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /opt/bahmni-mart/conf/bahmni-mart.conf
+. /opt/bahmni-mart/conf/bahmni-mart-postgres.conf
 
 manage_user_and_group() {
     #create bahmni user and group if doesn't exist
@@ -52,7 +52,7 @@ update_postgresql_conf() {
 update_pg_hba_conf() {
     echo "update pg_hba.conf"
     sed -i "s|local   all             all                                     peer|local   all             all                                     trust|g" /var/lib/pgsql/${POSTGRESQL_VERSION}/data/pg_hba.conf
-    sed -i "s|host    all             all             127.0.0.1/32            ident|host    all             all             127.0.0.1/32            trust|g" /var/lib/pgsql/${POSTGRESQL_VERSION}/data/pg_hba.conf
+    sed -i "s|host    all             all             127.0.0.1/32            ident|host    all             all             0.0.0.0/0            trust|g" /var/lib/pgsql/${POSTGRESQL_VERSION}/data/pg_hba.conf
     sed -i "s|host    all             all             ::1/128                 ident|host    all             all             ::1/128                 trust|g" /var/lib/pgsql/${POSTGRESQL_VERSION}/data/pg_hba.conf
 }
 
@@ -65,6 +65,7 @@ updating_firewall_rules_to_allow_postgres_port() {
 restart_postgres_service() {
     echo "restarting postresql service"
     sudo chkconfig postgresql-${POSTGRESQL_VERSION} on
+    sudo service postgresql-${POSTGRESQL_VERSION} stop
     sudo service postgresql-${POSTGRESQL_VERSION} start
 }
 
@@ -83,14 +84,14 @@ create_postgres_users_and_db() {
 }
 
 
-manage_user_and_group
+#manage_user_and_group
 create_mart_directories
 link_directories
-manage_permissions
-setup_cronjob
+#manage_permissions
+#setup_cronjob
 init_db
 update_postgresql_conf
 update_pg_hba_conf
-updating_firewall_rules_to_allow_postgres_port
+#updating_firewall_rules_to_allow_postgres_port
 restart_postgres_service
 create_postgres_users_and_db
