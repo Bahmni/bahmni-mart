@@ -1,29 +1,22 @@
 sudo: true
-language: java
+
+language : java
 jdk:
 - oraclejdk8
+
 services:
-- docker
+  - docker
+
 jobs:
   include:
-  - stage: compile
-    script: "./compile.sh"
-  - stage: test
-    script: "./test.sh"
+    - stage : compile
+      script: ./compile.sh
+    - stage : test
+      script: ./test.sh
+    - stage : builddocker
+      script: ./builddocker.sh
+
 stages:
-- compile
-- test
-env:
-  global:
-	  - secure: kpSpWRHrAE7bb7ajMA3CChAYSdx/foGD/7TlY/9znbmoK1RVCTYdGXWQpl2Ozmf61ufic5fvtTW/PVG32jmllFxuxAMMdeMb6+cB3bBB9TS4R7bTn3Z4gH2IQXeBhSHK/HEWriFbwhA48ghuB/INgdlO2YV/YQl+eoeeDn9GVj2uBrY9yDvXah6fpt1+dXYTuyVa3ZqUDniFu+3PPn5KWZiPAJab9bA6hILPepABtFXJyLnp6rhT8TB3FhbSx6Ro1MYTndHdJjJkY1cDiu3gqTDkFwgeNaI926QWxNPWcpEyFhv9BuPSHFF4NpZZHCWz/8EoDc9N+2q68oKH/4pPde8EZ/MwZ32aCu9yIrzpw3qXTV/a3mArzElCGAp+Y+/SXg6pq5JTfPK1h8hT8jFLdNvvL4hw5Frs0Y57eucQmZkHXX37JdUBO7Aucauw5HCcJV/NaJm0oAMaSiqvYFRyXKVv+AHXAROnXGIQ0wAy+JQFEiPQaEWQlbxho1mmxKEvqNJSxVx0ToOvZOx2eoC9al+WrMDjEKjBaFM8vffdyXPJmS+k4bgW6V9MvQJjkTaSV5BVH2h6KEwdwFcVFRTkGWblFIz/XEDH66RQRH1OGX4SI7XwNgtmlRw3jnLqkHXPnj6x1P+4ojMtohNpbrvYfYY5wqRNMzOK6yji95jUaR0=
-	  - secure: qPvnH+Q1+9GiCTTb40z0P4qKi3BdTGy6QShdQuKoEVla8V2IHiIJTbVVdzj/0r58vu6XjcJs/mcghqWpi8PUEcCJFhwB8WJZrSHAMpMoV3I8FhFpMEZgjfRwzsDOKzwOvZtKgpBsKgRbetwHzNFWaTWO8f10rLujekoprp+w4HJkUfqv3vYYXpcnNHrmynGfEYot0SalA4WoryYEtXUhrcmpfam1L672UwHWmhZEkEEasIXXumQMI0uTQCpAAoPYTRUI8Zbojjkw1yqw1BflL0I4SQKfku2JRESBPR43ZMUxEKhvCif8TKnu1YDNcNyWrlnBOvf1mPCq/FKx0IJYQBqD9aMAvnBPMRPgoUTOSqQTNus73MKcEQxIG7dWPXyifH9B5SC01r3bGOIVgKhJYZXmIdiEjH0lKqqpYX4Dx0YB2PSWKkWd92EOYXXu+t4SWRI9Za/9a8F4zIAJIY9x/yyIuy7xO1oFqfi6k0tkAQ9IqSkNdnafvha0xOFJo751DLgk6a8/ZFBlWYP6euCJ89s4gsIzqs9jy87ZLo5ecOaBjwNwmUgl3vcgyFu3n9fdxdVOUAyL8D9nUFamdL7REdm5h6kjFaml0Li1NVrWCMtymw+CgShI8BS5GJjJNihOuM4tELvEg01Y4SjHMhnVmnbbteLDDfZr8hqE4zrKlHk=
-	  - COMMIT=${TRAVIS_COMMIT::8}
-after_success:
-- docker login -u $DOCKER_USER -p $DOCKER_PASS
-- export REPO=anallytics/bahmnimart
-- export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH
-  ; fi`
-- docker build -f Dockerfile -t $REPO:$COMMIT .
-- docker tag $REPO:$COMMIT $REPO:$TAG
-- docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-- docker push $REPO
+      - compile
+      - test
+      - builddocker
