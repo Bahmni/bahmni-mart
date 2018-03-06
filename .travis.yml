@@ -13,10 +13,13 @@ jobs:
       script: ./compile.sh
     - stage : test
       script: ./test.sh
-    - stage : builddocker
-      script: ./builddocker.sh
+    - stage : buildDocker
+      script: ./buildDocker.sh
+    - stage: deploy
+      script: ./deployDockerRemote.sh
 
 stages:
       - compile
       - test
-      - builddocker
+      - buildDocker
+      - deploy
