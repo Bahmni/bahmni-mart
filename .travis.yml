@@ -7,6 +7,11 @@ jdk:
 services:
   - docker
 
+addons:
+  apt:
+    packages:
+    - sshpass
+
 jobs:
   include:
     - stage : compile
