@@ -1,0 +1,252 @@
+[
+  {
+    "name": "program",
+    "columns": [
+      {
+        "name": "program_id",
+        "type": "integer",
+        "isPrimaryKey": true,
+        "reference": null
+      },
+      {
+        "name": "concept_name",
+        "type": "text",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "outcomes_concept_name",
+        "type": "text",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "date_created",
+        "type": "date",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "date_changed",
+        "type": "date",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "name",
+        "type": "text",
+        "isPrimaryKey": false,
+        "reference": null
+      }
+    ]
+  },
+  {
+    "name": "patient_program",
+    "columns": [
+      {
+        "name": "patient_program_id",
+        "type": "integer",
+        "isPrimaryKey": true,
+        "reference": null
+      },
+      {
+        "name": "program_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable" : "program",
+          "referenceColumn" : "program_id"
+        }
+      },
+      {
+        "name": "patient_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable" : "patient",
+          "referenceColumn" : "patient_id"
+        }
+      },
+      {
+        "name": "date_enrolled",
+        "type": "date",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "date_completed",
+        "type": "date",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "location_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": null
+      }
+    ]
+  },
+  {
+    "name": "program_workflow",
+    "columns": [
+      {
+        "name": "program_workflow_id",
+        "type": "integer",
+        "isPrimaryKey": true,
+        "reference": null
+      },
+      {
+        "name": "program_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable": "program",
+          "referenceColumn": "program_id"
+        }
+      },
+      {
+        "name": "concept_name",
+        "type": "text",
+        "isPrimaryKey": false,
+        "reference": null
+      }
+    ]
+  },
+  {
+    "name": "program_workflow_state",
+    "columns": [
+      {
+        "name": "program_workflow_state_id",
+        "type": "integer",
+        "isPrimaryKey": true,
+        "reference": null
+      },
+      {
+        "name": "program_workflow_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable": "program_workflow",
+          "referenceColumn": "program_workflow_id"
+        }
+      },
+      {
+        "name": "concept_name",
+        "type": "text",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "initial",
+        "type": "boolean",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "terminal",
+        "type": "boolean",
+        "isPrimaryKey": false,
+        "reference": null
+      }
+    ]
+  },
+  {
+    "name": "patient_state",
+    "columns": [
+      {
+        "name": "patient_state_id",
+        "type": "integer",
+        "isPrimaryKey": true,
+        "reference": null
+      },
+      {
+        "name": "patient_program_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable": "patient_program",
+          "referenceColumn": "patient_program_id"
+        }
+      },
+      {
+        "name": "state",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable": "program_workflow_state",
+          "referenceColumn": "program_workflow_state_id"
+        }
+      },
+      {
+        "name": "start_date",
+        "type": "date",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "end_date",
+        "type": "date",
+        "isPrimaryKey": false,
+        "reference": null
+      }
+    ]
+  },
+  {
+    "name": "episode_patient_program",
+    "columns": [
+      {
+        "name": "episode_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable": "episode",
+          "referenceColumn": "episode_id"
+        }
+      },
+      {
+        "name": "patient_program_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable": "patient_program",
+          "referenceColumn": "patient_program_id"
+        }
+      }
+    ]
+  },
+  {
+    "name": "episode",
+    "columns": [
+      {
+        "name": "episode_id",
+        "type": "integer",
+        "isPrimaryKey": true,
+        "reference": null
+      }
+    ]
+  },
+  {
+    "name": "episode_encounter",
+    "columns": [
+      {
+        "name": "episode_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable": "episode",
+          "referenceColumn": "episode_id"
+        }
+      },
+      {
+        "name": "encounter_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": {
+          "referenceTable": "encounter",
+          "referenceColumn": "encounter_id"
+        }
+      }
+    ]
+  }
+]
