@@ -105,7 +105,7 @@ public class BatchUtilsTest {
 
     @Test
     public void shouldGivePSQLCompatibleValueForDate() {
-        assertEquals("'2012-12-01'", BatchUtils.getPostgresCompatibleValue("2012-12-01", "timestamp"));
+        assertEquals("'2012-12-01'", BatchUtils.getPostgresCompatibleValue("2012-12-01", "date"));
     }
 
     @Test

@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 
 @Component
-public class ConfigMultiSelectAndAddMore {
+public class MultiSelectAndAddMore {
     @Value("${defaultMultiSelectAndAddMore}")
     private String defaultMultiSelectAndAddMore;
 
@@ -30,10 +30,12 @@ public class ConfigMultiSelectAndAddMore {
 
     private static final String ALLOW_ADD_MORE = "allowAddMore";
     private static final String MULTI_SELECT = "multiSelect";
+    private static final String CONCEPT_SET_UI = "conceptSetUI";
+    private static final String CONFIG = "config";
 
     private List<String> multiSelectAndAddMore = new ArrayList<>();
 
-    public List<String> getMultiSelectAndAddMore() {
+    public List<String> getConceptNames() {
         Set<Map.Entry<String, JsonElement>> conceptSet = getAllConceptSet();
         List<String> ignoreConceptsList = BatchUtils.convertConceptNamesToSet(ignoreConcepts);
 
@@ -63,10 +65,9 @@ public class ConfigMultiSelectAndAddMore {
 
     private Set<Map.Entry<String, JsonElement>> getConceptSet(String multiSelectAndAddMoreFile) {
         try {
-            FileReader json = new FileReader(multiSelectAndAddMoreFile);
-            JsonElement parse = new JsonParser().parse(json);
+            JsonElement parse = new JsonParser().parse(new FileReader(multiSelectAndAddMoreFile));
             JsonObject asJsonObject = parse.getAsJsonObject();
-            JsonObject configSet = asJsonObject.getAsJsonObject("config").getAsJsonObject("conceptSetUI");
+            JsonObject configSet = asJsonObject.getAsJsonObject(CONFIG).getAsJsonObject(CONCEPT_SET_UI);
             return configSet.entrySet();
         } catch (FileNotFoundException e) {
             return Collections.emptySet();

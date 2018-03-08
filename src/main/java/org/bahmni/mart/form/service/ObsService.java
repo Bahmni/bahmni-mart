@@ -29,9 +29,9 @@ public class ObsService {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public List<Concept> getConceptsByNames(String commaSeparatedConceptNames) {
+    public List<Concept> getConceptsByNames(List<String> conceptNames) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
-        parameters.addValue("conceptNames", BatchUtils.convertConceptNamesToSet(commaSeparatedConceptNames));
+        parameters.addValue("conceptNames", conceptNames);
 
         return jdbcTemplate.query(conceptDetailsSql, parameters, new BeanPropertyRowMapper<>(Concept.class));
     }

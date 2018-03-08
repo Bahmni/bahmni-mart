@@ -1,31 +1,34 @@
 package org.bahmni.mart.form;
 
+import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.MultiSelectAndAddMore;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+@PrepareForTest({BatchUtils.class, BahmniFormFactory.class})
+@RunWith(PowerMockRunner.class)
 public class BahmniFormFactoryTest {
-
-    private List<Concept> allConcepts;
 
     private List<Concept> historyAndExaminationConcepts;
 
@@ -42,31 +45,38 @@ public class BahmniFormFactoryTest {
     @Mock
     private ObsService obsService;
 
-    private String addMoreAndMultiSelectConceptNames;
+    @Mock
+    private MultiSelectAndAddMore multiSelectAndAddMore;
+
+    private String separateTableConceptNames;
     private String ignoreConceptNames;
+
+    private List<String> separateTableConceptList;
+    private List<String> ignoreConceptsNameList;
 
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         initMocks(this);
 
-        addMoreAndMultiSelectConceptNames = "Operation Notes Template, Discharge Summary," +
+        separateTableConceptNames = "Operation Notes Template, Discharge Summary," +
                 " Surgeries and Procedures, Other Notes, BP, Notes";
-        List<Concept> addMoreAndMultiSelectConcepts = new ArrayList<>();
-        addMoreAndMultiSelectConcepts.add(new Concept(3365, "Operation Notes Template", 1));
-        addMoreAndMultiSelectConcepts.add(new Concept(1200, "Discharge Summary, Surgeries and Procedures", 1));
-        addMoreAndMultiSelectConcepts.add(new Concept(1206, "Other Notes", 1));
-        addMoreAndMultiSelectConcepts.add(new Concept(7771, "BP", 1));
-        addMoreAndMultiSelectConcepts.add(new Concept(1209, "Notes", 0));
+        separateTableConceptList = Arrays.asList("Operation Notes Template",
+                "Discharge Summary, Surgeries and Procedures",
+                "Other Notes",
+                "BP",
+                "Notes");
+        List<Concept> separateTableConcepts = new ArrayList<>();
+        separateTableConcepts.add(new Concept(3365, "Operation Notes Template", 1));
+        separateTableConcepts.add(new Concept(1200, "Discharge Summary, Surgeries and Procedures", 1));
+        separateTableConcepts.add(new Concept(1206, "Other Notes", 1));
+        separateTableConcepts.add(new Concept(7771, "BP", 1));
+        separateTableConcepts.add(new Concept(1209, "Notes", 0));
 
         ignoreConceptNames = "Video, Audio";
+        ignoreConceptsNameList = Arrays.asList("Video", "Audio");
         List<Concept> ignoreConcepts = new ArrayList<>();
         ignoreConcepts.add(new Concept(1111, "Video", 0));
         ignoreConcepts.add(new Concept(1112, "Audio", 0));
-
-        allConcepts = new ArrayList<>();
-        allConcepts.add(new Concept(1189, "History and Examination", 1));
-        allConcepts.add(new Concept(56, "Vitals", 1));
-        allConcepts.add(new Concept(3365, "Operation Notes Template", 1));
 
         historyAndExaminationConcepts = new ArrayList<>();
         historyAndExaminationConcepts.add(new Concept(1190, "Chief Complaint Data", 1));
@@ -93,10 +103,14 @@ public class BahmniFormFactoryTest {
 
         bahmniFormFactory = new BahmniFormFactory();
         bahmniFormFactory.setObsService(obsService);
-        when(obsService.getConceptsByNames(addMoreAndMultiSelectConceptNames))
-                .thenReturn(addMoreAndMultiSelectConcepts);
-        when(obsService.getConceptsByNames(ignoreConceptNames)).thenReturn(ignoreConcepts);
-        setValuesForMemberFields(bahmniFormFactory, "addMoreConceptNames", addMoreAndMultiSelectConceptNames);
+        bahmniFormFactory.setMultiSelectAndAddMore(multiSelectAndAddMore);
+        mockStatic(BatchUtils.class);
+        when(BatchUtils.convertConceptNamesToSet(ignoreConceptNames)).thenReturn(ignoreConceptsNameList);
+        when(multiSelectAndAddMore.getConceptNames()).thenReturn(separateTableConceptList);
+        when(obsService.getConceptsByNames(separateTableConceptList))
+                .thenReturn(separateTableConcepts);
+        when(obsService.getConceptsByNames(ignoreConceptsNameList)).thenReturn(ignoreConcepts);
+        setValuesForMemberFields(bahmniFormFactory, "separateTableConceptNames", separateTableConceptNames);
         setValuesForMemberFields(bahmniFormFactory, "ignoreConceptsNames", ignoreConceptNames);
         bahmniFormFactory.postConstruct();
     }
@@ -114,66 +128,30 @@ public class BahmniFormFactoryTest {
     }
 
     @Test
-    @Ignore // This test is about create new table per concept-set. But currently we are creating table per form
-    public void shouldCreatAForm() {
-        when(obsService.getChildConcepts("All Observation Templates")).thenReturn(allConcepts);
+    public void shouldCreateAForm() {
         when(obsService.getChildConcepts("History and Examination"))
                 .thenReturn(historyAndExaminationConcepts);
-        when(obsService.getChildConcepts("Vitals")).thenReturn(vitalsConcepts);
-        when(obsService.getChildConcepts("Operation Notes Template"))
-                .thenReturn(operationNotesConcepts);
         when(obsService.getChildConcepts("Chief Complaint Data"))
                 .thenReturn(chiefComplaintDataConcepts);
-        when(obsService.getChildConcepts("Other Notes")).thenReturn(otherNotesConcepts);
 
-        BahmniForm allObservationTemplates = bahmniFormFactory
-                .createForm(new Concept(1,"All Observation Templates",1),null);
+        BahmniForm historyAndExamination = bahmniFormFactory.createForm(
+                new Concept(1189, "History and Examination", 1),
+                null);
 
-        assertNotNull(allObservationTemplates);
+        List<BahmniForm> historyAndExaminationChildren = historyAndExamination.getChildren();
 
-        assertEquals("All Observation Templates",allObservationTemplates.getFormName().getName());
-        assertEquals(3,allObservationTemplates.getChildren().size());
-
-        List<String> children = allObservationTemplates.getChildren().stream().map(form -> form.getFormName().getName())
-                .collect(Collectors.toList());
-        assertTrue(children.containsAll(
-                Arrays.asList("History and Examination", "Vitals", "Operation Notes Template")));
-
-        assertNull(allObservationTemplates.getRootForm());
-
-        BahmniForm historyAndExaminationForm = allObservationTemplates.getChildren().get(0);
-        assertEquals(1,historyAndExaminationForm.getDepthToParent());
-        assertEquals(1,historyAndExaminationForm.getChildren().size());
-        assertEquals(4,historyAndExaminationForm.getFields().size());
-
-        assertEquals("Chief Complaint Notes",historyAndExaminationForm.getFields().get(0).getName());
-        assertEquals(allObservationTemplates,historyAndExaminationForm.getParent());
-        BahmniForm chiefComplaintNotesForm = historyAndExaminationForm.getChildren().get(0);
-        assertEquals(historyAndExaminationForm, chiefComplaintNotesForm.getRootForm());
-        assertEquals(2,chiefComplaintNotesForm.getDepthToParent());
-
-        BahmniForm vitalsForm = allObservationTemplates.getChildren().get(1);
-        assertEquals(1, vitalsForm.getFields().size());
-        assertTrue(vitalsForm.getChildren().isEmpty());
-        assertEquals("Vitals Notes", vitalsForm.getFields().get(0).getName());
-        assertEquals(1, vitalsForm.getDepthToParent());
-        assertNull(vitalsForm.getRootForm());
-        assertEquals(allObservationTemplates, vitalsForm.getParent());
-
-        BahmniForm operationNotesTemplateForm = allObservationTemplates.getChildren().get(2);
-        assertEquals(1, operationNotesTemplateForm.getFields().size());
-        assertEquals(1, operationNotesTemplateForm.getChildren().size());
-        assertEquals("Anesthesia Administered", operationNotesTemplateForm.getFields().get(0).getName());
-        assertEquals("Other Notes", operationNotesTemplateForm.getChildren().get(0).getFormName().getName());
-        assertEquals(1, operationNotesTemplateForm.getDepthToParent());
-        assertNull(operationNotesTemplateForm.getRootForm());
-        assertEquals(allObservationTemplates, operationNotesTemplateForm.getParent());
-
-        assertEquals(2, operationNotesTemplateForm.getChildren().get(0).getDepthToParent());
-        assertEquals(operationNotesTemplateForm, operationNotesTemplateForm.getChildren().get(0).getRootForm());
-
-        verify(obsService, times(1)).getConceptsByNames(addMoreAndMultiSelectConceptNames);
-        verify(obsService, times(1)).getConceptsByNames(ignoreConceptNames);
+        assertEquals("History and Examination", historyAndExamination.getFormName().getName());
+        List<Concept> historyAndExaminationFields = historyAndExamination.getFields();
+        assertEquals(4, historyAndExaminationFields.size());
+        assertEquals("Chief Complaint Notes", historyAndExaminationFields.get(0).getName());
+        assertEquals("History", historyAndExaminationFields.get(1).getName());
+        assertEquals("Examination", historyAndExaminationFields.get(2).getName());
+        assertEquals("Image", historyAndExaminationFields.get(3).getName());
+        assertEquals(1, historyAndExaminationChildren.size());
+        assertEquals(2, historyAndExaminationChildren.get(0).getDepthToParent());
+        assertEquals("BP", historyAndExaminationChildren.get(0).getFormName().getName());
+        verify(obsService, times(1)).getConceptsByNames(separateTableConceptList);
+        verify(obsService, times(1)).getConceptsByNames(ignoreConceptsNameList);
     }
 
     @Test
@@ -192,7 +170,40 @@ public class BahmniFormFactoryTest {
         assertEquals("Health Education", bahmniForm.getFormName().getName());
         assertEquals(1, bahmniForm.getFields().size());
         assertEquals(hasTakenCourse, bahmniForm.getFields().get(0));
-        verify(obsService, times(1)).getConceptsByNames(addMoreAndMultiSelectConceptNames);
-        verify(obsService, times(1)).getConceptsByNames(ignoreConceptNames);
+        verify(obsService, times(1)).getConceptsByNames(separateTableConceptList);
+        verify(obsService, times(1)).getConceptsByNames(ignoreConceptsNameList);
+    }
+
+    @Test
+    public void shouldCreateChildForMultiSelectAddMoreAndSeparateTable() {
+        historyAndExaminationConcepts.add(new Concept(3365, "Operation Notes Template", 1));
+        historyAndExaminationConcepts.add(new Concept(1209, "Notes", 0));
+        List<Concept> operationNotesTemplate = new ArrayList<>();
+        operationNotesTemplate.add(new Concept(3366, "Notes Templates", 0));
+
+        when(obsService.getChildConcepts("History and Examination"))
+                .thenReturn(historyAndExaminationConcepts);
+        when(obsService.getChildConcepts("Chief Complaint Data"))
+                .thenReturn(chiefComplaintDataConcepts);
+        when(obsService.getChildConcepts("Operation Notes Template"))
+                .thenReturn(operationNotesTemplate);
+        when(obsService.getChildConcepts("BP")).thenReturn(new ArrayList<>());
+
+
+        BahmniForm historyAndExamination = bahmniFormFactory.createForm(
+                new Concept(1189, "History and Examination", 1),
+                null);
+
+        assertEquals("History and Examination", historyAndExamination.getFormName().getName());
+        assertEquals(3, historyAndExamination.getChildren().size());
+        assertEquals("BP", historyAndExamination.getChildren().get(0).getFormName().getName());
+        assertEquals(0, historyAndExamination.getChildren().get(0).getFields().size());
+        assertEquals("Operation Notes Template", historyAndExamination.getChildren().get(1).getFormName().getName());
+        assertEquals(1, historyAndExamination.getChildren().get(1).getFields().size());
+        assertEquals(1, historyAndExamination.getChildren().get(2).getFields().size());
+        verify(obsService, times(1)).getChildConcepts("History and Examination");
+        verify(obsService, times(1)).getChildConcepts("Chief Complaint Data");
+        verify(obsService, times(1)).getChildConcepts("Operation Notes Template");
+        verify(obsService, times(1)).getChildConcepts("BP");
     }
 }

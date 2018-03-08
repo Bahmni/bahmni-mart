@@ -49,13 +49,11 @@ public class ObsServiceTest {
 
     @Test
     public void shouldGetConceptsByNames() throws Exception {
-        String commaSeparatedConceptNames = "Video, Image, Radiology Documents";
         List<String> conceptNamesList = Arrays.asList("Video", "Image", "Radiology Documents");
         MapSqlParameterSource mapSqlParameterSource = Mockito.mock(MapSqlParameterSource.class);
         PowerMockito.whenNew(MapSqlParameterSource.class).withNoArguments().thenReturn(mapSqlParameterSource);
-        PowerMockito.when(BatchUtils.convertConceptNamesToSet(commaSeparatedConceptNames)).thenReturn(conceptNamesList);
 
-        obsService.getConceptsByNames(commaSeparatedConceptNames);
+        obsService.getConceptsByNames(conceptNamesList);
 
         Mockito.verify(mapSqlParameterSource, Mockito.times(1)).addValue("conceptNames", conceptNamesList);
         Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1))
