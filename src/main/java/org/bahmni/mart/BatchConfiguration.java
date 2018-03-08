@@ -1,12 +1,15 @@
 package org.bahmni.mart;
 
 import freemarker.template.TemplateExceptionHandler;
+import org.bahmni.mart.exports.AsIsTableMetadataGenerator;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
+import org.bahmni.mart.table.TableExportStep;
 import org.bahmni.mart.table.TableGeneratorStep;
+import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -47,6 +50,12 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
     @Autowired
     private TableGeneratorStep tableGeneratorStep;
 
+    @Autowired
+    private AsIsTableMetadataGenerator asIsTableMetadataGenerator;
+
+    @Autowired
+    private ObjectFactory<TableExportStep> tablesExportStepObjectFactory;
+
     private static final String DEFAULT_ENCODING = "UTF-8";
 
     @Bean
@@ -66,6 +75,15 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
         }
 
         tableGeneratorStep.createTables(formTableMetadataGenerator.getTableDataList());
+        tableGeneratorStep.createTables(asIsTableMetadataGenerator.getTableDataList());
+
+        List<TableData> tableDataList = asIsTableMetadataGenerator.getTableDataList();
+
+        for (TableData tableData : tableDataList) {
+            TableExportStep tablesExportStep = tablesExportStepObjectFactory.getObject();
+            tablesExportStep.setTableData(tableData);
+            completeDataExport.next(tablesExportStep.getStep());
+        }
 
         return completeDataExport.end().build();
     }

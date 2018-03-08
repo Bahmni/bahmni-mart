@@ -3,11 +3,13 @@ package org.bahmni.mart;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.io.FileUtils;
+import org.bahmni.mart.exports.AsIsTableMetadataGenerator;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
+import org.bahmni.mart.table.TableExportStep;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +66,12 @@ public class BatchConfigurationTest {
     private TableGeneratorStep tableGeneratorStep;
 
     @Mock
+    private AsIsTableMetadataGenerator asIsTableMetadataGenerator;
+
+    @Mock
+    private ObjectFactory<TableExportStep> tablesExportStepObjectFactory;
+
+    @Mock
     private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
 
 
@@ -100,6 +108,8 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "formTableMetadataGenerator", formTableMetadataGenerator);
         setValuesForMemberFields(batchConfiguration, "observationExportStepFactory", observationExportStepFactory);
         setValuesForMemberFields(batchConfiguration, "tableGeneratorStep", tableGeneratorStep);
+        setValuesForMemberFields(batchConfiguration, "asIsTableMetadataGenerator", asIsTableMetadataGenerator);
+        setValuesForMemberFields(batchConfiguration, "tablesExportStepObjectFactory", tablesExportStepObjectFactory);
 
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         BahmniForm medicalHistoryForm = new BahmniForm();
@@ -156,6 +166,8 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "formTableMetadataGenerator", formTableMetadataGenerator);
         setValuesForMemberFields(batchConfiguration, "observationExportStepFactory", observationExportStepFactory);
         setValuesForMemberFields(batchConfiguration, "tableGeneratorStep", tableGeneratorStep);
+        setValuesForMemberFields(batchConfiguration, "asIsTableMetadataGenerator", asIsTableMetadataGenerator);
+        setValuesForMemberFields(batchConfiguration, "tablesExportStepObjectFactory", tablesExportStepObjectFactory);
 
         when(formListProcessor.retrieveAllForms()).thenReturn(new ArrayList<>());
         JobBuilder jobBuilder = Mockito.mock(JobBuilder.class);

@@ -1,4 +1,4 @@
-package com.bahmni.batch.bahmnianalytics.table;
+package org.bahmni.mart.table;
 
 import java.util.ArrayList;
 import java.util.List;

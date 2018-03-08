@@ -1,8 +1,8 @@
-package com.bahmni.batch.bahmnianalytics.table;
+package org.bahmni.mart.table;
 
-import com.bahmni.batch.bahmnianalytics.table.domain.TableColumn;
-import com.bahmni.batch.bahmnianalytics.table.domain.TableData;
-import com.bahmni.batch.bahmnianalytics.util.BatchUtils;
+import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.table.domain.TableColumn;
+import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.item.ItemProcessor;
 
 import java.util.Map;
@@ -15,10 +15,8 @@ public class TableDataProcessor implements ItemProcessor<Map<String, Object>, Ma
 
     @Override
     public Map<String, Object> process(Map<String, Object> item) throws Exception {
-        Map<String, Object> processedMap = item.entrySet().stream().collect(
-            Collectors.toMap(p -> p.getKey(),
-                p -> getProcessedValue(p.getKey(), p.getValue())));
-        return processedMap;
+        return item.entrySet().stream().collect(
+                Collectors.toMap(p -> p.getKey(), p -> getProcessedValue(p.getKey(), p.getValue())));
     }
 
     public TableData getTableData() {
@@ -33,7 +31,8 @@ public class TableDataProcessor implements ItemProcessor<Map<String, Object>, Ma
         if (value == null) {
             return "";
         }
-        Optional<TableColumn> col = tableData.getColumns().stream().filter(column -> column.getName().equals(key)).findFirst();
+        Optional<TableColumn> col = tableData.getColumns().stream()
+                .filter(column -> column.getName().equals(key)).findFirst();
         return BatchUtils.getPostgresCompatibleValue(value.toString(), col.get().getType());
     }
 }

@@ -62,10 +62,7 @@
         "name": "patient_id",
         "type": "integer",
         "isPrimaryKey": false,
-        "reference": {
-          "referenceTable" : "patient",
-          "referenceColumn" : "patient_id"
-        }
+        "reference": null
       },
       {
         "name": "date_enrolled",
@@ -193,6 +190,17 @@
     ]
   },
   {
+    "name": "episode",
+    "columns": [
+      {
+        "name": "episode_id",
+        "type": "integer",
+        "isPrimaryKey": true,
+        "reference": null
+      }
+    ]
+  },
+  {
     "name": "episode_patient_program",
     "columns": [
       {
@@ -216,17 +224,6 @@
     ]
   },
   {
-    "name": "episode",
-    "columns": [
-      {
-        "name": "episode_id",
-        "type": "integer",
-        "isPrimaryKey": true,
-        "reference": null
-      }
-    ]
-  },
-  {
     "name": "episode_encounter",
     "columns": [
       {
@@ -242,10 +239,7 @@
         "name": "encounter_id",
         "type": "integer",
         "isPrimaryKey": false,
-        "reference": {
-          "referenceTable": "encounter",
-          "referenceColumn": "encounter_id"
-        }
+        "reference": null
       }
     ]
   }

@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Primary
 @Component("FormTableMetadataGenerator")
-public class FormTableMetadataGenerator implements TableMetadataGenerator{
+public class FormTableMetadataGenerator implements TableMetadataGenerator {
 
     private Map<String, TableData> tableDataMap = new LinkedHashMap<>();
 
