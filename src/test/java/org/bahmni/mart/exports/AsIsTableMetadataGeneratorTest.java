@@ -75,7 +75,7 @@ public class AsIsTableMetadataGeneratorTest {
     public void shouldSetupTableDataForGivenInfo() throws Exception {
         when(BatchUtils.convertResourceOutputToString(metadataJson)).thenReturn(json);
 
-        List<TableData> tableDataList = asIsTableGenerator.getTables();
+        List<TableData> tableDataList = asIsTableGenerator.getTableDataList();
         Assert.assertEquals(2, tableDataList.size());
 
         Assert.assertEquals("Name", tableDataList.get(0).getColumns().get(0).getName());

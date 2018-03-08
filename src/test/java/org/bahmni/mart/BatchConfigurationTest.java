@@ -141,8 +141,8 @@ public class BatchConfigurationTest {
         verify(fstgObservationExportStep, times(1)).setForm(fstg);
         verify(jobFlowBuilder, times(1)).next(medicalHistoryObservationStep);
         verify(jobFlowBuilder, times(1)).next(fstgObservationStep);
-        verify(formTableMetadataGenerator, times(1)).getTables();
-        verify(tableGeneratorStep, atLeastOnce()).createTables(formTableMetadataGenerator.getTables());
+        verify(formTableMetadataGenerator, times(1)).getTableDataList();
+        verify(tableGeneratorStep, atLeastOnce()).createTables(formTableMetadataGenerator.getTableDataList());
         verify(formTableMetadataGenerator, times(2)).addMetadataForForm(any(BahmniForm.class));
     }
 
@@ -178,8 +178,8 @@ public class BatchConfigurationTest {
         verify(formListProcessor, times(1)).retrieveAllForms();
         verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
         verify(observationExportStepFactory, times(0)).getObject();
-        verify(formTableMetadataGenerator, times(1)).getTables();
-        verify(tableGeneratorStep, atLeastOnce()).createTables(formTableMetadataGenerator.getTables());
+        verify(formTableMetadataGenerator, times(1)).getTableDataList();
+        verify(tableGeneratorStep, atLeastOnce()).createTables(formTableMetadataGenerator.getTableDataList());
         verify(formTableMetadataGenerator, times(0)).addMetadataForForm(any(BahmniForm.class));
     }
 }

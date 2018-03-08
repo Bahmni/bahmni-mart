@@ -20,7 +20,7 @@ public class AsIsTableMetadataGenerator implements TableMetadataGenerator {
     private Resource metadataJson;
 
     @Override
-    public List<TableData> getTables() {
+    public List<TableData> getTableDataList() {
         if (tables.isEmpty()) {
             readTableDataFromJson();
         }

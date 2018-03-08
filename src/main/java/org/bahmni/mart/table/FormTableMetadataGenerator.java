@@ -16,12 +16,12 @@ import java.util.Map;
 
 @Primary
 @Component("FormTableMetadataGenerator")
-public class FormTableMetadataGenerator {
+public class FormTableMetadataGenerator implements TableMetadataGenerator{
 
     private Map<String, TableData> tableDataMap = new LinkedHashMap<>();
 
 
-    public List<TableData> getTables() {
+    public List<TableData> getTableDataList() {
         return new ArrayList<>(tableDataMap.values());
     }
 

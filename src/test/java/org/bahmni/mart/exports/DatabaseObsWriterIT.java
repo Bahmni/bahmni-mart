@@ -70,7 +70,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
 
         formTableMetadataGenerator.addMetadataForForm(bahmniForm);
         databaseObsWriter.setForm(bahmniForm);
-        tableGeneratorStep.createTables(formTableMetadataGenerator.getTables());
+        tableGeneratorStep.createTables(formTableMetadataGenerator.getTableDataList());
 
         databaseObsWriter.write(items);
 

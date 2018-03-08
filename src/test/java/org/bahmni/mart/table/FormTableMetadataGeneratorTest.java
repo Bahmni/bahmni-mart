@@ -90,7 +90,7 @@ public class FormTableMetadataGeneratorTest {
 
         formTableMetadataGenerator.addMetadataForForm(form);
 
-        List<TableData> tables = formTableMetadataGenerator.getTables();
+        List<TableData> tables = formTableMetadataGenerator.getTableDataList();
         assertEquals(1, tables.size());
     }
 

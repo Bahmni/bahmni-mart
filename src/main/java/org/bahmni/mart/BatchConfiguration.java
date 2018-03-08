@@ -65,7 +65,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
             formTableMetadataGenerator.addMetadataForForm(form);
         }
 
-        tableGeneratorStep.createTables(formTableMetadataGenerator.getTables());
+        tableGeneratorStep.createTables(formTableMetadataGenerator.getTableDataList());
 
         return completeDataExport.end().build();
     }
