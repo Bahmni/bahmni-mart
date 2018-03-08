@@ -3,14 +3,9 @@ package org.bahmni.mart;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.io.FileUtils;
-import org.bahmni.mart.exports.AsIsTableMetadataGenerator;
-import org.bahmni.mart.exports.ObservationExportStep;
+import org.bahmni.mart.config.FormStepConfigurer;
+import org.bahmni.mart.config.ProgramDataStepConfigurer;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
-import org.bahmni.mart.form.FormListProcessor;
-import org.bahmni.mart.form.domain.BahmniForm;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
-import org.bahmni.mart.table.TableExportStep;
-import org.bahmni.mart.table.TableGeneratorStep;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,17 +21,14 @@ import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.JobFlowBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,29 +43,16 @@ public class BatchConfigurationTest {
     private Resource freemarkerTemplateLocation;
 
     @Mock
-    private FormListProcessor formListProcessor;
-
-    @Mock
     private JobBuilderFactory jobBuilderFactory;
-
-    @Mock
-    private ObjectFactory<ObservationExportStep> observationExportStepFactory;
-
-    @Mock
-    private FormTableMetadataGenerator formTableMetadataGenerator;
-
-    @Mock
-    private TableGeneratorStep tableGeneratorStep;
-
-    @Mock
-    private AsIsTableMetadataGenerator asIsTableMetadataGenerator;
-
-    @Mock
-    private ObjectFactory<TableExportStep> tablesExportStepObjectFactory;
 
     @Mock
     private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
 
+    @Mock
+    private FormStepConfigurer formStepConfigurer;
+
+    @Mock
+    private ProgramDataStepConfigurer programDataStepConfigurer;
 
     private BatchConfiguration batchConfiguration;
 
@@ -81,6 +60,8 @@ public class BatchConfigurationTest {
     public void setUp() throws Exception {
         mockStatic(FileUtils.class);
         batchConfiguration = new BatchConfiguration();
+        setValuesForMemberFields(batchConfiguration, "formStepConfigurer", formStepConfigurer);
+        setValuesForMemberFields(batchConfiguration, "programDataStepConfigurer", programDataStepConfigurer);
     }
 
     @Test
@@ -99,77 +80,11 @@ public class BatchConfigurationTest {
     }
 
     @Test
-    public void shouldCompleteDataExportWithObsForms() throws Exception {
-        setValuesForMemberFields(batchConfiguration, "formListProcessor", formListProcessor);
+    public void shouldCompleteDataExpor() throws Exception {
         setValuesForMemberFields(batchConfiguration, "jobBuilderFactory", jobBuilderFactory);
         setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
                 treatmentRegistrationBaseExportStep);
-        setValuesForMemberFields(batchConfiguration, "formListProcessor", formListProcessor);
-        setValuesForMemberFields(batchConfiguration, "formTableMetadataGenerator", formTableMetadataGenerator);
-        setValuesForMemberFields(batchConfiguration, "observationExportStepFactory", observationExportStepFactory);
-        setValuesForMemberFields(batchConfiguration, "tableGeneratorStep", tableGeneratorStep);
-        setValuesForMemberFields(batchConfiguration, "asIsTableMetadataGenerator", asIsTableMetadataGenerator);
-        setValuesForMemberFields(batchConfiguration, "tablesExportStepObjectFactory", tablesExportStepObjectFactory);
 
-        ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
-        BahmniForm medicalHistoryForm = new BahmniForm();
-        BahmniForm fstg = new BahmniForm();
-        bahmniForms.add(medicalHistoryForm);
-        bahmniForms.add(fstg);
-
-        when(formListProcessor.retrieveAllForms()).thenReturn(bahmniForms);
-        JobBuilder jobBuilder = Mockito.mock(JobBuilder.class);
-        when(jobBuilderFactory.get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME)).thenReturn(jobBuilder);
-        when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
-        when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
-        Step treatmentStep = Mockito.mock(Step.class);
-        when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(treatmentStep);
-
-        JobFlowBuilder jobFlowBuilder = Mockito.mock(JobFlowBuilder.class);
-        when(jobBuilder.flow(treatmentStep)).thenReturn(jobFlowBuilder);
-        FlowJobBuilder flowJobBuilder = Mockito.mock(FlowJobBuilder.class);
-        when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
-        Job expectedJob = Mockito.mock(Job.class);
-        when(flowJobBuilder.build()).thenReturn(expectedJob);
-
-        ObservationExportStep medicalHistoryObservationExportStep = Mockito.mock(ObservationExportStep.class);
-        ObservationExportStep fstgObservationExportStep = Mockito.mock(ObservationExportStep.class);
-        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryObservationExportStep)
-                .thenReturn(fstgObservationExportStep);
-        Step medicalHistoryObservationStep = Mockito.mock(Step.class);
-        Step fstgObservationStep = Mockito.mock(Step.class);
-        when(medicalHistoryObservationExportStep.getStep()).thenReturn(medicalHistoryObservationStep);
-        when(fstgObservationExportStep.getStep()).thenReturn(fstgObservationStep);
-
-        Job actualJob = batchConfiguration.completeDataExport();
-
-        assertEquals(expectedJob, actualJob);
-        verify(formListProcessor, times(1)).retrieveAllForms();
-        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
-        verify(observationExportStepFactory, times(2)).getObject();
-        verify(medicalHistoryObservationExportStep, times(1)).setForm(medicalHistoryForm);
-        verify(fstgObservationExportStep, times(1)).setForm(fstg);
-        verify(jobFlowBuilder, times(1)).next(medicalHistoryObservationStep);
-        verify(jobFlowBuilder, times(1)).next(fstgObservationStep);
-        verify(formTableMetadataGenerator, times(1)).getTableDataList();
-        verify(tableGeneratorStep, atLeastOnce()).createTables(formTableMetadataGenerator.getTableDataList());
-        verify(formTableMetadataGenerator, times(2)).addMetadataForForm(any(BahmniForm.class));
-    }
-
-    @Test
-    public void shouldCompleteDataExportWithoutObsForms() throws Exception {
-        setValuesForMemberFields(batchConfiguration, "formListProcessor", formListProcessor);
-        setValuesForMemberFields(batchConfiguration, "jobBuilderFactory", jobBuilderFactory);
-        setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
-                treatmentRegistrationBaseExportStep);
-        setValuesForMemberFields(batchConfiguration, "formListProcessor", formListProcessor);
-        setValuesForMemberFields(batchConfiguration, "formTableMetadataGenerator", formTableMetadataGenerator);
-        setValuesForMemberFields(batchConfiguration, "observationExportStepFactory", observationExportStepFactory);
-        setValuesForMemberFields(batchConfiguration, "tableGeneratorStep", tableGeneratorStep);
-        setValuesForMemberFields(batchConfiguration, "asIsTableMetadataGenerator", asIsTableMetadataGenerator);
-        setValuesForMemberFields(batchConfiguration, "tablesExportStepObjectFactory", tablesExportStepObjectFactory);
-
-        when(formListProcessor.retrieveAllForms()).thenReturn(new ArrayList<>());
         JobBuilder jobBuilder = Mockito.mock(JobBuilder.class);
         when(jobBuilderFactory.get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME)).thenReturn(jobBuilder);
         when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
@@ -187,11 +102,10 @@ public class BatchConfigurationTest {
         Job actualJob = batchConfiguration.completeDataExport();
 
         assertEquals(expectedJob, actualJob);
-        verify(formListProcessor, times(1)).retrieveAllForms();
         verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
-        verify(observationExportStepFactory, times(0)).getObject();
-        verify(formTableMetadataGenerator, times(1)).getTableDataList();
-        verify(tableGeneratorStep, atLeastOnce()).createTables(formTableMetadataGenerator.getTableDataList());
-        verify(formTableMetadataGenerator, times(0)).addMetadataForForm(any(BahmniForm.class));
+        verify(formStepConfigurer, times(1)).createTables();
+        verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder);
+        verify(programDataStepConfigurer, times(1)).createTables();
+        verify(programDataStepConfigurer, times(1)).registerSteps(jobFlowBuilder);
     }
 }

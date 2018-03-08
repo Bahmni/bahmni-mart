@@ -19,9 +19,9 @@ import static org.mockito.Mockito.when;
 
 @PrepareForTest(BatchUtils.class)
 @RunWith(PowerMockRunner.class)
-public class AsIsTableMetadataGeneratorTest {
+public class ProgramMetaDataGeneratorTest {
 
-    private AsIsTableMetadataGenerator asIsTableGenerator;
+    private ProgramMetaDataGenerator asIsTableGenerator;
 
     @Mock
     private Resource metadataJson;
@@ -30,7 +30,7 @@ public class AsIsTableMetadataGeneratorTest {
 
     @Before
     public void setUp() throws Exception {
-        asIsTableGenerator = new AsIsTableMetadataGenerator();
+        asIsTableGenerator = new ProgramMetaDataGenerator();
         PowerMockito.mockStatic(BatchUtils.class);
         json = "[\n" +
                 "  {\n" +

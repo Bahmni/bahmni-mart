@@ -13,10 +13,10 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class AsIsTableMetadataGenerator implements TableMetadataGenerator {
+public class ProgramMetaDataGenerator implements TableMetadataGenerator {
 
     private List<TableData> tables = new ArrayList<TableData>();
-    @Value("classpath:metadata.json")
+    @Value("classpath:program-metadata.json")
     private Resource metadataJson;
 
     @Override

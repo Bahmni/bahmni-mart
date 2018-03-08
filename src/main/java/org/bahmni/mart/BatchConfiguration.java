@@ -1,15 +1,10 @@
 package org.bahmni.mart;
 
 import freemarker.template.TemplateExceptionHandler;
-import org.bahmni.mart.exports.AsIsTableMetadataGenerator;
-import org.bahmni.mart.exports.ObservationExportStep;
+import org.bahmni.mart.config.FormStepConfigurer;
+import org.bahmni.mart.config.ProgramDataStepConfigurer;
+import org.bahmni.mart.config.StepConfigurer;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
-import org.bahmni.mart.form.FormListProcessor;
-import org.bahmni.mart.form.domain.BahmniForm;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
-import org.bahmni.mart.table.TableExportStep;
-import org.bahmni.mart.table.TableGeneratorStep;
-import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -17,13 +12,13 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -31,6 +26,7 @@ import java.util.List;
 public class BatchConfiguration extends DefaultBatchConfigurer {
 
     public static final String FULL_DATA_EXPORT_JOB_NAME = "ammanExports";
+    private static final String DEFAULT_ENCODING = "UTF-8";
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -39,53 +35,32 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
     private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
 
     @Autowired
-    private FormListProcessor formListProcessor;
+    private FormStepConfigurer formStepConfigurer;
 
     @Autowired
-    private FormTableMetadataGenerator formTableMetadataGenerator;
+    private ProgramDataStepConfigurer programDataStepConfigurer;
 
-    @Autowired
-    private ObjectFactory<ObservationExportStep> observationExportStepFactory;
-
-    @Autowired
-    private TableGeneratorStep tableGeneratorStep;
-
-    @Autowired
-    private AsIsTableMetadataGenerator asIsTableMetadataGenerator;
-
-    @Autowired
-    private ObjectFactory<TableExportStep> tablesExportStepObjectFactory;
-
-    private static final String DEFAULT_ENCODING = "UTF-8";
+    private List<StepConfigurer> stepConfigurers = new ArrayList<>();
 
     @Bean
     public Job completeDataExport() throws IOException {
-        List<BahmniForm> forms = formListProcessor.retrieveAllForms();
-
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
                 .incrementer(new RunIdIncrementer()).preventRestart()
                 .flow(treatmentRegistrationBaseExportStep.getStep());
         //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
 
-        for (BahmniForm form : forms) {
-            ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
-            observationExportStep.setForm(form);
-            completeDataExport.next(observationExportStep.getStep());
-            formTableMetadataGenerator.addMetadataForForm(form);
+        setStepConfigurers();
+
+        for (StepConfigurer stepConfigurer : stepConfigurers) {
+            stepConfigurer.registerSteps(completeDataExport);
+            stepConfigurer.createTables();
         }
-
-        tableGeneratorStep.createTables(formTableMetadataGenerator.getTableDataList());
-        tableGeneratorStep.createTables(asIsTableMetadataGenerator.getTableDataList());
-
-        List<TableData> tableDataList = asIsTableMetadataGenerator.getTableDataList();
-
-        for (TableData tableData : tableDataList) {
-            TableExportStep tablesExportStep = tablesExportStepObjectFactory.getObject();
-            tablesExportStep.setTableData(tableData);
-            completeDataExport.next(tablesExportStep.getStep());
-        }
-
         return completeDataExport.end().build();
+    }
+
+    private void setStepConfigurers() {
+        stepConfigurers.add(formStepConfigurer);
+        stepConfigurers.add(programDataStepConfigurer);
     }
 
 
@@ -93,7 +68,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
     public freemarker.template.Configuration freeMarkerConfiguration() throws IOException {
         freemarker.template.Configuration freemarkerTemplateConfig = new freemarker.template.Configuration(
                 freemarker.template.Configuration.VERSION_2_3_22);
-        freemarkerTemplateConfig.setClassForTemplateLoading(this.getClass(),"/templates");
+        freemarkerTemplateConfig.setClassForTemplateLoading(this.getClass(), "/templates");
         freemarkerTemplateConfig.setDefaultEncoding(DEFAULT_ENCODING);
         freemarkerTemplateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
