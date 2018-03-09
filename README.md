@@ -6,7 +6,7 @@ Standalone Batch Application based on spring-batch. This application will create
 
 ### Dev Setup
 To setup dev box please run the following command
-* ```sh scripts/dev-setup.sh```
+* ```sh scripts/dev/setup.sh```
 
 ### Test
 To run the test run the following command
