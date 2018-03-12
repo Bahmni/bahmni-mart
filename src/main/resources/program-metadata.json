@@ -37,6 +37,24 @@
         "type": "text",
         "isPrimaryKey": false,
         "reference": null
+      },
+      {
+        "name": "description",
+        "type": "text",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "creator",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "changed_by",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": null
       }
     ]
   },
@@ -78,6 +96,36 @@
       },
       {
         "name": "location_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "outcome_concept_id",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "creator",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "date_created",
+        "type": "timestamp",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "date_changed",
+        "type": "timestamp",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "changed_by",
         "type": "integer",
         "isPrimaryKey": false,
         "reference": null
@@ -145,6 +193,30 @@
         "type": "boolean",
         "isPrimaryKey": false,
         "reference": null
+      },
+      {
+        "name": "creator",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "changed_by",
+        "type": "integer",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "date_created",
+        "type": "timestamp",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "date_changed",
+        "type": "timestamp",
+        "isPrimaryKey": false,
+        "reference": null
       }
     ]
   },
@@ -186,57 +258,27 @@
         "type": "date",
         "isPrimaryKey": false,
         "reference": null
-      }
-    ]
-  },
-  {
-    "name": "episode",
-    "columns": [
+      },
       {
-        "name": "episode_id",
+        "name": "creator",
         "type": "integer",
-        "isPrimaryKey": true,
+        "isPrimaryKey": false,
         "reference": null
-      }
-    ]
-  },
-  {
-    "name": "episode_patient_program",
-    "columns": [
-      {
-        "name": "episode_id",
-        "type": "integer",
-        "isPrimaryKey": false,
-        "reference": {
-          "referenceTable": "episode",
-          "referenceColumn": "episode_id"
-        }
       },
       {
-        "name": "patient_program_id",
-        "type": "integer",
+        "name": "date_created",
+        "type": "timestamp",
         "isPrimaryKey": false,
-        "reference": {
-          "referenceTable": "patient_program",
-          "referenceColumn": "patient_program_id"
-        }
-      }
-    ]
-  },
-  {
-    "name": "episode_encounter",
-    "columns": [
-      {
-        "name": "episode_id",
-        "type": "integer",
-        "isPrimaryKey": false,
-        "reference": {
-          "referenceTable": "episode",
-          "referenceColumn": "episode_id"
-        }
+        "reference": null
       },
       {
-        "name": "encounter_id",
+        "name": "date_changed",
+        "type": "timestamp",
+        "isPrimaryKey": false,
+        "reference": null
+      },
+      {
+        "name": "changed_by",
         "type": "integer",
         "isPrimaryKey": false,
         "reference": null
