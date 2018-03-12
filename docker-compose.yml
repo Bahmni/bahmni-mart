@@ -1,33 +1,26 @@
-version: '2'
-services:
-  javaapp:
-    image: bahmnimart-java:latest
-    container_name: mart
-    network_mode: bridge
-    depends_on:
-      - postgres-server
-    links:
-      - postgres-server
-    restart: on-failure:10
-    environment:
-      OPENMRS_DB_SERVER: "${OPENMRS_DB_SERVER}"
-      OPENMRS_DB_USER: "${OPENMRS_DB_USERNAME}"
-      OPENMRS_DB_PASSWORD: "${OPENMRS_DB_PASSWORD}"
-      ANALYTICS_DB_SERVER: postgres-server
-      ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"
-      MYSQL_DB_NAME: "${MYSQL_DB_NAME}"
-      POSTGRES_DB_NAME: "${POSTGRES_DB_NAME}"
-  postgres-server:
-    image: bahmnimart-postgres:latest
-    volumes:
-      - /var/docker-volumes/db:/var/lib/postgresql/data/:rw
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
-    container_name: postgres-server
-    network_mode: bridge
-    ports:
-     - "4432:5432"
-    restart: on-failure:10
-    environment:
-      POSTGRES_DB_NAME: "${POSTGRES_DB_NAME}"
-      ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"
+javaapp:
+  image: anallytics/bahmni-mart
+  container_name: mart
+  links:
+    - postgres-server
+  restart: on-failure:10
+  environment:
+    OPENMRS_DB_SERVER: HOSTIP
+    OPENMRS_DB_USER: "openmrs-user"
+    OPENMRS_DB_PASSWORD: ""
+    ANALYTICS_DB_SERVER: postgres-server
+    ANALYTICS_DB_USER: "analytics"
+    MYSQL_DB_NAME: "openmrs"
+    POSTGRES_DB_NAME: "analytics"
+    MULTI_SELECT_CONCEPTS: "[]"
+postgres-server:
+  image: anallytics/postgres
+  volumes:
+   - ./db:/var/lib/postgresql/data/:rw
+  container_name: postgres-server
+  ports:
+   - "4432:5432"
+  restart: on-failure:10
+  environment:
+    POSTGRES_DB_NAME: "analytics"
+    ANALYTICS_DB_USER: "analytics"

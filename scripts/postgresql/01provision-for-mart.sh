@@ -7,7 +7,7 @@ EOSQL
 
 echo "Creating the analytics DB"
 psql <<-EOSQL
-    CREATE DATABASE "${POSTGRES_DB_NAME}" WITH OWNER analytics ENCODING='UTF-8';
+    CREATE DATABASE "${POSTGRES_DB_NAME}" WITH OWNER "${ANALYTICS_DB_USER}" ENCODING='UTF-8';
 EOSQL
 
 echo "Revoke access for other users from analytics"
