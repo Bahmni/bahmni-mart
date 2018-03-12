@@ -1,0 +1,33 @@
+version: '2'
+services:
+  javaapp:
+    image: bahmnimart-java:latest
+    container_name: mart
+    network_mode: bridge
+    depends_on:
+      - postgres-server
+    links:
+      - postgres-server
+    restart: on-failure:10
+    environment:
+      OPENMRS_DB_SERVER: "${OPENMRS_DB_SERVER}"
+      OPENMRS_DB_USER: "${OPENMRS_DB_USERNAME}"
+      OPENMRS_DB_PASSWORD: "${OPENMRS_DB_PASSWORD}"
+      ANALYTICS_DB_SERVER: postgres-server
+      ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"
+      MYSQL_DB_NAME: "${MYSQL_DB_NAME}"
+      POSTGRES_DB_NAME: "${POSTGRES_DB_NAME}"
+  postgres-server:
+    image: bahmnimart-postgres:latest
+    volumes:
+      - /var/docker-volumes/db:/var/lib/postgresql/data/:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    container_name: postgres-server
+    network_mode: bridge
+    ports:
+     - "4432:5432"
+    restart: on-failure:10
+    environment:
+      POSTGRES_DB_NAME: "${POSTGRES_DB_NAME}"
+      ANALYTICS_DB_USER: "${ANALYTICS_DB_USER}"

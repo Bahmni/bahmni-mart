@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-./gradlew assemble
+../gradlew clean check
 if [ "$?" != 0 ]; then
    exit "$?"
 fi

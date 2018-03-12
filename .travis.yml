@@ -15,16 +15,14 @@ addons:
 jobs:
   include:
     - stage : compile
-      script: ./compile.sh
+      script: ./scripts/compile.sh
     - stage : test
-      script: ./test.sh
+      script: ./scripts/test.sh
     - stage : buildDocker
-      script: ./buildDocker.sh
-    - stage: deploy
-      script: ./deployDockerRemote.sh
+      script: ./scripts/buildDocker.sh
 
 stages:
       - compile
       - test
       - buildDocker
-      - deploy
+

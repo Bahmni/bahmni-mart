@@ -1,0 +1,6 @@
+FROM postgres:9.5
+
+COPY scripts/postgresql/01provision-for-mart.sh /docker-entrypoint-initdb.d/
+RUN chmod +x /docker-entrypoint-initdb.d/01provision-for-mart.sh
+
+ENTRYPOINT ["docker-entrypoint.sh","postgres"]
