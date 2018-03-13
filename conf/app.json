@@ -13,20 +13,18 @@
       "MH, Network Area": {
         "dropdown": true
       },
-      "FSTG, Specialty determined by MLO":{
-        "multiSelect":true
+      "FSTG, Specialty determined by MLO": {
+        "multiSelect": true
       },
-      "FSTG, Priority":
-      {
-        "dropdown":true
+      "FSTG, Priority": {
+        "dropdown": true
       },
       "OR, Operation performed": {
-        "autocomplete":true,
-        "codedConceptName":"OR, Operation performed coded",
-        "nonCodedConceptName":"OR, Operation performed non coded",
+        "autocomplete": true,
+        "codedConceptName": "OR, Operation performed coded",
+        "nonCodedConceptName": "OR, Operation performed non coded",
         "allowAddMore": true
       }
     }
   }
-
 }

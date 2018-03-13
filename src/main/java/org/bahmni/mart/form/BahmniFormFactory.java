@@ -1,7 +1,7 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.MultiSelectAndAddMore;
+import org.bahmni.mart.helper.SeparateTableConfigHelper;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
@@ -25,7 +25,7 @@ public class BahmniFormFactory {
     private ObsService obsService;
 
     @Autowired
-    private MultiSelectAndAddMore multiSelectAndAddMore;
+    private SeparateTableConfigHelper separateTableConfigHelper;
 
     private List<Concept> allSeparateTableConcepts;
     private List<Concept> ignoreConcepts;
@@ -39,9 +39,19 @@ public class BahmniFormFactory {
         bahmniForm.setFormName(concept);
         bahmniForm.setDepthToParent(depth);
         bahmniForm.setParent(parentForm);
+        bahmniForm.setRootForm(getRootFormFor(parentForm));
 
         constructFormFields(concept, bahmniForm, depth);
         return bahmniForm;
+    }
+
+    private BahmniForm getRootFormFor(BahmniForm form) {
+        if (form == null) {
+            return null;
+        } else if (form.getDepthToParent() == 1) {
+            return form;
+        }
+        return getRootFormFor(form.getParent());
     }
 
     private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth) {
@@ -60,7 +70,7 @@ public class BahmniFormFactory {
             } else if (childConcept.getIsSet() == 0) {
                 bahmniForm.addField(childConcept);
             } else {
-                constructFormFields(childConcept, bahmniForm, childDepth);
+                constructFormFields(childConcept, bahmniForm, depth);
             }
         }
     }
@@ -73,7 +83,7 @@ public class BahmniFormFactory {
     }
 
     private List<String> getAllSeparateTableConceptNames() {
-        List<String> multiSelectAndAddMoreConceptsNames = multiSelectAndAddMore.getConceptNames();
+        List<String> multiSelectAndAddMoreConceptsNames = separateTableConfigHelper.getConceptNames();
         List<String> separateTableConceptsNames = BatchUtils.convertConceptNamesToSet(separateTableConceptNames);
 
         for (String conceptName : multiSelectAndAddMoreConceptsNames) {
@@ -86,9 +96,5 @@ public class BahmniFormFactory {
 
     public void setObsService(ObsService obsService) {
         this.obsService = obsService;
-    }
-
-    public void setMultiSelectAndAddMore(MultiSelectAndAddMore multiSelectAndAddMore) {
-        this.multiSelectAndAddMore = multiSelectAndAddMore;
     }
 }

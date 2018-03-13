@@ -1,7 +1,7 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.MultiSelectAndAddMore;
+import org.bahmni.mart.helper.SeparateTableConfigHelper;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
@@ -46,7 +46,7 @@ public class BahmniFormFactoryTest {
     private ObsService obsService;
 
     @Mock
-    private MultiSelectAndAddMore multiSelectAndAddMore;
+    private SeparateTableConfigHelper separateTableConfigHelper;
 
     private String separateTableConceptNames;
     private String ignoreConceptNames;
@@ -61,10 +61,7 @@ public class BahmniFormFactoryTest {
         separateTableConceptNames = "Operation Notes Template, Discharge Summary," +
                 " Surgeries and Procedures, Other Notes, BP, Notes";
         separateTableConceptList = Arrays.asList("Operation Notes Template",
-                "Discharge Summary, Surgeries and Procedures",
-                "Other Notes",
-                "BP",
-                "Notes");
+                "Discharge Summary, Surgeries and Procedures", "Other Notes", "BP", "Notes");
         List<Concept> separateTableConcepts = new ArrayList<>();
         separateTableConcepts.add(new Concept(3365, "Operation Notes Template", 1));
         separateTableConcepts.add(new Concept(1200, "Discharge Summary, Surgeries and Procedures", 1));
@@ -85,7 +82,6 @@ public class BahmniFormFactoryTest {
         historyAndExaminationConcepts.add(new Concept(1844, "Examination", 0));
         historyAndExaminationConcepts.add(new Concept(2077, "Image", 0));
 
-
         chiefComplaintDataConcepts = new ArrayList<>();
         chiefComplaintDataConcepts.add(new Concept(7771, "BP", 1));
 
@@ -100,13 +96,12 @@ public class BahmniFormFactoryTest {
         otherNotesConcepts.add(new Concept(1209, "Notes", 0));
         otherNotesConcepts.add(new Concept(1210, "Notes1", 0));
 
-
         bahmniFormFactory = new BahmniFormFactory();
         bahmniFormFactory.setObsService(obsService);
-        bahmniFormFactory.setMultiSelectAndAddMore(multiSelectAndAddMore);
+        setValuesForMemberFields(bahmniFormFactory,"separateTableConfigHelper", separateTableConfigHelper);
         mockStatic(BatchUtils.class);
         when(BatchUtils.convertConceptNamesToSet(ignoreConceptNames)).thenReturn(ignoreConceptsNameList);
-        when(multiSelectAndAddMore.getConceptNames()).thenReturn(separateTableConceptList);
+        when(separateTableConfigHelper.getConceptNames()).thenReturn(separateTableConceptList);
         when(obsService.getConceptsByNames(separateTableConceptList))
                 .thenReturn(separateTableConcepts);
         when(obsService.getConceptsByNames(ignoreConceptsNameList)).thenReturn(ignoreConcepts);
@@ -148,7 +143,7 @@ public class BahmniFormFactoryTest {
         assertEquals("Examination", historyAndExaminationFields.get(2).getName());
         assertEquals("Image", historyAndExaminationFields.get(3).getName());
         assertEquals(1, historyAndExaminationChildren.size());
-        assertEquals(2, historyAndExaminationChildren.get(0).getDepthToParent());
+        assertEquals(1, historyAndExaminationChildren.get(0).getDepthToParent());
         assertEquals("BP", historyAndExaminationChildren.get(0).getFormName().getName());
         verify(obsService, times(1)).getConceptsByNames(separateTableConceptList);
         verify(obsService, times(1)).getConceptsByNames(ignoreConceptsNameList);
