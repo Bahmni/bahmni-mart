@@ -5,7 +5,7 @@ javaapp:
     - postgres-server
   restart: on-failure:10
   environment:
-    OPENMRS_DB_SERVER: HOSTIP
+    OPENMRS_DB_SERVER: 172.17.42.1
     OPENMRS_DB_USER: "openmrs-user"
     OPENMRS_DB_PASSWORD: ""
     ANALYTICS_DB_SERVER: postgres-server
@@ -13,10 +13,12 @@ javaapp:
     MYSQL_DB_NAME: "openmrs"
     POSTGRES_DB_NAME: "analytics"
     MULTI_SELECT_CONCEPTS: "[]"
+    DEFAULT_CONFIG_ADD_MORE_MULTI_SELECT: "/var/www/bahmni_config/openmrs/apps/clinical/app.json"
+    IMPLEMENTATION_CONFIG_ADD_MORE_MULTI_SELECT: "/var/www/implementation_config/openmrs/apps/clinical/app.json"
 postgres-server:
   image: anallytics/postgres
   volumes:
-   - ./db:/var/lib/postgresql/data/:rw
+   - /var/docker-volumes/db:/var/lib/postgresql/data/:rw
   container_name: postgres-server
   ports:
    - "4432:5432"
