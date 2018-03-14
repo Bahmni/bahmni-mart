@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bahmni.mart.BatchUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,8 @@ public class SeparateTableConfigHelper {
 
     @Value("${ignoreConcepts}")
     private String ignoreConcepts;
+
+    private static final Logger log = LoggerFactory.getLogger(SeparateTableConfigHelper.class);
 
     private static final String ALLOW_ADD_MORE_KEY = "allowAddMore";
     private static final String MULTI_SELECT_KEY = "multiSelect";
@@ -67,9 +71,11 @@ public class SeparateTableConfigHelper {
     private Set<Map.Entry<String, JsonElement>> getConceptSet(String multiSelectAndAddMoreFile) {
         try {
             JsonObject jsonConfig = (JsonObject) new JsonParser().parse(new FileReader(multiSelectAndAddMoreFile));
-
-            return jsonConfig.getAsJsonObject(CONFIG_KEY).getAsJsonObject(CONCEPT_SET_UI_KEY).entrySet();
-        } catch (FileNotFoundException e) {
+            JsonObject configKeyJson = jsonConfig.getAsJsonObject(CONFIG_KEY);
+            return configKeyJson != null && configKeyJson.getAsJsonObject(CONCEPT_SET_UI_KEY) != null ?
+                    configKeyJson.getAsJsonObject(CONCEPT_SET_UI_KEY).entrySet() : Collections.emptySet();
+        } catch (FileNotFoundException | ClassCastException e) {
+            log.warn(e.getMessage(), e);
             return Collections.emptySet();
         }
     }

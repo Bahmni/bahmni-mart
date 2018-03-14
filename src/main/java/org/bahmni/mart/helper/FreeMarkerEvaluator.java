@@ -34,8 +34,6 @@ public class FreeMarkerEvaluator<T> {
         }
         String result = stringWriter.toString();
         log.debug(String.format("The generated template for [%s]", input.toString()));
-        log.debug(result);
-
         return result;
     }
 

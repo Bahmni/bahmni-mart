@@ -1,0 +1,16 @@
+{
+  "config": {
+    "conceptSetUI": {
+      "FSTG, Specialty determined by MLO": {
+        "multiSelect": true
+      },
+      "MH, Name of MLO": {
+        "allowAddMore": true,
+        "multiSelect": true
+      },
+      "Demo": {
+
+      }
+    }
+  }
+}

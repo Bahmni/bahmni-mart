@@ -26,19 +26,13 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-@PrepareForTest({BatchUtils.class, BahmniFormFactory.class})
+@PrepareForTest({BatchUtils.class})
 @RunWith(PowerMockRunner.class)
 public class BahmniFormFactoryTest {
 
     private List<Concept> historyAndExaminationConcepts;
 
-    private List<Concept> vitalsConcepts;
-
     private List<Concept> chiefComplaintDataConcepts;
-
-    private List<Concept> operationNotesConcepts;
-
-    private List<Concept> otherNotesConcepts;
 
     private BahmniFormFactory bahmniFormFactory;
 
@@ -48,9 +42,6 @@ public class BahmniFormFactoryTest {
     @Mock
     private SeparateTableConfigHelper separateTableConfigHelper;
 
-    private String separateTableConceptNames;
-    private String ignoreConceptNames;
-
     private List<String> separateTableConceptList;
     private List<String> ignoreConceptsNameList;
 
@@ -58,7 +49,7 @@ public class BahmniFormFactoryTest {
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         initMocks(this);
 
-        separateTableConceptNames = "Operation Notes Template, Discharge Summary," +
+        String separateTableConceptNames = "Operation Notes Template, Discharge Summary," +
                 " Surgeries and Procedures, Other Notes, BP, Notes";
         separateTableConceptList = Arrays.asList("Operation Notes Template",
                 "Discharge Summary, Surgeries and Procedures", "Other Notes", "BP", "Notes");
@@ -69,7 +60,7 @@ public class BahmniFormFactoryTest {
         separateTableConcepts.add(new Concept(7771, "BP", 1));
         separateTableConcepts.add(new Concept(1209, "Notes", 0));
 
-        ignoreConceptNames = "Video, Audio";
+        String ignoreConceptNames = "Video, Audio";
         ignoreConceptsNameList = Arrays.asList("Video", "Audio");
         List<Concept> ignoreConcepts = new ArrayList<>();
         ignoreConcepts.add(new Concept(1111, "Video", 0));
@@ -84,17 +75,6 @@ public class BahmniFormFactoryTest {
 
         chiefComplaintDataConcepts = new ArrayList<>();
         chiefComplaintDataConcepts.add(new Concept(7771, "BP", 1));
-
-        vitalsConcepts = new ArrayList<>();
-        vitalsConcepts.add(new Concept(1842, "Vitals Notes", 0));
-
-        operationNotesConcepts = new ArrayList<>();
-        operationNotesConcepts.add(new Concept(3351, "Anesthesia Administered", 0));
-        operationNotesConcepts.add(new Concept(1206, "Other Notes", 1));
-
-        otherNotesConcepts = new ArrayList<>();
-        otherNotesConcepts.add(new Concept(1209, "Notes", 0));
-        otherNotesConcepts.add(new Concept(1210, "Notes1", 0));
 
         bahmniFormFactory = new BahmniFormFactory();
         bahmniFormFactory.setObsService(obsService);

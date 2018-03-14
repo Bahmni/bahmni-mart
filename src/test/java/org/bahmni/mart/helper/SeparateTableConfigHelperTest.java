@@ -311,4 +311,80 @@ public class SeparateTableConfigHelperTest {
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
         verifyStatic(times(1));
     }
+
+    @Test
+    public void shouldReturnEmptyListForEmptyFile() throws Exception {
+        String jsonString = "";
+        JsonElement jsonConfig = new JsonParser().parse(jsonString);
+
+        String ignoreConcepts = "Test Concept, Video";
+        setValuesForMemberFields(separateTableConfigHelper, "ignoreConcepts", ignoreConcepts);
+        setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
+        setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
+        mockStatic(BatchUtils.class);
+        when(BatchUtils.convertConceptNamesToSet(ignoreConcepts)).thenReturn(Collections.emptyList());
+        whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
+        whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
+        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
+        when(jsonParser.parse(fileReader)).thenReturn(jsonConfig);
+        List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper.getConceptNames();
+        assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
+        verifyStatic(times(1));
+    }
+
+    @Test
+    public void shouldReturnEmptyListForMissingConfigKey() throws Exception {
+        String jsonString = "{\n" +
+                "  \"missingConfig\": {\n" +
+                "    \"conceptSetUI\": {\n" +
+                "      \"All Observation Templates\": {\n" +
+                "        \"showPanelView\": false\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        JsonElement jsonConfig = new JsonParser().parse(jsonString);
+
+        String ignoreConcepts = "Test Concept, Video";
+        setValuesForMemberFields(separateTableConfigHelper, "ignoreConcepts", ignoreConcepts);
+        setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
+        setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
+        mockStatic(BatchUtils.class);
+        when(BatchUtils.convertConceptNamesToSet(ignoreConcepts)).thenReturn(Collections.emptyList());
+        whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
+        whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
+        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
+        when(jsonParser.parse(fileReader)).thenReturn(jsonConfig);
+        List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper.getConceptNames();
+        assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
+        verifyStatic(times(1));
+    }
+
+    @Test
+    public void shouldReturnEmptyListForMissingConceptSetUIKey() throws Exception {
+        String jsonString = "{\n" +
+                "  \"config\": {\n" +
+                "    \"missingConceptSetUI\": {\n" +
+                "      \"All Observation Templates\": {\n" +
+                "        \"showPanelView\": false\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        JsonElement jsonConfig = new JsonParser().parse(jsonString);
+
+        String ignoreConcepts = "Test Concept, Video";
+        setValuesForMemberFields(separateTableConfigHelper, "ignoreConcepts", ignoreConcepts);
+        setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
+        setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
+        mockStatic(BatchUtils.class);
+        when(BatchUtils.convertConceptNamesToSet(ignoreConcepts)).thenReturn(Collections.emptyList());
+        whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
+        whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
+        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
+        when(jsonParser.parse(fileReader)).thenReturn(jsonConfig);
+        List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper.getConceptNames();
+        assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
+        verifyStatic(times(1));
+    }
 }
