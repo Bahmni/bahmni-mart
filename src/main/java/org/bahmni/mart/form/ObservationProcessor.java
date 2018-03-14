@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +35,6 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
 
     private BahmniForm form;
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
-
     @Value("classpath:sql/obsDetail.sql")
     private Resource obsDetailSqlResource;
 
@@ -49,6 +46,9 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
 
     @Autowired
     private FormFieldTransformer formFieldTransformer;
+
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override
     public List<Obs> process(Map<String, Object> obsRow) throws Exception {

@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Program data",
+    "type": "generic",
+    "readerSql": "SELECT p.program_id, p.name AS `program_name`, cn_outcome.name AS `program_outcome` FROM program p INNER JOIN concept c ON c.concept_id = p.outcomes_concept_id AND c.retired IS FALSE AND p.retired IS FALSE INNER JOIN concept_set cs ON cs.concept_set = c.concept_id LEFT OUTER JOIN concept_name cn_cs ON cn_cs.concept_id = cs.concept_set AND cn_cs.concept_name_type = 'FULLY_SPECIFIED' AND cn_cs.voided IS FALSE LEFT OUTER JOIN concept_name cn_outcome ON cn_outcome.concept_id = cs.concept_id AND cn_outcome.concept_name_type = 'FULLY_SPECIFIED' AND cn_outcome.voided IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "program_outcomes"
+  },
+  {
+    "name": "Patient program data",
+    "type": "generic",
+    "readerSql": "SELECT pp.patient_id, pp.program_id, epp.episode_id, pp.patient_program_id, pp.date_enrolled, pp.date_completed, pp.location_id, l.name AS location_name, cn_outcome.name AS outcome_name, pp.creator, pp.date_created, pp.date_changed, pp.changed_by FROM patient_program pp INNER JOIN episode_patient_program epp ON epp.patient_program_id = pp.patient_program_id AND pp.voided IS FALSE LEFT OUTER JOIN concept_name cn_outcome ON cn_outcome.concept_id = pp.outcome_concept_id AND cn_outcome.concept_name_type = 'FULLY_SPECIFIED' LEFT OUTER JOIN location l ON l.location_id = pp.location_id AND l.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "patient_program"
+  },
+  {
+    "name": "Person details",
+    "type": "generic",
+    "readerSql": "SELECT p.person_id, pn.person_name_id, pn.preferred, pn.prefix, pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name2, pn.family_name_suffix, p.gender, p.birthdate, p.birthtime, p.birthdate_estimated, p.dead, p.death_date, p.deathdate_estimated, p.cause_of_death FROM person p INNER JOIN person_name pn ON p.person_id = pn.person_id AND p.voided IS FALSE AND pn.voided IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "person_details"
+  },
+  {
+    "name": "Person address",
+    "type": "generic",
+    "readerSql": "SELECT person_id, preferred, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14, address15, city_village, state_province, postal_code, country, county_district, latitude, longitude, start_date, end_date FROM person_address",
+    "chunkSizeToRead": "500",
+    "tableName": "person_address"
+  },
+  {
+    "name": "Address hierarchy levels",
+    "type": "generic",
+    "readerSql": "SELECT address_hierarchy_level_id, name, parent_level_id, address_field FROM address_hierarchy_level",
+    "chunkSizeToRead": "500",
+    "tableName": "address_hierarchy_level"
+  },
+  {
+    "name": "Person information",
+    "type": "generic",
+    "readerSql": "SELECT p.person_id, pat.description, pa.value FROM person p INNER JOIN person_attribute pa ON pa.person_id = p.person_id AND p.voided IS FALSE AND pa.voided IS FALSE INNER JOIN person_attribute_type pat ON pat.person_attribute_type_id = pa.person_attribute_type_id AND pat.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "person_information"
+  },
+  {
+    "name": "Patient identification",
+    "type": "generic",
+    "readerSql": "SELECT pe.person_id, pa.patient_id, pi.identifier, pi.identifier_type, pi.preferred, pi.location_id, l.name, pit.patient_identifier_type_id from person pe INNER JOIN patient pa ON pa.patient_id = pe.person_id AND pe.voided IS FALSE AND pa.voided IS FALSE INNER JOIN patient_identifier pi ON pi.patient_id = pa.patient_id AND pi.voided IS FALSE INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id = pi.identifier_type AND pit.retired IS FALSE LEFT OUTER JOIN location l ON l.location_id = pi.location_id AND l.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "patient_identifier"
+  },
+  {
+    "name": "Patient allergy status",
+    "type": "generic",
+    "readerSql": "SELECT patient_id, allergy_status FROM patient",
+    "chunkSizeToRead": "500",
+    "tableName": "patient_allergy_status"
+  }
+
+]

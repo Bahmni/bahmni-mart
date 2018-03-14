@@ -29,7 +29,7 @@ public class ProgramMetaDataGenerator implements TableMetadataGenerator {
 
     private void readTableDataFromJson() {
         TableData[] tablesData = new Gson().fromJson(
-                BatchUtils.convertResourceOutputToString(metadataJson),TableData[].class);
+                BatchUtils.convertResourceOutputToString(metadataJson), TableData[].class);
         if (tablesData != null) {
             tables = Arrays.asList(tablesData);
         }

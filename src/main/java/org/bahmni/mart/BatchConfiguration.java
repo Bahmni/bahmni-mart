@@ -4,26 +4,36 @@ import freemarker.template.TemplateExceptionHandler;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.ProgramDataStepConfigurer;
 import org.bahmni.mart.config.StepConfigurer;
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.exports.SimpleJobTemplate;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration extends DefaultBatchConfigurer {
+public class BatchConfiguration extends DefaultBatchConfigurer implements CommandLineRunner {
 
     public static final String FULL_DATA_EXPORT_JOB_NAME = "ammanExports";
     private static final String DEFAULT_ENCODING = "UTF-8";
@@ -39,6 +49,16 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
 
     @Autowired
     private ProgramDataStepConfigurer programDataStepConfigurer;
+
+    @Autowired
+    private SimpleJobTemplate simpleJobTemplate;
+
+    @Autowired
+    private JobDefinitionReader jobDefinitionReader;
+
+    @Autowired
+    private JobLauncher jobLauncher;
+
 
     private List<StepConfigurer> stepConfigurers = new ArrayList<>();
 
@@ -63,7 +83,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
         stepConfigurers.add(programDataStepConfigurer);
     }
 
-
     @Bean
     public freemarker.template.Configuration freeMarkerConfiguration() throws IOException {
         freemarker.template.Configuration freemarkerTemplateConfig = new freemarker.template.Configuration(
@@ -78,5 +97,27 @@ public class BatchConfiguration extends DefaultBatchConfigurer {
     @PreDestroy
     public void generateReport() {
 
+    }
+
+    @Override
+    public void run(String... args) {
+        List<Job> jobs = getJobs();
+        jobs.forEach(job -> {
+            try {
+                JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+                jobParametersBuilder.addDate(job.getName(), new Date());
+                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+            } catch (JobExecutionAlreadyRunningException | JobRestartException |
+                    JobParametersInvalidException | JobInstanceAlreadyCompleteException e) {
+                e.getMessage();
+            }
+        });
+    }
+
+    private List<Job> getJobs() {
+        List<Job> jobs = new ArrayList<>();
+        jobDefinitionReader.getJobDefinitions()
+                .forEach(jobDefinition -> jobs.add(simpleJobTemplate.buildJob(jobDefinition)));
+        return jobs;
     }
 }

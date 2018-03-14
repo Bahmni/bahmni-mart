@@ -14,24 +14,17 @@ import java.util.List;
 @Component
 public class TableGeneratorStep {
 
+    private static final Logger log = LoggerFactory.getLogger(TableGeneratorStep.class);
     @Qualifier("postgresJdbcTemplate")
     @Autowired
     private JdbcTemplate postgresJdbcTemplate;
-
     @Autowired
     private FreeMarkerEvaluator<TableData> freeMarkerEvaluatorForTables;
 
-    private static final Logger log = LoggerFactory.getLogger(TableGeneratorStep.class);
-
     public void createTables(List<TableData> tables) {
-        tables.forEach(
-            tableData -> {
-                try {
-                    String sql = freeMarkerEvaluatorForTables.evaluate("ddlForForm.ftl", tableData);
-                    postgresJdbcTemplate.execute(sql);
-                } catch (Exception e) {
-                    log.error("Cannot create table: " + tableData.getName() + " " + e.getMessage());
-                }
+        tables.forEach(tableData -> {
+            String sql = freeMarkerEvaluatorForTables.evaluate("ddlForForm.ftl", tableData);
+            postgresJdbcTemplate.execute(sql);
             }
         );
     }

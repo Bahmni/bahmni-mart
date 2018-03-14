@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Arrays;
@@ -81,22 +80,5 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
 
         assertEquals(1, referenceTableDataColumns.size());
         assertEquals(new HashSet<>(Arrays.asList("foreignkeycolumn")), new HashSet<>(referenceTableDataColumns));
-    }
-
-    @Test
-    public void shouldNotStopTableCreationIfThereIsErrorOccuresForOthersTable() {
-        TableData tableData = new TableData("tablename");
-        TableData referenceTableData = new TableData("foreignkeytable");
-
-        referenceTableData.addColumn(new TableColumn("foreignkeycolumn", "Integer", false, null));
-        tableData.addColumn(new TableColumn(null, "Integer", false, null));
-
-        tableGeneratorStep.createTables(Arrays.asList(tableData, referenceTableData));
-
-        postgresJdbcTemplate.queryForList("SELECT * FROM \"foreignkeytable\"");
-
-        expectedException.expect(BadSqlGrammarException.class);
-        expectedException.expectMessage("user lacks privilege or object not found: tablename");
-        postgresJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
     }
 }

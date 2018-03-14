@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Component
 @Scope(value = "prototype")
-class TableRecordWriter implements ItemWriter<Map<String, Object>> {
+public class TableRecordWriter implements ItemWriter<Map<String, Object>> {
 
     @Qualifier("postgresJdbcTemplate")
     @Autowired

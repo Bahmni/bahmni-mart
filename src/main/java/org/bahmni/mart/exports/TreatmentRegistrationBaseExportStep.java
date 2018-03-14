@@ -15,8 +15,8 @@ public class TreatmentRegistrationBaseExportStep extends BaseExportStep {
     public TreatmentRegistrationBaseExportStep(StepBuilderFactory stepBuilderFactory, DataSource dataSource,
                                                @Value("classpath:sql/treatmentRegistration.sql") Resource sqlResource,
                                                @Value("${outputFolder}/treatmentRegistration.csv")
-                                                           Resource outputFolder,
-                                               @Value("${treatmentRegistrationHeaders}")String headers) {
+                                                       Resource outputFolder,
+                                               @Value("${treatmentRegistrationHeaders}") String headers) {
         super(stepBuilderFactory, dataSource, sqlResource, outputFolder, "treatmentRegistration", headers);
     }
 }

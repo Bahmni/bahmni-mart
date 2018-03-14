@@ -6,19 +6,23 @@ public class Constants {
 
     private static HashMap<String, String> postgresDataTypeMap = new HashMap<String, String>() {
         {
-            put("Datetime", "date");
-            put("Boolean", "text");
-            put("Numeric", "numeric");
-            put("Time", "time");
-            put("Date", "date");
-            put("Text", "text");
-            put("N/A", "integer");
-            put("Coded", "text");
+            put("datetime", "date");
+            put("boolean", "text");
+            put("numeric", "numeric");
+            put("time", "time");
+            put("date", "date");
+            put("text", "text");
+            put("n/a", "integer");
+            put("coded", "text");
+            put("tinyint", "boolean");
+            put("char", "text");
+            put("varchar", "text");
         }
     };
 
     public static String getPostgresDataTypeFor(String key) {
-        return postgresDataTypeMap.get(key);
+        String keyInLowerCase = (key != null) ? key.toLowerCase() : null;
+        return postgresDataTypeMap.getOrDefault(keyInLowerCase, key);
     }
 
 }

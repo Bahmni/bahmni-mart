@@ -3,14 +3,18 @@ package org.bahmni.mart.table.domain;
 public class TableColumn {
     private String name;
     private String type;
-    private Boolean isPrimaryKey;
+    private boolean isPrimaryKey;
     private ForeignKey reference;
 
-    public TableColumn(String name, String type, Boolean isPrimaryKey, ForeignKey reference) {
+    public TableColumn(String name, String type, boolean isPrimaryKey, ForeignKey reference) {
         this.name = name;
         this.type = type;
         this.isPrimaryKey = isPrimaryKey;
         this.reference = reference;
+    }
+
+    public TableColumn() {
+
     }
 
     public String getName() {
