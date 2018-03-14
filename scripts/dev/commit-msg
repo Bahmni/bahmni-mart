@@ -2,7 +2,7 @@
 message_file = ARGV[0]
 message = File.read(message_file)
 
-$regex = /^\s*([\w]+)\s*(?:\,)?\s*([\w]*)\s*\|\s*\#\d+\s*\|.*$/
+$regex = /(^\s*([\w]+)\s*(?:\,)?\s*([\w]*)\s*\|\s*\#\d+\s*\|.*$|.*Merge branch.*)/
 
 unless $regex.match(message)
   puts "[POLICY] Your message is not formatted correctly"
