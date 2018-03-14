@@ -4,6 +4,8 @@ javaapp:
   links:
     - postgres-server
   restart: on-failure:10
+  volumes:
+    - /var/www:/var/www:rw
   environment:
     OPENMRS_DB_SERVER: 172.17.42.1
     OPENMRS_DB_USER: "openmrs-user"
@@ -13,8 +15,8 @@ javaapp:
     MYSQL_DB_NAME: "openmrs"
     POSTGRES_DB_NAME: "analytics"
     MULTI_SELECT_CONCEPTS: "[]"
-    DEFAULT_CONFIG_ADD_MORE_MULTI_SELECT: "/var/www/bahmni_config/openmrs/apps/clinical/app.json"
-    IMPLEMENTATION_CONFIG_ADD_MORE_MULTI_SELECT: "/var/www/implementation_config/openmrs/apps/clinical/app.json"
+    DEFAULT_CONFIG_FILE_PATH: "/var/www/bahmni_config/openmrs/apps/clinical/app.json"
+    IMPLEMENTATION_CONFIG_FILE_PATH: "/var/www/implementation_config/openmrs/apps/clinical/app.json"
 postgres-server:
   image: anallytics/postgres
   volumes:

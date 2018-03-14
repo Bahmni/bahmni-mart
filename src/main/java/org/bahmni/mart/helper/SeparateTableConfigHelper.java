@@ -22,10 +22,10 @@ import static java.util.stream.Collectors.toSet;
 
 @Component
 public class SeparateTableConfigHelper {
-    @Value("${defaultMultiSelectAndAddMore}")
+    @Value("${defaultConfigPath}")
     private String defaultConfigFile;
 
-    @Value("${implementationMultiSelectAndAddMore}")
+    @Value("${implementationConfigPath}")
     private String implementationConfigFile;
 
     @Value("${ignoreConcepts}")
