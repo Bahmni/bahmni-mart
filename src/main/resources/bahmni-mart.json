@@ -11,7 +11,7 @@
     "type": "generic",
     "readerSql": "SELECT pp.patient_id, pp.program_id, epp.episode_id, pp.patient_program_id, pp.date_enrolled, pp.date_completed, pp.location_id, l.name AS location_name, cn_outcome.name AS outcome_name, pp.creator, pp.date_created, pp.date_changed, pp.changed_by FROM patient_program pp INNER JOIN episode_patient_program epp ON epp.patient_program_id = pp.patient_program_id AND pp.voided IS FALSE LEFT OUTER JOIN concept_name cn_outcome ON cn_outcome.concept_id = pp.outcome_concept_id AND cn_outcome.concept_name_type = 'FULLY_SPECIFIED' LEFT OUTER JOIN location l ON l.location_id = pp.location_id AND l.retired IS FALSE",
     "chunkSizeToRead": "500",
-    "tableName": "patient_program"
+    "tableName": "patient_program_data"
   },
   {
     "name": "Person details",
