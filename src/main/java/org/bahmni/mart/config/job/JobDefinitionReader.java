@@ -21,7 +21,7 @@ public class JobDefinitionReader {
     @Autowired
     private SimpleJobTemplate simpleJobTemplate;
 
-    @Value("${bahmniConfigPath}")
+    @Value("${bahmniMartConfigPath}")
     private Resource jobDefinition;
 
     private List<JobDefinition> jobDefinitions;

@@ -17,7 +17,7 @@ javaapp:
     MULTI_SELECT_CONCEPTS: "[]"
     DEFAULT_CONFIG_FILE_PATH: "/var/www/bahmni_config/openmrs/apps/clinical/app.json"
     IMPLEMENTATION_CONFIG_FILE_PATH: "/var/www/implementation_config/openmrs/apps/clinical/app.json"
-    BAHMNI_CONFIG_PATH: "/var/www/bahmni_config/openmrs/bahmni-mart.json"
+    BAHMNI_MART_CONFIG_PATH: "classpath:bahmni-mart.json"
 postgres-server:
   image: anallytics/postgres
   volumes:
