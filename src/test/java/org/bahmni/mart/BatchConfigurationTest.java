@@ -7,10 +7,13 @@ import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.ProgramDataStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.exports.SimpleJobTemplate;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
@@ -37,14 +40,17 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @PrepareForTest({BatchConfiguration.class, FileUtils.class})
 @RunWith(PowerMockRunner.class)
 public class BatchConfigurationTest {
+
+    @Rule
+    ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private Resource freemarkerTemplateLocation;
@@ -127,9 +133,16 @@ public class BatchConfigurationTest {
     }
 
     @Test
-    public void shouldRunJobs() throws Exception {
+    public void shouldNotRunJobsForValidJobConfiguration() throws Exception {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         JobDefinition jobDefinition1 = mock(JobDefinition.class);
+
+        when(jobDefinition.getName()).thenReturn("job");
+        when(jobDefinition1.getName()).thenReturn("job1");
+
+        when(jobDefinition.getTableName()).thenReturn("table");
+        when(jobDefinition1.getTableName()).thenReturn("table1");
+
         List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
         Job job = mock(Job.class);
         Job job1 = mock(Job.class);
@@ -139,9 +152,37 @@ public class BatchConfigurationTest {
 
         batchConfiguration.run();
 
-        verify(jobDefinitionReader,times(1)).getJobDefinitions();
-        verify(simpleJobTemplate,times(1)).buildJob(jobDefinition);
-        verify(simpleJobTemplate,times(1)).buildJob(jobDefinition1);
-        verify(jobLauncher, times(2)).run(any(Job.class),any(JobParameters.class));
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(simpleJobTemplate, times(1)).buildJob(jobDefinition);
+        verify(simpleJobTemplate, times(1)).buildJob(jobDefinition1);
+        verify(jobLauncher, times(2)).run(any(Job.class), any(JobParameters.class));
+    }
+
+    @Test
+    public void shouldNotRunJobsForInvalidJobConfiguration() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        JobDefinition jobDefinition1 = mock(JobDefinition.class);
+
+        when(jobDefinition.getName()).thenReturn("job1");
+        when(jobDefinition1.getName()).thenReturn("job1");
+
+        when(jobDefinition.getTableName()).thenReturn("table");
+        when(jobDefinition1.getTableName()).thenReturn("table1");
+
+        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
+        Job job = mock(Job.class);
+        Job job1 = mock(Job.class);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
+        when(simpleJobTemplate.buildJob(jobDefinition)).thenReturn(job);
+        when(simpleJobTemplate.buildJob(jobDefinition1)).thenReturn(job1);
+
+        expectedException.expect(InvalidJobConfiguration.class);
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(simpleJobTemplate, times(0)).buildJob(jobDefinition);
+        verify(simpleJobTemplate, times(0)).buildJob(jobDefinition1);
+        verify(jobLauncher, times(0)).run(any(Job.class), any(JobParameters.class));
+
     }
 }

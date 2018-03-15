@@ -4,7 +4,10 @@ import freemarker.template.TemplateExceptionHandler;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.ProgramDataStepConfigurer;
 import org.bahmni.mart.config.StepConfigurer;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.exports.SimpleJobTemplate;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.slf4j.Logger;
@@ -32,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableBatchProcessing
@@ -105,7 +109,14 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     @Override
     public void run(String... args) {
-        List<Job> jobs = getJobs();
+        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
+        if (!JobDefinitionValidator.validate(jobDefinitions))
+            throw new InvalidJobConfiguration();
+
+        launchJobs(getJobs(jobDefinitions));
+    }
+
+    private void launchJobs(List<Job> jobs) {
         jobs.forEach(job -> {
             try {
                 JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -119,10 +130,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         });
     }
 
-    private List<Job> getJobs() {
-        List<Job> jobs = new ArrayList<>();
-        jobDefinitionReader.getJobDefinitions()
-                .forEach(jobDefinition -> jobs.add(simpleJobTemplate.buildJob(jobDefinition)));
-        return jobs;
+    private List<Job> getJobs(List<JobDefinition> jobDefinitions) {
+        return jobDefinitions.stream().map(jobDefinition -> simpleJobTemplate.buildJob(jobDefinition))
+                .collect(Collectors.toList());
     }
 }
