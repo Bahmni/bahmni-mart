@@ -277,6 +277,20 @@ CREATE TABLE person_attribute_type
   UNIQUE (uuid)
 );
 
+CREATE TABLE patient
+(
+  patient_id     INT                           NOT NULL
+    PRIMARY KEY,
+  creator        INT DEFAULT '0'               NOT NULL,
+  date_created   DATETIME                      NOT NULL,
+  changed_by     INT                           NULL,
+  date_changed   DATETIME                      NULL,
+  voided         TINYINT(1) DEFAULT '0'        NOT NULL,
+  voided_by      INT                           NULL,
+  date_voided    DATETIME                      NULL,
+  void_reason    VARCHAR(255)                  NULL,
+  allergy_status VARCHAR(50) DEFAULT 'Unknown' NOT NULL
+);
 
 CREATE VIEW concept_view AS
   SELECT

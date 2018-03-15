@@ -1,2 +1,9 @@
 [
+  {
+    "name": "Patient allergy status",
+    "type": "generic",
+    "readerSql": "SELECT patient_id, allergy_status FROM patient",
+    "chunkSizeToRead": "500",
+    "tableName": "patient_allergy_status_test"
+  }
 ]
