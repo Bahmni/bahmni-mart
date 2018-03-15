@@ -2,7 +2,6 @@ package org.bahmni.mart.table;
 
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,6 +10,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -42,9 +43,9 @@ public class TableDataExtractorTest {
 
         TableData actualTableData = tableDataExtractor.extractData(resultSet);
 
-        Assert.assertNotNull(actualTableData);
-        Assert.assertEquals(1, actualTableData.getColumns().size());
-        Assert.assertEquals(columnName, actualTableData.getColumns().get(0).getName());
-        Assert.assertEquals(columnType, actualTableData.getColumns().get(0).getType());
+        assertNotNull(actualTableData);
+        assertEquals(1, actualTableData.getColumns().size());
+        assertEquals(columnName, actualTableData.getColumns().get(0).getName());
+        assertEquals(columnType, actualTableData.getColumns().get(0).getType());
     }
 }
