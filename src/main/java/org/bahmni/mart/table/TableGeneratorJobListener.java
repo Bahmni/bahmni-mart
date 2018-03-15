@@ -4,11 +4,12 @@ import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.helper.Constants;
 import org.bahmni.mart.table.domain.TableData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,8 @@ import java.util.Optional;
 
 @Component
 public class TableGeneratorJobListener extends JobExecutionListenerSupport {
+
+    private static final Logger log = LoggerFactory.getLogger(TableGeneratorJobListener.class);
 
     public static final String LIMIT = " LIMIT 1";
 
@@ -35,17 +38,14 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
     public void beforeJob(JobExecution jobExecution) {
         try {
             createTable(jobExecution.getJobInstance().getJobName());
-        } catch (BadSqlGrammarException e) {
-            //TODO 0log message
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             jobExecution.stop();
         }
     }
 
     private void createTable(String jobName) {
-        TableData tableData = getTableDataForMart(jobName);
-        tableGeneratorStep.createTables(Arrays.asList(tableData));
-
+        tableGeneratorStep.createTables(Arrays.asList(getTableDataForMart(jobName)));
     }
 
     public TableData getTableDataForMart(String jobName) {
@@ -63,5 +63,4 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
                 .filter(tempJobDefinition -> tempJobDefinition.getName().equals(jobName)).findFirst();
         return optionalJobDefinition.orElseGet(JobDefinition::new);
     }
-
 }

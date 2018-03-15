@@ -23,8 +23,6 @@ import java.util.Map;
 @Component
 public class SimpleJobTemplate {
 
-    private static final String STEP = "step-1";
-
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
@@ -52,11 +50,11 @@ public class SimpleJobTemplate {
     }
 
     private Step loadData(JobDefinition jobConfiguration) {
-        return stepBuilderFactory.get(STEP)
+        return stepBuilderFactory.get(String.format("%s_Step", jobConfiguration.getName()))
                 .<Map<String, Object>, Map<String, Object>>chunk(jobConfiguration.getChunkSizeToRead())
                 .reader(openMRSDataReader(jobConfiguration))
                 .processor(getProcessor(jobConfiguration))
-                .writer(martWriter(jobConfiguration))
+                .writer(getWriter())
                 .build();
     }
 
@@ -67,7 +65,7 @@ public class SimpleJobTemplate {
         return tableDataProcessor;
     }
 
-    private TableRecordWriter martWriter(JobDefinition jobConfiguration) {
+    private TableRecordWriter getWriter() {
         TableRecordWriter writer = recordWriterObjectFactory.getObject();
         writer.setTableData(tableDataForMart);
         return writer;
@@ -81,6 +79,4 @@ public class SimpleJobTemplate {
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
     }
-
-
 }

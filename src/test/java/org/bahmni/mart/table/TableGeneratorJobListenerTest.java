@@ -88,8 +88,7 @@ public class TableGeneratorJobListenerTest {
         when(jobDefinition.getTableName()).thenReturn(tableName);
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
         TableData tableData = new TableData();
-        TableColumn column = new TableColumn();
-        column.setType("char");
+        TableColumn column = new TableColumn("test", "char", false, null);
         tableData.addColumn(column);
         when(openMRSJdbc.query(anyString(), any(TableDataExtractor.class))).thenReturn(tableData);
 

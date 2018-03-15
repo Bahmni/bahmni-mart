@@ -36,9 +36,7 @@ public class TableDataExtractorTest {
         when(resultSetMetaData.getColumnTypeName(1)).thenReturn(columnType);
 
         TableData expectedTableData = new TableData();
-        TableColumn tableColumn = new TableColumn();
-        tableColumn.setName(columnName);
-        tableColumn.setType(columnType);
+        TableColumn tableColumn = new TableColumn(columnName, columnType, false, null);
         expectedTableData.setColumns(Arrays.asList(tableColumn));
 
         TableData actualTableData = tableDataExtractor.extractData(resultSet);

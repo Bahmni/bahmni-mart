@@ -13,10 +13,6 @@ public class TableColumn {
         this.reference = reference;
     }
 
-    public TableColumn() {
-
-    }
-
     public String getName() {
         return name;
     }

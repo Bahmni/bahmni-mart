@@ -7,6 +7,8 @@ import org.bahmni.mart.config.StepConfigurer;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exports.SimpleJobTemplate;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -34,6 +36,8 @@ import java.util.List;
 @Configuration
 @EnableBatchProcessing
 public class BatchConfiguration extends DefaultBatchConfigurer implements CommandLineRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(BatchConfiguration.class);
 
     public static final String FULL_DATA_EXPORT_JOB_NAME = "ammanExports";
     private static final String DEFAULT_ENCODING = "UTF-8";
@@ -109,7 +113,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
                 jobLauncher.run(job, jobParametersBuilder.toJobParameters());
             } catch (JobExecutionAlreadyRunningException | JobRestartException |
                     JobParametersInvalidException | JobInstanceAlreadyCompleteException e) {
-                e.getMessage();
+                log.warn(e.getMessage());
+                log.debug(e.getMessage(), e);
             }
         });
     }

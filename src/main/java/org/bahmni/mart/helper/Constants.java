@@ -21,8 +21,7 @@ public class Constants {
     };
 
     public static String getPostgresDataTypeFor(String key) {
-        String keyInLowerCase = (key != null) ? key.toLowerCase() : null;
-        return postgresDataTypeMap.getOrDefault(keyInLowerCase, key);
+        return postgresDataTypeMap.getOrDefault((key != null) ? key.toLowerCase() : null, key);
     }
 
 }

@@ -12,14 +12,13 @@ public class TableDataExtractor implements ResultSetExtractor<TableData> {
 
     @Override
     public TableData extractData(ResultSet resultSet) throws SQLException {
-
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         TableData currentTable = new TableData();
+
         for (int index = 1; index <= resultSetMetaData.getColumnCount(); index++) {
-            TableColumn column = new TableColumn();
-            column.setName(resultSetMetaData.getColumnLabel(index));
-            column.setType(resultSetMetaData.getColumnTypeName(index));
-            currentTable.addColumn(column);
+            String columnName = resultSetMetaData.getColumnLabel(index);
+            String columnType = resultSetMetaData.getColumnTypeName(index);
+            currentTable.addColumn(new TableColumn(columnName, columnType, false, null));
         }
         return currentTable;
     }
