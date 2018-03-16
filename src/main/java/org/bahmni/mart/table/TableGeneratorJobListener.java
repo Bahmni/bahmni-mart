@@ -28,8 +28,8 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
     private JobDefinitionReader jobDefinitionReader;
 
     @Autowired
-    @Qualifier("mysqlJdbcTemplate")
-    private JdbcTemplate openMRSJdbc;
+    @Qualifier("openmrsJdbcTemplate")
+    private JdbcTemplate openMRSJdbcTemplate;
 
     @Autowired
     private TableGeneratorStep tableGeneratorStep;
@@ -51,7 +51,7 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
     public TableData getTableDataForMart(String jobName) {
         JobDefinition jobDefinition = getJobDefinitionByName(jobName);
         ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
-        TableData tableData = openMRSJdbc.query(jobDefinition.getReaderSql() + LIMIT, resultSetExtractor);
+        TableData tableData = openMRSJdbcTemplate.query(jobDefinition.getReaderSql() + LIMIT, resultSetExtractor);
         tableData.setName(jobDefinition.getTableName());
         tableData.getColumns().forEach(tableColumn -> tableColumn
                 .setType(Constants.getPostgresDataTypeFor(tableColumn.getType())));

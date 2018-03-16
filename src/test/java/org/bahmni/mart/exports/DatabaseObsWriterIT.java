@@ -74,7 +74,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
 
         databaseObsWriter.write(items);
 
-        List<Map<String, Object>> maps = postgresJdbcTemplate.queryForList("SELECT * FROM \"test\"");
+        List<Map<String, Object>> maps = martJdbcTemplate.queryForList("SELECT * FROM \"test\"");
         assertEquals(2, maps.size());
 
         Map<String, Object> actualObs1 = maps.get(0);

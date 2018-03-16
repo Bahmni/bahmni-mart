@@ -27,7 +27,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class TableRecordWriterTest {
 
     @Mock
-    private JdbcTemplate postgresJdbcTemplate;
+    private JdbcTemplate martJdbcTemplate;
 
     @Mock
     private FreeMarkerEvaluator<TableRecordHolder> tableRecordHolderFreeMarkerEvaluator;
@@ -48,7 +48,7 @@ public class TableRecordWriterTest {
         tableData = new TableData();
         tableData.setName("program");
         tableRecordWriter.setTableData(tableData);
-        setValuesForMemberFields(tableRecordWriter, "postgresJdbcTemplate", postgresJdbcTemplate);
+        setValuesForMemberFields(tableRecordWriter, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(tableRecordWriter, "tableRecordHolderFreeMarkerEvaluator",
                 tableRecordHolderFreeMarkerEvaluator);
     }
@@ -60,7 +60,7 @@ public class TableRecordWriterTest {
 
         tableRecordWriter.write(Arrays.asList(items));
 
-        verify(postgresJdbcTemplate, times(1)).execute(sql);
+        verify(martJdbcTemplate, times(1)).execute(sql);
         verify(tableRecordHolderFreeMarkerEvaluator, times(1)).evaluate(anyString(), any(TableRecordHolder.class));
     }
 

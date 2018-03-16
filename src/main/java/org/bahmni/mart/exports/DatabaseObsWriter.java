@@ -22,9 +22,9 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseObsWriter.class);
 
-    @Qualifier("postgresJdbcTemplate")
+    @Qualifier("martJdbcTemplate")
     @Autowired
-    private JdbcTemplate postgresJdbcTemplate;
+    private JdbcTemplate martJdbcTemplate;
 
 
     @Autowired
@@ -51,7 +51,7 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
             ObsRecordExtractorForTable extractor = new ObsRecordExtractorForTable(tableData.getName());
             extractor.execute(items, tableData);
             String sql = freeMarkerEvaluatorForTableRecords.evaluate("insertObs.ftl", extractor);
-            postgresJdbcTemplate.execute(sql);
+            martJdbcTemplate.execute(sql);
         } catch (Exception e) {
             log.error(String.format("Cannot insert into %s %s", tableData.getName(), e.getMessage()));
         }

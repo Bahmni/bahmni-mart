@@ -11,9 +11,9 @@ import java.util.List;
 
 @Component
 public class TableGeneratorStep {
-    @Qualifier("postgresJdbcTemplate")
+    @Qualifier("martJdbcTemplate")
     @Autowired
-    private JdbcTemplate postgresJdbcTemplate;
+    private JdbcTemplate martJdbcTemplate;
 
     @Autowired
     private FreeMarkerEvaluator<TableData> freeMarkerEvaluatorForTables;
@@ -21,7 +21,7 @@ public class TableGeneratorStep {
     public void createTables(List<TableData> tables) {
         tables.forEach(tableData -> {
             String sql = freeMarkerEvaluatorForTables.evaluate("ddlForForm.ftl", tableData);
-            postgresJdbcTemplate.execute(sql);
+            martJdbcTemplate.execute(sql);
             }
         );
     }

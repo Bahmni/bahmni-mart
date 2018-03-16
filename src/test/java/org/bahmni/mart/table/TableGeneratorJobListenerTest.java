@@ -35,7 +35,7 @@ public class TableGeneratorJobListenerTest {
     private JobDefinitionReader jobDefinitionReader;
 
     @Mock
-    private JdbcTemplate openMRSJdbc;
+    private JdbcTemplate openMRSJdbcTemplate;
 
     @Mock
     private TableGeneratorStep tableGeneratorStep;
@@ -46,7 +46,7 @@ public class TableGeneratorJobListenerTest {
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         tableGeneratorJobListener = new TableGeneratorJobListener();
         setValuesForMemberFields(tableGeneratorJobListener, "jobDefinitionReader", jobDefinitionReader);
-        setValuesForMemberFields(tableGeneratorJobListener, "openMRSJdbc", openMRSJdbc);
+        setValuesForMemberFields(tableGeneratorJobListener, "openMRSJdbcTemplate", openMRSJdbcTemplate);
         setValuesForMemberFields(tableGeneratorJobListener, "tableGeneratorStep", tableGeneratorStep);
     }
 
@@ -56,7 +56,7 @@ public class TableGeneratorJobListenerTest {
         JobInstance jobInstance = mock(JobInstance.class);
 
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
-        when(openMRSJdbc.query(any(String.class), any(TableDataExtractor.class))).thenReturn(new TableData());
+        when(openMRSJdbcTemplate.query(any(String.class), any(TableDataExtractor.class))).thenReturn(new TableData());
 
         tableGeneratorJobListener.beforeJob(jobExecution);
 
@@ -72,7 +72,7 @@ public class TableGeneratorJobListenerTest {
         doThrow(new BadSqlGrammarException("", "select from table",
                 new SQLException())).when(tableGeneratorStep).createTables(any());
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
-        when(openMRSJdbc.query(any(String.class), any(TableDataExtractor.class))).thenReturn(new TableData());
+        when(openMRSJdbcTemplate.query(any(String.class), any(TableDataExtractor.class))).thenReturn(new TableData());
 
         tableGeneratorJobListener.beforeJob(jobExecution);
 
@@ -90,7 +90,7 @@ public class TableGeneratorJobListenerTest {
         TableData tableData = new TableData();
         TableColumn column = new TableColumn("test", "char", false, null);
         tableData.addColumn(column);
-        when(openMRSJdbc.query(anyString(), any(TableDataExtractor.class))).thenReturn(tableData);
+        when(openMRSJdbcTemplate.query(anyString(), any(TableDataExtractor.class))).thenReturn(tableData);
 
         TableData actualData = tableGeneratorJobListener.getTableDataForMart(jobName);
 

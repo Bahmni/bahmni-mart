@@ -30,7 +30,7 @@ public class SimpleJobTemplate {
     private StepBuilderFactory stepBuilderFactory;
 
     @Autowired
-    @Qualifier("mysqlDb")
+    @Qualifier("openmrsDb")
     private DataSource openMRSDataSource;
 
     @Autowired

@@ -23,9 +23,9 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
     @Autowired
     TableGeneratorStep tableGeneratorStep;
 
-    @Qualifier("postgresJdbcTemplate")
+    @Qualifier("martJdbcTemplate")
     @Autowired
-    private JdbcTemplate postgresJdbcTemplate;
+    private JdbcTemplate martJdbcTemplate;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -40,8 +40,8 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
         tableData.addColumn(new TableColumn("column_three", "Integer", false, null));
 
         tableGeneratorStep.createTables(Arrays.asList(tableData));
-        postgresJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
-        List<Object> tableDataColumns = postgresJdbcTemplate.queryForList("SELECT column_name FROM " +
+        martJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
+        List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
                 "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='PUBLIC';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 
@@ -63,8 +63,8 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
         tableData.addColumn(new TableColumn("column_three", "Integer", false, foreignKey));
 
         tableGeneratorStep.createTables(Arrays.asList(referenceTableData, tableData));
-        postgresJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
-        List<Object> tableDataColumns = postgresJdbcTemplate.queryForList("SELECT column_name FROM " +
+        martJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
+        List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
                 "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='PUBLIC';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 
@@ -73,8 +73,8 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
                 new HashSet<>(tableDataColumns));
 
 
-        postgresJdbcTemplate.queryForList("SELECT * FROM \"foreignkeytable\"");
-        List<Object> referenceTableDataColumns = postgresJdbcTemplate.queryForList("SELECT column_name FROM " +
+        martJdbcTemplate.queryForList("SELECT * FROM \"foreignkeytable\"");
+        List<Object> referenceTableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
                 "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'foreignkeytable' AND TABLE_SCHEMA='PUBLIC';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 

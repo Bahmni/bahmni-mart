@@ -17,9 +17,9 @@ import java.util.Map;
 @Scope(value = "prototype")
 public class TableRecordWriter implements ItemWriter<Map<String, Object>> {
 
-    @Qualifier("postgresJdbcTemplate")
+    @Qualifier("martJdbcTemplate")
     @Autowired
-    private JdbcTemplate postgresJdbcTemplate;
+    private JdbcTemplate martJdbcTemplate;
 
     @Autowired
     private FreeMarkerEvaluator<TableRecordHolder> tableRecordHolderFreeMarkerEvaluator;
@@ -41,6 +41,6 @@ public class TableRecordWriter implements ItemWriter<Map<String, Object>> {
         });
         TableRecordHolder tableRecordHolder = new TableRecordHolder(recordList, tableData.getName());
         String sql = tableRecordHolderFreeMarkerEvaluator.evaluate("insertObs.ftl", tableRecordHolder);
-        postgresJdbcTemplate.execute(sql);
+        martJdbcTemplate.execute(sql);
     }
 }

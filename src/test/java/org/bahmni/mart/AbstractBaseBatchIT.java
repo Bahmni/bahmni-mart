@@ -13,12 +13,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringBootTest(classes = Application.class)
 @TestPropertySource(locations = "classpath:test.properties")
 public abstract class AbstractBaseBatchIT {
-    @Qualifier("postgresJdbcTemplate")
+    @Qualifier("martJdbcTemplate")
     @Autowired
-    protected JdbcTemplate postgresJdbcTemplate;
+    protected JdbcTemplate martJdbcTemplate;
 
     @After
     public void tearDown() throws Exception {
-        postgresJdbcTemplate.execute("DROP SCHEMA PUBLIC CASCADE");
+        martJdbcTemplate.execute("DROP SCHEMA PUBLIC CASCADE");
     }
 }

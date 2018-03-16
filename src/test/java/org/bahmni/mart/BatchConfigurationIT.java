@@ -35,11 +35,11 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         expectedPatientList.put("133", "Unknown");
 
         batchConfiguration.run();
-        List<Object> tableDataColumns = postgresJdbcTemplate.queryForList("SELECT column_name FROM " +
+        List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
                 "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_allergy_status_test'" +
                 " AND TABLE_SCHEMA='PUBLIC';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
-        List<Map<String, Object>> patientList = postgresJdbcTemplate
+        List<Map<String, Object>> patientList = martJdbcTemplate
                 .queryForList("SELECT * FROM \"patient_allergy_status_test\"");
         List<String> columnsName = tableDataColumns.stream().map(name -> name.toString().toLowerCase())
                 .collect(Collectors.toList());

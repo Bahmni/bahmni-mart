@@ -14,26 +14,26 @@ import javax.sql.DataSource;
 public class DatabaseConfiguration {
 
     @Primary
-    @Bean(name = "mysqlDb")
-    @ConfigurationProperties(prefix = "spring.ds_mysql")
-    public DataSource mysqlDataSource() {
+    @Bean(name = "openmrsDb")
+    @ConfigurationProperties(prefix = "spring.ds_openmrs")
+    public DataSource openmrsDataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "mysqlJdbcTemplate")
-    public JdbcTemplate jdbcTemplate(@Qualifier("mysqlDb") DataSource dsMySql) {
-        return new JdbcTemplate(dsMySql);
+    @Bean(name = "openmrsJdbcTemplate")
+    public JdbcTemplate openmrsJdbcTemplate(@Qualifier("openmrsDb") DataSource dsOpenmrs) {
+        return new JdbcTemplate(dsOpenmrs);
     }
 
-    @Bean(name = "postgresqlDb")
-    @ConfigurationProperties(prefix = "spring.ds_psql")
-    public DataSource postgresDataSource() {
+    @Bean(name = "martDb")
+    @ConfigurationProperties(prefix = "spring.ds_mart")
+    public DataSource martDataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "postgresJdbcTemplate")
-    public JdbcTemplate postgresJdbcTemplate(@Qualifier("postgresqlDb") DataSource dsPostgres) {
-        return new JdbcTemplate(dsPostgres);
+    @Bean(name = "martJdbcTemplate")
+    public JdbcTemplate martJdbcTemplate(@Qualifier("martDb") DataSource dsMart) {
+        return new JdbcTemplate(dsMart);
     }
 
 }
