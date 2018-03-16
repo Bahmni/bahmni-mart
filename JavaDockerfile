@@ -1,4 +1,5 @@
 FROM openjdk:8-jdk-alpine
 ADD build/libs/bahmni-mart-1.0.0.jar bahmni-mart.jar
+ADD conf/bahmni-mart.json /opt/bahmni-mart/conf/bahmni-mart.json
 
 ENTRYPOINT sleep 20; java -Xms768m -Xmx2048m -Djava.security.egd=file:/dev/./urandom -jar /bahmni-mart.jar
