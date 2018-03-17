@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -70,8 +71,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     private List<StepConfigurer> stepConfigurers = new ArrayList<>();
 
-    @Bean
-    public Job completeDataExport() throws IOException {
+    private Job buildObsJob() throws IOException {
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
                 .incrementer(new RunIdIncrementer()).preventRestart()
                 .flow(treatmentRegistrationBaseExportStep.getStep());
@@ -131,7 +131,15 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     }
 
     private List<Job> getJobs(List<JobDefinition> jobDefinitions) {
-        return jobDefinitions.stream().map(jobDefinition -> simpleJobTemplate.buildJob(jobDefinition))
-                .collect(Collectors.toList());
+        return jobDefinitions.stream().map(jobDefinition -> {
+            try {
+                return jobDefinition.getType().equals("obs") ? buildObsJob()
+                        : simpleJobTemplate.buildJob(jobDefinition);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        })
+                .filter(Objects::nonNull).collect(Collectors.toList());
     }
 }

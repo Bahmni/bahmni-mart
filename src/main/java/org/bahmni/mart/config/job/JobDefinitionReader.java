@@ -3,17 +3,14 @@ package org.bahmni.mart.config.job;
 import com.google.gson.Gson;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.exports.SimpleJobTemplate;
-import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 public class JobDefinitionReader {
@@ -43,12 +40,4 @@ public class JobDefinitionReader {
             this.jobDefinitions = Arrays.asList(jobDefinitions);
         }
     }
-
-    @Bean
-    public List<Job> jobs() {
-        return getJobDefinitions().stream().map(jobDefinition -> simpleJobTemplate.buildJob(jobDefinition))
-                .collect(Collectors.toList());
-    }
-
-
 }

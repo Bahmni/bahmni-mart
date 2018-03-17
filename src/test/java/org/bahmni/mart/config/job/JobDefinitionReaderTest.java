@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.springframework.batch.core.Job;
 import org.springframework.core.io.Resource;
 
 import java.util.List;
@@ -18,9 +17,6 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.mock;
 
 @PrepareForTest(BatchUtils.class)
 @RunWith(PowerMockRunner.class)
@@ -66,19 +62,5 @@ public class JobDefinitionReaderTest {
         assertEquals("select * from program", jobDefinitions.get(0).getReaderSql());
         assertEquals(1000, jobDefinitions.get(0).getChunkSizeToRead());
         assertEquals("MyProgram", jobDefinitions.get(0).getTableName());
-    }
-
-    @Test
-    public void shouldReturnListOfJobs() {
-        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
-        Job expectedJob = mock(Job.class);
-        when(simpleJobTemplate.buildJob(jobDefinitions.get(0))).thenReturn(expectedJob);
-
-        List<Job> jobs = jobDefinitionReader.jobs();
-
-        verify(simpleJobTemplate, times(1)).buildJob(jobDefinitions.get(0));
-        assertNotNull(jobs);
-        assertEquals(1, jobs.size());
-        assertEquals(expectedJob, jobs.get(0));
     }
 }

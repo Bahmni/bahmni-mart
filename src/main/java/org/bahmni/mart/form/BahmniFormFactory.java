@@ -15,9 +15,6 @@ import java.util.List;
 @Component
 public class BahmniFormFactory {
 
-    @Value("${separateTable}")
-    private String separateTableConceptNames;
-
     @Value("${ignoreConcepts}")
     private String ignoreConceptsNames;
 
@@ -83,8 +80,9 @@ public class BahmniFormFactory {
     }
 
     private List<String> getAllSeparateTableConceptNames() {
-        List<String> multiSelectAndAddMoreConceptsNames = separateTableConfigHelper.getConceptNames();
-        List<String> separateTableConceptsNames = BatchUtils.convertConceptNamesToSet(separateTableConceptNames);
+        List<String> multiSelectAndAddMoreConceptsNames = separateTableConfigHelper
+                .getAddMoreAndMultiSelectConceptNames();
+        List<String> separateTableConceptsNames = separateTableConfigHelper.getSeparateTableNames();
 
         for (String conceptName : multiSelectAndAddMoreConceptsNames) {
             if (!separateTableConceptsNames.contains(conceptName)) {

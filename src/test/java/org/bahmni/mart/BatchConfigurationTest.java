@@ -76,6 +76,11 @@ public class BatchConfigurationTest {
     @Mock
     private JobLauncher jobLauncher;
 
+    @Mock
+    private Job expectedJob;
+
+    private JobFlowBuilder jobFlowBuilder;
+
     private BatchConfiguration batchConfiguration;
 
     @Before
@@ -87,6 +92,22 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "jobDefinitionReader", jobDefinitionReader);
         setValuesForMemberFields(batchConfiguration, "simpleJobTemplate", simpleJobTemplate);
         setValuesForMemberFields(batchConfiguration, "jobLauncher", jobLauncher);
+        setValuesForMemberFields(batchConfiguration, "jobBuilderFactory", jobBuilderFactory);
+        setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
+                treatmentRegistrationBaseExportStep);
+
+        JobBuilder jobBuilder = mock(JobBuilder.class);
+        when(jobBuilderFactory.get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME)).thenReturn(jobBuilder);
+        when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
+        when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
+        Step treatmentStep = mock(Step.class);
+        when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(treatmentStep);
+
+        jobFlowBuilder = mock(JobFlowBuilder.class);
+        when(jobBuilder.flow(treatmentStep)).thenReturn(jobFlowBuilder);
+        FlowJobBuilder flowJobBuilder = mock(FlowJobBuilder.class);
+        when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
+        when(flowJobBuilder.build()).thenReturn(expectedJob);
     }
 
     @Test
@@ -105,31 +126,19 @@ public class BatchConfigurationTest {
     }
 
     @Test
-    public void shouldCompleteDataExport() throws Exception {
-        setValuesForMemberFields(batchConfiguration, "jobBuilderFactory", jobBuilderFactory);
-        setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
-                treatmentRegistrationBaseExportStep);
+    public void shouldRunObsJob() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinition.getType()).thenReturn("obs");
 
-        JobBuilder jobBuilder = mock(JobBuilder.class);
-        when(jobBuilderFactory.get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME)).thenReturn(jobBuilder);
-        when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
-        when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
-        Step treatmentStep = mock(Step.class);
-        when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(treatmentStep);
+        batchConfiguration.run();
 
-        JobFlowBuilder jobFlowBuilder = mock(JobFlowBuilder.class);
-        when(jobBuilder.flow(treatmentStep)).thenReturn(jobFlowBuilder);
-        FlowJobBuilder flowJobBuilder = mock(FlowJobBuilder.class);
-        when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
-        Job expectedJob = mock(Job.class);
-        when(flowJobBuilder.build()).thenReturn(expectedJob);
-
-        Job actualJob = batchConfiguration.completeDataExport();
-
-        assertEquals(expectedJob, actualJob);
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
         verify(formStepConfigurer, times(1)).createTables();
         verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+
     }
 
     @Test
@@ -139,6 +148,9 @@ public class BatchConfigurationTest {
 
         when(jobDefinition.getName()).thenReturn("job");
         when(jobDefinition1.getName()).thenReturn("job1");
+
+        when(jobDefinition.getType()).thenReturn("generic");
+        when(jobDefinition1.getType()).thenReturn("generic");
 
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition1.getTableName()).thenReturn("table1");

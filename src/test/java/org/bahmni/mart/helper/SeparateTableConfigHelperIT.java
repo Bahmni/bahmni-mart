@@ -33,7 +33,7 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldReturnListOfMultiSelectAndAddMore() {
-        List<String> conceptNames = separateTableConfigHelper.getConceptNames();
+        List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
         assertEquals(3, conceptNames.size());
         List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed", "Video");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
@@ -47,7 +47,7 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
                 "src/test/resources/conf/defaultApp.json");
         setValuesForMemberFields(separateTableConfigHelper, "ignoreConcepts", "");
 
-        List<String> conceptNames = separateTableConfigHelper.getConceptNames();
+        List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
         assertEquals(2, conceptNames.size());
         List<String> expected = Arrays.asList("OR, Operation performed", "Video");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
@@ -61,7 +61,7 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
                 "src/test/resources/conf/implementationApp.json");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "/src/notPresent.json");
 
-        List<String> conceptNames = separateTableConfigHelper.getConceptNames();
+        List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
         assertEquals(2, conceptNames.size());
         List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "MH, Name of MLO");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
@@ -77,6 +77,6 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", emptyDefaultConfPath);
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", emptyImplConfPath);
 
-        assertTrue(separateTableConfigHelper.getConceptNames().isEmpty());
+        assertTrue(separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames().isEmpty());
     }
 }

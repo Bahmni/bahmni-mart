@@ -49,8 +49,6 @@ public class BahmniFormFactoryTest {
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         initMocks(this);
 
-        String separateTableConceptNames = "Operation Notes Template, Discharge Summary," +
-                " Surgeries and Procedures, Other Notes, BP, Notes";
         separateTableConceptList = Arrays.asList("Operation Notes Template",
                 "Discharge Summary, Surgeries and Procedures", "Other Notes", "BP", "Notes");
         List<Concept> separateTableConcepts = new ArrayList<>();
@@ -81,11 +79,10 @@ public class BahmniFormFactoryTest {
         setValuesForMemberFields(bahmniFormFactory,"separateTableConfigHelper", separateTableConfigHelper);
         mockStatic(BatchUtils.class);
         when(BatchUtils.convertConceptNamesToSet(ignoreConceptNames)).thenReturn(ignoreConceptsNameList);
-        when(separateTableConfigHelper.getConceptNames()).thenReturn(separateTableConceptList);
+        when(separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames()).thenReturn(separateTableConceptList);
         when(obsService.getConceptsByNames(separateTableConceptList))
                 .thenReturn(separateTableConcepts);
         when(obsService.getConceptsByNames(ignoreConceptsNameList)).thenReturn(ignoreConcepts);
-        setValuesForMemberFields(bahmniFormFactory, "separateTableConceptNames", separateTableConceptNames);
         setValuesForMemberFields(bahmniFormFactory, "ignoreConceptsNames", ignoreConceptNames);
         bahmniFormFactory.postConstruct();
     }

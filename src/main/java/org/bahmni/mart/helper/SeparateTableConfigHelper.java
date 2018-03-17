@@ -1,5 +1,6 @@
 package org.bahmni.mart.helper;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -7,6 +8,7 @@ import org.bahmni.mart.BatchUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -22,6 +24,11 @@ import static java.util.stream.Collectors.toSet;
 
 @Component
 public class SeparateTableConfigHelper {
+
+    private static final String TYPE = "type";
+    private static final String OBS = "obs";
+    private static final String SEPARATE_TABLES = "separateTables";
+
     @Value("${defaultConfigPath}")
     private String defaultConfigFile;
 
@@ -31,6 +38,10 @@ public class SeparateTableConfigHelper {
     @Value("${ignoreConcepts}")
     private String ignoreConcepts;
 
+    @Value("${bahmniMartConfigPath}")
+    private Resource configFile;
+
+
     private static final Logger log = LoggerFactory.getLogger(SeparateTableConfigHelper.class);
 
     private static final String ALLOW_ADD_MORE_KEY = "allowAddMore";
@@ -38,7 +49,7 @@ public class SeparateTableConfigHelper {
     private static final String CONCEPT_SET_UI_KEY = "conceptSetUI";
     private static final String CONFIG_KEY = "config";
 
-    public List<String> getConceptNames() {
+    public List<String> getAddMoreAndMultiSelectConceptNames() {
         List<String> multiSelectAndAddMore = new ArrayList<>();
         List<String> ignoreConceptsList = BatchUtils.convertConceptNamesToSet(ignoreConcepts);
 
@@ -79,4 +90,22 @@ public class SeparateTableConfigHelper {
             return Collections.emptySet();
         }
     }
+
+    public List<String> getSeparateTableNames() {
+        List<String> separateTableNames = new ArrayList<String>();
+        JsonArray jobsConfig = new JsonParser().parse(BatchUtils
+                .convertResourceOutputToString(configFile)).getAsJsonArray();
+        for (JsonElement job : jobsConfig) {
+            if (job.getAsJsonObject().get(TYPE).getAsString().equals(OBS)) {
+                JsonElement separateTablesConfig = job.getAsJsonObject().get(SEPARATE_TABLES);
+                JsonArray separateTables = separateTablesConfig != null ? separateTablesConfig.getAsJsonArray() :
+                        new JsonArray();
+                for (JsonElement seperateTable : separateTables) {
+                    separateTableNames.add(seperateTable.getAsString());
+                }
+            }
+        }
+        return separateTableNames;
+    }
+
 }
