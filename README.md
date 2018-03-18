@@ -4,14 +4,64 @@
 
 Standalone Batch Application based on spring-batch. This application will create various table in **analytics** DB like Patient Information, Program Enrollment Information, Drug Orders (TB and Non-TB), Various forms filled by the users (Observation Templates), Bacteriology forms information
 
-### Dev Setup
-To setup dev box please run the following command
+---
+## Setting up Dev Environment
+
+### Prerequisites
+* **java 8**
+* **docker** (version 1.7.1)
+    * For **CentOS 6.7** install **docker-io**. To install it run follow the steps presents [here](https://centos.pkgs.org/6/epel-x86_64/docker-io-1.7.1-2.el6.x86_64.rpm.html).
+* **docker-compose** (version 1.5.2)
+    * To install it in **CentOS 6.7** run the following commands
+    
+        ```bash
+            sudo wget http://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` -O /usr/bin/docker-compose
+            chmod +x /usr/bin/docker-compose
+        ```
+### Setting up Git Hooks
+To setup git hooks please run the following command
 * ```sh scripts/dev/setup.sh```
 
-### Test
-To run the test run the following command
+---
+### Build 
+#### JAR
+To build JAR run the following command
+* ```./gradlew clean build```
+ 
+#### Bahmni mart docker image
+To build bahmni mart docker image run the following command
+* ```docker build -f JavaDockerfile -t anallytics/bahmni-mart .```
+ 
+#### Postgres docker image
+To build postgres docker image for bahmni mart run the following command
+* ```docker build -f PostgresqlDockerfile -t anallytics/postgres .```
+
+---
+### Checks/ Verifications
+#### Test
+To run tests run the following command
 * ```./gradlew test```
-### Build RPM
-To build RPM run the following command
-* ```./gradlew buildRPM```
+
+#### Coverage
+To check code coverage run the following command
+* ```./gradlew clean jacocoTestCoverageVerification```
+ 
+#### Style
+To check code style run the following command
+* ```./gradlew clean checkstyleMain checkstyleTest```
+
+#### All
+To run all chesks present in bahmni mart run the following command
+* ```./gradlew clean check```
+
+---
+### Commands to Remember
+* ```docker-compose up -d``` (Fetch docker images from remote if images are not present in local and run in headless mode)
+* ```docker ps -a``` (Check status of docker containers)
+* ```docker logs -f mart``` (Check logs of bahmni-mart container)
+* ```docker logs -f postgres-server``` (Check logs of postgres-server container)
+* ```docker-compose stop``` (Stop all docker containers)
+* ```docker-compose rm -f``` (Remove all stopped containers)
+* ```docker start <CONTAINER ID>``` (Start specific docker container)
+* ```docker exec -it postgres-server psql -Uanalytics``` (Access PSQL database of postgres-server container)
  
