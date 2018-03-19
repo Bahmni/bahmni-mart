@@ -1,6 +1,8 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
@@ -22,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Objects;
 
 @Component
 @Scope(value = "prototype")
@@ -50,6 +54,9 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private JobDefinitionReader jobDefinitionReader;
+
     @Override
     public List<Obs> process(Map<String, Object> obsRow) throws Exception {
         List<Integer> allChildObsIds = new ArrayList<>();
@@ -68,8 +75,9 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
     }
 
     private List<Obs> formObs(Integer obsId) {
-        Map<String, Integer> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("obsId", obsId);
+        params.put("conceptReferenceSource", getConceptReferenceSource());
         return getObs(params, formObsSql);
     }
 
@@ -90,15 +98,23 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
         List<Integer> leafConcepts = formFieldTransformer.transformFormToFieldIds(form);
 
         if (allChildObsGroupIds.size() > 0 && leafConcepts.size() > 0) {
-            Map<String, List<Integer>> params = new HashMap<>();
+            Map<String, Object> params = new HashMap<>();
             params.put("childObsIds", allChildObsGroupIds);
             params.put("leafConceptIds", leafConcepts);
+            params.put("conceptReferenceSource", getConceptReferenceSource());
             return getObs(params, leafObsSql);
         }
         return new ArrayList<>();
     }
 
-    protected void retrieveChildObsIds(List<Integer> allChildObsIds, List<Integer> ids) {
+    private String getConceptReferenceSource() {
+        Optional<String> code = jobDefinitionReader.getJobDefinitions().stream()
+                .filter(job -> job.getType().equals("obs"))
+                .map(JobDefinition::getConceptReferenceSource).filter(Objects::nonNull).findFirst();
+        return code.orElse("");
+    }
+
+    void retrieveChildObsIds(List<Integer> allChildObsIds, List<Integer> ids) {
         Map<String, List<Integer>> params = new HashMap<>();
         params.put("parentObsIds", ids);
 
@@ -117,26 +133,6 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
 
     public void setForm(BahmniForm form) {
         this.form = form;
-    }
-
-    public void setJdbcTemplate(NamedParameterJdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    public void setObsDetailSqlResource(Resource obsDetailSqlResource) {
-        this.obsDetailSqlResource = obsDetailSqlResource;
-    }
-
-    public void setLeafObsSqlResource(Resource leafObsSqlResource) {
-        this.leafObsSqlResource = leafObsSqlResource;
-    }
-
-    public void setFormObsSqlResource(Resource formObsSqlResource) {
-        this.formObsSqlResource = formObsSqlResource;
-    }
-
-    public void setFormFieldTransformer(FormFieldTransformer formFieldTransformer) {
-        this.formFieldTransformer = formFieldTransformer;
     }
 
     @PostConstruct

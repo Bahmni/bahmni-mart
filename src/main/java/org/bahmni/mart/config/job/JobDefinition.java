@@ -6,6 +6,7 @@ public class JobDefinition {
     private String readerSql;
     private int chunkSizeToRead;
     private String tableName;
+    private String conceptReferenceSource;
 
     public int getChunkSizeToRead() {
         return chunkSizeToRead;
@@ -47,4 +48,7 @@ public class JobDefinition {
         this.tableName = tableName;
     }
 
+    public String getConceptReferenceSource() {
+        return conceptReferenceSource;
+    }
 }

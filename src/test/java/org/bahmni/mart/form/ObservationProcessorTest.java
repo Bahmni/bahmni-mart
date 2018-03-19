@@ -1,11 +1,14 @@
 package org.bahmni.mart.form;
 
+import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -13,15 +16,19 @@ import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -33,6 +40,9 @@ public class ObservationProcessorTest {
     @Mock
     private FormFieldTransformer formFieldTransformer;
 
+    @Mock
+    private JobDefinitionReader jobDefinitionReader;
+
     private List<Obs> obsList;
 
     private BahmniForm form;
@@ -40,24 +50,28 @@ public class ObservationProcessorTest {
     private ObservationProcessor observationProcessor;
 
     @Before
-    public void setup() {
+    public void setup() throws NoSuchFieldException, IllegalAccessException {
         initMocks(this);
 
         form = new BahmniForm();
         form.setFormName(new Concept(1, "formName", 0));
 
         observationProcessor = new ObservationProcessor();
-        observationProcessor.setJdbcTemplate(namedParameterJdbcTemplate);
-        observationProcessor.setObsDetailSqlResource(new ByteArrayResource("blah..blah..blah".getBytes()));
-        observationProcessor.setLeafObsSqlResource(new ByteArrayResource("get..all..child".getBytes()));
-        observationProcessor.setFormObsSqlResource(new ByteArrayResource("get..some..child".getBytes()));
-        observationProcessor.setFormFieldTransformer(formFieldTransformer);
+        setValuesForMemberFields(observationProcessor, "jobDefinitionReader", jobDefinitionReader);
+        setValuesForMemberFields(observationProcessor, "jdbcTemplate", namedParameterJdbcTemplate);
+        setValuesForMemberFields(observationProcessor, "obsDetailSqlResource",
+                new ByteArrayResource("blah..blah..blah".getBytes()));
+        setValuesForMemberFields(observationProcessor, "leafObsSqlResource",
+                new ByteArrayResource("get..all..child".getBytes()));
+        setValuesForMemberFields(observationProcessor, "formObsSqlResource",
+                new ByteArrayResource("get..some..child".getBytes()));
+        setValuesForMemberFields(observationProcessor, "formFieldTransformer", formFieldTransformer);
 
         obsList = new ArrayList<>();
         obsList.add(new Obs(1, null, new Concept(1, "systolic", 0), "120"));
         obsList.add(new Obs(1, null, new Concept(1, "diastolic", 0), "80"));
         obsList.add(new Obs(1, null, new Concept(1, "abcd", 0), "180"));
-
+        observationProcessor.postConstruct();
     }
 
     @Test
@@ -153,11 +167,43 @@ public class ObservationProcessorTest {
         List<Integer> fieldIds = new ArrayList<>();
         when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(fieldIds);
         form.getFormName().setIsSet(1);
-        when(namedParameterJdbcTemplate.query(eq("blah..blah..blah"), any(Map.class), any(ColumnMapRowMapper.class)))
-                .thenReturn(null);
 
         List<Obs> process = observationProcessor.process(obsRow);
 
         Assert.assertEquals(0, process.size());
+    }
+
+    @Test
+    public void shouldAddCodeFromJobDefinitionToParamsMap() throws Exception {
+        ArgumentCaptor<HashMap> captor = ArgumentCaptor.forClass(HashMap.class);
+        Concept testConcept = new Concept(1, "test", 0);
+        form.addField(testConcept);
+        observationProcessor.setForm(form);
+        Map<String, Object> obsRow = new HashMap<>();
+        obsRow.put("obs_id", 1);
+        List<Integer> fieldIds = new ArrayList<>();
+        fieldIds.add(1);
+        when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(fieldIds);
+
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinition.getType()).thenReturn("obs");
+        String conceptReferenceSource = "BAHMNI-INTERNAL";
+        when(jobDefinition.getConceptReferenceSource()).thenReturn(conceptReferenceSource);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+
+        observationProcessor.process(obsRow);
+
+        verify(namedParameterJdbcTemplate, times(1)).query(eq("get..all..child"),
+                captor.capture(), any(BeanPropertyRowMapper.class));
+        HashMap childrenParams = captor.getAllValues().get(0);
+        assertEquals(conceptReferenceSource, childrenParams.get("conceptReferenceSource"));
+        assertEquals("[1]", childrenParams.get("leafConceptIds").toString());
+        assertEquals("[1]", childrenParams.get("childObsIds").toString());
+
+        verify(namedParameterJdbcTemplate, times(1)).query(eq("get..some..child"),
+                captor.capture(), any(BeanPropertyRowMapper.class));
+        HashMap childParams = captor.getAllValues().get(1);
+        assertEquals(conceptReferenceSource, childParams.get("conceptReferenceSource"));
+        assertEquals(1, childParams.get("obsId"));
     }
 }
