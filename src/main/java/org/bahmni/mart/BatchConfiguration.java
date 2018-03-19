@@ -71,7 +71,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     private List<StepConfigurer> stepConfigurers = new ArrayList<>();
 
-    private Job buildObsJob() throws IOException {
+    private Job buildObsJob() {
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
                 .incrementer(new RunIdIncrementer()).preventRestart()
                 .flow(treatmentRegistrationBaseExportStep.getStep());
@@ -131,15 +131,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     }
 
     private List<Job> getJobs(List<JobDefinition> jobDefinitions) {
-        return jobDefinitions.stream().map(jobDefinition -> {
-            try {
-                return jobDefinition.getType().equals("obs") ? buildObsJob()
-                        : simpleJobTemplate.buildJob(jobDefinition);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-        })
+        return jobDefinitions.stream().map(jobDefinition -> jobDefinition.getType().equals("obs") ? buildObsJob()
+                : simpleJobTemplate.buildJob(jobDefinition))
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
 }

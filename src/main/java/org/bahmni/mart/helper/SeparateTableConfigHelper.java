@@ -25,9 +25,9 @@ import static java.util.stream.Collectors.toSet;
 @Component
 public class SeparateTableConfigHelper {
 
-    private static final String TYPE = "type";
-    private static final String OBS = "obs";
-    private static final String SEPARATE_TABLES = "separateTables";
+    private static final String TYPE_KEY = "type";
+    private static final String OBS_TYPE = "obs";
+    private static final String SEPARATE_TABLES_KEY = "separateTables";
 
     @Value("${defaultConfigPath}")
     private String defaultConfigFile;
@@ -38,7 +38,7 @@ public class SeparateTableConfigHelper {
     @Value("${ignoreConcepts}")
     private String ignoreConcepts;
 
-    @Value("${bahmniMartConfigPath}")
+    @Value("${bahmniMartConfigFile}")
     private Resource configFile;
 
 
@@ -96,8 +96,8 @@ public class SeparateTableConfigHelper {
         JsonArray jobsConfig = new JsonParser().parse(BatchUtils
                 .convertResourceOutputToString(configFile)).getAsJsonArray();
         for (JsonElement job : jobsConfig) {
-            if (job.getAsJsonObject().get(TYPE).getAsString().equals(OBS)) {
-                JsonElement separateTablesConfig = job.getAsJsonObject().get(SEPARATE_TABLES);
+            if (job.getAsJsonObject().get(TYPE_KEY).getAsString().equals(OBS_TYPE)) {
+                JsonElement separateTablesConfig = job.getAsJsonObject().get(SEPARATE_TABLES_KEY);
                 JsonArray separateTables = separateTablesConfig != null ? separateTablesConfig.getAsJsonArray() :
                         new JsonArray();
                 for (JsonElement seperateTable : separateTables) {
