@@ -90,6 +90,7 @@ public class BatchUtilsTest {
         assertNull(BatchUtils.getPostgresCompatibleValue(null, "text"));
         assertNull(BatchUtils.getPostgresCompatibleValue(null, "date"));
         assertNull(BatchUtils.getPostgresCompatibleValue(null, "timestamp"));
+        assertNull(BatchUtils.getPostgresCompatibleValue(null, "time"));
     }
 
     @Test
@@ -106,6 +107,11 @@ public class BatchUtilsTest {
     @Test
     public void shouldGivePSQLCompatibleValueForDate() {
         assertEquals("'2012-12-01'", BatchUtils.getPostgresCompatibleValue("2012-12-01", "date"));
+    }
+
+    @Test
+    public void shouldGivePSQLCompatibleValueForTime() {
+        assertEquals("'08:00:00'", BatchUtils.getPostgresCompatibleValue("08:00:00", "time"));
     }
 
     @Test

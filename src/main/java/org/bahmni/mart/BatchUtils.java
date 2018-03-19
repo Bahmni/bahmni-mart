@@ -40,6 +40,7 @@ public class BatchUtils {
               return getStringForPsql(value.replaceAll("'", "''"));
           case "date":
           case "timestamp":
+          case "time":
               return getStringForPsql(value);
           default:
               return value;

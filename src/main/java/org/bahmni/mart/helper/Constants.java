@@ -6,7 +6,7 @@ public class Constants {
 
     private static HashMap<String, String> postgresDataTypeMap = new HashMap<String, String>() {
         {
-            put("datetime", "date");
+            put("datetime", "timestamp");
             put("boolean", "text");
             put("numeric", "numeric");
             put("time", "time");
