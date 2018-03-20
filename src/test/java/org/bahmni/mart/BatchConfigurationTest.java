@@ -4,6 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.io.FileUtils;
 import org.bahmni.mart.config.FormStepConfigurer;
+import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.ProgramDataStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
@@ -23,6 +24,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.JobFlowBuilder;
@@ -79,6 +81,9 @@ public class BatchConfigurationTest {
     @Mock
     private Job expectedJob;
 
+    @Mock
+    private MetaDataStepConfigurer metaDataStepConfigurer;
+
     private JobFlowBuilder jobFlowBuilder;
 
     private BatchConfiguration batchConfiguration;
@@ -93,6 +98,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "simpleJobTemplate", simpleJobTemplate);
         setValuesForMemberFields(batchConfiguration, "jobLauncher", jobLauncher);
         setValuesForMemberFields(batchConfiguration, "jobBuilderFactory", jobBuilderFactory);
+        setValuesForMemberFields(batchConfiguration, "metaDataStepConfigurer", metaDataStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
                 treatmentRegistrationBaseExportStep);
 
@@ -108,6 +114,7 @@ public class BatchConfigurationTest {
         FlowJobBuilder flowJobBuilder = mock(FlowJobBuilder.class);
         when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
         when(flowJobBuilder.build()).thenReturn(expectedJob);
+        when(jobDefinitionReader.getConceptReferenceSource()).thenReturn("");
     }
 
     @Test
@@ -195,6 +202,34 @@ public class BatchConfigurationTest {
         verify(simpleJobTemplate, times(0)).buildJob(jobDefinition);
         verify(simpleJobTemplate, times(0)).buildJob(jobDefinition1);
         verify(jobLauncher, times(0)).run(any(Job.class), any(JobParameters.class));
+    }
 
+    @Test
+    public void shouldAddMetaDataStepGivenConceptReferenceSource() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinitionReader.getConceptReferenceSource()).thenReturn("Bahmni-Internal");
+
+        batchConfiguration.run();
+
+        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+        verify(metaDataStepConfigurer, times(1)).createTables();
+        verify(metaDataStepConfigurer, times(1)).registerSteps(any(FlowBuilder.class));
+    }
+
+    @Test
+    public void shouldNotAddMetaDataStepGivenNoConceptReferenceSource() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinition.getType()).thenReturn("obs");
+
+        batchConfiguration.run();
+
+        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+        verify(metaDataStepConfigurer, times(0)).createTables();
+        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));
     }
 }

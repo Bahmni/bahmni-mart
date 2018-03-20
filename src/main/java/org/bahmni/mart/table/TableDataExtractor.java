@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import static org.bahmni.mart.helper.Constants.getPostgresDataTypeFor;
+
 public class TableDataExtractor implements ResultSetExtractor<TableData> {
 
     @Override
@@ -17,7 +19,7 @@ public class TableDataExtractor implements ResultSetExtractor<TableData> {
 
         for (int index = 1; index <= resultSetMetaData.getColumnCount(); index++) {
             String columnName = resultSetMetaData.getColumnLabel(index);
-            String columnType = resultSetMetaData.getColumnTypeName(index);
+            String columnType = getPostgresDataTypeFor(resultSetMetaData.getColumnTypeName(index));
             currentTable.addColumn(new TableColumn(columnName, columnType, false, null));
         }
         return currentTable;

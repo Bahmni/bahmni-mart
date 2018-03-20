@@ -11,6 +11,8 @@ import org.springframework.core.io.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Configuration
 public class JobDefinitionReader {
@@ -39,5 +41,12 @@ public class JobDefinitionReader {
         if (jobDefinitions != null) {
             this.jobDefinitions = Arrays.asList(jobDefinitions);
         }
+    }
+
+    public String getConceptReferenceSource() {
+        Optional<String> code = jobDefinitions.stream()
+                .filter(job -> job.getType().equals("obs"))
+                .map(JobDefinition::getConceptReferenceSource).filter(Objects::nonNull).findFirst();
+        return code.orElse("");
     }
 }

@@ -32,7 +32,7 @@ public class TableDataExtractorTest {
         when(resultSet.getMetaData()).thenReturn(resultSetMetaData);
         String columnName = "column_name";
         when(resultSetMetaData.getColumnLabel(1)).thenReturn(columnName);
-        String columnType = "integer";
+        String columnType = "varchar";
         when(resultSetMetaData.getColumnTypeName(1)).thenReturn(columnType);
 
         TableData expectedTableData = new TableData();
@@ -44,6 +44,6 @@ public class TableDataExtractorTest {
         assertNotNull(actualTableData);
         assertEquals(1, actualTableData.getColumns().size());
         assertEquals(columnName, actualTableData.getColumns().get(0).getName());
-        assertEquals(columnType, actualTableData.getColumns().get(0).getType());
+        assertEquals("text", actualTableData.getColumns().get(0).getType());
     }
 }

@@ -118,4 +118,13 @@ public class BatchUtilsTest {
     public void shouldGiveTheSameValueForAllOtherTypes() {
         assertEquals("222", BatchUtils.getPostgresCompatibleValue("222", "numeric"));
     }
+
+    @Test
+    public void shouldReplaceParameterWithValue() throws Exception {
+        String sql = "Select * from table where column = :parameter";
+
+        sql = BatchUtils.constructSqlWithParameter(sql,"parameter","value");
+
+        assertEquals("Select * from table where column = 'value'",sql);
+    }
 }

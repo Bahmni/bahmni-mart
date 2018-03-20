@@ -188,7 +188,7 @@ public class ObservationProcessorTest {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getType()).thenReturn("obs");
         String conceptReferenceSource = "BAHMNI-INTERNAL";
-        when(jobDefinition.getConceptReferenceSource()).thenReturn(conceptReferenceSource);
+        when(jobDefinitionReader.getConceptReferenceSource()).thenReturn(conceptReferenceSource);
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
 
         observationProcessor.process(obsRow);

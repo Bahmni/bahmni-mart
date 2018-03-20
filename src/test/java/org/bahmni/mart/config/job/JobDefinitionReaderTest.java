@@ -11,11 +11,13 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.core.io.Resource;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @PrepareForTest(BatchUtils.class)
@@ -62,5 +64,30 @@ public class JobDefinitionReaderTest {
         assertEquals("select * from program", jobDefinitions.get(0).getReaderSql());
         assertEquals(1000, jobDefinitions.get(0).getChunkSizeToRead());
         assertEquals("MyProgram", jobDefinitions.get(0).getTableName());
+    }
+
+    @Test
+    public void shouldReturnConceptReferenceSourceIfItIsPresent() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinition.getConceptReferenceSource()).thenReturn("BAHMNI_INTERNAL");
+        setValuesForMemberFields(jobDefinitionReader,"jobDefinitions", Arrays.asList(jobDefinition));
+
+        String conceptReferenceSource = jobDefinitionReader.getConceptReferenceSource();
+
+        assertEquals("BAHMNI_INTERNAL",conceptReferenceSource);
+
+    }
+
+    @Test
+    public void shouldReturnEmptyStringIfConceptReferenceSourceIsNotPresent() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinition.getType()).thenReturn("obs");
+        setValuesForMemberFields(jobDefinitionReader,"jobDefinitions", Arrays.asList(jobDefinition));
+
+        String conceptReferenceSource = jobDefinitionReader.getConceptReferenceSource();
+
+        assertEquals("",conceptReferenceSource);
+
     }
 }

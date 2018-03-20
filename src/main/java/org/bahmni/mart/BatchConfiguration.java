@@ -2,6 +2,7 @@ package org.bahmni.mart;
 
 import freemarker.template.TemplateExceptionHandler;
 import org.bahmni.mart.config.FormStepConfigurer;
+import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.ProgramDataStepConfigurer;
 import org.bahmni.mart.config.StepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
@@ -68,6 +69,10 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private JobLauncher jobLauncher;
 
+    @Autowired
+    private MetaDataStepConfigurer metaDataStepConfigurer;
+
+    private List<JobDefinition> jobDefinitions;
 
     private List<StepConfigurer> stepConfigurers = new ArrayList<>();
 
@@ -88,6 +93,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     private void setStepConfigurers() {
         stepConfigurers.add(formStepConfigurer);
+        if (!jobDefinitionReader.getConceptReferenceSource().equals(""))
+            stepConfigurers.add(metaDataStepConfigurer);
         stepConfigurers.add(programDataStepConfigurer);
     }
 
@@ -109,11 +116,10 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     @Override
     public void run(String... args) {
-        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
+        jobDefinitions = jobDefinitionReader.getJobDefinitions();
         if (!JobDefinitionValidator.validate(jobDefinitions))
             throw new InvalidJobConfiguration();
-
-        launchJobs(getJobs(jobDefinitions));
+        launchJobs(getJobs());
     }
 
     private void launchJobs(List<Job> jobs) {
@@ -130,7 +136,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         });
     }
 
-    private List<Job> getJobs(List<JobDefinition> jobDefinitions) {
+    private List<Job> getJobs() {
         return jobDefinitions.stream().map(jobDefinition -> jobDefinition.getType().equals("obs") ? buildObsJob()
                 : simpleJobTemplate.buildJob(jobDefinition))
                 .filter(Objects::nonNull).collect(Collectors.toList());

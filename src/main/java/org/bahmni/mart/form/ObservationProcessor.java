@@ -1,7 +1,6 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
@@ -19,13 +18,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Objects;
 
 @Component
 @Scope(value = "prototype")
@@ -77,7 +74,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
     private List<Obs> formObs(Integer obsId) {
         Map<String, Object> params = new HashMap<>();
         params.put("obsId", obsId);
-        params.put("conceptReferenceSource", getConceptReferenceSource());
+        params.put("conceptReferenceSource", jobDefinitionReader.getConceptReferenceSource());
         return getObs(params, formObsSql);
     }
 
@@ -101,17 +98,10 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
             Map<String, Object> params = new HashMap<>();
             params.put("childObsIds", allChildObsGroupIds);
             params.put("leafConceptIds", leafConcepts);
-            params.put("conceptReferenceSource", getConceptReferenceSource());
+            params.put("conceptReferenceSource", jobDefinitionReader.getConceptReferenceSource());
             return getObs(params, leafObsSql);
         }
         return new ArrayList<>();
-    }
-
-    private String getConceptReferenceSource() {
-        Optional<String> code = jobDefinitionReader.getJobDefinitions().stream()
-                .filter(job -> job.getType().equals("obs"))
-                .map(JobDefinition::getConceptReferenceSource).filter(Objects::nonNull).findFirst();
-        return code.orElse("");
     }
 
     void retrieveChildObsIds(List<Integer> allChildObsIds, List<Integer> ids) {

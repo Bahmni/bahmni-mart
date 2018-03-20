@@ -47,6 +47,11 @@ public class BatchUtils {
         }
     }
 
+    public static String constructSqlWithParameter(String sql, String parameter, String value) {
+        return sql.replaceAll(":" + parameter, "'" +
+                value + "'");
+    }
+
     private static String getStringForPsql(String value) {
         return String.format("'%s'", value);
     }
