@@ -35,7 +35,7 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
         if (tableData != null) {
             tableDataMap.remove(formName);
             TableColumn foreignKeyColumn = getForeignKeyColumn(form);
-            if (!tableData.getColumns().contains(foreignKeyColumn))
+            if (foreignKeyColumn != null && !tableData.getColumns().contains(foreignKeyColumn))
                 tableData.addColumn(foreignKeyColumn);
             tableDataMap.put(formName, tableData);
         } else {
@@ -59,7 +59,7 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
 
     private TableColumn getPrimaryColumn(BahmniForm form) {
         return new TableColumn(String.format("id_%s", getProcessedName(form.getFormName().getName())),
-                Constants.getPostgresDataTypeFor(form.getFormName().getDataType()), true, null);
+                "integer", true, null);
     }
 
     private TableColumn getForeignKeyColumn(BahmniForm form) {
@@ -71,10 +71,7 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
             String referenceColumn = "id_" + referenceTableName;
             ForeignKey reference = new ForeignKey(referenceColumn, referenceTableName);
 
-            return new TableColumn(referenceColumn,
-                    Constants.getPostgresDataTypeFor(formParentConcept.getDataType()),
-                    false,
-                    reference);
+            return new TableColumn(referenceColumn, "integer", false, reference);
         }
         return null;
     }

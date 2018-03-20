@@ -53,7 +53,7 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
             String sql = freeMarkerEvaluatorForTableRecords.evaluate("insertObs.ftl", extractor);
             martJdbcTemplate.execute(sql);
         } catch (Exception e) {
-            log.error(String.format("Cannot insert into %s %s", tableData.getName(), e.getMessage()));
+            log.error(String.format("Cannot insert into %s %s", tableData.getName(), e.getMessage()), e);
         }
     }
 }
