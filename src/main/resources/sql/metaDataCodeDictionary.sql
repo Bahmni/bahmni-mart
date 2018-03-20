@@ -3,7 +3,6 @@ SELECT
      CONCAT("\"", questionConcept.concept_short_name, "\"")                                 AS `question`,
      questionConcept.concept_datatype_name                                                  AS `question_datatype`,
      CONCAT("\"", questionConcept.description, "\"")                                        AS `description`,
-     crtv.code                                                                              AS `question_header`,
      CONCAT("\"",answerConcept.answer, "\"")                                                AS `answer`,
      crtvForAnswerCode.code                                                                 AS `answer_code`
   FROM concept_set cs
@@ -20,7 +19,6 @@ UNION
 SELECT
       "Drug Code"                                                         AS `Fully Specified Name`,
       "drug_code"                                                         AS `question`,
-      "Drug"                                                              AS `question_datatype`,
       concat("\"", drugDesc.description, "\"")                              AS `description`,
       "drug_code"                                                         AS `header`,
       concat("\"", drugCV.name, "\"")                        AS `answer`,
