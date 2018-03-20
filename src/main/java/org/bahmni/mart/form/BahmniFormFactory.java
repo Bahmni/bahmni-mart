@@ -45,7 +45,7 @@ public class BahmniFormFactory {
     private BahmniForm getRootFormFor(BahmniForm form) {
         if (form == null) {
             return null;
-        } else if (form.getDepthToParent() == 1) {
+        } else if (form.getDepthToParent() == 0) {
             return form;
         }
         return getRootFormFor(form.getParent());
@@ -67,7 +67,7 @@ public class BahmniFormFactory {
             } else if (childConcept.getIsSet() == 0) {
                 bahmniForm.addField(childConcept);
             } else {
-                constructFormFields(childConcept, bahmniForm, depth);
+                constructFormFields(childConcept, bahmniForm, childDepth);
             }
         }
     }

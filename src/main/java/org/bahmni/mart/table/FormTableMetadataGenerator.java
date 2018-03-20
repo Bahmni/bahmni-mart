@@ -63,7 +63,7 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
     }
 
     private TableColumn getForeignKeyColumn(BahmniForm form) {
-        if (form.getParent() != null && form.getParent().getParent() != null) {
+        if (form.getParent() != null) {
 
             Concept formParentConcept = form.getParent().getFormName();
             String formParentConceptName = formParentConcept.getName();

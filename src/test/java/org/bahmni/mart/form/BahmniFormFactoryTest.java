@@ -120,7 +120,7 @@ public class BahmniFormFactoryTest {
         assertEquals("Examination", historyAndExaminationFields.get(2).getName());
         assertEquals("Image", historyAndExaminationFields.get(3).getName());
         assertEquals(1, historyAndExaminationChildren.size());
-        assertEquals(1, historyAndExaminationChildren.get(0).getDepthToParent());
+        assertEquals(2, historyAndExaminationChildren.get(0).getDepthToParent());
         assertEquals("BP", historyAndExaminationChildren.get(0).getFormName().getName());
         verify(obsService, times(1)).getConceptsByNames(separateTableConceptList);
         verify(obsService, times(1)).getConceptsByNames(ignoreConceptsNameList);
