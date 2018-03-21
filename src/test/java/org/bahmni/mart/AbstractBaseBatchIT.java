@@ -1,6 +1,7 @@
 package org.bahmni.mart;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +17,11 @@ public abstract class AbstractBaseBatchIT {
     @Qualifier("martJdbcTemplate")
     @Autowired
     protected JdbcTemplate martJdbcTemplate;
+
+    @Before
+    public void setUp() throws Exception {
+        martJdbcTemplate.execute("DROP SCHEMA PUBLIC CASCADE;");
+    }
 
     @After
     public void tearDown() throws Exception {

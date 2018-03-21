@@ -1,4 +1,3 @@
-
 CREATE TABLE concept_class
 (
   concept_class_id INT AUTO_INCREMENT
@@ -27,7 +26,7 @@ CREATE TABLE concept_datatype
   description         VARCHAR(255)            NULL,
   creator             INT DEFAULT '0'         NOT NULL,
   date_created        DATETIME                NOT NULL,
-  retired             BOOLEAN DEFAULT FALSE NOT NULL,
+  retired             BOOLEAN DEFAULT FALSE   NOT NULL,
   retired_by          INT                     NULL,
   date_retired        DATETIME                NULL,
   retire_reason       VARCHAR(255)            NULL,
@@ -39,7 +38,7 @@ CREATE TABLE concept_datatype
 CREATE TABLE concept
 (
   concept_id    INT AUTO_INCREMENT PRIMARY KEY,
-  retired       BOOLEAN DEFAULT FALSE NOT NULL,
+  retired       BOOLEAN DEFAULT FALSE  NOT NULL,
   short_name    VARCHAR(255)           NULL,
   description   TEXT                   NULL,
   form_text     TEXT                   NULL,
@@ -114,7 +113,7 @@ CREATE TABLE concept_map_type
   changed_by          INT                    NULL,
   date_changed        DATETIME               NULL,
   is_hidden           TINYINT(1) DEFAULT '0' NOT NULL,
-  retired             BOOLEAN DEFAULT FALSE NOT NULL,
+  retired             BOOLEAN DEFAULT FALSE  NOT NULL,
   retired_by          INT                    NULL,
   date_retired        DATETIME               NULL,
   retire_reason       VARCHAR(255)           NULL,
@@ -135,7 +134,7 @@ CREATE TABLE concept_reference_source
   hl7_code          VARCHAR(50) DEFAULT '' NULL,
   creator           INT DEFAULT '0'        NOT NULL,
   date_created      DATETIME               NOT NULL,
-  retired           BOOLEAN DEFAULT FALSE NOT NULL,
+  retired           BOOLEAN DEFAULT FALSE  NOT NULL,
   retired_by        INT                    NULL,
   date_retired      DATETIME               NULL,
   retire_reason     VARCHAR(255)           NULL,
@@ -156,20 +155,20 @@ CREATE TABLE concept_reference_term
 (
   concept_reference_term_id INT AUTO_INCREMENT
     PRIMARY KEY,
-  concept_source_id         INT                    NOT NULL,
-  name                      VARCHAR(255)           NULL,
-  code                      VARCHAR(255)           NOT NULL,
-  version                   VARCHAR(255)           NULL,
-  description               VARCHAR(255)           NULL,
-  creator                   INT                    NOT NULL,
-  date_created              DATETIME               NOT NULL,
-  date_changed              DATETIME               NULL,
-  changed_by                INT                    NULL,
+  concept_source_id         INT                   NOT NULL,
+  name                      VARCHAR(255)          NULL,
+  code                      VARCHAR(255)          NOT NULL,
+  version                   VARCHAR(255)          NULL,
+  description               VARCHAR(255)          NULL,
+  creator                   INT                   NOT NULL,
+  date_created              DATETIME              NOT NULL,
+  date_changed              DATETIME              NULL,
+  changed_by                INT                   NULL,
   retired                   BOOLEAN DEFAULT FALSE NOT NULL,
-  retired_by                INT                    NULL,
-  date_retired              DATETIME               NULL,
-  retire_reason             VARCHAR(255)           NULL,
-  uuid                      CHAR(38)               NOT NULL,
+  retired_by                INT                   NULL,
+  date_retired              DATETIME              NULL,
+  retire_reason             VARCHAR(255)          NULL,
+  uuid                      CHAR(38)              NOT NULL,
   CONSTRAINT concept_reference_term_uuid
   UNIQUE (uuid),
   CONSTRAINT mapped_concept_source
@@ -253,6 +252,88 @@ CREATE TABLE program_attribute_type
 );
 
 
+CREATE TABLE person
+(
+  person_id           INT AUTO_INCREMENT
+    PRIMARY KEY,
+  gender              VARCHAR(50) DEFAULT '' NULL,
+  birthdate           DATE                   NULL,
+  birthdate_estimated TINYINT(1) DEFAULT '0' NOT NULL,
+  dead                TINYINT(1) DEFAULT '0' NOT NULL,
+  death_date          DATETIME               NULL,
+  cause_of_death      INT                    NULL,
+  creator             INT                    NULL,
+  date_created        DATETIME               NOT NULL,
+  changed_by          INT                    NULL,
+  date_changed        DATETIME               NULL,
+  voided              TINYINT(1) DEFAULT '0' NOT NULL,
+  voided_by           INT                    NULL,
+  date_voided         DATETIME               NULL,
+  void_reason         VARCHAR(255)           NULL,
+  uuid                CHAR(38)               NOT NULL,
+  deathdate_estimated TINYINT(1) DEFAULT '0' NOT NULL,
+  birthtime           TIME                   NULL,
+  CONSTRAINT person_uuid_index
+  UNIQUE (uuid)
+);
+
+CREATE TABLE program
+(
+  program_id          INT AUTO_INCREMENT
+    PRIMARY KEY,
+  concept_id          INT DEFAULT '0'        NOT NULL,
+  outcomes_concept_id INT                    NULL,
+  creator             INT DEFAULT '0'        NOT NULL,
+  date_created        DATETIME               NOT NULL,
+  changed_by          INT                    NULL,
+  date_changed        DATETIME               NULL,
+  retired             TINYINT(1) DEFAULT '0' NOT NULL,
+  name                VARCHAR(50)            NOT NULL,
+  description         TEXT                   NULL,
+  uuid                CHAR(38)               NOT NULL,
+  CONSTRAINT program_uuid_index
+  UNIQUE (uuid)
+);
+
+CREATE TABLE patient_state
+(
+  patient_state_id   INT AUTO_INCREMENT
+    PRIMARY KEY,
+  patient_program_id INT DEFAULT '0'        NOT NULL,
+  state              INT DEFAULT '0'        NOT NULL,
+  start_date         DATE                   NULL,
+  end_date           DATE                   NULL,
+  creator            INT DEFAULT '0'        NOT NULL,
+  date_created       DATETIME               NOT NULL,
+  changed_by         INT                    NULL,
+  date_changed       DATETIME               NULL,
+  voided             TINYINT(1) DEFAULT '0' NOT NULL,
+  voided_by          INT                    NULL,
+  date_voided        DATETIME               NULL,
+  void_reason        VARCHAR(255)           NULL,
+  uuid               CHAR(38)               NOT NULL,
+  CONSTRAINT patient_state_uuid_index
+  UNIQUE (uuid)
+);
+
+CREATE TABLE program_workflow_state
+(
+  program_workflow_state_id INT AUTO_INCREMENT
+    PRIMARY KEY,
+  program_workflow_id       INT DEFAULT '0'        NOT NULL,
+  concept_id                INT DEFAULT '0'        NOT NULL,
+  initial                   TINYINT(1) DEFAULT '0' NOT NULL,
+  terminal                  TINYINT(1) DEFAULT '0' NOT NULL,
+  creator                   INT DEFAULT '0'        NOT NULL,
+  date_created              DATETIME               NOT NULL,
+  retired                   TINYINT(1) DEFAULT '0' NOT NULL,
+  changed_by                INT                    NULL,
+  date_changed              DATETIME               NULL,
+  uuid                      CHAR(38)               NOT NULL,
+  CONSTRAINT program_workflow_state_uuid_index
+  UNIQUE (uuid)
+);
+
 CREATE TABLE person_attribute_type
 (
   person_attribute_type_id INT AUTO_INCREMENT
@@ -292,6 +373,100 @@ CREATE TABLE patient
   allergy_status VARCHAR(50) DEFAULT 'Unknown' NOT NULL
 );
 
+
+CREATE TABLE encounter
+(
+  encounter_id       INT AUTO_INCREMENT
+    PRIMARY KEY,
+  encounter_type     INT                    NOT NULL,
+  patient_id         INT DEFAULT '0'        NOT NULL,
+  location_id        INT                    NULL,
+  form_id            INT                    NULL,
+  encounter_datetime DATETIME               NOT NULL,
+  creator            INT DEFAULT '0'        NOT NULL,
+  date_created       DATETIME               NOT NULL,
+  voided             TINYINT(1) DEFAULT '0' NOT NULL,
+  voided_by          INT                    NULL,
+  date_voided        DATETIME               NULL,
+  void_reason        VARCHAR(255)           NULL,
+  changed_by         INT                    NULL,
+  date_changed       DATETIME               NULL,
+  visit_id           INT                    NULL,
+  uuid               CHAR(38)               NOT NULL,
+  CONSTRAINT encounter_uuid_index
+  UNIQUE (uuid)
+);
+
+CREATE TABLE obs
+(
+  obs_id                  INT AUTO_INCREMENT
+    PRIMARY KEY,
+  person_id               INT                         NOT NULL,
+  concept_id              INT DEFAULT '0'             NOT NULL,
+  encounter_id            INT                         NULL,
+  order_id                INT                         NULL,
+  obs_datetime            DATETIME                    NOT NULL,
+  location_id             INT                         NULL,
+  obs_group_id            INT                         NULL,
+  accession_number        VARCHAR(255)                NULL,
+  value_group_id          INT                         NULL,
+  value_coded             INT                         NULL,
+  value_coded_name_id     INT                         NULL,
+  value_drug              INT                         NULL,
+  value_datetime          DATETIME                    NULL,
+  value_numeric           DOUBLE                      NULL,
+  value_modifier          VARCHAR(2)                  NULL,
+  value_text              TEXT                        NULL,
+  value_complex           VARCHAR(1000)               NULL,
+  comments                VARCHAR(255)                NULL,
+  creator                 INT DEFAULT '0'             NOT NULL,
+  date_created            DATETIME                    NOT NULL,
+  voided                  TINYINT(1) DEFAULT '0'      NOT NULL,
+  voided_by               INT                         NULL,
+  date_voided             DATETIME                    NULL,
+  void_reason             VARCHAR(255)                NULL,
+  uuid                    CHAR(38)                    NOT NULL,
+  previous_version        INT                         NULL,
+  form_namespace_and_path VARCHAR(255)                NULL,
+  status                  VARCHAR(16) DEFAULT 'FINAL' NOT NULL,
+  interpretation          VARCHAR(32)                 NULL,
+  CONSTRAINT obs_concept
+  FOREIGN KEY (concept_id) REFERENCES concept (concept_id),
+  CONSTRAINT encounter_observations
+  FOREIGN KEY (encounter_id) REFERENCES encounter (encounter_id),
+  CONSTRAINT obs_grouping_id
+  FOREIGN KEY (obs_group_id) REFERENCES obs (obs_id),
+  CONSTRAINT answer_concept
+  FOREIGN KEY (value_coded) REFERENCES concept (concept_id),
+  CONSTRAINT obs_name_of_coded_value
+  FOREIGN KEY (value_coded_name_id) REFERENCES concept_name (concept_name_id),
+  CONSTRAINT previous_version
+  FOREIGN KEY (previous_version) REFERENCES obs (obs_id)
+);
+
+CREATE TABLE patient_program
+(
+  patient_program_id INT AUTO_INCREMENT
+    PRIMARY KEY,
+  patient_id         INT DEFAULT '0'        NOT NULL,
+  program_id         INT DEFAULT '0'        NOT NULL,
+  date_enrolled      DATETIME               NULL,
+  date_completed     DATETIME               NULL,
+  location_id        INT                    NULL,
+  outcome_concept_id INT                    NULL,
+  creator            INT DEFAULT '0'        NOT NULL,
+  date_created       DATETIME               NOT NULL,
+  changed_by         INT                    NULL,
+  date_changed       DATETIME               NULL,
+  voided             TINYINT(1) DEFAULT '0' NOT NULL,
+  voided_by          INT                    NULL,
+  date_voided        DATETIME               NULL,
+  void_reason        VARCHAR(255)           NULL,
+  uuid               CHAR(38)               NOT NULL,
+  CONSTRAINT patient_program_uuid_index
+  UNIQUE (uuid)
+);
+
 CREATE TABLE patient_for_ignore_columns_test
 (
   patient_id     INT                           NOT NULL
@@ -309,13 +484,13 @@ CREATE TABLE patient_for_ignore_columns_test
 
 CREATE VIEW concept_view AS
   SELECT
-    concept.concept_id              AS concept_id,
-    concept_full_name.name                    AS concept_full_name,
-    concept_short_name.name                   AS concept_short_name,
-    concept_class.name              AS concept_class_name,
-    concept_datatype.name           AS concept_datatype_name,
-    concept.retired                 AS retired,
-    concept.date_created            AS date_created
+    concept.concept_id      AS concept_id,
+    concept_full_name.name  AS concept_full_name,
+    concept_short_name.name AS concept_short_name,
+    concept_class.name      AS concept_class_name,
+    concept_datatype.name   AS concept_datatype_name,
+    concept.retired         AS retired,
+    concept.date_created    AS date_created
   FROM ((((concept
     LEFT JOIN concept_name concept_full_name
       ON (((concept_full_name.concept_id = concept.concept_id) AND

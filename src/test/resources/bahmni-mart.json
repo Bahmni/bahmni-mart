@@ -13,6 +13,13 @@
     "chunkSizeToRead": "500",
     "tableName": "patient_allergy_status_test1",
     "columnsToIgnore": ["creator", "date"]
+  },
+  {
+    "name": "Obs Data",
+    "type": "obs",
+    "separateTables": [
+      "FSTG, Specialty determined by MLO",
+      "Stage"
+    ]
   }
-
 ]

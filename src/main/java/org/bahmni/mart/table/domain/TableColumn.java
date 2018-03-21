@@ -1,5 +1,7 @@
 package org.bahmni.mart.table.domain;
 
+import java.util.Objects;
+
 public class TableColumn {
     private String name;
     private String type;
@@ -44,5 +46,22 @@ public class TableColumn {
     public void setReference(ForeignKey reference) {
         // Type of the baseColumn and referenceColumn should be same
         this.reference = reference;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TableColumn that = (TableColumn) o;
+        return isPrimaryKey == that.isPrimaryKey &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(reference, that.reference);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(name, type, isPrimaryKey, reference);
     }
 }
