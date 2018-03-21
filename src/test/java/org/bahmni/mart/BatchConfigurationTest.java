@@ -5,7 +5,6 @@ import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.io.FileUtils;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
-import org.bahmni.mart.config.ProgramDataStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
@@ -67,9 +66,6 @@ public class BatchConfigurationTest {
     private FormStepConfigurer formStepConfigurer;
 
     @Mock
-    private ProgramDataStepConfigurer programDataStepConfigurer;
-
-    @Mock
     private JobDefinitionReader jobDefinitionReader;
 
     @Mock
@@ -93,7 +89,6 @@ public class BatchConfigurationTest {
         mockStatic(FileUtils.class);
         batchConfiguration = new BatchConfiguration();
         setValuesForMemberFields(batchConfiguration, "formStepConfigurer", formStepConfigurer);
-        setValuesForMemberFields(batchConfiguration, "programDataStepConfigurer", programDataStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "jobDefinitionReader", jobDefinitionReader);
         setValuesForMemberFields(batchConfiguration, "simpleJobTemplate", simpleJobTemplate);
         setValuesForMemberFields(batchConfiguration, "jobLauncher", jobLauncher);

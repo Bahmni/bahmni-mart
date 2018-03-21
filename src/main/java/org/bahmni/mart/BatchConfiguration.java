@@ -3,7 +3,6 @@ package org.bahmni.mart;
 import freemarker.template.TemplateExceptionHandler;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
-import org.bahmni.mart.config.ProgramDataStepConfigurer;
 import org.bahmni.mart.config.StepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
@@ -58,9 +57,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private FormStepConfigurer formStepConfigurer;
 
     @Autowired
-    private ProgramDataStepConfigurer programDataStepConfigurer;
-
-    @Autowired
     private SimpleJobTemplate simpleJobTemplate;
 
     @Autowired
@@ -95,7 +91,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         stepConfigurers.add(formStepConfigurer);
         if (!jobDefinitionReader.getConceptReferenceSource().equals(""))
             stepConfigurers.add(metaDataStepConfigurer);
-        stepConfigurers.add(programDataStepConfigurer);
     }
 
     @Bean
