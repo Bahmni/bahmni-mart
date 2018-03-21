@@ -98,7 +98,7 @@ public class BatchConfigurationTest {
                 treatmentRegistrationBaseExportStep);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
-        when(jobBuilderFactory.get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME)).thenReturn(jobBuilder);
+        when(jobBuilderFactory.get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME)).thenReturn(jobBuilder);
         when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
         when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
         Step treatmentStep = mock(Step.class);
@@ -139,7 +139,7 @@ public class BatchConfigurationTest {
         batchConfiguration.run();
 
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
-        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
+        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME);
         verify(formStepConfigurer, times(1)).createTables();
         verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
@@ -218,7 +218,7 @@ public class BatchConfigurationTest {
 
         batchConfiguration.run();
 
-        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
+        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(1)).createTables();
         verify(metaDataStepConfigurer, times(1)).registerSteps(any(FlowBuilder.class));
@@ -232,7 +232,7 @@ public class BatchConfigurationTest {
 
         batchConfiguration.run();
 
-        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.FULL_DATA_EXPORT_JOB_NAME);
+        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(0)).createTables();
         verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));

@@ -44,7 +44,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     private static final Logger log = LoggerFactory.getLogger(BatchConfiguration.class);
 
-    public static final String FULL_DATA_EXPORT_JOB_NAME = "ammanExports";
+    public static final String OBS_DATA_FLATTENING_JOB_NAME = "flattenObs";
     private static final String DEFAULT_ENCODING = "UTF-8";
 
     @Autowired
@@ -73,7 +73,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private List<StepConfigurer> stepConfigurers = new ArrayList<>();
 
     private Job buildObsJob() {
-        FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(FULL_DATA_EXPORT_JOB_NAME)
+        FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(OBS_DATA_FLATTENING_JOB_NAME)
                 .incrementer(new RunIdIncrementer()).preventRestart()
                 .flow(treatmentRegistrationBaseExportStep.getStep());
         //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
