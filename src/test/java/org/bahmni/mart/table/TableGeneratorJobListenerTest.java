@@ -2,12 +2,15 @@ package org.bahmni.mart.table;
 
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -29,6 +32,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(JobDefinitionUtil.class)
 public class TableGeneratorJobListenerTest {
 
     @Mock
@@ -54,9 +58,11 @@ public class TableGeneratorJobListenerTest {
     public void shouldCallCreateTablesOnProperJobExecution() {
         JobExecution jobExecution = mock(JobExecution.class);
         JobInstance jobInstance = mock(JobInstance.class);
+        PowerMockito.mockStatic(JobDefinitionUtil.class);
 
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
         when(openMRSJdbcTemplate.query(any(String.class), any(TableDataExtractor.class))).thenReturn(new TableData());
+        when(JobDefinitionUtil.getReaderSQLByIgnoringColumns(any())).thenReturn("Some sql");
 
         tableGeneratorJobListener.beforeJob(jobExecution);
 
@@ -69,6 +75,8 @@ public class TableGeneratorJobListenerTest {
     public void shouldStopJobWhenTableCreationFails() {
         JobExecution jobExecution = mock(JobExecution.class);
         JobInstance jobInstance = mock(JobInstance.class);
+        PowerMockito.mockStatic(JobDefinitionUtil.class);
+        when(JobDefinitionUtil.getReaderSQLByIgnoringColumns(any())).thenReturn("Some sql");
         doThrow(new BadSqlGrammarException("", "select from table",
                 new SQLException())).when(tableGeneratorStep).createTables(any());
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
@@ -86,6 +94,7 @@ public class TableGeneratorJobListenerTest {
         when(jobDefinition.getName()).thenReturn(jobName);
         String tableName = "test table";
         when(jobDefinition.getTableName()).thenReturn(tableName);
+        when(jobDefinition.getReaderSql()).thenReturn("dummy SQL");
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
         TableData tableData = new TableData();
         TableColumn column = new TableColumn("test", "char", false, null);

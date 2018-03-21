@@ -130,6 +130,9 @@ public class BatchConfigurationTest {
     @Test
     public void shouldRunObsJob() throws Exception {
         JobDefinition jobDefinition = mock(JobDefinition.class);
+
+        when(jobDefinition.getReaderSql()).thenReturn("Some sql");
+        when(jobDefinition.getTableName()).thenReturn("Some table");
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
 
@@ -144,7 +147,7 @@ public class BatchConfigurationTest {
     }
 
     @Test
-    public void shouldNotRunJobsForValidJobConfiguration() throws Exception {
+    public void shouldRunJobsForValidJobConfiguration() throws Exception {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         JobDefinition jobDefinition1 = mock(JobDefinition.class);
 
@@ -156,6 +159,10 @@ public class BatchConfigurationTest {
 
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition1.getTableName()).thenReturn("table1");
+
+        when(jobDefinition.getReaderSql()).thenReturn("Some sql");
+        when(jobDefinition1.getReaderSql()).thenReturn("Some sql");
+
 
         List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
         Job job = mock(Job.class);
@@ -182,6 +189,9 @@ public class BatchConfigurationTest {
 
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition1.getTableName()).thenReturn("table1");
+
+        when(jobDefinition.getType()).thenReturn("generic");
+        when(jobDefinition1.getType()).thenReturn("generic");
 
         List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
         Job job = mock(Job.class);

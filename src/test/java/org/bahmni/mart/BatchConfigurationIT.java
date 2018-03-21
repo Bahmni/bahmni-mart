@@ -1,5 +1,6 @@
 package org.bahmni.mart;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,13 +17,11 @@ import static org.junit.Assert.assertTrue;
 public class BatchConfigurationIT extends AbstractBaseBatchIT {
     @Autowired
     BatchConfiguration batchConfiguration;
+    private Map<String, String> expectedPatientList;
 
-
-    @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-            scripts = "classpath:testDataSet/insertPatientsData.sql")
-    @Test
-    public void shouldCreateTablesBasedOnJobConfiguration() {
-        HashMap<String, String> expectedPatientList = new HashMap<>();
+    @Before
+    public void setUp() {
+        expectedPatientList = new HashMap<>();
         expectedPatientList.put("124", "Test");
         expectedPatientList.put("125", "Unknown");
         expectedPatientList.put("126", "Unknown");
@@ -33,6 +32,11 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         expectedPatientList.put("131", "Unknown");
         expectedPatientList.put("132", "Unknown");
         expectedPatientList.put("133", "Unknown");
+    }
+
+    @Test
+    @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
+    public void shouldCreateTablesBasedOnJobConfiguration() {
 
         batchConfiguration.run();
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
@@ -54,5 +58,31 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
             assertEquals(expectedPatientList.get(patientId), allergyStatus);
         }
 
+    }
+
+    @Test
+    @Sql(scripts = "classpath:testDataSet/insertPatientsDataForIgnoreColumns.sql")
+    public void shouldCreateTablesBasedOnJobConfigurationByIgnoringColumns() {
+
+        batchConfiguration.run();
+
+        List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_allergy_status_test1'" +
+                " AND TABLE_SCHEMA='PUBLIC';")
+                .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
+        List<Map<String, Object>> patientList = martJdbcTemplate
+                .queryForList("SELECT * FROM \"patient_allergy_status_test1\"");
+        List<String> columnsName = tableDataColumns.stream().map(name -> name.toString().toLowerCase())
+                .collect(Collectors.toList());
+
+        assertEquals(10, patientList.size());
+        assertEquals(2, tableDataColumns.size());
+        assertTrue(columnsName.containsAll(Arrays.asList("patient_id", "allergy_status")));
+
+        for (Map<String, Object> row : patientList) {
+            String patientId = row.get("patient_id").toString();
+            String allergyStatus = row.get("allergy_status").toString();
+            assertEquals(expectedPatientList.get(patientId), allergyStatus);
+        }
     }
 }

@@ -9,28 +9,7 @@ public class JobDefinition {
     private int chunkSizeToRead;
     private String tableName;
     private String conceptReferenceSource;
-    private List<ColumnsToIgnore> columnsToIgnore;
-
-    class ColumnsToIgnore {
-        private String tableName;
-        private List<String> columns;
-
-        public String getTableName() {
-            return tableName;
-        }
-
-        public void setTableName(String tableName) {
-            this.tableName = tableName;
-        }
-
-        public List<String> getColumns() {
-            return columns;
-        }
-
-        public void setColumns(List<String> columns) {
-            this.columns = columns;
-        }
-    }
+    private List<String> columnsToIgnore;
 
     public int getChunkSizeToRead() {
         return chunkSizeToRead;
@@ -80,11 +59,11 @@ public class JobDefinition {
         this.conceptReferenceSource = conceptReferenceSource;
     }
 
-    public List<ColumnsToIgnore> getColumnsToIgnore() {
+    public List<String> getColumnsToIgnore() {
         return columnsToIgnore;
     }
 
-    public void setColumnsToIgnore(List<ColumnsToIgnore> columnsToIgnore) {
+    public void setColumnsToIgnore(List<String> columnsToIgnore) {
         this.columnsToIgnore = columnsToIgnore;
     }
 }

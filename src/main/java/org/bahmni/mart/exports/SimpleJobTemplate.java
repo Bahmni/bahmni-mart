@@ -1,10 +1,13 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.table.TableDataProcessor;
 import org.bahmni.mart.table.TableGeneratorJobListener;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -22,6 +25,8 @@ import java.util.Map;
 
 @Component
 public class SimpleJobTemplate {
+
+    private static final Logger logger = LoggerFactory.getLogger(SimpleJobTemplate.class);
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -60,7 +65,11 @@ public class SimpleJobTemplate {
 
     private TableDataProcessor getProcessor(JobDefinition jobConfiguration) {
         TableDataProcessor tableDataProcessor = new TableDataProcessor();
-        tableDataForMart = tableGeneratorJobListener.getTableDataForMart(jobConfiguration.getName());
+        try {
+            tableDataForMart = tableGeneratorJobListener.getTableDataForMart(jobConfiguration.getName());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
         tableDataProcessor.setTableData(tableDataForMart);
         return tableDataProcessor;
     }
@@ -72,10 +81,10 @@ public class SimpleJobTemplate {
     }
 
     private JdbcCursorItemReader<Map<String, Object>> openMRSDataReader(JobDefinition jobConfiguration) {
-        String readerSql = jobConfiguration.getReaderSql();
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(openMRSDataSource);
-        reader.setSql(readerSql);
+        String readerSQLAfterIgnoringColumns = JobDefinitionUtil.getReaderSQLByIgnoringColumns(jobConfiguration);
+        reader.setSql(readerSQLAfterIgnoringColumns);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
     }

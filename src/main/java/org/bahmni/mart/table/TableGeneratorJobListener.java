@@ -2,6 +2,8 @@ package org.bahmni.mart.table;
 
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.helper.Constants;
 import org.bahmni.mart.table.domain.TableData;
 import org.slf4j.Logger;
@@ -20,7 +22,7 @@ import java.util.Optional;
 @Component
 public class TableGeneratorJobListener extends JobExecutionListenerSupport {
 
-    private static final Logger log = LoggerFactory.getLogger(TableGeneratorJobListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(TableGeneratorJobListener.class);
 
     public static final String LIMIT = " LIMIT 1";
 
@@ -39,7 +41,7 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
         try {
             createTable(jobExecution.getJobInstance().getJobName());
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             jobExecution.stop();
         }
     }
@@ -51,7 +53,13 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
     public TableData getTableDataForMart(String jobName) {
         JobDefinition jobDefinition = getJobDefinitionByName(jobName);
         ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
-        TableData tableData = openMRSJdbcTemplate.query(jobDefinition.getReaderSql() + LIMIT, resultSetExtractor);
+        String readerSQLAfterIgnoringColumns = JobDefinitionUtil
+                .getReaderSQLByIgnoringColumns(getJobDefinitionByName(jobName));
+        if (readerSQLAfterIgnoringColumns == null || readerSQLAfterIgnoringColumns.isEmpty()) {
+            throw new InvalidJobConfiguration(String
+                    .format("Reader SQL is empty for the job definition '%s'", jobName));
+        }
+        TableData tableData = openMRSJdbcTemplate.query(readerSQLAfterIgnoringColumns + LIMIT, resultSetExtractor);
         tableData.setName(jobDefinition.getTableName());
         tableData.getColumns().forEach(tableColumn -> tableColumn
                 .setType(Constants.getPostgresDataTypeFor(tableColumn.getType())));

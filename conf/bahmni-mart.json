@@ -5,12 +5,7 @@
     "readerSql": "SELECT p.program_id, p.name AS `program_name`, cn_outcome.name AS `program_outcome` FROM program p INNER JOIN concept c ON c.concept_id = p.outcomes_concept_id AND c.retired IS FALSE AND p.retired IS FALSE INNER JOIN concept_set cs ON cs.concept_set = c.concept_id LEFT OUTER JOIN concept_name cn_cs ON cn_cs.concept_id = cs.concept_set AND cn_cs.concept_name_type = 'FULLY_SPECIFIED' AND cn_cs.voided IS FALSE LEFT OUTER JOIN concept_name cn_outcome ON cn_outcome.concept_id = cs.concept_id AND cn_outcome.concept_name_type = 'FULLY_SPECIFIED' AND cn_outcome.voided IS FALSE",
     "chunkSizeToRead": "500",
     "tableName": "program_outcomes",
-    "columnsToIgnore": [
-      {
-        "tableName": "program_outcomes",
-        "columns": ["program_id", "program_name"]
-      }
-    ]
+    "columnsToIgnore": []
   },
   {
     "name": "Patient program data",
@@ -97,16 +92,6 @@
       "SMH, Pain Assessment",
       "FV, Outcomes FV"
     ],
-    "conceptReferenceSource": "MSF-INTERNAL",
-    "columnsToIgnore": [
-      {
-        "tableName": "observation_sheet",
-        "columns": ["patient_id", "encounter_id"]
-      },
-      {
-        "tableName": "opd_nursing_note",
-        "columns": ["onn,_temperature"]
-      }
-    ]
+    "conceptReferenceSource": "MSF-INTERNAL"
   }
 ]
