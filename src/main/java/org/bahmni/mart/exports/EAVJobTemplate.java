@@ -1,6 +1,7 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.table.domain.TableData;
 import org.bahmni.mart.table.listener.EAVJobListener;
@@ -24,7 +25,8 @@ public class EAVJobTemplate extends JobTemplate {
 
     private String getReaderSql(JobDefinition jobConfiguration) {
         TableData tableData = eavJobListener.getTableDataForMart(jobConfiguration.getName());
-        return freeMarkerEvaluator.evaluate("attribute.ftl",
+        String readerSql = freeMarkerEvaluator.evaluate("attribute.ftl",
                 new EAV(tableData, jobConfiguration.getEavAttributes()));
+        return JobDefinitionUtil.getReaderSQLByIgnoringColumns(jobConfiguration.getColumnsToIgnore(), readerSql);
     }
 }

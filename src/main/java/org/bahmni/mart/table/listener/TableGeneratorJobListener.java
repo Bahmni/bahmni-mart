@@ -56,7 +56,7 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport imple
         JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
         String readerSQLAfterIgnoringColumns = JobDefinitionUtil
-                .getReaderSQLByIgnoringColumns(jobDefinition);
+                .getReaderSQLByIgnoringColumns(jobDefinition.getColumnsToIgnore(), jobDefinition.getReaderSql());
         if (readerSQLAfterIgnoringColumns == null || readerSQLAfterIgnoringColumns.isEmpty()) {
             throw new InvalidJobConfiguration(String
                     .format("Reader SQL is empty for the job definition '%s'", jobName));

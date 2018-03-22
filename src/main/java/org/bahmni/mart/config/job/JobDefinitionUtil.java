@@ -13,10 +13,7 @@ public class JobDefinitionUtil {
     public static final String TO_SPLIT_SELECT = "(?i)select";
     public static final String SELECT = "select";
 
-    public static String getReaderSQLByIgnoringColumns(JobDefinition jobDefinition) {
-
-        List<String> columnsToIgnore = jobDefinition.getColumnsToIgnore();
-        String readerSQL = jobDefinition.getReaderSql();
+    public static String getReaderSQLByIgnoringColumns(List<String> columnsToIgnore, String readerSQL) {
         if (readerSQL == null || readerSQL.isEmpty() || columnsToIgnore == null || columnsToIgnore.isEmpty()) {
             return readerSQL;
         }

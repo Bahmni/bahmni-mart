@@ -87,6 +87,7 @@ public class SeparateTableConfigHelperTest {
         assertEquals(3, multiSelectAndAddMoreConceptNames.size());
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
         verifyStatic(times(1));
+        BatchUtils.convertConceptNamesToSet(null);
     }
 
     @Test
@@ -131,6 +132,7 @@ public class SeparateTableConfigHelperTest {
         assertEquals(2, multiSelectAndAddMoreConceptNames.size());
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
         verifyStatic(times(1));
+        BatchUtils.convertConceptNamesToSet(ignoreConcepts);
     }
 
     @Test
@@ -160,7 +162,7 @@ public class SeparateTableConfigHelperTest {
                 .getAddMoreAndMultiSelectConceptNames();
         assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
         verifyStatic(times(1));
-
+        BatchUtils.convertConceptNamesToSet(ignoreConcepts);
     }
 
     @Test
@@ -218,6 +220,7 @@ public class SeparateTableConfigHelperTest {
         assertEquals(2, multiSelectAndAddMoreConceptNames.size());
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
         verifyStatic(times(1));
+        BatchUtils.convertConceptNamesToSet(ignoreConcepts);
     }
 
     @Test
@@ -263,6 +266,7 @@ public class SeparateTableConfigHelperTest {
         assertEquals(2, multiSelectAndAddMoreConceptNames.size());
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
         verifyStatic(times(1));
+        BatchUtils.convertConceptNamesToSet(ignoreConcepts);
     }
 
     @Test
@@ -320,6 +324,7 @@ public class SeparateTableConfigHelperTest {
 
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
         verifyStatic(times(1));
+        BatchUtils.convertConceptNamesToSet(null);
     }
 
     @Test
@@ -341,6 +346,7 @@ public class SeparateTableConfigHelperTest {
                 .getAddMoreAndMultiSelectConceptNames();
         assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
         verifyStatic(times(1));
+        BatchUtils.convertConceptNamesToSet(ignoreConcepts);
     }
 
     @Test
@@ -370,6 +376,7 @@ public class SeparateTableConfigHelperTest {
                 .getAddMoreAndMultiSelectConceptNames();
         assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
         verifyStatic(times(1));
+        BatchUtils.convertConceptNamesToSet(ignoreConcepts);
     }
 
     @Test
@@ -399,6 +406,7 @@ public class SeparateTableConfigHelperTest {
                 .getAddMoreAndMultiSelectConceptNames();
         assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
         verifyStatic(times(1));
+        BatchUtils.convertConceptNamesToSet(ignoreConcepts);
     }
 
     @Test
