@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 @Component
-public class TableGeneratorJobListener extends JobExecutionListenerSupport {
+public class TableGeneratorJobListener extends JobExecutionListenerSupport implements JobListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TableGeneratorJobListener.class);
 
@@ -51,6 +51,7 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
         tableGeneratorStep.createTables(Arrays.asList(getTableDataForMart(jobName)));
     }
 
+    @Override
     public TableData getTableDataForMart(String jobName) {
         JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();

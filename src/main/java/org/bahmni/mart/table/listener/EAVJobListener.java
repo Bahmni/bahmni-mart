@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
-public class EAVJobListener extends JobExecutionListenerSupport {
+public class EAVJobListener extends JobExecutionListenerSupport implements JobListener {
     private static final Logger log = LoggerFactory.getLogger(TableGeneratorJobListener.class);
 
     @Autowired
@@ -44,10 +44,11 @@ public class EAVJobListener extends JobExecutionListenerSupport {
     }
 
     private void createTable(String jobName) {
-        tableGeneratorStep.createTables(Arrays.asList(getTableData(jobName)));
+        tableGeneratorStep.createTables(Arrays.asList(getTableDataForMart(jobName)));
     }
 
-    public TableData getTableData(String jobName) {
+    @Override
+    public TableData getTableDataForMart(String jobName) {
         TableData tableData = new TableData();
         JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         tableData.setName(jobDefinition.getTableName());
