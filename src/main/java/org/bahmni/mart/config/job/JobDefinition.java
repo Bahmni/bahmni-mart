@@ -10,6 +10,7 @@ public class JobDefinition {
     private String tableName;
     private String conceptReferenceSource;
     private List<String> columnsToIgnore;
+    private EAVJobData eavAttributes;
 
     public int getChunkSizeToRead() {
         return chunkSizeToRead;
@@ -55,15 +56,23 @@ public class JobDefinition {
         return conceptReferenceSource;
     }
 
-    public void setConceptReferenceSource(String conceptReferenceSource) {
-        this.conceptReferenceSource = conceptReferenceSource;
-    }
-
     public List<String> getColumnsToIgnore() {
         return columnsToIgnore;
     }
 
     public void setColumnsToIgnore(List<String> columnsToIgnore) {
         this.columnsToIgnore = columnsToIgnore;
+    }
+
+    public EAVJobData getEavAttributes() {
+        return eavAttributes;
+    }
+
+    public void setEavAttributes(EAVJobData eavAttributes) {
+        this.eavAttributes = eavAttributes;
+    }
+
+    public void setConceptReferenceSource(String conceptReferenceSource) {
+        this.conceptReferenceSource = conceptReferenceSource;
     }
 }

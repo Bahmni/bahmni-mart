@@ -127,6 +127,20 @@
     "tableName": "location_tag_map"
   },
   {
+    "name": "Person Attributes",
+    "type": "eav",
+    "chunkSizeToRead": "500",
+    "tableName": "person_attributes",
+    "eavAttributes": {
+      "attributeTypeTableName": "person_attribute_type",
+      "attributeTableName": "person_attribute",
+      "valueTableJoiningId": "person_attribute_type_id",
+      "typeTableJoiningId": "person_attribute_type_id",
+      "valueColumnName": "value",
+      "primaryKey": "person_id"
+    }
+  },
+  {
     "name": "Obs Data",
     "type": "obs",
     "separateTables": [

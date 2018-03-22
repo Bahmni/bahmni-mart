@@ -1,7 +1,7 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.table.TableGeneratorJobListener;
+import org.bahmni.mart.table.listener.TableGeneratorJobListener;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.junit.Before;
 import org.junit.Test;

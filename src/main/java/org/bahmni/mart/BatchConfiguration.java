@@ -8,6 +8,7 @@ import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
+import org.bahmni.mart.exports.EAVJobTemplate;
 import org.bahmni.mart.exports.SimpleJobTemplate;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.slf4j.Logger;
@@ -67,6 +68,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     @Autowired
     private MetaDataStepConfigurer metaDataStepConfigurer;
+
+    @Autowired
+    private EAVJobTemplate eavJobTemplate;
 
     private List<JobDefinition> jobDefinitions;
 
@@ -133,6 +137,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     private List<Job> getJobs() {
         return jobDefinitions.stream().map(jobDefinition -> jobDefinition.getType().equals("obs") ? buildObsJob()
+                : jobDefinition.getType().equals("eav") ? eavJobTemplate.buildJob(jobDefinition)
                 : simpleJobTemplate.buildJob(jobDefinition))
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }

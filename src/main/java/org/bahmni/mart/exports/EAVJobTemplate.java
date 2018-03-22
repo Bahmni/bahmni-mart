@@ -1,13 +1,12 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.table.TableDataProcessor;
-import org.bahmni.mart.table.listener.TableGeneratorJobListener;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.bahmni.mart.table.listener.EAVJobListener;
+import org.bahmni.mart.table.model.EAV;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -24,9 +23,7 @@ import javax.sql.DataSource;
 import java.util.Map;
 
 @Component
-public class SimpleJobTemplate {
-
-    private static final Logger logger = LoggerFactory.getLogger(SimpleJobTemplate.class);
+public class EAVJobTemplate {
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -39,17 +36,20 @@ public class SimpleJobTemplate {
     private DataSource openMRSDataSource;
 
     @Autowired
-    private TableGeneratorJobListener tableGeneratorJobListener;
+    private FreeMarkerEvaluator<EAV> freeMarkerEvaluator;
 
     @Autowired
     private ObjectFactory<TableRecordWriter> recordWriterObjectFactory;
+
+    @Autowired
+    private EAVJobListener eavJobListener;
 
     private TableData tableDataForMart;
 
     public Job buildJob(JobDefinition jobConfiguration) {
         return jobBuilderFactory.get(jobConfiguration.getName())
                 .incrementer(new RunIdIncrementer())
-                .listener(tableGeneratorJobListener)
+                .listener(eavJobListener)
                 .flow(loadData(jobConfiguration))
                 .end().build();
     }
@@ -65,11 +65,7 @@ public class SimpleJobTemplate {
 
     private TableDataProcessor getProcessor(JobDefinition jobConfiguration) {
         TableDataProcessor tableDataProcessor = new TableDataProcessor();
-        try {
-            tableDataForMart = tableGeneratorJobListener.getTableDataForMart(jobConfiguration.getName());
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        tableDataForMart = eavJobListener.getTableData(jobConfiguration.getName());
         tableDataProcessor.setTableData(tableDataForMart);
         return tableDataProcessor;
     }
@@ -81,11 +77,15 @@ public class SimpleJobTemplate {
     }
 
     private JdbcCursorItemReader<Map<String, Object>> openMRSDataReader(JobDefinition jobConfiguration) {
+        TableData tableData = eavJobListener.getTableData(jobConfiguration.getName());
+        String readerSql = freeMarkerEvaluator.evaluate("attribute.ftl",
+                new EAV(tableData, jobConfiguration.getEavAttributes()));
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(openMRSDataSource);
-        String readerSQLAfterIgnoringColumns = JobDefinitionUtil.getReaderSQLByIgnoringColumns(jobConfiguration);
-        reader.setSql(readerSQLAfterIgnoringColumns);
+        reader.setSql(readerSql);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
     }
+
+
 }
