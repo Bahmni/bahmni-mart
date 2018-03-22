@@ -49,4 +49,10 @@ public class JobDefinitionReader {
                 .map(JobDefinition::getConceptReferenceSource).filter(Objects::nonNull).findFirst();
         return code.orElse("");
     }
+
+    public JobDefinition getJobDefinitionByName(String jobName) {
+        Optional<JobDefinition> optionalJobDefinition = getJobDefinitions().stream()
+                .filter(tempJobDefinition -> tempJobDefinition.getName().equals(jobName)).findFirst();
+        return optionalJobDefinition.orElseGet(JobDefinition::new);
+    }
 }

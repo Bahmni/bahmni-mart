@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,7 +30,7 @@ public class JobDefinitionReaderTest {
     private String json;
 
     @Mock
-    private Resource jobDefinion;
+    private Resource jobDefinition;
 
     @Mock
     private SimpleJobTemplate simpleJobTemplate;
@@ -48,9 +49,9 @@ public class JobDefinitionReaderTest {
                 "    \"tableName\": \"MyProgram\"\n" +
                 "  }\n" +
                 "]";
-        setValuesForMemberFields(jobDefinitionReader, "jobDefinition", jobDefinion);
+        setValuesForMemberFields(jobDefinitionReader, "jobDefinition", jobDefinition);
         setValuesForMemberFields(jobDefinitionReader, "simpleJobTemplate", simpleJobTemplate);
-        when(BatchUtils.convertResourceOutputToString(jobDefinion)).thenReturn(json);
+        when(BatchUtils.convertResourceOutputToString(jobDefinition)).thenReturn(json);
     }
 
     @Test
@@ -88,6 +89,27 @@ public class JobDefinitionReaderTest {
         String conceptReferenceSource = jobDefinitionReader.getConceptReferenceSource();
 
         assertEquals("",conceptReferenceSource);
+    }
 
+    @Test
+    public void shouldReturnJobDefinitionGivenJobName() throws NoSuchFieldException, IllegalAccessException {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        setValuesForMemberFields(jobDefinitionReader,"jobDefinitions", Arrays.asList(jobDefinition));
+
+        when(jobDefinition.getName()).thenReturn("Person Attributes");
+        JobDefinition personAttributeDefinition = jobDefinitionReader.getJobDefinitionByName("Person Attributes");
+
+        assertEquals(jobDefinition, personAttributeDefinition);
+    }
+
+    @Test
+    public void shouldReturnEmptyJobDefinitionGivenInvalidName() throws NoSuchFieldException, IllegalAccessException {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        setValuesForMemberFields(jobDefinitionReader,"jobDefinitions", Arrays.asList(jobDefinition));
+
+        when(jobDefinition.getName()).thenReturn("Person Attributes");
+        JobDefinition personAttributeDefinition = jobDefinitionReader.getJobDefinitionByName("InvalidName");
+
+        assertNotEquals(jobDefinition, personAttributeDefinition);
     }
 }

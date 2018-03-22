@@ -25,10 +25,10 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
@@ -58,9 +58,11 @@ public class TableGeneratorJobListenerTest {
     public void shouldCallCreateTablesOnProperJobExecution() {
         JobExecution jobExecution = mock(JobExecution.class);
         JobInstance jobInstance = mock(JobInstance.class);
+        JobDefinition jobDefinition = mock(JobDefinition.class);
         PowerMockito.mockStatic(JobDefinitionUtil.class);
 
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
+        when(jobDefinitionReader.getJobDefinitionByName(anyString())).thenReturn(jobDefinition);
         when(openMRSJdbcTemplate.query(any(String.class), any(TableDataExtractor.class))).thenReturn(new TableData());
         when(JobDefinitionUtil.getReaderSQLByIgnoringColumns(any())).thenReturn("Some sql");
 
@@ -77,9 +79,12 @@ public class TableGeneratorJobListenerTest {
         JobInstance jobInstance = mock(JobInstance.class);
         PowerMockito.mockStatic(JobDefinitionUtil.class);
         when(JobDefinitionUtil.getReaderSQLByIgnoringColumns(any())).thenReturn("Some sql");
+        JobDefinition jobDefinition = mock(JobDefinition.class);
         doThrow(new BadSqlGrammarException("", "select from table",
                 new SQLException())).when(tableGeneratorStep).createTables(any());
+
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
+        when(jobDefinitionReader.getJobDefinitionByName(anyString())).thenReturn(jobDefinition);
         when(openMRSJdbcTemplate.query(any(String.class), any(TableDataExtractor.class))).thenReturn(new TableData());
 
         tableGeneratorJobListener.beforeJob(jobExecution);
@@ -94,17 +99,19 @@ public class TableGeneratorJobListenerTest {
         when(jobDefinition.getName()).thenReturn(jobName);
         String tableName = "test table";
         when(jobDefinition.getTableName()).thenReturn(tableName);
+        when(jobDefinitionReader.getJobDefinitionByName(jobName)).thenReturn(jobDefinition);
         when(jobDefinition.getReaderSql()).thenReturn("dummy SQL");
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
         TableData tableData = new TableData();
-        TableColumn column = new TableColumn("test", "char", false, null);
-        tableData.addColumn(column);
+        tableData.addColumn(new TableColumn("test", "char", false, null));
         when(openMRSJdbcTemplate.query(anyString(), any(TableDataExtractor.class))).thenReturn(tableData);
 
         TableData actualData = tableGeneratorJobListener.getTableDataForMart(jobName);
 
         List<TableColumn> columns = actualData.getColumns();
 
+        verify(jobDefinitionReader,times(1)).getJobDefinitionByName(jobName);
+        verify(openMRSJdbcTemplate,times(1)).query(anyString(), any(TableDataExtractor.class));
         assertEquals(tableName, actualData.getName());
         assertEquals(1, columns.size());
         assertEquals("text", columns.get(0).getType());

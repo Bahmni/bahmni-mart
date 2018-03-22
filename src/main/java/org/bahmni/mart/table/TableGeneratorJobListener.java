@@ -17,7 +17,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 @Component
 public class TableGeneratorJobListener extends JobExecutionListenerSupport {
@@ -51,10 +50,10 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
     }
 
     public TableData getTableDataForMart(String jobName) {
-        JobDefinition jobDefinition = getJobDefinitionByName(jobName);
+        JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
         String readerSQLAfterIgnoringColumns = JobDefinitionUtil
-                .getReaderSQLByIgnoringColumns(getJobDefinitionByName(jobName));
+                .getReaderSQLByIgnoringColumns(jobDefinition);
         if (readerSQLAfterIgnoringColumns == null || readerSQLAfterIgnoringColumns.isEmpty()) {
             throw new InvalidJobConfiguration(String
                     .format("Reader SQL is empty for the job definition '%s'", jobName));
@@ -64,11 +63,5 @@ public class TableGeneratorJobListener extends JobExecutionListenerSupport {
         tableData.getColumns().forEach(tableColumn -> tableColumn
                 .setType(Constants.getPostgresDataTypeFor(tableColumn.getType())));
         return tableData;
-    }
-
-    private JobDefinition getJobDefinitionByName(String jobName) {
-        Optional<JobDefinition> optionalJobDefinition = jobDefinitionReader.getJobDefinitions().stream()
-                .filter(tempJobDefinition -> tempJobDefinition.getName().equals(jobName)).findFirst();
-        return optionalJobDefinition.orElseGet(JobDefinition::new);
     }
 }
