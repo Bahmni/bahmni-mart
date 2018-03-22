@@ -85,6 +85,48 @@
     "tableName": "patient_appointment"
   },
   {
+    "name": "Patient Visit Details",
+    "type": "generic",
+    "readerSql": "SELECT visit_id, patient_id, visit.visit_type_id as visit_type_id, vt.name as visit_type_name, vt.description as visit_type_description, date_started as visit_start_date, date_stopped as visit_end_date, indication_concept_id, visit.location_id as location_id, location.name as location_name from visit INNER JOIN visit_type vt ON visit.visit_type_id = vt.visit_type_id AND visit.voided IS FALSE AND vt.retired IS FALSE INNER JOIN location ON visit.location_id = location.location_id AND location.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "patient_visit_details"
+  },
+  {
+    "name": "Patient Encounter Details",
+    "type": "generic",
+    "readerSql": "SELECT patient_id, visit_id, encounter_id, et.encounter_type_id as encounter_type_id, et.name as encounter_type_name, et.description as encounter_type_description, et.edit_privilege as edit_privilege, et.view_privilege as view_privilege, location_id, form_id, encounter_datetime from encounter INNER JOIN encounter_type et ON encounter.encounter_type = et.encounter_type_id AND encounter.voided is FALSE AND et.retired is FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "patient_encounter_details"
+  },
+  {
+    "name": "Encounter Provider and Role",
+    "type": "generic",
+    "readerSql": "SELECT ep.encounter_provider_id as encounter_provider_id, ep.encounter_id as encounter_id, ep.provider_id as provider_id, er.encounter_role_id as encounter_role_id, er.name as encounter_role_name, er.description as encounter_role_description from encounter_provider ep INNER JOIN encounter_role er on ep.encounter_role_id = er.encounter_role_id AND ep.voided IS FALSE AND er.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "encounter_provider_and_role"
+  },
+  {
+    "name": "Provider",
+    "type": "generic",
+    "readerSql": "SELECT provider_id, person_id, name, identifier, provider_role_id from provider WHERE provider.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "provider"
+  },
+  {
+    "name": "Location",
+    "type": "generic",
+    "readerSql": "SELECT location_id, name, description, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14,  address15, city_village, state_province, postal_code, country, latitude, longitude, county_district, parent_location from location WHERE retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "location"
+  },
+  {
+    "name": "Location Tag Map",
+    "type": "generic",
+    "readerSql": "SELECT ltm.location_id as location_id, lt.location_tag_id as location_tag_id, lt.name as location_tag_name, lt.description as location_tag_description from location_tag_map ltm INNER JOIN location_tag lt on ltm.location_tag_id = lt.location_tag_id AND lt.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "location_tag_map"
+  },
+  {
     "name": "Obs Data",
     "type": "obs",
     "separateTables": [
