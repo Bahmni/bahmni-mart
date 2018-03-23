@@ -19,7 +19,8 @@
     "type": "generic",
     "readerSql": "SELECT p.person_id, pn.person_name_id, pn.preferred, pn.prefix, pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name2, pn.family_name_suffix, p.gender, p.birthdate, p.birthtime, p.birthdate_estimated, p.dead, p.death_date, p.deathdate_estimated, p.cause_of_death FROM person p INNER JOIN person_name pn ON p.person_id = pn.person_id AND p.voided IS FALSE AND pn.voided IS FALSE",
     "chunkSizeToRead": "500",
-    "tableName": "person_details"
+    "tableName": "person_details",
+    "columnsToIgnore": ["prefix", "given_name", "middle_name", "family_name_prefix", "family_name", "family_name2", "family_name_suffix"]
   },
   {
     "name": "Person address",
@@ -61,7 +62,10 @@
     "type": "generic",
     "readerSql": "SELECT appser.appointment_service_id, appser.name AS `service_name`, appser.description AS `service_description`, appser.start_time AS `service_start_time`, appser.end_time AS `service_end_time`, appser.max_appointments_limit AS `service_max_load`, appser.duration_mins AS `service_duration`, l.name AS `location_name`, ast.name AS `service_type`, ast.duration_mins AS `service_type_duration`, spec.name AS `speciality` FROM (SELECT appointment_service_id, name, description, start_time, end_time, max_appointments_limit, duration_mins, location_id, speciality_id, voided FROM appointment_service WHERE voided IS FALSE) appser LEFT OUTER JOIN appointment_service_type ast ON ast.appointment_service_id = appser.appointment_service_id AND ast.voided IS FALSE LEFT OUTER JOIN location l ON l.location_id = appser.location_id AND l.retired IS FALSE LEFT OUTER JOIN appointment_speciality spec ON spec.speciality_id = appser.speciality_id AND spec.voided IS FALSE",
     "chunkSizeToRead": "500",
-    "tableName": "appointment_service"
+    "tableName": "appointment_service",
+    "columnsToIgnore": [
+      "speciality"
+    ]
   },
   {
     "name": "Appointment service availability",
@@ -202,7 +206,9 @@
       "Video",
       "Image",
       "Documents, Image Upload",
-      "Radiology Documents"
+      "Radiology Documents",
+      "FSTG, Comments", "CC, Additional comments, complications", "FUP, Comments about dismissal",
+      "FUP,Comments about next follow-up", "FSTG, Comments about refusal"
     ]
   }
 ]

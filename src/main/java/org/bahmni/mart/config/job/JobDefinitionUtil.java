@@ -1,5 +1,6 @@
 package org.bahmni.mart.config.job;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,16 +16,14 @@ public class JobDefinitionUtil {
 
     private static Logger logger = LoggerFactory.getLogger(JobDefinitionUtil.class);
     public static final String TO_SPLIT_FROM = "(?i)from";
-    public static final String FROM = "from";
     public static final String TO_SPLIT_SELECT = "(?i)select";
-    public static final String SELECT = "select";
     public static final String OBS_JOB_TYPE = "obs";
 
     public static String getReaderSQLByIgnoringColumns(List<String> columnsToIgnore, String readerSQL) {
-        if (readerSQL == null || readerSQL.isEmpty() || columnsToIgnore == null || columnsToIgnore.isEmpty()) {
+        if (StringUtils.isEmpty(readerSQL) || columnsToIgnore == null || columnsToIgnore.isEmpty()) {
             return readerSQL;
         }
-        String[] sqlSubstrings = readerSQL.split(TO_SPLIT_FROM);
+        String[] sqlSubstrings = readerSQL.split(TO_SPLIT_FROM, 2);
         String[] readerSQLColumns = sqlSubstrings[0].trim().split(TO_SPLIT_SELECT)[1].trim().split(",");
 
         List<String> updatedColumns = getUpdatedColumns(readerSQLColumns, columnsToIgnore);
@@ -37,12 +36,12 @@ public class JobDefinitionUtil {
         if (updatedColumns.isEmpty())
             return finalColumns;
         finalColumns = updatedColumns.toString();
-        return SELECT + " " + finalColumns.substring(1, finalColumns.length() - 1) + " " + FROM + query;
+        return String.format("select %s from%s", finalColumns.substring(1, finalColumns.length() - 1), query);
     }
 
     private static String getTrimmedSql(String trimSql) {
         String finalTrimSql = trimSql.trim();
-        String[] splitBy = {"\\.", " as ", " AS "};
+        String[] splitBy = {"\\.", " as ", " AS ", " aS ", " As "};
         for (String splitToken : splitBy) {
             finalTrimSql = (finalTrimSql.split(splitToken).length > 1) ?
                     finalTrimSql.split(splitToken)[1] : finalTrimSql;
