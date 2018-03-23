@@ -1,21 +1,32 @@
 package org.bahmni.mart.form;
 
+import org.bahmni.mart.CommonTestHelper;
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+@PrepareForTest({JobDefinitionUtil.class})
+@RunWith(PowerMockRunner.class)
 public class FormListProcessorTest {
 
     @Mock
@@ -24,15 +35,20 @@ public class FormListProcessorTest {
     @Mock
     private ObsService obsService;
 
+    @Mock
+    private JobDefinitionReader jobDefinitionReader;
+
     private FormListProcessor formListProcessor;
 
     @Before
-    public void setup() {
+    public void setup() throws NoSuchFieldException, IllegalAccessException {
         initMocks(this);
         formListProcessor = new FormListProcessor();
         formListProcessor.setObsService(obsService);
         formListProcessor.setBahmniFormFactory(bahmniFormFactory);
-
+        CommonTestHelper.setValuesForMemberFields(formListProcessor,"jobDefinitionReader",jobDefinitionReader);
+        mockStatic(JobDefinitionUtil.class);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList());
     }
 
     @Test
@@ -42,6 +58,7 @@ public class FormListProcessorTest {
         conceptList.add(conceptA);
 
         when(obsService.getChildConcepts(FormListProcessor.ALL_FORMS)).thenReturn(conceptList);
+        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Arrays.asList());
 
 
         BahmniForm a11 = new BahmniFormBuilder().withName("a11").build();
@@ -69,4 +86,32 @@ public class FormListProcessorTest {
 
     }
 
+    @Test
+    public void shouldRetrieveFormsDiscardingIgnoreConcepts() {
+        Concept conceptA = new Concept(1, "formA", 1);
+        Concept conceptB = new Concept(1,"formB",1);
+        List<Concept> conceptList = new ArrayList();
+        conceptList.add(conceptA);
+        conceptList.add(conceptB);
+
+        when(obsService.getChildConcepts(FormListProcessor.ALL_FORMS)).thenReturn(conceptList);
+        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Arrays.asList("formB"));
+
+        BahmniForm childFormOfA = new BahmniFormBuilder().withName("childFormOfA").build();
+        BahmniForm childFormOfB = new BahmniFormBuilder().withName("childFormOfB").build();
+
+        BahmniForm formA = new BahmniFormBuilder().withName("formA").withChild(childFormOfA).build();
+        BahmniForm formB = new BahmniFormBuilder().withName("formB").withChild(childFormOfB).build();
+
+        when(bahmniFormFactory.createForm(conceptA, null)).thenReturn(formA);
+        when(bahmniFormFactory.createForm(conceptB, null)).thenReturn(formB);
+
+        List<BahmniForm> expected = Arrays.asList(formA, childFormOfA);
+
+        List<BahmniForm> actual = formListProcessor.retrieveAllForms();
+
+        assertEquals(expected.size(), actual.size());
+        assertEquals(expected, actual);
+
+    }
 }

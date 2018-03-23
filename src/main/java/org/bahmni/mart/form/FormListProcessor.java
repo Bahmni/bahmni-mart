@@ -1,5 +1,7 @@
 package org.bahmni.mart.form;
 
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
@@ -22,10 +24,15 @@ public class FormListProcessor {
     @Autowired
     private BahmniFormFactory bahmniFormFactory;
 
+    @Autowired
+    private JobDefinitionReader jobDefinitionReader;
+
 
     public List<BahmniForm> retrieveAllForms() {
+        List<String> ignoreConcepts = JobDefinitionUtil
+                .getIgnoreConceptNamesForObsJob(jobDefinitionReader.getJobDefinitions());
         List<Concept> allFormConcepts = obsService.getChildConcepts(ALL_FORMS);
-        List<BahmniForm> forms = allFormConcepts.stream()
+        List<BahmniForm> forms = allFormConcepts.stream().filter(concept -> !ignoreConcepts.contains(concept.getName()))
                 .map(concept -> bahmniFormFactory.createForm(concept, null)).collect(Collectors.toList());
 
         List<BahmniForm> flattenedFormList = new ArrayList<>(forms);
