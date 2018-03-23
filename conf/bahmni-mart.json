@@ -87,14 +87,14 @@
   {
     "name": "Patient Visit Details",
     "type": "generic",
-    "readerSql": "SELECT visit_id, patient_id, visit.visit_type_id as visit_type_id, vt.name as visit_type_name, vt.description as visit_type_description, date_started as visit_start_date, date_stopped as visit_end_date, indication_concept_id, visit.location_id as location_id, location.name as location_name from visit INNER JOIN visit_type vt ON visit.visit_type_id = vt.visit_type_id AND visit.voided IS FALSE AND vt.retired IS FALSE INNER JOIN location ON visit.location_id = location.location_id AND location.retired IS FALSE",
+    "readerSql": "SELECT visit_id, patient.patient_id AS patient_id, visit.visit_type_id AS visit_type_id, vt.name AS visit_type_name, vt.description AS visit_type_description, date_started AS visit_start_date, date_stopped AS visit_end_date, indication_concept_id, visit.location_id AS location_id, location.name AS location_name FROM patient INNER JOIN visit on patient.patient_id = visit.patient_id AND patient.voided is FALSE AND visit.voided IS FALSE INNER JOIN visit_type vt ON visit.visit_type_id = vt.visit_type_id AND vt.retired IS FALSE INNER JOIN location ON visit.location_id = location.location_id AND location.retired IS FALSE",
     "chunkSizeToRead": "500",
     "tableName": "patient_visit_details"
   },
   {
     "name": "Patient Encounter Details",
     "type": "generic",
-    "readerSql": "SELECT patient_id, visit_id, encounter_id, et.encounter_type_id as encounter_type_id, et.name as encounter_type_name, et.description as encounter_type_description, et.edit_privilege as edit_privilege, et.view_privilege as view_privilege, location_id, form_id, encounter_datetime from encounter INNER JOIN encounter_type et ON encounter.encounter_type = et.encounter_type_id AND encounter.voided is FALSE AND et.retired is FALSE",
+    "readerSql": "SELECT patient.patient_id, visit_id, encounter_id, et.encounter_type_id AS encounter_type_id, et.name AS encounter_type_name, et.description AS encounter_type_description, et.edit_privilege AS edit_privilege, et.view_privilege AS view_privilege, location_id, form_id, encounter_datetime FROM patient INNER JOIN encounter ON patient.patient_id = encounter.patient_id AND patient.voided IS FALSE INNER JOIN encounter_type et ON encounter.encounter_type = et.encounter_type_id AND encounter.voided IS FALSE AND et.retired IS FALSE",
     "chunkSizeToRead": "500",
     "tableName": "patient_encounter_details"
   },
@@ -127,6 +127,27 @@
     "tableName": "location_tag_map"
   },
   {
+    "name": "Location Attribute Details",
+    "type": "generic",
+    "readerSql": "SELECT location_attribute_id, location_id, lat.location_attribute_type_id as attribute_type_id, la.value_reference as value_reference, lat.name as location_attribute_type_name, lat.description as location_attribute_type_description, lat.datatype as location_attribute_type_datatype, lat.datatype_config as location_attribute_type_datatype_config, lat.preferred_handler as location_attribute_type_preferred_handler, lat.handler_config as location_attribute_type_handler_config, lat.min_occurs as location_attribute_type_min_occurs, lat.max_occurs as location_attribute_type_max_occurs from location_attribute la INNER JOIN location_attribute_type lat on la.attribute_type_id = lat.location_attribute_type_id AND la.voided IS FALSE AND lat.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "location_attribute_details"
+  },
+  {
+    "name": "Visit Attribute Details",
+    "type": "generic",
+    "readerSql": "SELECT va.visit_id AS visit_id, va.visit_attribute_id AS visit_attribute_id, va.value_reference AS value_reference, vat.visit_attribute_type_id AS visit_attribute_type_id, vat.name AS visit_attribute_type_name, vat.description AS visit_attribute_type_description, vat.datatype AS visit_attribute_type_datatype, vat.datatype_config AS visit_attribute_type_datatype_config, vat.preferred_handler AS visit_attribute_type_preferred_handler, vat.handler_config AS visit_attribute_type_handler_config, vat.min_occurs AS visit_attribute_type_min_occurs, vat.max_occurs AS visit_attribute_type_max_occurs FROM visit INNER JOIN visit_attribute va on visit.visit_id = va.visit_id AND visit.voided is FALSE INNER JOIN visit_attribute_type vat ON va.attribute_type_id = vat.visit_attribute_type_id AND va.voided IS FALSE AND vat.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "visit_attribute_details"
+  },
+  {
+    "name": "Provider Attribute Details",
+    "type": "generic",
+    "readerSql": "SELECT pa.provider_attribute_id AS provider_attribute_id, pat.provider_attribute_type_id AS attribute_type_id, pa.provider_id AS provider_id, pa.value_reference AS value_reference, pat.name AS provider_attribute_type_name, pat.description AS provider_attribute_type_description, pat.datatype AS provider_attribute_datatype, pat.datatype_config AS provider_attribute_datatype_config, pat.preferred_handler AS provider_attribute_type_preferred_handler, pat.handler_config AS provider_attribute_type_handler_config, pat.min_occurs AS provider_attribute_type_min_occurs, pat.max_occurs AS provider_attribute_type_max_occurs FROM provider INNER JOIN provider_attribute pa on provider.provider_id = pa.provider_id AND provider.retired IS FALSE INNER JOIN provider_attribute_type pat ON pa.attribute_type_id = pat.provider_attribute_type_id AND pa.voided IS FALSE AND pat.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "provider_attribute_details"
+  },
+  {
     "name": "Person Attributes",
     "type": "eav",
     "chunkSizeToRead": "500",
@@ -138,6 +159,34 @@
       "typeTableJoiningId": "person_attribute_type_id",
       "valueColumnName": "value",
       "primaryKey": "person_id"
+    }
+  },
+  {
+    "name": "Visit Attributes",
+    "type": "eav",
+    "chunkSizeToRead": "500",
+    "tableName": "visit_attributes",
+    "eavAttributes": {
+      "attributeTypeTableName": "visit_attribute_type",
+      "attributeTableName": "visit_attribute",
+      "valueTableJoiningId": "attribute_type_id",
+      "typeTableJoiningId": "visit_attribute_type_id",
+      "valueColumnName": "value_reference",
+      "primaryKey": "visit_id"
+    }
+  },
+  {
+    "name": "Provider Attributes",
+    "type": "eav",
+    "chunkSizeToRead": "500",
+    "tableName": "provider_attributes",
+    "eavAttributes": {
+      "attributeTypeTableName": "provider_attribute_type",
+      "attributeTableName": "provider_attribute",
+      "valueTableJoiningId": "attribute_type_id",
+      "typeTableJoiningId": "provider_attribute_type_id",
+      "valueColumnName": "value_reference",
+      "primaryKey": "provider_id"
     }
   },
   {
