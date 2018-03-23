@@ -8,8 +8,9 @@ import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
-import org.bahmni.mart.exports.template.SimpleJobTemplate;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
+import org.bahmni.mart.exports.template.EAVJobTemplate;
+import org.bahmni.mart.exports.template.SimpleJobTemplate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,6 +73,9 @@ public class BatchConfigurationTest {
     private SimpleJobTemplate simpleJobTemplate;
 
     @Mock
+    private EAVJobTemplate eavJobTemplate;
+
+    @Mock
     private JobLauncher jobLauncher;
 
     @Mock
@@ -96,6 +100,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "metaDataStepConfigurer", metaDataStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
                 treatmentRegistrationBaseExportStep);
+        setValuesForMemberFields(batchConfiguration, "eavJobTemplate", eavJobTemplate);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME)).thenReturn(jobBuilder);
@@ -236,5 +241,23 @@ public class BatchConfigurationTest {
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(0)).createTables();
         verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));
+    }
+
+    @Test
+    public void shouldRunEavJob() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        Job job = mock(Job.class);
+
+        when(jobDefinition.getReaderSql()).thenReturn("Some sql");
+        when(jobDefinition.getTableName()).thenReturn("Some table");
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinition.getType()).thenReturn("eav");
+        when(eavJobTemplate.buildJob(jobDefinition)).thenReturn(job);
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+        verify(eavJobTemplate, times(1)).buildJob(jobDefinition);
     }
 }

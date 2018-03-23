@@ -43,12 +43,12 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         List<Map<String, Object>> tables = martJdbcTemplate.queryForList("SELECT TABLE_NAME FROM " +
                 "INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='PUBLIC' AND TABLE_NAME <> 'test'");
-        assertTrue(tables.size() >= 5);
+        assertTrue(tables.size() >= 6);
 
         List<String> tableNames = tables.stream().map(table -> table.get("TABLE_NAME").toString())
                 .collect(Collectors.toList());
         List<String> expectedTableNames = Arrays.asList("patient_allergy_status_test", "first_stage_validation",
-                "fstg,_specialty_determined_by_mlo", "follow-up_validation", "stage");
+                "fstg,_specialty_determined_by_mlo", "follow-up_validation", "stage", "person_attributes");
         assertTrue(tableNames.containsAll(expectedTableNames));
         verifyTableColumns();
 
@@ -101,6 +101,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         tableMap.put("follow-up_validation", Arrays.asList("id_follow-up_validation", "patient_id", "encounter_id"));
         tableMap.put("stage", Arrays.asList("id_stage", "patient_id", "encounter_id", "id_first_stage_validation",
                 "stage", "id_follow-up_validation"));
+        tableMap.put("person_attributes", Arrays.asList("person_id", "givennamelocal", "familynamelocal",
+                "middlenamelocal", "viber", "phonenumber2"));
 
         for (String tableName : tableMap.keySet()) {
             String sql = String.format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' " +

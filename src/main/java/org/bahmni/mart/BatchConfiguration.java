@@ -8,9 +8,9 @@ import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
+import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.mart.exports.template.EAVJobTemplate;
 import org.bahmni.mart.exports.template.SimpleJobTemplate;
-import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -136,9 +136,17 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     }
 
     private List<Job> getJobs() {
-        return jobDefinitions.stream().map(jobDefinition -> jobDefinition.getType().equals("obs") ? buildObsJob()
-                : jobDefinition.getType().equals("eav") ? eavJobTemplate.buildJob(jobDefinition)
-                : simpleJobTemplate.buildJob(jobDefinition))
-                .filter(Objects::nonNull).collect(Collectors.toList());
+        return jobDefinitions.stream().map(this::getJobByType).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    private Job getJobByType(JobDefinition jobDefinition) {
+        switch (jobDefinition.getType()) {
+          case "obs":
+              return buildObsJob();
+          case "eav":
+              return eavJobTemplate.buildJob(jobDefinition);
+          default:
+              return simpleJobTemplate.buildJob(jobDefinition);
+        }
     }
 }
