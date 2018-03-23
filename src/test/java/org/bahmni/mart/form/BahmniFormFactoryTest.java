@@ -1,10 +1,12 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.helper.SeparateTableConfigHelper;
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.helper.SeparateTableConfigHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,13 +22,14 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-@PrepareForTest({BatchUtils.class})
+@PrepareForTest({BatchUtils.class, JobDefinitionUtil.class})
 @RunWith(PowerMockRunner.class)
 public class BahmniFormFactoryTest {
 
@@ -41,6 +44,9 @@ public class BahmniFormFactoryTest {
 
     @Mock
     private SeparateTableConfigHelper separateTableConfigHelper;
+
+    @Mock
+    private JobDefinitionReader jobDefinitionReader;
 
     private List<String> separateTableConceptList;
     private List<String> ignoreConceptsNameList;
@@ -58,7 +64,6 @@ public class BahmniFormFactoryTest {
         separateTableConcepts.add(new Concept(7771, "BP", 1));
         separateTableConcepts.add(new Concept(1209, "Notes", 0));
 
-        String ignoreConceptNames = "Video, Audio";
         ignoreConceptsNameList = Arrays.asList("Video", "Audio");
         List<Concept> ignoreConcepts = new ArrayList<>();
         ignoreConcepts.add(new Concept(1111, "Video", 0));
@@ -76,14 +81,17 @@ public class BahmniFormFactoryTest {
 
         bahmniFormFactory = new BahmniFormFactory();
         bahmniFormFactory.setObsService(obsService);
-        setValuesForMemberFields(bahmniFormFactory,"separateTableConfigHelper", separateTableConfigHelper);
+        setValuesForMemberFields(bahmniFormFactory, "separateTableConfigHelper", separateTableConfigHelper);
+        setValuesForMemberFields(bahmniFormFactory, "jobDefinitionReader", jobDefinitionReader);
         mockStatic(BatchUtils.class);
-        when(BatchUtils.convertConceptNamesToSet(ignoreConceptNames)).thenReturn(ignoreConceptsNameList);
-        when(separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames()).thenReturn(separateTableConceptList);
+        mockStatic(JobDefinitionUtil.class);
+        when(obsService.getConceptsByNames(any())).thenReturn(ignoreConcepts);
+        when(JobDefinitionUtil.getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsNameList);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList());
+        when(separateTableConfigHelper.getAllSeparateTableConceptNames()).thenReturn(separateTableConceptList);
         when(obsService.getConceptsByNames(separateTableConceptList))
                 .thenReturn(separateTableConcepts);
         when(obsService.getConceptsByNames(ignoreConceptsNameList)).thenReturn(ignoreConcepts);
-        setValuesForMemberFields(bahmniFormFactory, "ignoreConceptsNames", ignoreConceptNames);
         bahmniFormFactory.postConstruct();
     }
 

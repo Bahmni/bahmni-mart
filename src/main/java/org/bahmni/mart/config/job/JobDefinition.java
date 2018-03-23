@@ -8,9 +8,18 @@ public class JobDefinition {
     private String readerSql;
     private int chunkSizeToRead;
     private String tableName;
+    private List<String> separateTables;
     private String conceptReferenceSource;
     private List<String> columnsToIgnore;
     private EAVJobData eavAttributes;
+
+    public List<String> getSeparateTables() {
+        return separateTables;
+    }
+
+    public void setSeparateTables(List<String> separateTables) {
+        this.separateTables = separateTables;
+    }
 
     public int getChunkSizeToRead() {
         return chunkSizeToRead;

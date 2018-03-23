@@ -34,6 +34,11 @@
     "separateTables": [
       "FSTG, Specialty determined by MLO",
       "Stage"
+    ],
+    "conceptReferenceSource": "",
+    "columnsToIgnore": [
+      "MH, Name of MLO"
     ]
   }
+
 ]

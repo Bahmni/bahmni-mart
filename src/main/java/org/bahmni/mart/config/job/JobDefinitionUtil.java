@@ -1,17 +1,24 @@
 package org.bahmni.mart.config.job;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 public class JobDefinitionUtil {
 
+    private static Logger logger = LoggerFactory.getLogger(JobDefinitionUtil.class);
     public static final String TO_SPLIT_FROM = "(?i)from";
     public static final String FROM = "from";
     public static final String TO_SPLIT_SELECT = "(?i)select";
     public static final String SELECT = "select";
+    public static final String OBS_JOB_TYPE = "obs";
 
     public static String getReaderSQLByIgnoringColumns(List<String> columnsToIgnore, String readerSQL) {
         if (readerSQL == null || readerSQL.isEmpty() || columnsToIgnore == null || columnsToIgnore.isEmpty()) {
@@ -59,4 +66,24 @@ public class JobDefinitionUtil {
         return updatedColumns;
     }
 
+    public static List<String> getIgnoreConceptNamesForObsJob(List<JobDefinition> jobDefinitions) {
+        List<String> columnsToIgnore = getObsJobDefinition(jobDefinitions).getColumnsToIgnore();
+        return columnsToIgnore == null ? new ArrayList<>() : columnsToIgnore;
+    }
+
+    public static List<String> getSeparateTableNamesForObsJob(List<JobDefinition> jobDefinitions) {
+        List<String> separateTables = getObsJobDefinition(jobDefinitions).getSeparateTables();
+        return separateTables == null ? new ArrayList<>() : separateTables;
+    }
+
+    public static JobDefinition getObsJobDefinition(List<JobDefinition> jobDefinitions) {
+        try {
+            Optional<JobDefinition> optionalObsJobDefinition = jobDefinitions.stream()
+                    .filter(jobDefinition -> jobDefinition.getType().equals(OBS_JOB_TYPE)).findFirst();
+            return optionalObsJobDefinition.get();
+        } catch (NoSuchElementException e) {
+            logger.info("No obs job definition found");
+        }
+        return new JobDefinition();
+    }
 }

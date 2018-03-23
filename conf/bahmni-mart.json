@@ -148,6 +148,12 @@
       "SMH, Pain Assessment",
       "FV, Outcomes FV"
     ],
-    "conceptReferenceSource": "MSF-INTERNAL"
+    "conceptReferenceSource": "MSF-INTERNAL",
+    "columnsToIgnore": [
+      "Video",
+      "Image",
+      "Documents, Image Upload",
+      "Radiology Documents"
+    ]
   }
 ]

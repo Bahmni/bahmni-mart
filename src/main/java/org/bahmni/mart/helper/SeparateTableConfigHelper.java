@@ -1,14 +1,13 @@
 package org.bahmni.mart.helper;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -21,13 +20,17 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForObsJob;
 
 @Component
 public class SeparateTableConfigHelper {
 
-    private static final String TYPE_KEY = "type";
-    private static final String OBS_TYPE = "obs";
-    private static final String SEPARATE_TABLES_KEY = "separateTables";
+    private static final Logger log = LoggerFactory.getLogger(SeparateTableConfigHelper.class);
+    private static final String ALLOW_ADD_MORE_KEY = "allowAddMore";
+    private static final String MULTI_SELECT_KEY = "multiSelect";
+    private static final String CONCEPT_SET_UI_KEY = "conceptSetUI";
+    private static final String CONFIG_KEY = "config";
 
     @Value("${defaultConfigPath}")
     private String defaultConfigFile;
@@ -35,23 +38,13 @@ public class SeparateTableConfigHelper {
     @Value("${implementationConfigPath}")
     private String implementationConfigFile;
 
-    @Value("${ignoreConcepts}")
-    private String ignoreConcepts;
-
-    @Value("${bahmniMartConfigFile}")
-    private Resource configFile;
-
-
-    private static final Logger log = LoggerFactory.getLogger(SeparateTableConfigHelper.class);
-
-    private static final String ALLOW_ADD_MORE_KEY = "allowAddMore";
-    private static final String MULTI_SELECT_KEY = "multiSelect";
-    private static final String CONCEPT_SET_UI_KEY = "conceptSetUI";
-    private static final String CONFIG_KEY = "config";
+    @Autowired
+    private JobDefinitionReader jobDefinitionReader;
 
     public List<String> getAddMoreAndMultiSelectConceptNames() {
         List<String> multiSelectAndAddMore = new ArrayList<>();
-        List<String> ignoreConceptsList = BatchUtils.convertConceptNamesToSet(ignoreConcepts);
+        List<String> ignoreConceptsList = getIgnoreConceptNamesForObsJob(
+                jobDefinitionReader.getJobDefinitions());
 
         for (Map.Entry<String, JsonElement> concept : getAllConceptSet()) {
             String conceptName = concept.getKey();
@@ -91,21 +84,16 @@ public class SeparateTableConfigHelper {
         }
     }
 
-    public List<String> getSeparateTableNames() {
-        List<String> separateTableNames = new ArrayList<String>();
-        JsonArray jobsConfig = new JsonParser().parse(BatchUtils
-                .convertResourceOutputToString(configFile)).getAsJsonArray();
-        for (JsonElement job : jobsConfig) {
-            if (job.getAsJsonObject().get(TYPE_KEY).getAsString().equals(OBS_TYPE)) {
-                JsonElement separateTablesConfig = job.getAsJsonObject().get(SEPARATE_TABLES_KEY);
-                JsonArray separateTables = separateTablesConfig != null ? separateTablesConfig.getAsJsonArray() :
-                        new JsonArray();
-                for (JsonElement seperateTable : separateTables) {
-                    separateTableNames.add(seperateTable.getAsString());
-                }
+    public List<String> getAllSeparateTableConceptNames() {
+        List<String> multiSelectAndAddMoreConceptsNames = getAddMoreAndMultiSelectConceptNames();
+        List<String> separateTableConceptsNames =
+                getSeparateTableNamesForObsJob(jobDefinitionReader.getJobDefinitions());
+
+        for (String conceptName : multiSelectAndAddMoreConceptsNames) {
+            if (!separateTableConceptsNames.contains(conceptName)) {
+                separateTableConceptsNames.add(conceptName);
             }
         }
-        return separateTableNames;
+        return separateTableConceptsNames;
     }
-
 }

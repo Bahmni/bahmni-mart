@@ -43,7 +43,7 @@ public class JobDefinitionReaderTest {
         json = "[\n" +
                 "  {\n" +
                 "    \"name\": \"Program Data\",\n" +
-                "    \"type\": \"program\",\n" +
+                "    \"type\": \"generic\",\n" +
                 "    \"readerSql\": \"select * from program\",\n" +
                 "    \"chunkSizeToRead\": \"1000\",\n" +
                 "    \"tableName\": \"MyProgram\"\n" +
@@ -61,7 +61,7 @@ public class JobDefinitionReaderTest {
         assertNotNull(jobDefinitions);
         assertEquals(1, jobDefinitions.size());
         assertEquals("Program Data", jobDefinitions.get(0).getName());
-        assertEquals("program", jobDefinitions.get(0).getType());
+        assertEquals("generic", jobDefinitions.get(0).getType());
         assertEquals("select * from program", jobDefinitions.get(0).getReaderSql());
         assertEquals(1000, jobDefinitions.get(0).getChunkSizeToRead());
         assertEquals("MyProgram", jobDefinitions.get(0).getTableName());
@@ -72,11 +72,11 @@ public class JobDefinitionReaderTest {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getType()).thenReturn("obs");
         when(jobDefinition.getConceptReferenceSource()).thenReturn("BAHMNI_INTERNAL");
-        setValuesForMemberFields(jobDefinitionReader,"jobDefinitions", Arrays.asList(jobDefinition));
+        setValuesForMemberFields(jobDefinitionReader, "jobDefinitions", Arrays.asList(jobDefinition));
 
         String conceptReferenceSource = jobDefinitionReader.getConceptReferenceSource();
 
-        assertEquals("BAHMNI_INTERNAL",conceptReferenceSource);
+        assertEquals("BAHMNI_INTERNAL", conceptReferenceSource);
 
     }
 
@@ -84,11 +84,11 @@ public class JobDefinitionReaderTest {
     public void shouldReturnEmptyStringIfConceptReferenceSourceIsNotPresent() throws Exception {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getType()).thenReturn("obs");
-        setValuesForMemberFields(jobDefinitionReader,"jobDefinitions", Arrays.asList(jobDefinition));
+        setValuesForMemberFields(jobDefinitionReader, "jobDefinitions", Arrays.asList(jobDefinition));
 
         String conceptReferenceSource = jobDefinitionReader.getConceptReferenceSource();
 
-        assertEquals("",conceptReferenceSource);
+        assertEquals("", conceptReferenceSource);
     }
 
     @Test

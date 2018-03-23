@@ -41,11 +41,9 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldReturnConceptNamesListWhenImplConfigFileIsNotPresentInTheGivenPath() throws Exception {
-        SeparateTableConfigHelper separateTableConfigHelper = new SeparateTableConfigHelper();
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "/src/notPresent.json");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile",
                 "src/test/resources/conf/defaultApp.json");
-        setValuesForMemberFields(separateTableConfigHelper, "ignoreConcepts", "");
 
         List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
         assertEquals(2, conceptNames.size());
@@ -55,15 +53,13 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldReturnConceptNamesListWhenDefaultConfigFileIsNotPresentInTheGivenPath() throws Exception {
-        SeparateTableConfigHelper separateTableConfigHelper = new SeparateTableConfigHelper();
-        setValuesForMemberFields(separateTableConfigHelper, "ignoreConcepts", "");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile",
                 "src/test/resources/conf/implementationApp.json");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "/src/notPresent.json");
 
         List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
-        assertEquals(2, conceptNames.size());
-        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "MH, Name of MLO");
+        assertEquals(1, conceptNames.size());
+        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
     }
 
@@ -71,9 +67,6 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
     public void shouldGiveEmptyListWhenBothConfigFilesAreEmpty() throws Exception {
         FileUtils.touch(new File(emptyDefaultConfPath));
         FileUtils.touch(new File(emptyImplConfPath));
-
-        SeparateTableConfigHelper separateTableConfigHelper = new SeparateTableConfigHelper();
-        setValuesForMemberFields(separateTableConfigHelper, "ignoreConcepts", "");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", emptyDefaultConfPath);
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", emptyImplConfPath);
 

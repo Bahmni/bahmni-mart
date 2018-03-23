@@ -1,28 +1,29 @@
 package org.bahmni.mart.form;
 
-import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.helper.SeparateTableConfigHelper;
+import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.helper.SeparateTableConfigHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
+
 @Component
 public class BahmniFormFactory {
-
-    @Value("${ignoreConcepts}")
-    private String ignoreConceptsNames;
 
     @Autowired
     private ObsService obsService;
 
     @Autowired
     private SeparateTableConfigHelper separateTableConfigHelper;
+
+    @Autowired
+    private JobDefinitionReader jobDefinitionReader;
 
     private List<Concept> allSeparateTableConcepts;
     private List<Concept> ignoreConcepts;
@@ -74,22 +75,10 @@ public class BahmniFormFactory {
 
     @PostConstruct
     public void postConstruct() {
-        List<String> allSeparateTableConceptNames = getAllSeparateTableConceptNames();
+        List<String> allSeparateTableConceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
         this.allSeparateTableConcepts = obsService.getConceptsByNames(allSeparateTableConceptNames);
-        this.ignoreConcepts = obsService.getConceptsByNames(BatchUtils.convertConceptNamesToSet(ignoreConceptsNames));
-    }
-
-    private List<String> getAllSeparateTableConceptNames() {
-        List<String> multiSelectAndAddMoreConceptsNames = separateTableConfigHelper
-                .getAddMoreAndMultiSelectConceptNames();
-        List<String> separateTableConceptsNames = separateTableConfigHelper.getSeparateTableNames();
-
-        for (String conceptName : multiSelectAndAddMoreConceptsNames) {
-            if (!separateTableConceptsNames.contains(conceptName)) {
-                separateTableConceptsNames.add(conceptName);
-            }
-        }
-        return separateTableConceptsNames;
+        this.ignoreConcepts = obsService.getConceptsByNames(getIgnoreConceptNamesForObsJob(
+                jobDefinitionReader.getJobDefinitions()));
     }
 
     public void setObsService(ObsService obsService) {
