@@ -1,7 +1,7 @@
 package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.exports.SimpleJobTemplate;
+import org.bahmni.mart.exports.template.SimpleJobTemplate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

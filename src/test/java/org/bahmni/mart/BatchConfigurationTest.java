@@ -8,7 +8,7 @@ import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
-import org.bahmni.mart.exports.SimpleJobTemplate;
+import org.bahmni.mart.exports.template.SimpleJobTemplate;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.junit.Before;
 import org.junit.Rule;

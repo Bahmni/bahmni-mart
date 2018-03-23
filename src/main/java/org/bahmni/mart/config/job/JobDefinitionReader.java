@@ -2,7 +2,7 @@ package org.bahmni.mart.config.job;
 
 import com.google.gson.Gson;
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.exports.SimpleJobTemplate;
+import org.bahmni.mart.exports.template.SimpleJobTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

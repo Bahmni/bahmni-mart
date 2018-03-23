@@ -1,4 +1,4 @@
-package org.bahmni.mart.exports;
+package org.bahmni.mart.exports.template;
 
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.table.TableDataProcessor;
@@ -18,6 +18,8 @@ import org.springframework.jdbc.core.ColumnMapRowMapper;
 
 import javax.sql.DataSource;
 import java.util.Map;
+
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
 
 public class JobTemplate {
 
@@ -40,7 +42,8 @@ public class JobTemplate {
         return jobBuilderFactory.get(jobConfiguration.getName())
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(loadData(jobConfiguration, listener, readerSql))
+                .flow(loadData(jobConfiguration, listener,
+                        getReaderSQLByIgnoringColumns(jobConfiguration.getColumnsToIgnore(), readerSql)))
                 .end().build();
     }
 
