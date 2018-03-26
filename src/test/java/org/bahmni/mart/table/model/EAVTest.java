@@ -1,6 +1,6 @@
 package org.bahmni.mart.table.model;
 
-import org.bahmni.mart.config.job.EAVJobData;
+import org.bahmni.mart.config.job.EavAttributes;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,23 +17,23 @@ public class EAVTest {
     private TableData tableData;
 
     @Mock
-    private EAVJobData eavJobData;
+    private EavAttributes eavAttributes;
 
     @Test
     public void shouldReturnDataTypeColumnNameForPersonAttributeTypeTable() {
-        when(eavJobData.getAttributeTypeTableName()).thenReturn("person_attribute_type");
-        assertEquals("format", new EAV(tableData, eavJobData).getTypeColumnName());
+        when(eavAttributes.getAttributeTypeTableName()).thenReturn("person_attribute_type");
+        assertEquals("format", new EAV(tableData, eavAttributes).getTypeColumnName());
     }
 
     @Test
     public void shouldReturnDataTypeColumnNameForVisitAttributeTypeTable() {
-        when(eavJobData.getAttributeTypeTableName()).thenReturn("visit_attribute_type");
-        assertEquals("datatype", new EAV(tableData, eavJobData).getTypeColumnName());
+        when(eavAttributes.getAttributeTypeTableName()).thenReturn("visit_attribute_type");
+        assertEquals("datatype", new EAV(tableData, eavAttributes).getTypeColumnName());
     }
 
     @Test
     public void shouldReturnDataTypeColumnNameForProviderAttributeTypeTable() {
-        when(eavJobData.getAttributeTypeTableName()).thenReturn("provider_attribute_type");
-        assertEquals("datatype", new EAV(tableData, eavJobData).getTypeColumnName());
+        when(eavAttributes.getAttributeTypeTableName()).thenReturn("provider_attribute_type");
+        assertEquals("datatype", new EAV(tableData, eavAttributes).getTypeColumnName());
     }
 }

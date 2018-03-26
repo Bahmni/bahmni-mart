@@ -1,6 +1,6 @@
 package org.bahmni.mart.config.job;
 
-public class EAVJobData {
+public class EavAttributes {
     private String attributeTypeTableName;
     private String attributeTableName;
     private String valueTableJoiningId;

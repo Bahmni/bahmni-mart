@@ -11,7 +11,7 @@ public class JobDefinition {
     private List<String> separateTables;
     private String conceptReferenceSource;
     private List<String> columnsToIgnore;
-    private EAVJobData eavAttributes;
+    private EavAttributes eavAttributes;
 
     public List<String> getSeparateTables() {
         return separateTables;
@@ -73,11 +73,11 @@ public class JobDefinition {
         this.columnsToIgnore = columnsToIgnore;
     }
 
-    public EAVJobData getEavAttributes() {
+    public EavAttributes getEavAttributes() {
         return eavAttributes;
     }
 
-    public void setEavAttributes(EAVJobData eavAttributes) {
+    public void setEavAttributes(EavAttributes eavAttributes) {
         this.eavAttributes = eavAttributes;
     }
 

@@ -1,6 +1,6 @@
 package org.bahmni.mart.table.listener;
 
-import org.bahmni.mart.config.job.EAVJobData;
+import org.bahmni.mart.config.job.EavAttributes;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.table.TableGeneratorStep;
@@ -50,7 +50,7 @@ public class EAVJobListenerTest {
     private JdbcTemplate openMRSJdbcTemplate;
 
     @Mock
-    private EAVJobData eavJobData;
+    private EavAttributes eavAttributes;
 
     @Mock
     private TableColumn tableColumn;
@@ -82,11 +82,11 @@ public class EAVJobListenerTest {
 
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
         when(jobDefinitionReader.getJobDefinitionByName(anyString())).thenReturn(jobDefinition);
-        when(jobDefinition.getEavAttributes()).thenReturn(eavJobData);
-        when(eavJobData.getAttributeTypeTableName()).thenReturn(attributeTable);
+        when(jobDefinition.getEavAttributes()).thenReturn(eavAttributes);
+        when(eavAttributes.getAttributeTypeTableName()).thenReturn(attributeTable);
         when(openMRSJdbcTemplate.queryForList(sql, String.class))
                 .thenReturn(Arrays.asList("givenLocalName", "familyName"));
-        when(eavJobData.getPrimaryKey()).thenReturn(primaryKey);
+        when(eavAttributes.getPrimaryKey()).thenReturn(primaryKey);
         whenNew(TableColumn.class)
                 .withArguments(primaryKey, "integer", true, null)
                 .thenReturn(tableColumn);
@@ -103,7 +103,7 @@ public class EAVJobListenerTest {
         verify(jobExecution, times(1)).getJobInstance();
         verify(jobInstance, times(1)).getJobName();
         verify(jobDefinitionReader, times(1)).getJobDefinitionByName(anyString());
-        verify(eavJobData, times(1)).getAttributeTypeTableName();
+        verify(eavAttributes, times(1)).getAttributeTypeTableName();
         verify(openMRSJdbcTemplate, times(1)).queryForList(sql, String.class);
         verify(tableGeneratorStep, times(1)).createTables(any());
     }

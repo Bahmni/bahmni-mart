@@ -1,6 +1,6 @@
 package org.bahmni.mart.table.listener;
 
-import org.bahmni.mart.config.job.EAVJobData;
+import org.bahmni.mart.config.job.EavAttributes;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
@@ -31,11 +31,11 @@ public class EAVJobListener extends AbstractJobListener {
     }
 
     private List<TableColumn> getColumns(JobDefinition jobConfiguration) {
-        EAVJobData eavJobData = jobConfiguration.getEavAttributes();
-        List<String> pivotColumns = getPivotColumns(eavJobData.getAttributeTypeTableName());
+        EavAttributes eavAttributes = jobConfiguration.getEavAttributes();
+        List<String> pivotColumns = getPivotColumns(eavAttributes.getAttributeTypeTableName());
 
         ArrayList<TableColumn> tableColumns = new ArrayList<>();
-        tableColumns.add(new TableColumn(eavJobData.getPrimaryKey(), "integer", true, null));
+        tableColumns.add(new TableColumn(eavAttributes.getPrimaryKey(), "integer", true, null));
         pivotColumns.forEach(columnTitle -> tableColumns.add(new TableColumn(columnTitle, "text", false, null)));
 
         return tableColumns;

@@ -6,18 +6,18 @@ SELECT
             <#assign primary_key = column.name>
         <#else >
         MAX(if( name =  '${column.name}',
-                    if  (value_table.${input.eavJobData.valueColumnName} REGEXP '^[[:digit:]]*$' AND
-                        ${getType('${column.name}', '${input.eavJobData.attributeTypeTableName}',
+                    if  (value_table.${input.eavAttributes.valueColumnName} REGEXP '^[[:digit:]]*$' AND
+                        ${getType('${column.name}', '${input.eavAttributes.attributeTypeTableName}',
                             '${input.typeColumnName}')} REGEXP '^org.openmrs.Concept$' AND
-                        ${getConceptName(input.eavJobData.valueColumnName)} IS NOT NULL,
-                        ${getConceptName(input.eavJobData.valueColumnName)},
-                        value_table.${input.eavJobData.valueColumnName})
+                        ${getConceptName(input.eavAttributes.valueColumnName)} IS NOT NULL,
+                        ${getConceptName(input.eavAttributes.valueColumnName)},
+                        value_table.${input.eavAttributes.valueColumnName})
         , NULL)) AS '${column.name}'
         </#if>
         <#if input.tableData.columns?seq_index_of(column) <=  input.tableData.columns?size - 2 >,</#if>
     </#list>
-FROM ${input.eavJobData.attributeTableName} as value_table INNER JOIN  ${input.eavJobData.attributeTypeTableName} as type_table
-WHERE value_table.${input.eavJobData.valueTableJoiningId} = type_table.${input.eavJobData.typeTableJoiningId}
+FROM ${input.eavAttributes.attributeTableName} as value_table INNER JOIN  ${input.eavAttributes.attributeTypeTableName} as type_table
+WHERE value_table.${input.eavAttributes.valueTableJoiningId} = type_table.${input.eavAttributes.typeTableJoiningId}
 GROUP BY ${primary_key} ;
 </@compress>
 
