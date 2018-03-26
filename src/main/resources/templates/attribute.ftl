@@ -7,6 +7,8 @@ SELECT
         <#else >
         MAX(if( name =  '${column.name}',
                     if  (value_table.${input.eavJobData.valueColumnName} REGEXP '^[[:digit:]]*$' AND
+                        ${getType('${column.name}', '${input.eavJobData.attributeTypeTableName}',
+                            '${input.typeColumnName}')} REGEXP '^org.openmrs.Concept$' AND
                         ${getConceptName(input.eavJobData.valueColumnName)} IS NOT NULL,
                         ${getConceptName(input.eavJobData.valueColumnName)},
                         value_table.${input.eavJobData.valueColumnName})
@@ -22,6 +24,11 @@ GROUP BY ${primary_key} ;
 <#function getConceptName conceptId>
     <#assign conceptName = "(select max(name) from concept_name where concept_id = value_table.${conceptId})">
     <#return conceptName>
+</#function>
+
+<#function getType attributeName typeTableName typeColumnName>
+    <#assign type="(select ${typeColumnName} from ${typeTableName} where name = '${attributeName}')">
+<#return type>
 </#function>
 
 

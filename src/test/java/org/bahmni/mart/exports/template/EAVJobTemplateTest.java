@@ -1,5 +1,6 @@
 package org.bahmni.mart.exports.template;
 
+import org.bahmni.mart.config.job.EAVJobData;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.table.domain.TableData;
@@ -32,6 +33,9 @@ public class EAVJobTemplateTest {
     private FreeMarkerEvaluator<EAV> freeMarkerEvaluator;
 
     @Mock
+    private EAVJobData eavJobData;
+
+    @Mock
     private TableData tableData;
 
     @Test
@@ -45,16 +49,19 @@ public class EAVJobTemplateTest {
         JobDefinition jobDefinition = new JobDefinition();
         jobDefinition.setName(testJobName);
         jobDefinition.setChunkSizeToRead(100);
+        jobDefinition.setEavAttributes(eavJobData);
 
         EAVJobTemplate spyEAVJobTemplate = spy(eavJobTemplate);
 
         doReturn(job).when((JobTemplate) spyEAVJobTemplate).buildJob(jobDefinition, listener, readerSql);
         when(listener.getTableDataForMart(testJobName)).thenReturn(tableData);
         when(freeMarkerEvaluator.evaluate(eq("attribute.ftl"), any(EAV.class))).thenReturn(readerSql);
+        when(eavJobData.getAttributeTypeTableName()).thenReturn("person_attribute_type");
 
         spyEAVJobTemplate.buildJob(jobDefinition);
         verify(spyEAVJobTemplate, times(1)).buildJob(jobDefinition, listener, readerSql);
         verify(listener, times(1)).getTableDataForMart(testJobName);
         verify(freeMarkerEvaluator, times(1)).evaluate(eq("attribute.ftl"), any(EAV.class));
+        verify(eavJobData, times(1)).getAttributeTypeTableName();
     }
 }
