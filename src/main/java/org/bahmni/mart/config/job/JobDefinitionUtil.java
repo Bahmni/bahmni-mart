@@ -1,88 +1,68 @@
 package org.bahmni.mart.config.job;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 public class JobDefinitionUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(JobDefinitionUtil.class);
-    public static final String TO_SPLIT_FROM = "(?i)from";
-    public static final String TO_SPLIT_SELECT = "(?i)select";
-    public static final String OBS_JOB_TYPE = "obs";
+    private static final String TO_SPLIT_FROM = "(?i)from";
+    private static final String TO_SPLIT_SELECT = "(?i)select";
+    private static final String OBS_JOB_TYPE = "obs";
 
     public static String getReaderSQLByIgnoringColumns(List<String> columnsToIgnore, String readerSQL) {
-        if (StringUtils.isEmpty(readerSQL) || columnsToIgnore == null || columnsToIgnore.isEmpty()) {
+        if (StringUtils.isEmpty(readerSQL) || CollectionUtils.isEmpty(columnsToIgnore)) {
             return readerSQL;
         }
+
         String[] sqlSubstrings = readerSQL.split(TO_SPLIT_FROM, 2);
-        String[] readerSQLColumns = sqlSubstrings[0].trim().split(TO_SPLIT_SELECT)[1].trim().split(",");
+        String[] readerSQLColumns = sqlSubstrings[0].replaceFirst(TO_SPLIT_SELECT, "").split(",");
 
-        List<String> updatedColumns = getUpdatedColumns(readerSQLColumns, columnsToIgnore);
-
-        return getUpdatedSQL(updatedColumns, sqlSubstrings[1]);
+        return getUpdatedSQL(getUpdatedColumns(Arrays.asList(readerSQLColumns),
+                new HashSet<>(columnsToIgnore)), sqlSubstrings[1].trim());
     }
 
     private static String getUpdatedSQL(List<String> updatedColumns, String query) {
-        String finalColumns = "";
-        if (updatedColumns.isEmpty())
-            return finalColumns;
-        finalColumns = updatedColumns.toString();
-        return String.format("select %s from%s", finalColumns.substring(1, finalColumns.length() - 1), query);
+        return updatedColumns.isEmpty() ? "" :
+                String.format("select %s from %s", StringUtils.join(updatedColumns, ", "), query);
     }
 
-    private static String getTrimmedSql(String trimSql) {
-        String finalTrimSql = trimSql.trim();
-        String[] splitBy = {"\\.", " as ", " AS ", " aS ", " As "};
-        for (String splitToken : splitBy) {
-            finalTrimSql = (finalTrimSql.split(splitToken).length > 1) ?
-                    finalTrimSql.split(splitToken)[1] : finalTrimSql;
+    private static String getColumnName(String sql) {
+        for (String splitToken : new String[]{"\\.", " (?i)as "}) {
+            String[] tokens = sql.split(splitToken);
+            sql = tokens[tokens.length - 1];
         }
-        return finalTrimSql.contains("`") ? finalTrimSql.substring(1, finalTrimSql.length() - 1) : finalTrimSql;
+        return sql.replaceAll("`", "");
     }
 
-    private static List<String> getUpdatedColumns(String[] readerSQLColumns, List<String> columnsToIgnore) {
-        Set<String> ignoredColumns = new HashSet<>();
-        ignoredColumns.addAll(columnsToIgnore);
-        List<String> updatedColumns = new ArrayList<>();
-
-        Arrays.asList(readerSQLColumns).forEach((String readerSQLColumn) -> {
-            String trimmedReaderSQLColumn = getTrimmedSql(readerSQLColumn);
-
-            boolean isIgnored = ignoredColumns.stream().anyMatch(trimmedReaderSQLColumn::equals);
-            if (!isIgnored) {
-                updatedColumns.add(readerSQLColumn);
-            }
-        });
-        return updatedColumns;
+    private static List<String> getUpdatedColumns(List<String> readerSQLColumns, HashSet<String> ignoredColumns) {
+        return readerSQLColumns.stream().map(String::trim)
+                .filter(column -> ignoredColumns.stream().noneMatch(getColumnName(column)::equals))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getIgnoreConceptNamesForObsJob(List<JobDefinition> jobDefinitions) {
-        List<String> columnsToIgnore = getObsJobDefinition(jobDefinitions).getColumnsToIgnore();
-        return columnsToIgnore == null ? new ArrayList<>() : columnsToIgnore;
+        return getDefaultIfNotPresent(getObsJobDefinition(jobDefinitions).getColumnsToIgnore());
     }
 
     public static List<String> getSeparateTableNamesForObsJob(List<JobDefinition> jobDefinitions) {
-        List<String> separateTables = getObsJobDefinition(jobDefinitions).getSeparateTables();
-        return separateTables == null ? new ArrayList<>() : separateTables;
+        return getDefaultIfNotPresent(getObsJobDefinition(jobDefinitions).getSeparateTables());
     }
 
-    public static JobDefinition getObsJobDefinition(List<JobDefinition> jobDefinitions) {
-        try {
-            Optional<JobDefinition> optionalObsJobDefinition = jobDefinitions.stream()
-                    .filter(jobDefinition -> jobDefinition.getType().equals(OBS_JOB_TYPE)).findFirst();
-            return optionalObsJobDefinition.get();
-        } catch (NoSuchElementException e) {
-            logger.info("No obs job definition found");
-        }
-        return new JobDefinition();
+    private static List<String> getDefaultIfNotPresent(List<String> names) {
+        return isNull(names) ? new ArrayList<>() : names;
+    }
+
+    private static JobDefinition getObsJobDefinition(List<JobDefinition> jobDefinitions) {
+        return jobDefinitions.stream()
+                .filter(jobDefinition -> jobDefinition.getType().equals(OBS_JOB_TYPE))
+                .findFirst().orElseGet(JobDefinition::new);
     }
 }
