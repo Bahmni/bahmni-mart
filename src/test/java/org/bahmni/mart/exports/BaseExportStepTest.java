@@ -1,13 +1,11 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.BatchUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.batch.core.Step;
@@ -19,7 +17,13 @@ import org.springframework.core.io.Resource;
 
 import javax.sql.DataSource;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 
 @PrepareForTest(BatchUtils.class)
@@ -38,17 +42,14 @@ public class BaseExportStepTest {
     @Mock
     private Resource outputFolder;
 
-    @Mock
-    SimpleStepBuilder<String, String> chunk;
-
     private BaseExportStep baseExportStep;
-    String headers = "patient_id, obs_id";
-    String exportName = "exportName";
+    private String headers = "patient_id, obs_id";
+    private String exportName = "exportName";
 
 
     @Before
     public void setUp() throws Exception {
-        PowerMockito.mockStatic(BatchUtils.class);
+        mockStatic(BatchUtils.class);
         baseExportStep = new BaseExportStep(stepBuilderFactory, dataSource,
                 sqlResource, outputFolder, exportName, headers);
     }
@@ -56,35 +57,33 @@ public class BaseExportStepTest {
     @Test
     public void shouldConvertSqlResourceToEquivalentSqlString() throws Exception {
         String sql = "";
-        Mockito.when(BatchUtils.convertResourceOutputToString(sqlResource)).thenReturn(sql);
+        when(BatchUtils.convertResourceOutputToString(sqlResource)).thenReturn(sql);
 
         baseExportStep.postConstruct();
 
-        PowerMockito.verifyStatic(Mockito.times(1));
+        verifyStatic(times(1));
         BatchUtils.convertResourceOutputToString(sqlResource);
     }
 
     @Test
     public void shouldReturnTheHeadersForExport() throws Exception {
-        String actualStepHeaders = baseExportStep.getHeaders();
-
-        Assert.assertEquals(headers, actualStepHeaders);
+        assertEquals(headers, baseExportStep.getHeaders());
     }
 
     @Test
     public void shouldGetTheBatchStepForBaseExport() throws Exception {
         StepBuilder stepBuilder = Mockito.mock(StepBuilder.class);
-        Mockito.when(stepBuilderFactory.get(exportName)).thenReturn(stepBuilder);
+        when(stepBuilderFactory.get(exportName)).thenReturn(stepBuilder);
         SimpleStepBuilder simpleStepBuilder = Mockito.mock(SimpleStepBuilder.class);
-        Mockito.when(stepBuilder.chunk(50)).thenReturn(simpleStepBuilder);
-        Mockito.when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
-        Mockito.when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
+        when(stepBuilder.chunk(50)).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
         TaskletStep expectedBaseExportStep = Mockito.mock(TaskletStep.class);
-        Mockito.when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
+        when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
 
         Step baseExportStepStep = baseExportStep.getStep();
 
-        Assert.assertNotNull(baseExportStepStep);
-        Assert.assertEquals(expectedBaseExportStep, baseExportStepStep);
+        assertNotNull(baseExportStepStep);
+        assertEquals(expectedBaseExportStep, baseExportStepStep);
     }
 }

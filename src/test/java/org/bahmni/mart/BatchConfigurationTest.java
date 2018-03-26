@@ -52,7 +52,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 public class BatchConfigurationTest {
 
     @Rule
-    ExpectedException expectedException = ExpectedException.none();
+    private ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private Resource freemarkerTemplateLocation;

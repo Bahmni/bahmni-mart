@@ -4,7 +4,6 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.bahmni.mart.exception.BatchResourceException;
 import org.bahmni.mart.form.domain.BahmniForm;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,20 +16,23 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 @PrepareForTest({FreeMarkerEvaluator.class})
 @RunWith(PowerMockRunner.class)
 public class FreeMarkerEvaluatorTest {
 
-    FreeMarkerEvaluator freeMarkerEvaluator;
+    private FreeMarkerEvaluator freeMarkerEvaluator;
 
     @Mock
-    Configuration configuration;
+    private Configuration configuration;
 
     @Rule
     ExpectedException expectedException = ExpectedException.none();
@@ -48,18 +50,18 @@ public class FreeMarkerEvaluatorTest {
         StringWriter stringWriter = Mockito.mock(StringWriter.class);
         PowerMockito.whenNew(StringWriter.class).withNoArguments().thenReturn(stringWriter);
         Template template = Mockito.mock(Template.class);
-        Mockito.when(configuration.getTemplate(templateName)).thenReturn(template);
+        when(configuration.getTemplate(templateName)).thenReturn(template);
         HashMap<String, Object> hashMap = mock(HashMap.class);
         PowerMockito.whenNew(HashMap.class).withNoArguments().thenReturn(hashMap);
         String expectedOutput = "outputValue";
-        Mockito.when(stringWriter.toString()).thenReturn(expectedOutput);
+        when(stringWriter.toString()).thenReturn(expectedOutput);
 
         String actualOutput = freeMarkerEvaluator.evaluate(templateName, bahmniForm);
 
-        Assert.assertEquals(expectedOutput, actualOutput);
-        Mockito.verify(configuration, times(1)).getTemplate(templateName);
-        Mockito.verify(hashMap, times(1)).put("input", bahmniForm);
-        Mockito.verify(template, times(1)).process(hashMap, stringWriter);
+        assertEquals(expectedOutput, actualOutput);
+        verify(configuration, times(1)).getTemplate(templateName);
+        verify(hashMap, times(1)).put("input", bahmniForm);
+        verify(template, times(1)).process(hashMap, stringWriter);
     }
 
     @Test
@@ -67,21 +69,13 @@ public class FreeMarkerEvaluatorTest {
         BahmniForm bahmniForm = new BahmniForm();
         String templateName = "Vital Signs";
         BatchResourceException batchResourceException = Mockito.mock(BatchResourceException.class);
-        Mockito.when(configuration.getTemplate(templateName)).thenThrow(batchResourceException);
+        when(configuration.getTemplate(templateName)).thenThrow(batchResourceException);
 
         expectedException.expect(BatchResourceException.class);
         expectedException.expectMessage(
                 String.format("Unable to continue generating a the template with name [%s]", templateName));
 
         freeMarkerEvaluator.evaluate(templateName, bahmniForm);
-        Mockito.verify(configuration, times(1)).getTemplate(templateName);
-    }
-
-    private void setValuesForMemberFields(
-            Object batchConfiguration, String fieldName, Object valueForMemberField)
-            throws NoSuchFieldException, IllegalAccessException {
-        Field f1 = batchConfiguration.getClass().getDeclaredField(fieldName);
-        f1.setAccessible(true);
-        f1.set(batchConfiguration, valueForMemberField);
+        verify(configuration, times(1)).getTemplate(templateName);
     }
 }

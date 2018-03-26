@@ -104,7 +104,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
         return new ArrayList<>();
     }
 
-    void retrieveChildObsIds(List<Integer> allChildObsIds, List<Integer> ids) {
+    protected void retrieveChildObsIds(List<Integer> allChildObsIds, List<Integer> ids) {
         Map<String, List<Integer>> params = new HashMap<>();
         params.put("parentObsIds", ids);
 

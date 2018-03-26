@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 public class BatchConfigurationIT extends AbstractBaseBatchIT {
     @Autowired
-    BatchConfiguration batchConfiguration;
+    private BatchConfiguration batchConfiguration;
 
     private Map<String, String> expectedPatientList;
 

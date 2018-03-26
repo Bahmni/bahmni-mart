@@ -1,7 +1,6 @@
 package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.exports.template.SimpleJobTemplate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,20 +26,14 @@ public class JobDefinitionReaderTest {
 
     private JobDefinitionReader jobDefinitionReader;
 
-    private String json;
-
     @Mock
     private Resource jobDefinition;
-
-    @Mock
-    private SimpleJobTemplate simpleJobTemplate;
-
 
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         jobDefinitionReader = new JobDefinitionReader();
         PowerMockito.mockStatic(BatchUtils.class);
-        json = "[\n" +
+        String json = "[\n" +
                 "  {\n" +
                 "    \"name\": \"Program Data\",\n" +
                 "    \"type\": \"generic\",\n" +
@@ -50,7 +43,6 @@ public class JobDefinitionReaderTest {
                 "  }\n" +
                 "]";
         setValuesForMemberFields(jobDefinitionReader, "jobDefinition", jobDefinition);
-        setValuesForMemberFields(jobDefinitionReader, "simpleJobTemplate", simpleJobTemplate);
         when(BatchUtils.convertResourceOutputToString(jobDefinition)).thenReturn(json);
     }
 

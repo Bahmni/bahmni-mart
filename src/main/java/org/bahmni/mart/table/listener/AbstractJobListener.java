@@ -38,5 +38,5 @@ public abstract class AbstractJobListener extends JobExecutionListenerSupport {
 
     public abstract TableData getTableDataForMart(String jobName);
 
-    abstract void logError(Exception e);
+    protected abstract void logError(Exception e);
 }

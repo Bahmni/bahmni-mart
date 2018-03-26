@@ -2,8 +2,6 @@ package org.bahmni.mart.config.job;
 
 import com.google.gson.Gson;
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.exports.template.SimpleJobTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -16,9 +14,6 @@ import java.util.Optional;
 
 @Configuration
 public class JobDefinitionReader {
-
-    @Autowired
-    private SimpleJobTemplate simpleJobTemplate;
 
     @Value("${bahmniMartConfigFile}")
     private Resource jobDefinition;

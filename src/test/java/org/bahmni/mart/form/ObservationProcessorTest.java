@@ -5,7 +5,6 @@ import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,6 +23,7 @@ import java.util.Map;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -168,9 +168,7 @@ public class ObservationProcessorTest {
         when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(fieldIds);
         form.getFormName().setIsSet(1);
 
-        List<Obs> process = observationProcessor.process(obsRow);
-
-        Assert.assertEquals(0, process.size());
+        assertTrue(observationProcessor.process(obsRow).isEmpty());
     }
 
     @Test

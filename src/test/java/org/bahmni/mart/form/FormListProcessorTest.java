@@ -41,7 +41,7 @@ public class FormListProcessorTest {
     private FormListProcessor formListProcessor;
 
     @Before
-    public void setup() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws NoSuchFieldException, IllegalAccessException {
         initMocks(this);
         formListProcessor = new FormListProcessor();
         formListProcessor.setObsService(obsService);

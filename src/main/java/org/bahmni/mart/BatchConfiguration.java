@@ -31,7 +31,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -106,11 +105,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         freemarkerTemplateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 
         return freemarkerTemplateConfig;
-    }
-
-    @PreDestroy
-    public void generateReport() {
-
     }
 
     @Override

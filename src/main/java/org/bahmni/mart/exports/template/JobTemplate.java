@@ -38,7 +38,7 @@ public class JobTemplate {
 
     private TableData tableDataForMart;
 
-    Job buildJob(JobDefinition jobConfiguration, AbstractJobListener listener, String readerSql) {
+    protected Job buildJob(JobDefinition jobConfiguration, AbstractJobListener listener, String readerSql) {
         return jobBuilderFactory.get(jobConfiguration.getName())
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)

@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class TableGeneratorStepIT extends AbstractBaseBatchIT {
 
     @Autowired
-    TableGeneratorStep tableGeneratorStep;
+    private TableGeneratorStep tableGeneratorStep;
 
     @Qualifier("martJdbcTemplate")
     @Autowired

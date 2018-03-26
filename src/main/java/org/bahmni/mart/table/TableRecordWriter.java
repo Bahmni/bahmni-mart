@@ -27,18 +27,15 @@ public class TableRecordWriter implements ItemWriter<Map<String, Object>> {
     @Autowired
     public TableMetadataGenerator tableMetadataGenerator;
 
+    private TableData tableData;
+
     public void setTableData(TableData tableData) {
         this.tableData = tableData;
     }
 
-    TableData tableData;
-
     @Override
     public void write(List<? extends Map<String, Object>> items) throws Exception {
-        List<Map<String, Object>> recordList = new ArrayList<>();
-        items.forEach(item -> {
-            recordList.add(item);
-        });
+        List<Map<String, Object>> recordList = new ArrayList<>(items);
         TableRecordHolder tableRecordHolder = new TableRecordHolder(recordList, tableData.getName());
         String sql = tableRecordHolderFreeMarkerEvaluator.evaluate("insertObs.ftl", tableRecordHolder);
         martJdbcTemplate.execute(sql);

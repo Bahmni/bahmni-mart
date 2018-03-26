@@ -255,7 +255,6 @@ public class SeparateTableConfigHelperTest {
         List<String> ignoreConceptsSet = Arrays.asList("Test Concept", "Video");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        String ignoreConcepts = "Test Concept, Video";
         mockStatic(BatchUtils.class);
         when(getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsSet);
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
@@ -449,7 +448,7 @@ public class SeparateTableConfigHelperTest {
         when(jsonParser.parse(implementationFileReader)).thenReturn(implementationConfig);
 
         mockStatic(JobDefinitionUtil.class);
-        when(JobDefinitionUtil.getIgnoreConceptNamesForObsJob(any())).thenReturn(Arrays.asList(""));
+        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Arrays.asList(""));
         List<String> seprateTables = new ArrayList<>();
         seprateTables.add("separate table");
         when(JobDefinitionUtil.getSeparateTableNamesForObsJob(any())).thenReturn(seprateTables);
