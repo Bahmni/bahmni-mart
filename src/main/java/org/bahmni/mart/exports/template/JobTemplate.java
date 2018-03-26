@@ -4,7 +4,7 @@ import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.table.TableDataProcessor;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
-import org.bahmni.mart.table.listener.JobListener;
+import org.bahmni.mart.table.listener.AbstractJobListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -38,7 +38,7 @@ public class JobTemplate {
 
     private TableData tableDataForMart;
 
-    Job buildJob(JobDefinition jobConfiguration, JobListener listener, String readerSql) {
+    Job buildJob(JobDefinition jobConfiguration, AbstractJobListener listener, String readerSql) {
         return jobBuilderFactory.get(jobConfiguration.getName())
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
@@ -47,7 +47,7 @@ public class JobTemplate {
                 .end().build();
     }
 
-    private Step loadData(JobDefinition jobConfiguration, JobListener listener, String readerSql) {
+    private Step loadData(JobDefinition jobConfiguration, AbstractJobListener listener, String readerSql) {
         return stepBuilderFactory.get(String.format("%s Step", jobConfiguration.getName()))
                 .<Map<String, Object>, Map<String, Object>>chunk(jobConfiguration.getChunkSizeToRead())
                 .reader(getReader(readerSql))
@@ -56,7 +56,7 @@ public class JobTemplate {
                 .build();
     }
 
-    private TableDataProcessor getProcessor(JobDefinition jobConfiguration, JobListener listener) {
+    private TableDataProcessor getProcessor(JobDefinition jobConfiguration, AbstractJobListener listener) {
         TableDataProcessor tableDataProcessor = new TableDataProcessor();
         tableDataForMart = listener.getTableDataForMart(jobConfiguration.getName());
         tableDataProcessor.setTableData(tableDataForMart);

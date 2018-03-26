@@ -21,7 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -60,9 +60,9 @@ public class EAVJobListenerTest {
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         eavJobListener = new EAVJobListener();
-        setValuesForMemberFields(eavJobListener, "tableGeneratorStep", tableGeneratorStep);
-        setValuesForMemberFields(eavJobListener, "jobDefinitionReader", jobDefinitionReader);
-        setValuesForMemberFields(eavJobListener, "openMRSJdbcTemplate", openMRSJdbcTemplate);
+        setValuesForSuperClassMemberFields(eavJobListener, "tableGeneratorStep", tableGeneratorStep);
+        setValuesForSuperClassMemberFields(eavJobListener, "jobDefinitionReader", jobDefinitionReader);
+        setValuesForSuperClassMemberFields(eavJobListener, "openMRSJdbcTemplate", openMRSJdbcTemplate);
     }
 
     @Test

@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -51,9 +51,9 @@ public class TableGeneratorJobListenerTest {
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         tableGeneratorJobListener = new TableGeneratorJobListener();
-        setValuesForMemberFields(tableGeneratorJobListener, "jobDefinitionReader", jobDefinitionReader);
-        setValuesForMemberFields(tableGeneratorJobListener, "openMRSJdbcTemplate", openMRSJdbcTemplate);
-        setValuesForMemberFields(tableGeneratorJobListener, "tableGeneratorStep", tableGeneratorStep);
+        setValuesForSuperClassMemberFields(tableGeneratorJobListener, "jobDefinitionReader", jobDefinitionReader);
+        setValuesForSuperClassMemberFields(tableGeneratorJobListener, "openMRSJdbcTemplate", openMRSJdbcTemplate);
+        setValuesForSuperClassMemberFields(tableGeneratorJobListener, "tableGeneratorStep", tableGeneratorStep);
     }
 
     @Test

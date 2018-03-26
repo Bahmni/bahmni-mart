@@ -3,7 +3,7 @@ package org.bahmni.mart.exports.template;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.table.TableRecordWriter;
-import org.bahmni.mart.table.listener.JobListener;
+import org.bahmni.mart.table.listener.AbstractJobListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +42,7 @@ public class JobTemplateTest {
     private StepBuilderFactory stepBuilderFactory;
 
     @Mock
-    private JobListener jobListener;
+    private AbstractJobListener jobListener;
 
     @Mock
     private ObjectFactory<TableRecordWriter> recordWriterObjectFactory;
