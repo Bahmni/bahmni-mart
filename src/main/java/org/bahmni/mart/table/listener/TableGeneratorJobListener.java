@@ -1,37 +1,53 @@
 package org.bahmni.mart.table.listener;
 
+import org.apache.commons.lang.StringUtils;
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.helper.Constants;
 import org.bahmni.mart.table.TableDataExtractor;
+import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
+
 @Component
 public class TableGeneratorJobListener extends AbstractJobListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TableGeneratorJobListener.class);
 
-    public static final String LIMIT = " LIMIT 1";
+    private static final String LIMIT = " LIMIT 1";
+
+    private static void setTableColumnType(TableColumn tableColumn) {
+        tableColumn.setType(Constants.getPostgresDataTypeFor(tableColumn.getType()));
+    }
 
     @Override
     public TableData getTableDataForMart(String jobName) {
         JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
-        ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
-        String readerSQLAfterIgnoringColumns = JobDefinitionUtil
-                .getReaderSQLByIgnoringColumns(jobDefinition.getColumnsToIgnore(), jobDefinition.getReaderSql());
-        if (readerSQLAfterIgnoringColumns == null || readerSQLAfterIgnoringColumns.isEmpty()) {
+
+        return getTableData(jobDefinition, getSql(jobDefinition));
+    }
+
+    private String getSql(JobDefinition jobDefinition) {
+        String sql = getReaderSQLByIgnoringColumns(jobDefinition.getColumnsToIgnore(), jobDefinition.getReaderSql());
+
+        if (StringUtils.isEmpty(sql)) {
             throw new InvalidJobConfiguration(String
-                    .format("Reader SQL is empty for the job definition '%s'", jobName));
+                    .format("Reader SQL is empty for the job definition '%s'", jobDefinition.getName()));
         }
-        TableData tableData = openMRSJdbcTemplate.query(readerSQLAfterIgnoringColumns + LIMIT, resultSetExtractor);
+        return sql;
+    }
+
+    private TableData getTableData(JobDefinition jobDefinition, String sql) {
+        ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
+        TableData tableData = openMRSJdbcTemplate.query(sql + LIMIT, resultSetExtractor);
         tableData.setName(jobDefinition.getTableName());
-        tableData.getColumns().forEach(tableColumn -> tableColumn
-                .setType(Constants.getPostgresDataTypeFor(tableColumn.getType())));
+        tableData.getColumns().forEach(TableGeneratorJobListener::setTableColumnType);
+
         return tableData;
     }
 
