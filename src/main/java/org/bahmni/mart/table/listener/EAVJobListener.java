@@ -1,5 +1,6 @@
 package org.bahmni.mart.table.listener;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.bahmni.mart.config.job.EavAttributes;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.table.domain.TableColumn;
@@ -32,12 +33,33 @@ public class EAVJobListener extends AbstractJobListener {
 
     private List<TableColumn> getColumns(JobDefinition jobConfiguration) {
         EavAttributes eavAttributes = jobConfiguration.getEavAttributes();
+        List<String> columnsToIgnore = jobConfiguration.getColumnsToIgnore();
         List<String> pivotColumns = getPivotColumns(eavAttributes.getAttributeTypeTableName());
 
-        ArrayList<TableColumn> tableColumns = new ArrayList<>();
-        tableColumns.add(new TableColumn(eavAttributes.getPrimaryKey(), "integer", true, null));
-        pivotColumns.forEach(columnTitle -> tableColumns.add(new TableColumn(columnTitle, "text", false, null)));
+        ArrayList<TableColumn> tableColumns = CollectionUtils.isEmpty(columnsToIgnore) ?
+                getAllColumns(pivotColumns) : getColumnsExceptIgnored(columnsToIgnore, pivotColumns);
 
+        tableColumns.add(0, new TableColumn(eavAttributes.getPrimaryKey(), "integer", true, null));
+
+        return tableColumns;
+    }
+
+    private ArrayList<TableColumn> getColumnsExceptIgnored(List<String> columnsToIgnore, List<String> pivotColumns) {
+        ArrayList<TableColumn> tableColumns = new ArrayList<>();
+        pivotColumns.forEach(columnTitle -> {
+            if (!columnsToIgnore.contains(columnTitle)) {
+                tableColumns.add(new TableColumn(columnTitle, "text", false, null));
+            }
+        });
+
+        return tableColumns;
+    }
+
+    private ArrayList<TableColumn> getAllColumns(List<String> pivotColumns) {
+        ArrayList<TableColumn> tableColumns = new ArrayList<>();
+        pivotColumns.forEach(columnTitle ->
+                tableColumns.add(new TableColumn(columnTitle, "text", false, null))
+        );
         return tableColumns;
     }
 

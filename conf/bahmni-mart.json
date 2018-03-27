@@ -193,7 +193,11 @@
       "typeTableJoiningId": "person_attribute_type_id",
       "valueColumnName": "value",
       "primaryKey": "person_id"
-    }
+    },
+    "columnsToIgnore": [
+      "id3DateOfExpiry",
+      "id3DocNumber"
+    ]
   },
   {
     "name": "Visit Attributes",
