@@ -17,6 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -68,8 +71,13 @@ public class SeparateTableConfigHelper {
 
     private Set<Map.Entry<String, JsonElement>> getAllConceptSet() {
         return Stream
-                .concat(getConceptSet(defaultConfigFile).stream(), getConceptSet(implementationConfigFile).stream())
-                .collect(toSet());
+                .concat(getConceptSet(implementationConfigFile).stream(), getConceptSet(defaultConfigFile).stream())
+                .filter(distinctByKey(Map.Entry::getKey)).collect(toSet());
+    }
+
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> keys = ConcurrentHashMap.newKeySet();
+        return key -> keys.add(keyExtractor.apply(key));
     }
 
     private Set<Map.Entry<String, JsonElement>> getConceptSet(String multiSelectAndAddMoreFile) {

@@ -399,7 +399,7 @@ public class SeparateTableConfigHelperTest {
     }
 
     @Test
-    public void shouldReturnListOfSeperateTableNames() throws Exception {
+    public void shouldReturnListOfSeparateTableNames() throws Exception {
 
         String defaultJsonString = "{\n" +
                 "  \"config\": {\n" +
@@ -460,6 +460,67 @@ public class SeparateTableConfigHelperTest {
 
         assertEquals(4, allSeparateConceptNames.size());
         assertThat(expectedSeparateTables, containsInAnyOrder(allSeparateConceptNames.toArray()));
+    }
 
+    @Test
+    public void shouldGiveMorePriorityToImplementationConfigIfDifferentConfigIsPresentInBothFiles() throws Exception {
+        String defaultJsonString = "{\n" +
+                "  \"config\": {\n" +
+                "    \"conceptSetUI\": {\n" +
+                "      \"All Observation Templates\": {\n" +
+                "        \"showPanelView\": false\n" +
+                "      },\n" +
+                "      \"Video\": {\n" +
+                "        \"allowAddMore\": true,\n" +
+                "        \"multiSelect\":true\n" +
+                "      },\n" +
+                "      \"Test Concept\":{\n" +
+                "        \"multiSelect\":true\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        String implementationJsonString = "{\n" +
+                "  \"config\": {\n" +
+                "    \"conceptSetUI\": {\n" +
+                "      \"Demo Concept\": {\n" +
+                "        \"xyz\": true\n" +
+                "      },\n" +
+                "      \"Test Concept\":{\n" +
+                "        \"multiSelect\":false\n" +
+                "      },\n" +
+                "      \"OR, Operation performed\": {\n" +
+                "        \"allowAddMore\": true\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n";
+
+        JsonElement defaultConfig = new JsonParser().parse(defaultJsonString);
+        JsonElement implementationConfig = new JsonParser().parse(implementationJsonString);
+        setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
+        setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
+        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Arrays.asList());
+        mockStatic(BatchUtils.class);
+        when(BatchUtils.convertConceptNamesToSet(null)).thenReturn(Collections.emptyList());
+        whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
+        whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(implementationFileReader);
+        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
+        when(jsonParser.parse(fileReader)).thenReturn(defaultConfig);
+        when(jsonParser.parse(implementationFileReader)).thenReturn(implementationConfig);
+
+        mockStatic(JobDefinitionUtil.class);
+        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Arrays.asList(""));
+        List<String> seprateTables = new ArrayList<>();
+        seprateTables.add("separate table");
+        when(JobDefinitionUtil.getSeparateTableNamesForObsJob(any())).thenReturn(seprateTables);
+        List<String> expectedSeparateTables = Arrays.asList("OR, Operation performed", "Video");
+
+        List<String> allSeparateConceptNames = separateTableConfigHelper
+                .getAddMoreAndMultiSelectConceptNames();
+
+        assertEquals(2, allSeparateConceptNames.size());
+        assertThat(expectedSeparateTables, containsInAnyOrder(allSeparateConceptNames.toArray()));
     }
 }
