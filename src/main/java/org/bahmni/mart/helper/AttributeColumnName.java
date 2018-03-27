@@ -2,6 +2,7 @@ package org.bahmni.mart.helper;
 
 public enum AttributeColumnName {
     person_attribute_type("format"),
+    surgical_appointment_attribute_type("format"),
     visit_attribute_type("datatype"),
     provider_attribute_type("datatype");
 

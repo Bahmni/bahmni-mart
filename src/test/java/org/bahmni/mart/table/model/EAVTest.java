@@ -26,6 +26,12 @@ public class EAVTest {
     }
 
     @Test
+    public void shouldReturnDataTypeColumnNameForSurgicalAppointmentAttributeTypeTable() {
+        when(eavAttributes.getAttributeTypeTableName()).thenReturn("surgical_appointment_attribute_type");
+        assertEquals("format", new EAV(tableData, eavAttributes).getTypeColumnName());
+    }
+
+    @Test
     public void shouldReturnDataTypeColumnNameForVisitAttributeTypeTable() {
         when(eavAttributes.getAttributeTypeTableName()).thenReturn("visit_attribute_type");
         assertEquals("datatype", new EAV(tableData, eavAttributes).getTypeColumnName());
