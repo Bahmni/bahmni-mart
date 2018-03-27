@@ -1,4 +1,5 @@
-[
+{
+  "jobs": [
   {
     "name": "Program data",
     "type": "generic",
@@ -278,4 +279,19 @@
       "FSTG, Comments about refusal"
     ]
   }
-]
+],
+  "views" : [
+    {
+      "name": "patient_program_view",
+      "viewSQL": "CREATE VIEW patient_program_view AS SELECT pa.address1, pa.address2, pa.address3, pa.address4, pa.address6, pa.state_province, pat.*, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, program_id, patient_program_id, date_enrolled, date_completed, location_name, program_outcome FROM person_address pa INNER JOIN person_details pd ON pa.person_id = pd.person_id INNER JOIN person_information pi ON pi.person_id = pd.person_id INNER JOIN person_attributes pat ON pat.person_id = pi.person_id INNER JOIN patient_program_data ppd ON ppd.patient_id = pat.person_id;"
+    },
+    {
+      "name": "patient_visits_encounters",
+      "viewSQL": "CREATE VIEW patient_visits_encounters AS SELECT pa.address1, pa.address2, pa.address3, pa.address4, pa.address6, pa.state_province, pat.*, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, pvd.visit_id, pvd.visit_type_name, pvd.visit_start_date, pvd.visit_end_date, pvd.location_name, visit_type_name AS visit_type, encounter_id, encounter_type_id, encounter_type_name, ped.location_name AS encounter_location FROM person_address pa INNER JOIN person_details pd ON pd.person_id = pa.person_id INNER JOIN person_attributes pat ON pat.person_id = pd.person_id INNER JOIN patient_visit_details pvd ON pvd.patient_id = pat.person_id INNER JOIN patient_encounter_details ped ON ped.patient_id = pvd.patient_id"
+    },
+    {
+      "name": "appointment_admin_panel",
+      "viewSQL": "CREATE VIEW appointment_admin_panel AS SELECT * from appointment_service INNER JOIN service_availability USING (appointment_service_id,service_name)"
+    }
+  ]
+}

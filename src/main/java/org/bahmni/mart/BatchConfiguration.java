@@ -2,11 +2,13 @@ package org.bahmni.mart;
 
 import freemarker.template.TemplateExceptionHandler;
 import org.bahmni.mart.config.FormStepConfigurer;
+import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.StepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.config.view.ViewExecutor;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.mart.exports.template.EAVJobTemplate;
@@ -63,6 +65,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private JobDefinitionReader jobDefinitionReader;
 
     @Autowired
+    private MartJSONReader martJSONReader;
+
+    @Autowired
     private JobLauncher jobLauncher;
 
     @Autowired
@@ -70,6 +75,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     @Autowired
     private EAVJobTemplate eavJobTemplate;
+
+    @Autowired
+    private ViewExecutor viewExecutor;
 
     private List<JobDefinition> jobDefinitions;
 
@@ -113,6 +121,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         if (!JobDefinitionValidator.validate(jobDefinitions))
             throw new InvalidJobConfiguration();
         launchJobs(getJobs());
+        viewExecutor.execute(martJSONReader.getViewDefinitions());
     }
 
     private void launchJobs(List<Job> jobs) {

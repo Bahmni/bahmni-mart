@@ -4,9 +4,11 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.io.FileUtils;
 import org.bahmni.mart.config.FormStepConfigurer;
+import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.view.ViewExecutor;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.mart.exports.template.EAVJobTemplate;
@@ -33,6 +35,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,6 +73,12 @@ public class BatchConfigurationTest {
     private JobDefinitionReader jobDefinitionReader;
 
     @Mock
+    private MartJSONReader martJSONReader;
+
+    @Mock
+    private ViewExecutor viewExecutor;
+
+    @Mock
     private SimpleJobTemplate simpleJobTemplate;
 
     @Mock
@@ -101,6 +110,8 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
                 treatmentRegistrationBaseExportStep);
         setValuesForMemberFields(batchConfiguration, "eavJobTemplate", eavJobTemplate);
+        setValuesForMemberFields(batchConfiguration, "martJSONReader", martJSONReader);
+        setValuesForMemberFields(batchConfiguration, "viewExecutor", viewExecutor);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME)).thenReturn(jobBuilder);
@@ -115,6 +126,7 @@ public class BatchConfigurationTest {
         when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
         when(flowJobBuilder.build()).thenReturn(expectedJob);
         when(jobDefinitionReader.getConceptReferenceSource()).thenReturn("");
+        when(martJSONReader.getViewDefinitions()).thenReturn(new ArrayList<>());
     }
 
     @Test
