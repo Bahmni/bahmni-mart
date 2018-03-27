@@ -2,17 +2,38 @@
   {
     "name": "Program data",
     "type": "generic",
-    "readerSql": "SELECT p.program_id, p.name AS `program_name`, cn_outcome.name AS `program_outcome` FROM program p INNER JOIN concept c ON c.concept_id = p.outcomes_concept_id AND c.retired IS FALSE AND p.retired IS FALSE INNER JOIN concept_set cs ON cs.concept_set = c.concept_id LEFT OUTER JOIN concept_name cn_cs ON cn_cs.concept_id = cs.concept_set AND cn_cs.concept_name_type = 'FULLY_SPECIFIED' AND cn_cs.voided IS FALSE LEFT OUTER JOIN concept_name cn_outcome ON cn_outcome.concept_id = cs.concept_id AND cn_outcome.concept_name_type = 'FULLY_SPECIFIED' AND cn_outcome.voided IS FALSE",
+    "readerSql": "SELECT p.program_id, p.name AS program_name, p.description AS program_description, cv.concept_full_name AS program_outcome, p.creator, p.date_created, p.date_changed, p.changed_by FROM program p INNER JOIN concept_view cv ON cv.concept_id = p.outcomes_concept_id AND cv.retired IS FALSE AND p.retired IS FALSE",
     "chunkSizeToRead": "500",
-    "tableName": "program_outcomes",
+    "tableName": "programs",
     "columnsToIgnore": []
   },
   {
     "name": "Patient program data",
     "type": "generic",
-    "readerSql": "SELECT pp.patient_id, pp.program_id, epp.episode_id, pp.patient_program_id, pp.date_enrolled, pp.date_completed, pp.location_id, l.name AS location_name, cn_outcome.name AS outcome_name, pp.creator, pp.date_created, pp.date_changed, pp.changed_by FROM patient_program pp INNER JOIN episode_patient_program epp ON epp.patient_program_id = pp.patient_program_id AND pp.voided IS FALSE LEFT OUTER JOIN concept_name cn_outcome ON cn_outcome.concept_id = pp.outcome_concept_id AND cn_outcome.concept_name_type = 'FULLY_SPECIFIED' LEFT OUTER JOIN location l ON l.location_id = pp.location_id AND l.retired IS FALSE",
+    "readerSql": "SELECT pp.patient_id, pp.program_id, epp.episode_id, pp.patient_program_id, pp.date_enrolled, pp.date_completed, pp.location_id, l.name AS location_name, cn_outcome.name AS program_outcome, pp.creator, pp.date_created, pp.date_changed, pp.changed_by FROM patient_program pp INNER JOIN episode_patient_program epp ON epp.patient_program_id = pp.patient_program_id AND pp.voided IS FALSE LEFT OUTER JOIN concept_name cn_outcome ON cn_outcome.concept_id = pp.outcome_concept_id AND cn_outcome.concept_name_type = 'FULLY_SPECIFIED' LEFT OUTER JOIN location l ON l.location_id = pp.location_id AND l.retired IS FALSE",
     "chunkSizeToRead": "500",
     "tableName": "patient_program_data"
+  },
+  {
+    "name": "Patient State",
+    "type": "generic",
+    "readerSql": "SELECT ps.patient_program_id, cv.concept_full_name AS state, ps.start_date, ps.end_date, ps.creator, ps.date_changed, ps.changed_by FROM patient_state ps INNER JOIN program_workflow_state pws ON pws.program_workflow_state_id = ps.state AND ps.voided IS FALSE AND pws.retired IS FALSE INNER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "patient_state"
+  },
+  {
+    "name": "Program Workflow",
+    "type": "generic",
+    "readerSql": "SELECT pw.program_id, pw.program_workflow_id, cv.concept_full_name AS program_workflow_name FROM program_workflow pw INNER JOIN concept_view cv ON cv.concept_id = pw.concept_id AND cv.retired IS FALSE AND pw.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "program_workflow"
+  },
+  {
+    "name": "Program Workflow States",
+    "type": "generic",
+    "readerSql": "SELECT pws.program_workflow_state_id, cv.concept_full_name AS state_name, pws.creator, pws.date_created, pws.date_changed, pws.changed_by FROM program_workflow_state pws INNER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired IS FALSE And pws.retired IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "Program_workflow_states"
   },
   {
     "name": "Person details",
@@ -98,7 +119,7 @@
   {
     "name": "Patient Encounter Details",
     "type": "generic",
-    "readerSql": "SELECT patient.patient_id, visit_id, encounter_id, et.encounter_type_id AS encounter_type_id, et.name AS encounter_type_name, et.description AS encounter_type_description, et.edit_privilege AS edit_privilege, et.view_privilege AS view_privilege, location_id, form_id, encounter_datetime FROM patient INNER JOIN encounter ON patient.patient_id = encounter.patient_id AND patient.voided IS FALSE INNER JOIN encounter_type et ON encounter.encounter_type = et.encounter_type_id AND encounter.voided IS FALSE AND et.retired IS FALSE",
+    "readerSql": "SELECT patient.patient_id, visit_id, encounter_id, et.encounter_type_id AS encounter_type_id, et.name AS encounter_type_name, et.description AS encounter_type_description, et.edit_privilege AS edit_privilege, et.view_privilege AS view_privilege, location.name AS location_name, form_id, encounter_datetime FROM patient INNER JOIN encounter ON patient.patient_id = encounter.patient_id AND patient.voided IS FALSE INNER JOIN encounter_type et ON encounter.encounter_type = et.encounter_type_id AND encounter.voided IS FALSE AND et.retired IS FALSE INNER JOIN location ON encounter.location_id = location.location_id AND location.retired IS FALSE",
     "chunkSizeToRead": "500",
     "tableName": "patient_encounter_details"
   },
