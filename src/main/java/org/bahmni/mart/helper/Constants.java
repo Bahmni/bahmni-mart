@@ -17,6 +17,7 @@ public class Constants {
             put("tinyint", "boolean");
             put("char", "text");
             put("varchar", "text");
+            put("complex", "text");
         }
     };
 

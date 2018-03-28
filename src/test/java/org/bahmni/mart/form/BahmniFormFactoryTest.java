@@ -1,6 +1,7 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
@@ -14,14 +15,18 @@ import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +46,9 @@ public class BahmniFormFactoryTest {
 
     @Mock
     private ObsService obsService;
+
+    @Mock
+    private JobDefinition jobDefinition;
 
     @Mock
     private SeparateTableConfigHelper separateTableConfigHelper;
@@ -85,18 +93,18 @@ public class BahmniFormFactoryTest {
         setValuesForMemberFields(bahmniFormFactory, "jobDefinitionReader", jobDefinitionReader);
         mockStatic(BatchUtils.class);
         mockStatic(JobDefinitionUtil.class);
-        when(obsService.getConceptsByNames(any())).thenReturn(ignoreConcepts);
-        when(JobDefinitionUtil.getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsNameList);
+        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsNameList);
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList());
         when(separateTableConfigHelper.getAllSeparateTableConceptNames()).thenReturn(separateTableConceptList);
         when(obsService.getConceptsByNames(separateTableConceptList))
                 .thenReturn(separateTableConcepts);
         when(obsService.getConceptsByNames(ignoreConceptsNameList)).thenReturn(ignoreConcepts);
-        bahmniFormFactory.postConstruct();
+        when(jobDefinition.getType()).thenReturn("obs");
     }
 
     @Test
     public void shouldCreateFormWithNoFieldsAndChildren() {
+        bahmniFormFactory.postConstruct();
         BahmniForm dischargeSummaryForm = bahmniFormFactory
                 .createForm(new Concept(1, "Discharge Summary, Surgeries and Procedures", 1), null);
 
@@ -109,10 +117,14 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldCreateAForm() {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinition.getType()).thenReturn("obs");
         when(obsService.getChildConcepts("History and Examination"))
                 .thenReturn(historyAndExaminationConcepts);
         when(obsService.getChildConcepts("Chief Complaint Data"))
                 .thenReturn(chiefComplaintDataConcepts);
+
+        bahmniFormFactory.postConstruct();
 
         BahmniForm historyAndExamination = bahmniFormFactory.createForm(
                 new Concept(1189, "History and Examination", 1),
@@ -136,6 +148,9 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldIgnoreCreatingAFormWhenTheConceptNameIsInIgnoreConcepts() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        bahmniFormFactory.postConstruct();
+
         Concept healthEducation = new Concept(1110, "Health Education", 1);
         Concept videoConcept = new Concept(1111, "Video", 0);
         Concept hasTakenCourse = new Concept(1112, "Has patient taken course", 0);
@@ -156,6 +171,9 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldCreateChildForMultiSelectAddMoreAndSeparateTable() {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        bahmniFormFactory.postConstruct();
+
         historyAndExaminationConcepts.add(new Concept(3365, "Operation Notes Template", 1));
         historyAndExaminationConcepts.add(new Concept(1209, "Notes", 0));
         List<Concept> operationNotesTemplate = new ArrayList<>();
@@ -169,6 +187,7 @@ public class BahmniFormFactoryTest {
                 .thenReturn(operationNotesTemplate);
         when(obsService.getChildConcepts("BP")).thenReturn(new ArrayList<>());
 
+        bahmniFormFactory.postConstruct();
 
         BahmniForm historyAndExamination = bahmniFormFactory.createForm(
                 new Concept(1189, "History and Examination", 1),
@@ -186,4 +205,30 @@ public class BahmniFormFactoryTest {
         verify(obsService, times(1)).getChildConcepts("Operation Notes Template");
         verify(obsService, times(1)).getChildConcepts("BP");
     }
+
+    @Test
+    public void shouldReturnEmptySeparateTableListWhenThereIsNoObsJob() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.emptyList());
+        when(jobDefinition.getType()).thenReturn("randonJob");
+        Field allSeparateTableConcepts = bahmniFormFactory.getClass().getDeclaredField("allSeparateTableConcepts");
+        allSeparateTableConcepts.setAccessible(true);
+
+        bahmniFormFactory.postConstruct();
+
+        assertTrue(((List<Concept>) allSeparateTableConcepts.get(bahmniFormFactory)).isEmpty());
+    }
+
+    @Test
+    public void shouldReturnEmptyIgnoreConceptsListWhenThereIsNoObsJob() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.emptyList());
+        when(jobDefinition.getType()).thenReturn("randonJob");
+        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        Field ignoreConcepts = bahmniFormFactory.getClass().getDeclaredField("ignoreConcepts");
+        ignoreConcepts.setAccessible(true);
+
+        bahmniFormFactory.postConstruct();
+
+        assertTrue(((List<Concept>) ignoreConcepts.get(bahmniFormFactory)).isEmpty());
+    }
+
 }

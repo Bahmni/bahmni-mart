@@ -1,5 +1,6 @@
 package org.bahmni.mart.form;
 
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
@@ -9,12 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
 
 @Component
 public class BahmniFormFactory {
+
+    private static final String OBS_JOB_TYPE = "obs";
 
     @Autowired
     private ObsService obsService;
@@ -76,9 +81,22 @@ public class BahmniFormFactory {
     @PostConstruct
     public void postConstruct() {
         List<String> allSeparateTableConceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
-        this.allSeparateTableConcepts = obsService.getConceptsByNames(allSeparateTableConceptNames);
-        this.ignoreConcepts = obsService.getConceptsByNames(getIgnoreConceptNamesForObsJob(
-                jobDefinitionReader.getJobDefinitions()));
+        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
+
+        this.allSeparateTableConcepts = isObsJobPresent(jobDefinitions) ?
+                obsService.getConceptsByNames(allSeparateTableConceptNames) : Collections.emptyList();
+        this.ignoreConcepts = isObsJobWithOutIgnoreColumns(jobDefinitions) ? Collections.emptyList() :
+                obsService.getConceptsByNames(getIgnoreConceptNamesForObsJob(jobDefinitions));
+    }
+
+    private Boolean isObsJobWithOutIgnoreColumns(List<JobDefinition> jobDefinitions) {
+        return getIgnoreConceptNamesForObsJob(jobDefinitions).isEmpty();
+    }
+
+    private Boolean isObsJobPresent(List<JobDefinition> jobDefinitions) {
+        return !jobDefinitions.stream()
+                .filter(jobDefinition -> OBS_JOB_TYPE.equals(jobDefinition.getType()))
+                .collect(Collectors.toList()).isEmpty();
     }
 
     public void setObsService(ObsService obsService) {
