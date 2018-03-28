@@ -40,7 +40,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     @Test
     @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
-    public void shouldCreateTablesBasedOnJobConfiguration() {
+    public void shouldCreateTablesAndViewsBasedOnConfiguration() {
 
         batchConfiguration.run();
 

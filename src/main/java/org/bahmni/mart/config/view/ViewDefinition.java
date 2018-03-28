@@ -3,7 +3,7 @@ package org.bahmni.mart.config.view;
 public class ViewDefinition {
 
     private String name;
-    private String viewSQL;
+    private String sql;
 
     public String getName() {
         return name;
@@ -13,11 +13,11 @@ public class ViewDefinition {
         this.name = name;
     }
 
-    public String getViewSQL() {
-        return viewSQL;
+    public String getSql() {
+        return sql;
     }
 
-    public void setViewSQL(String viewSQL) {
-        this.viewSQL = viewSQL;
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 }

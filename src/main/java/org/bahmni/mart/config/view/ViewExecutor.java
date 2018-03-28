@@ -1,6 +1,5 @@
 package org.bahmni.mart.config.view;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +22,15 @@ public class ViewExecutor {
         viewDefinitions.forEach(viewDefinition -> {
             try {
                 logger.info(String.format("Executing the view '%s'.", viewDefinition.getName()));
-                martJdbcTemplate.execute(getUpdatedViewSQL(viewDefinition.getViewSQL()));
+                martJdbcTemplate.execute(getUpdatedViewSQL(viewDefinition));
             } catch (Exception e) {
                 logger.error(String.format("Unable to execute the view %s.", viewDefinition.getName()), e);
             }
         });
     }
 
-    private String getUpdatedViewSQL(String viewSQL) {
-        return String.format("drop view if exists %s;%s", getViewName(viewSQL), viewSQL);
+    private String getUpdatedViewSQL(ViewDefinition viewDefinition) {
+        return String.format("drop view if exists %s;create view %s as %s",
+                viewDefinition.getName(), viewDefinition.getName(), viewDefinition.getSql());
     }
-
-    private String getViewName(String viewSQL) {
-        return StringUtils.isEmpty(viewSQL) ?
-                viewSQL : StringUtils.substringBetween(viewSQL.toLowerCase(), " view ", " as ").trim();
-    }
-
-
 }

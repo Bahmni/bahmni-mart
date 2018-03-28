@@ -296,15 +296,15 @@
   "views" : [
     {
       "name": "patient_program_view",
-      "viewSQL": "CREATE VIEW patient_program_view AS SELECT pa.address1, pa.address2, pa.address3, pa.address4, pa.address6, pa.state_province, pat.*, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, program_id, patient_program_id, date_enrolled, date_completed, location_name, program_outcome FROM person_details pd LEFT OUTER JOIN person_address pa ON pa.person_id = pd.person_id LEFT OUTER JOIN person_attributes pat ON pat.person_id = pa.person_id LEFT OUTER JOIN patient_program_data ppd ON ppd.patient_id = pat.person_id"
+      "sql": "SELECT pa.address1, pa.address2, pa.address3, pa.address4, pa.address6, pa.state_province, pat.*, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, program_id, patient_program_id, date_enrolled, date_completed, location_name, program_outcome FROM person_details pd LEFT OUTER JOIN person_address pa ON pa.person_id = pd.person_id LEFT OUTER JOIN person_attributes pat ON pat.person_id = pa.person_id LEFT OUTER JOIN patient_program_data ppd ON ppd.patient_id = pat.person_id"
     },
     {
       "name": "patient_visits_encounters_view",
-      "viewSQL": "CREATE VIEW patient_visits_encounters AS SELECT pd.person_id, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, pvd.visit_id, pvd.visit_type_name, pvd.visit_start_date, pvd.visit_end_date, pvd.location_name, visit_type_name AS visit_type, encounter_id, encounter_type_id, encounter_type_name, ped.location_name AS encounter_location FROM person_details pd LEFT OUTER JOIN patient_visit_details pvd ON pvd.patient_id = pd.person_id LEFT OUTER JOIN patient_encounter_details ped ON ped.patient_id = pvd.patient_id"
+      "sql": "SELECT pd.person_id, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, pvd.visit_id, pvd.visit_type_name, pvd.visit_start_date, pvd.visit_end_date, pvd.location_name, visit_type_name AS visit_type, encounter_id, encounter_type_id, encounter_type_name, ped.location_name AS encounter_location FROM person_details pd LEFT OUTER JOIN patient_visit_details pvd ON pvd.patient_id = pd.person_id LEFT OUTER JOIN patient_encounter_details ped ON ped.patient_id = pvd.patient_id"
     },
     {
       "name": "appointment_admin_panel_view",
-      "viewSQL": "CREATE VIEW appointment_admin_panel AS SELECT * from appointment_service LEFT OUTER JOIN service_availability USING (appointment_service_id,service_name)"
+      "sql": "SELECT * from appointment_service LEFT OUTER JOIN service_availability USING (appointment_service_id,service_name)"
     }
   ]
 }

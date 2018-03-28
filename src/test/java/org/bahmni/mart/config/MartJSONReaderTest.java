@@ -37,7 +37,7 @@ public class MartJSONReaderTest {
                 "\"views\": [\n" +
                 "  {\n" +
                 "       \"name\": \"patient_program_view\",\n" +
-                "       \"viewSQL\": \"create view patient_program_view as select * from patient_program\"\n" +
+                "       \"sql\": \"select * from patient_program\"\n" +
                 "  }]\n" +
                 "}";
         PowerMockito.mockStatic(BatchUtils.class);
@@ -67,7 +67,7 @@ public class MartJSONReaderTest {
         assertEquals(1, viewDefinitions.size());
         ViewDefinition viewDefinition = viewDefinitions.get(0);
         assertEquals("patient_program_view", viewDefinition.getName());
-        assertEquals("create view patient_program_view as select * from patient_program",
-                viewDefinition.getViewSQL());
+        assertEquals("select * from patient_program",
+                viewDefinition.getSql());
     }
 }

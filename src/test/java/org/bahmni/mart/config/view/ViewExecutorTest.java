@@ -41,25 +41,25 @@ public class ViewExecutorTest {
     public void shouldExecuteTwoViewsSuccessfully() {
         ViewDefinition viewDefinition = new ViewDefinition();
         viewDefinition.setName("view1");
-        viewDefinition.setViewSQL("create view patient_view as select * from patient");
+        viewDefinition.setSql("select * from patient");
 
         ViewDefinition viewDefinition1 = new ViewDefinition();
         viewDefinition1.setName("view2");
-        viewDefinition1.setViewSQL("create view program_view as select * from program");
+        viewDefinition1.setSql("select * from program");
 
         viewExecutor.execute(Arrays.asList(viewDefinition, viewDefinition1));
 
         verify(martJdbcTemplate, times(1))
-                .execute("drop view if exists patient_view;" + viewDefinition.getViewSQL());
+                .execute("drop view if exists view1;create view view1 as " + viewDefinition.getSql());
         verify(martJdbcTemplate, times(1))
-                .execute("drop view if exists program_view;" + viewDefinition1.getViewSQL());
+                .execute("drop view if exists view2;create view view2 as " + viewDefinition1.getSql());
     }
 
     @Test
     public void shouldLogTheErrorIfViewSQLSyntaxIsIncorrect() throws NoSuchFieldException, IllegalAccessException {
         ViewDefinition viewDefinition = new ViewDefinition();
         viewDefinition.setName("view1");
-        viewDefinition.setViewSQL("create view  as select * from patient");
+        viewDefinition.setSql("select * from patient");
 
         doThrow(Exception.class).when(martJdbcTemplate).execute(anyString());
         Logger logger = mock(Logger.class);
@@ -74,9 +74,9 @@ public class ViewExecutorTest {
     public void shouldLogTheErrorIfViewSQLIsEmpty() throws NoSuchFieldException, IllegalAccessException {
         ViewDefinition viewDefinition = new ViewDefinition();
         viewDefinition.setName("view1");
-        viewDefinition.setViewSQL("");
+        viewDefinition.setSql("");
 
-        doThrow(Exception.class).when(martJdbcTemplate).execute("drop view if exists ;");
+        doThrow(Exception.class).when(martJdbcTemplate).execute("drop view if exists view1;create view view1 as ");
         Logger logger = mock(Logger.class);
         setValuesForMemberFields(viewExecutor, "logger", logger);
 
@@ -90,9 +90,10 @@ public class ViewExecutorTest {
     public void shouldLogTheErrorIfViewSQLIsNull() throws NoSuchFieldException, IllegalAccessException {
         ViewDefinition viewDefinition = new ViewDefinition();
         viewDefinition.setName("view1");
-        viewDefinition.setViewSQL(null);
+        viewDefinition.setSql(null);
 
-        doThrow(Exception.class).when(martJdbcTemplate).execute("drop view if exists null;null");
+        doThrow(Exception.class).when(martJdbcTemplate)
+                .execute("drop view if exists view1;create view view1 as null");
         Logger logger = mock(Logger.class);
         setValuesForMemberFields(viewExecutor, "logger", logger);
 
