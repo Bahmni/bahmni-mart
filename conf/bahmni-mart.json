@@ -3,9 +3,17 @@
   {
     "name": "Program data",
     "type": "generic",
-    "readerSql": "SELECT p.program_id, p.name AS program_name, p.description AS program_description, cv.concept_full_name AS program_outcome, p.creator, p.date_created, p.date_changed, p.changed_by FROM program p INNER JOIN concept_view cv ON cv.concept_id = p.outcomes_concept_id AND cv.retired IS FALSE AND p.retired IS FALSE",
+    "readerSql": "SELECT program_id, name AS program_name, description AS program_description, creator, date_created, date_changed, changed_by FROM program WHERE retired IS FALSE",
     "chunkSizeToRead": "500",
     "tableName": "programs",
+    "columnsToIgnore": []
+  },
+  {
+    "name": "Program outcomes",
+    "type": "generic",
+    "readerSql": "SELECT p.program_id, p.name AS `program_name`, cn_outcome.name AS `program_outcome` FROM program p INNER JOIN concept c ON c.concept_id = p.outcomes_concept_id AND c.retired IS FALSE AND p.retired IS FALSE INNER JOIN concept_set cs ON cs.concept_set = c.concept_id LEFT OUTER JOIN concept_name cn_cs ON cn_cs.concept_id = cs.concept_set AND cn_cs.concept_name_type = 'FULLY_SPECIFIED' AND cn_cs.voided IS FALSE LEFT OUTER JOIN concept_name cn_outcome ON cn_outcome.concept_id = cs.concept_id AND cn_outcome.concept_name_type = 'FULLY_SPECIFIED' AND cn_outcome.voided IS FALSE",
+    "chunkSizeToRead": "500",
+    "tableName": "program_outcomes",
     "columnsToIgnore": []
   },
   {
@@ -18,7 +26,7 @@
   {
     "name": "Patient State",
     "type": "generic",
-    "readerSql": "SELECT ps.patient_program_id, cv.concept_full_name AS state, ps.start_date, ps.end_date, ps.creator, ps.date_changed, ps.changed_by FROM patient_state ps INNER JOIN program_workflow_state pws ON pws.program_workflow_state_id = ps.state AND ps.voided IS FALSE AND pws.retired IS FALSE INNER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired IS FALSE",
+    "readerSql": "SELECT ps.patient_program_id, cv.concept_full_name AS state, ps.start_date, ps.end_date, ps.creator, ps.date_created, ps.date_changed, ps.changed_by FROM patient_state ps INNER JOIN program_workflow_state pws ON pws.program_workflow_state_id = ps.state AND ps.voided IS FALSE AND pws.retired IS FALSE INNER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired IS FALSE",
     "chunkSizeToRead": "500",
     "tableName": "patient_state"
   },
@@ -32,7 +40,7 @@
   {
     "name": "Program Workflow States",
     "type": "generic",
-    "readerSql": "SELECT pws.program_workflow_state_id, cv.concept_full_name AS state_name, pws.creator, pws.date_created, pws.date_changed, pws.changed_by FROM program_workflow_state pws INNER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired IS FALSE And pws.retired IS FALSE",
+    "readerSql": "SELECT pws.program_workflow_state_id, pws.program_workflow_id, cv.concept_full_name AS state_name, pws.creator, pws.date_created, pws.date_changed, pws.changed_by FROM program_workflow_state pws INNER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired IS FALSE And pws.retired IS FALSE",
     "chunkSizeToRead": "500",
     "tableName": "Program_workflow_states"
   },
@@ -275,6 +283,7 @@
       "Video",
       "Image",
       "Documents, Image Upload",
+      "Documents, Image",
       "Radiology Documents",
       "FSTG, Comments",
       "CC, Additional comments, complications",
