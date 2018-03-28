@@ -56,12 +56,43 @@ public class ViewExecutorTest {
     }
 
     @Test
-    public void shouldThrowExceptionIfViewSQLIsNotProper() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldLogTheErrorIfViewSQLSyntaxIsIncorrect() throws NoSuchFieldException, IllegalAccessException {
         ViewDefinition viewDefinition = new ViewDefinition();
         viewDefinition.setName("view1");
-        viewDefinition.setViewSQL("create view patient_view as select * from patient");
+        viewDefinition.setViewSQL("create view  as select * from patient");
 
         doThrow(Exception.class).when(martJdbcTemplate).execute(anyString());
+        Logger logger = mock(Logger.class);
+        setValuesForMemberFields(viewExecutor, "logger", logger);
+
+        viewExecutor.execute(Arrays.asList(viewDefinition));
+        verify(logger, times(1)).error(eq("Unable to execute the view view1."),
+                any(Exception.class));
+    }
+
+    @Test
+    public void shouldLogTheErrorIfViewSQLIsEmpty() throws NoSuchFieldException, IllegalAccessException {
+        ViewDefinition viewDefinition = new ViewDefinition();
+        viewDefinition.setName("view1");
+        viewDefinition.setViewSQL("");
+
+        doThrow(Exception.class).when(martJdbcTemplate).execute("drop view if exists ;");
+        Logger logger = mock(Logger.class);
+        setValuesForMemberFields(viewExecutor, "logger", logger);
+
+        viewExecutor.execute(Arrays.asList(viewDefinition));
+        verify(logger, times(1)).error(eq("Unable to execute the view view1."),
+                any(Exception.class));
+    }
+
+
+    @Test
+    public void shouldLogTheErrorIfViewSQLIsNull() throws NoSuchFieldException, IllegalAccessException {
+        ViewDefinition viewDefinition = new ViewDefinition();
+        viewDefinition.setName("view1");
+        viewDefinition.setViewSQL(null);
+
+        doThrow(Exception.class).when(martJdbcTemplate).execute("drop view if exists null;null");
         Logger logger = mock(Logger.class);
         setValuesForMemberFields(viewExecutor, "logger", logger);
 

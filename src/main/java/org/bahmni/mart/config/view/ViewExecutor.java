@@ -35,7 +35,8 @@ public class ViewExecutor {
     }
 
     private String getViewName(String viewSQL) {
-        return StringUtils.substringBetween(viewSQL.toLowerCase(), " view ", " as ").trim();
+        return StringUtils.isEmpty(viewSQL) ?
+                viewSQL : StringUtils.substringBetween(viewSQL.toLowerCase(), " view ", " as ").trim();
     }
 
 

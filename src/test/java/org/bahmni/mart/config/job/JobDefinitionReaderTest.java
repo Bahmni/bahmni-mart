@@ -2,7 +2,6 @@ package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.BatchUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -12,10 +11,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,7 +29,7 @@ public class JobDefinitionReaderTest {
     private String json;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() {
         PowerMockito.mockStatic(BatchUtils.class);
         json = "{\"jobs\": [\n" +
                 "  {\n" +
@@ -38,6 +38,18 @@ public class JobDefinitionReaderTest {
                 "    \"readerSql\": \"select * from program\",\n" +
                 "    \"chunkSizeToRead\": \"1000\",\n" +
                 "    \"tableName\": \"MyProgram\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"name\": \"Obs Data\",\n" +
+                "    \"type\": \"obs\",\n" +
+                "    \"separateTables\": [\n" +
+                "      \"FSTG, Specialty determined by MLO\",\n" +
+                "      \"Stage\"\n" +
+                "    ],\n" +
+                "    \"conceptReferenceSource\": \"BAHMNI_INTERNAL\",\n" +
+                "    \"columnsToIgnore\": [\n" +
+                "      \"MH, Name of MLO\"\n" +
+                "    ]\n" +
                 "  }\n" +
                 "]}";
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(json);
@@ -51,21 +63,34 @@ public class JobDefinitionReaderTest {
         List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
 
         assertNotNull(jobDefinitions);
-        assertEquals(1, jobDefinitions.size());
-        assertEquals("Program Data", jobDefinitions.get(0).getName());
-        assertEquals("generic", jobDefinitions.get(0).getType());
-        assertEquals("select * from program", jobDefinitions.get(0).getReaderSql());
-        assertEquals(1000, jobDefinitions.get(0).getChunkSizeToRead());
-        assertEquals("MyProgram", jobDefinitions.get(0).getTableName());
+        assertEquals(2, jobDefinitions.size());
+        JobDefinition genericJobDefinition = jobDefinitions.get(0);
+        assertEquals("Program Data", genericJobDefinition.getName());
+        assertEquals("generic", genericJobDefinition.getType());
+        assertEquals("select * from program", genericJobDefinition.getReaderSql());
+        assertEquals(1000, genericJobDefinition.getChunkSizeToRead());
+        assertEquals("MyProgram", genericJobDefinition.getTableName());
+
+        JobDefinition obsJobDefinition = jobDefinitions.get(1);
+        assertEquals("Obs Data", obsJobDefinition.getName());
+        assertEquals("obs", obsJobDefinition.getType());
+
+        List<String> expectedSeparateTables = Arrays.asList("FSTG, Specialty determined by MLO", "Stage");
+        List<String> actualSeparateTables = obsJobDefinition.getSeparateTables();
+        assertEquals(2, actualSeparateTables.size());
+        assertThat(expectedSeparateTables, containsInAnyOrder(actualSeparateTables.toArray()));
+
+        List<String> expectedIgnoredColumns = Arrays.asList("MH, Name of MLO");
+        List<String> actualColumnsToIgnore = obsJobDefinition.getColumnsToIgnore();
+        assertEquals(1, actualColumnsToIgnore.size());
+        assertThat(expectedIgnoredColumns, containsInAnyOrder(actualColumnsToIgnore.toArray()));
     }
 
     @Test
-    @Ignore
-    public void shouldReturnConceptReferenceSourceIfItIsPresent() throws Exception {
+    public void shouldReturnConceptReferenceSourceIfItIsPresent() {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getType()).thenReturn("obs");
         when(jobDefinition.getConceptReferenceSource()).thenReturn("BAHMNI_INTERNAL");
-        setValuesForMemberFields(jobDefinitionReader, "jobDefinitions", Arrays.asList(jobDefinition));
 
         String conceptReferenceSource = jobDefinitionReader.getConceptReferenceSource();
 
@@ -74,15 +99,7 @@ public class JobDefinitionReaderTest {
     }
 
     @Test
-    public void shouldReturnEmptyStringIfConceptReferenceSourceIsNotPresent() throws Exception {
-
-        String conceptReferenceSource = jobDefinitionReader.getConceptReferenceSource();
-
-        assertEquals("", conceptReferenceSource);
-    }
-
-    @Test
-    public void shouldReturnJobDefinitionGivenJobName() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldReturnJobDefinitionGivenJobName() {
         JobDefinition programDataDefinition = jobDefinitionReader.getJobDefinitionByName("Program Data");
 
         assertEquals("Program Data", programDataDefinition.getName());
@@ -93,7 +110,7 @@ public class JobDefinitionReaderTest {
     }
 
     @Test
-    public void shouldReturnEmptyJobDefinitionGivenInvalidName() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldReturnEmptyJobDefinitionGivenInvalidName() {
         JobDefinition personAttributeDefinition = jobDefinitionReader.getJobDefinitionByName("InvalidName");
 
         assertNull(personAttributeDefinition.getName());

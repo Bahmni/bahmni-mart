@@ -41,5 +41,11 @@
         "MH, Name of MLO"
       ]
     }
+  ],
+  "views": [
+    {
+      "name": "view1",
+      "viewSQL": "CREATE VIEW test_view as select * from \"patient_allergy_status_test\""
+    }
   ]
 }

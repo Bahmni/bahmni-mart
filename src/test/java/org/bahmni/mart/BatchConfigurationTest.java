@@ -194,6 +194,7 @@ public class BatchConfigurationTest {
         verify(simpleJobTemplate, times(1)).buildJob(jobDefinition);
         verify(simpleJobTemplate, times(1)).buildJob(jobDefinition1);
         verify(jobLauncher, times(2)).run(any(Job.class), any(JobParameters.class));
+        verify(viewExecutor, times(1)).execute(any());
     }
 
     @Test

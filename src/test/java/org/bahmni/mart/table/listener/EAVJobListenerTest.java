@@ -87,8 +87,6 @@ public class EAVJobListenerTest {
 
     @Test
     public void shouldCallCreateTablesWithAllTableColumnsWhenIgnoredColumnIsEmpty() throws Exception {
-        JobExecution jobExecution = mock(JobExecution.class);
-        JobInstance jobInstance = mock(JobInstance.class);
         String sql = "select name from attributeTable;";
         String jobName = "JobName";
 

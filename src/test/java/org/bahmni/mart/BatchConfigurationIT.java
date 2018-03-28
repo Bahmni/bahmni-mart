@@ -9,9 +9,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class BatchConfigurationIT extends AbstractBaseBatchIT {
@@ -56,12 +59,16 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 .queryForList("SELECT * FROM \"patient_allergy_status_test\"");
         assertEquals(10, patientList.size());
 
+        verifyRecords(patientList);
+        verifyViews();
+    }
+
+    private void verifyRecords(List<Map<String, Object>> patientList) {
         for (Map<String, Object> row : patientList) {
             String patientId = row.get("patient_id").toString();
             String allergyStatus = row.get("allergy_status").toString();
             assertEquals(expectedPatientList.get(patientId), allergyStatus);
         }
-
     }
 
     @Test
@@ -83,11 +90,16 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(2, tableDataColumns.size());
         assertTrue(columnsName.containsAll(Arrays.asList("patient_id", "allergy_status")));
 
-        for (Map<String, Object> row : patientList) {
-            String patientId = row.get("patient_id").toString();
-            String allergyStatus = row.get("allergy_status").toString();
-            assertEquals(expectedPatientList.get(patientId), allergyStatus);
-        }
+        verifyRecords(patientList);
+    }
+
+    private void verifyViews() {
+        List<Map<String, Object>> view = martJdbcTemplate.queryForList("SELECT * from test_view");
+        Set<String> columnNames = view.get(0).keySet();
+        assertEquals(2, columnNames.size());
+        assertThat(Arrays.asList("PATIENT_ID", "ALLERGY_STATUS"), containsInAnyOrder(columnNames.toArray()));
+        assertEquals(10, view.size());
+        verifyRecords(view);
     }
 
     private void verifyTableColumns() {
