@@ -69,10 +69,6 @@ public class JobDefinition {
         return columnsToIgnore;
     }
 
-    public void setColumnsToIgnore(List<String> columnsToIgnore) {
-        this.columnsToIgnore = columnsToIgnore;
-    }
-
     public EavAttributes getEavAttributes() {
         return eavAttributes;
     }
@@ -81,7 +77,4 @@ public class JobDefinition {
         this.eavAttributes = eavAttributes;
     }
 
-    public void setConceptReferenceSource(String conceptReferenceSource) {
-        this.conceptReferenceSource = conceptReferenceSource;
-    }
 }
