@@ -1,21 +1,17 @@
 package org.bahmni.mart.table;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 
 public class TableRecordHolder {
 
-    private List<Map<String, Object>> recordList = new ArrayList<>();
+    private List<Map<String, Object>> recordList;
     private String tableName;
 
     public TableRecordHolder(List<Map<String, Object>> recordList, String tableName) {
         this.recordList = recordList;
         this.tableName = tableName;
-    }
-
-    public TableRecordHolder() {
     }
 
     public List<Map<String, Object>> getRecordList() {

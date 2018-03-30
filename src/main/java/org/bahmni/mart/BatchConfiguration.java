@@ -40,13 +40,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
 @Configuration
 @EnableBatchProcessing
 public class BatchConfiguration extends DefaultBatchConfigurer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(BatchConfiguration.class);
 
-    public static final String OBS_DATA_FLATTENING_JOB_NAME = "flattenObs";
+    protected static final String OBS_DATA_FLATTENING_JOB_NAME = "flattenObs";
     private static final String DEFAULT_ENCODING = "UTF-8";
 
     @Autowired
@@ -79,29 +81,27 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private ViewExecutor viewExecutor;
 
-    private List<JobDefinition> jobDefinitions;
-
-    private List<StepConfigurer> stepConfigurers = new ArrayList<>();
-
     private Job buildObsJob() {
         FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(OBS_DATA_FLATTENING_JOB_NAME)
                 .incrementer(new RunIdIncrementer()).preventRestart()
                 .flow(treatmentRegistrationBaseExportStep.getStep());
         //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
 
-        setStepConfigurers();
-
-        for (StepConfigurer stepConfigurer : stepConfigurers) {
+        getStepConfigurers().forEach(stepConfigurer -> {
             stepConfigurer.registerSteps(completeDataExport);
             stepConfigurer.createTables();
-        }
+        });
+
         return completeDataExport.end().build();
     }
 
-    private void setStepConfigurers() {
+    private List<StepConfigurer> getStepConfigurers() {
+        ArrayList<StepConfigurer> stepConfigurers = new ArrayList<>();
         stepConfigurers.add(formStepConfigurer);
-        if (!jobDefinitionReader.getConceptReferenceSource().equals(""))
+
+        if (!isEmpty(jobDefinitionReader.getConceptReferenceSource()))
             stepConfigurers.add(metaDataStepConfigurer);
+        return stepConfigurers;
     }
 
     @Bean
@@ -117,10 +117,10 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     @Override
     public void run(String... args) {
-        jobDefinitions = jobDefinitionReader.getJobDefinitions();
+        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
         if (!JobDefinitionValidator.validate(jobDefinitions))
             throw new InvalidJobConfiguration();
-        launchJobs(getJobs());
+        launchJobs(getJobs(jobDefinitions));
         viewExecutor.execute(martJSONReader.getViewDefinitions());
     }
 
@@ -138,7 +138,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         });
     }
 
-    private List<Job> getJobs() {
+    private List<Job> getJobs(List<JobDefinition> jobDefinitions) {
         return jobDefinitions.stream().map(this::getJobByType).filter(Objects::nonNull).collect(Collectors.toList());
     }
 

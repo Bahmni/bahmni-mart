@@ -1,22 +1,38 @@
 package org.bahmni.mart.config.job;
 
-import org.bahmni.mart.exception.InvalidJobConfiguration;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+@RunWith(PowerMockRunner.class)
 public class JobDefinitionValidatorTest {
+    @Mock
+    private Logger logger = mock(Logger.class);
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
     private static final String GENERIC = "generic";
+
+    @Before
+    public void setUp() throws Exception {
+        setValueForFinalStaticField(JobDefinitionValidator.class, "logger", logger);
+    }
 
     @Test
     public void shouldThrowInvalidJobConfigurationExceptionIfReaderSQLIsEmpty() {
@@ -32,13 +48,8 @@ public class JobDefinitionValidatorTest {
         jobDefinition1.setTableName("table1");
         jobDefinition1.setType(GENERIC);
 
-        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
-
-        exception.expect(InvalidJobConfiguration.class);
-        exception.expectMessage("Reader SQL is empty for the job 'test1'");
-
-        JobDefinitionValidator.validate(jobDefinitions);
-
+        JobDefinitionValidator.validate(Arrays.asList(jobDefinition, jobDefinition1));
+        verify(logger, times(1)).error("Reader SQL is empty for the job 'test1'");
     }
 
     @Test
@@ -55,13 +66,8 @@ public class JobDefinitionValidatorTest {
         jobDefinition1.setTableName("table1");
         jobDefinition1.setType(GENERIC);
 
-        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
-
-        exception.expect(InvalidJobConfiguration.class);
-        exception.expectMessage("Reader SQL is empty for the job 'test1");
-
-        JobDefinitionValidator.validate(jobDefinitions);
-
+        JobDefinitionValidator.validate(Arrays.asList(jobDefinition, jobDefinition1));
+        verify(logger, times(1)).error("Reader SQL is empty for the job 'test1'");
     }
 
     @Test
@@ -78,12 +84,8 @@ public class JobDefinitionValidatorTest {
         jobDefinition1.setTableName("");
         jobDefinition1.setType(GENERIC);
 
-        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
-
-        exception.expect(InvalidJobConfiguration.class);
-        exception.expectMessage("Table name is empty for the job 'test1'");
-
-        JobDefinitionValidator.validate(jobDefinitions);
+        JobDefinitionValidator.validate(Arrays.asList(jobDefinition, jobDefinition1));
+        verify(logger, times(1)).error("Table name is empty for the job 'test1'");
 
     }
 
@@ -101,12 +103,9 @@ public class JobDefinitionValidatorTest {
         jobDefinition1.setTableName(null);
         jobDefinition1.setType(GENERIC);
 
-        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
+        JobDefinitionValidator.validate(Arrays.asList(jobDefinition, jobDefinition1));
+        verify(logger, times(1)).error("Table name is empty for the job 'test1'");
 
-        exception.expect(InvalidJobConfiguration.class);
-        exception.expectMessage("Table name is empty for the job 'test1'");
-
-        JobDefinitionValidator.validate(jobDefinitions);
 
     }
 

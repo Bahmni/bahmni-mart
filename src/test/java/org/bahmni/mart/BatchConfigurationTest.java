@@ -1,13 +1,12 @@
 package org.bahmni.mart;
 
-import freemarker.template.Configuration;
-import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.io.FileUtils;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.config.view.ViewExecutor;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
@@ -19,7 +18,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.batch.core.Job;
@@ -34,23 +32,23 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
-@PrepareForTest({BatchConfiguration.class, FileUtils.class})
+@PrepareForTest({FileUtils.class, JobDefinitionValidator.class})
 @RunWith(PowerMockRunner.class)
 public class BatchConfigurationTest {
 
@@ -88,7 +86,10 @@ public class BatchConfigurationTest {
     private JobLauncher jobLauncher;
 
     @Mock
-    private Job expectedJob;
+    private Job job;
+
+    @Mock
+    private JobDefinition jobDefinition;
 
     @Mock
     private MetaDataStepConfigurer metaDataStepConfigurer;
@@ -100,6 +101,7 @@ public class BatchConfigurationTest {
     @Before
     public void setUp() throws Exception {
         mockStatic(FileUtils.class);
+        mockStatic(JobDefinitionValidator.class);
         batchConfiguration = new BatchConfiguration();
         setValuesForMemberFields(batchConfiguration, "formStepConfigurer", formStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "jobDefinitionReader", jobDefinitionReader);
@@ -124,33 +126,18 @@ public class BatchConfigurationTest {
         when(jobBuilder.flow(treatmentStep)).thenReturn(jobFlowBuilder);
         FlowJobBuilder flowJobBuilder = mock(FlowJobBuilder.class);
         when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
-        when(flowJobBuilder.build()).thenReturn(expectedJob);
+        when(flowJobBuilder.build()).thenReturn(job);
         when(jobDefinitionReader.getConceptReferenceSource()).thenReturn("");
         when(martJSONReader.getViewDefinitions()).thenReturn(new ArrayList<>());
+        when(JobDefinitionValidator.validate(anyListOf(JobDefinition.class))).thenReturn(true);
     }
 
-    @Test
-    public void shouldAddFreeMarkerConfiguration() throws Exception {
-        Configuration configuration = PowerMockito.mock(Configuration.class);
-        whenNew(Configuration.class).withArguments(any()).thenReturn(configuration);
-        File configurationFile = mock(File.class);
-        when(freemarkerTemplateLocation.getFile()).thenReturn(configurationFile);
-
-        Configuration freeMarkerConfiguration = batchConfiguration.freeMarkerConfiguration();
-
-        assertEquals(configuration, freeMarkerConfiguration);
-        verify(configuration, times(1)).setDefaultEncoding("UTF-8");
-        verify(configuration, times(1)).setClassForTemplateLoading(any(), eq("/templates"));
-        verify(configuration, times(1)).setTemplateExceptionHandler(any(TemplateExceptionHandler.class));
-    }
 
     @Test
     public void shouldRunObsJob() throws Exception {
-        JobDefinition jobDefinition = mock(JobDefinition.class);
-
         when(jobDefinition.getReaderSql()).thenReturn("Some sql");
         when(jobDefinition.getTableName()).thenReturn("Some table");
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
 
         batchConfiguration.run();
@@ -165,72 +152,53 @@ public class BatchConfigurationTest {
 
     @Test
     public void shouldRunJobsForValidJobConfiguration() throws Exception {
-        JobDefinition jobDefinition = mock(JobDefinition.class);
-        JobDefinition jobDefinition1 = mock(JobDefinition.class);
-
-        when(jobDefinition.getName()).thenReturn("job");
-        when(jobDefinition1.getName()).thenReturn("job1");
+        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition);
 
         when(jobDefinition.getType()).thenReturn("generic");
-        when(jobDefinition1.getType()).thenReturn("generic");
-
-        when(jobDefinition.getTableName()).thenReturn("table");
-        when(jobDefinition1.getTableName()).thenReturn("table1");
-
         when(jobDefinition.getReaderSql()).thenReturn("Some sql");
-        when(jobDefinition1.getReaderSql()).thenReturn("Some sql");
 
-
-        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
-        Job job = mock(Job.class);
-        Job job1 = mock(Job.class);
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
         when(simpleJobTemplate.buildJob(jobDefinition)).thenReturn(job);
-        when(simpleJobTemplate.buildJob(jobDefinition1)).thenReturn(job1);
 
         batchConfiguration.run();
 
+        verify(jobDefinition, times(2)).getType();
+        verify(job, times(2)).getName();
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
-        verify(simpleJobTemplate, times(1)).buildJob(jobDefinition);
-        verify(simpleJobTemplate, times(1)).buildJob(jobDefinition1);
+        verify(simpleJobTemplate, times(2)).buildJob(jobDefinition);
         verify(jobLauncher, times(2)).run(any(Job.class), any(JobParameters.class));
         verify(viewExecutor, times(1)).execute(any());
+        verifyStatic(times(1));
+        JobDefinitionValidator.validate(anyListOf(JobDefinition.class));
     }
 
     @Test
     public void shouldNotRunJobsForInvalidJobConfiguration() throws Exception {
-        JobDefinition jobDefinition = mock(JobDefinition.class);
-        JobDefinition jobDefinition1 = mock(JobDefinition.class);
+        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition);
 
-        when(jobDefinition.getName()).thenReturn("job1");
-        when(jobDefinition1.getName()).thenReturn("job1");
-
+        when(JobDefinitionValidator.validate(anyListOf(JobDefinition.class))).thenReturn(false);
         when(jobDefinition.getTableName()).thenReturn("table");
-        when(jobDefinition1.getTableName()).thenReturn("table1");
-
         when(jobDefinition.getType()).thenReturn("generic");
-        when(jobDefinition1.getType()).thenReturn("generic");
 
-        List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition1);
-        Job job = mock(Job.class);
-        Job job1 = mock(Job.class);
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
         when(simpleJobTemplate.buildJob(jobDefinition)).thenReturn(job);
-        when(simpleJobTemplate.buildJob(jobDefinition1)).thenReturn(job1);
 
-        expectedException.expect(InvalidJobConfiguration.class);
-        batchConfiguration.run();
+        // As Junit does not support to expect Exception and others verify in same test method, we have to use old way
 
-        verify(jobDefinitionReader, times(1)).getJobDefinitions();
-        verify(simpleJobTemplate, times(0)).buildJob(jobDefinition);
-        verify(simpleJobTemplate, times(0)).buildJob(jobDefinition1);
-        verify(jobLauncher, times(0)).run(any(Job.class), any(JobParameters.class));
+        try {
+            batchConfiguration.run();
+        } catch (InvalidJobConfiguration e) {
+            verify(jobDefinitionReader, times(1)).getJobDefinitions();
+            verify(simpleJobTemplate, times(0)).buildJob(jobDefinition);
+            verify(jobLauncher, times(0)).run(any(Job.class), any(JobParameters.class));
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test
     public void shouldAddMetaDataStepGivenConceptReferenceSource() throws Exception {
-        JobDefinition jobDefinition = mock(JobDefinition.class);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
         when(jobDefinitionReader.getConceptReferenceSource()).thenReturn("Bahmni-Internal");
 
@@ -240,12 +208,29 @@ public class BatchConfigurationTest {
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(1)).createTables();
         verify(metaDataStepConfigurer, times(1)).registerSteps(any(FlowBuilder.class));
+        verify(jobDefinitionReader, times(1)).getConceptReferenceSource();
+        verify(jobDefinition, times(1)).getType();
+    }
+
+    @Test
+    public void shouldNotAddMetaDataStepGivenConceptReferenceSourceIsNull() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinitionReader.getConceptReferenceSource()).thenReturn(null);
+
+        batchConfiguration.run();
+
+        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+        verify(metaDataStepConfigurer, times(0)).createTables();
+        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));
+        verify(jobDefinitionReader, times(1)).getConceptReferenceSource();
+        verify(jobDefinition, times(1)).getType();
     }
 
     @Test
     public void shouldNotAddMetaDataStepGivenNoConceptReferenceSource() throws Exception {
-        JobDefinition jobDefinition = mock(JobDefinition.class);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
 
         batchConfiguration.run();
@@ -254,16 +239,12 @@ public class BatchConfigurationTest {
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(0)).createTables();
         verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
     }
 
     @Test
     public void shouldRunEavJob() throws Exception {
-        JobDefinition jobDefinition = mock(JobDefinition.class);
-        Job job = mock(Job.class);
-
-        when(jobDefinition.getReaderSql()).thenReturn("Some sql");
-        when(jobDefinition.getTableName()).thenReturn("Some table");
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("eav");
         when(eavJobTemplate.buildJob(jobDefinition)).thenReturn(job);
 
@@ -272,5 +253,6 @@ public class BatchConfigurationTest {
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(eavJobTemplate, times(1)).buildJob(jobDefinition);
+        verify(jobDefinition, times(1)).getType();
     }
 }
