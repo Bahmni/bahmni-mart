@@ -40,6 +40,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     @Test
     @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
+    @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void shouldCreateTablesAndViewsBasedOnConfiguration() {
 
         batchConfiguration.run();
@@ -72,7 +73,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    @Sql(scripts = "classpath:testDataSet/insertPatientsDataForIgnoreColumns.sql")
+    @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
+    @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void shouldCreateTablesBasedOnJobConfigurationByIgnoringColumns() {
 
         batchConfiguration.run();
