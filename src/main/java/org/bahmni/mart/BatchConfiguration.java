@@ -1,6 +1,5 @@
 package org.bahmni.mart;
 
-import freemarker.template.TemplateExceptionHandler;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
@@ -30,10 +29,8 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +46,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private static final Logger log = LoggerFactory.getLogger(BatchConfiguration.class);
 
     protected static final String OBS_DATA_FLATTENING_JOB_NAME = "flattenObs";
-    private static final String DEFAULT_ENCODING = "UTF-8";
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -102,17 +98,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         if (!isEmpty(jobDefinitionReader.getConceptReferenceSource()))
             stepConfigurers.add(metaDataStepConfigurer);
         return stepConfigurers;
-    }
-
-    @Bean
-    public freemarker.template.Configuration freeMarkerConfiguration() throws IOException {
-        freemarker.template.Configuration freemarkerTemplateConfig = new freemarker.template.Configuration(
-                freemarker.template.Configuration.VERSION_2_3_22);
-        freemarkerTemplateConfig.setClassForTemplateLoading(this.getClass(), "/templates");
-        freemarkerTemplateConfig.setDefaultEncoding(DEFAULT_ENCODING);
-        freemarkerTemplateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-
-        return freemarkerTemplateConfig;
     }
 
     @Override

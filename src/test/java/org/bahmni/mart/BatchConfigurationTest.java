@@ -30,7 +30,6 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.JobFlowBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,9 +53,6 @@ public class BatchConfigurationTest {
 
     @Rule
     private ExpectedException expectedException = ExpectedException.none();
-
-    @Mock
-    private Resource freemarkerTemplateLocation;
 
     @Mock
     private JobBuilderFactory jobBuilderFactory;
@@ -131,7 +127,6 @@ public class BatchConfigurationTest {
         when(martJSONReader.getViewDefinitions()).thenReturn(new ArrayList<>());
         when(JobDefinitionValidator.validate(anyListOf(JobDefinition.class))).thenReturn(true);
     }
-
 
     @Test
     public void shouldRunObsJob() throws Exception {
