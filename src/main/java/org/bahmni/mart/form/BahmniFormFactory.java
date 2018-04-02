@@ -88,8 +88,4 @@ public class BahmniFormFactory {
                 .filter(jobDefinition -> OBS_JOB_TYPE.equals(jobDefinition.getType()))
                 .collect(Collectors.toList()).isEmpty();
     }
-
-    public void setObsService(ObsService obsService) {
-        this.obsService = obsService;
-    }
 }

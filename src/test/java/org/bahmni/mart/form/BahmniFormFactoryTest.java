@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -61,7 +60,6 @@ public class BahmniFormFactoryTest {
 
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
-        initMocks(this);
 
         separateTableConceptList = Arrays.asList("Operation Notes Template",
                 "Discharge Summary, Surgeries and Procedures", "Other Notes", "BP", "Notes");
@@ -88,13 +86,13 @@ public class BahmniFormFactoryTest {
         chiefComplaintDataConcepts.add(new Concept(7771, "BP", 1));
 
         bahmniFormFactory = new BahmniFormFactory();
-        bahmniFormFactory.setObsService(obsService);
+        setValuesForMemberFields(bahmniFormFactory, "obsService", obsService);
         setValuesForMemberFields(bahmniFormFactory, "separateTableConfigHelper", separateTableConfigHelper);
         setValuesForMemberFields(bahmniFormFactory, "jobDefinitionReader", jobDefinitionReader);
         mockStatic(BatchUtils.class);
         mockStatic(JobDefinitionUtil.class);
         when(getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsNameList);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList());
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.emptyList());
         when(separateTableConfigHelper.getAllSeparateTableConceptNames()).thenReturn(separateTableConceptList);
         when(obsService.getConceptsByNames(separateTableConceptList))
                 .thenReturn(separateTableConcepts);
@@ -117,7 +115,7 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldCreateAForm() {
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
         when(obsService.getChildConcepts("History and Examination"))
                 .thenReturn(historyAndExaminationConcepts);
@@ -148,7 +146,7 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldIgnoreCreatingAFormWhenTheConceptNameIsInIgnoreConcepts() throws Exception {
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         bahmniFormFactory.postConstruct();
 
         Concept healthEducation = new Concept(1110, "Health Education", 1);
@@ -171,7 +169,7 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldCreateChildForMultiSelectAddMoreAndSeparateTable() {
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         bahmniFormFactory.postConstruct();
 
         historyAndExaminationConcepts.add(new Concept(3365, "Operation Notes Template", 1));

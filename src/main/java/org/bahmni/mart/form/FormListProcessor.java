@@ -50,12 +50,4 @@ public class FormListProcessor {
             }
         }
     }
-
-    public void setObsService(ObsService obsService) {
-        this.obsService = obsService;
-    }
-
-    public void setBahmniFormFactory(BahmniFormFactory bahmniFormFactory) {
-        this.bahmniFormFactory = bahmniFormFactory;
-    }
 }

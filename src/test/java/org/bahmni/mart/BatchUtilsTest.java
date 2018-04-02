@@ -45,20 +45,17 @@ public class BatchUtilsTest {
         String expectedString = "stringEquivalentOfClassPathResource";
         when(IOUtils.toString(inputStream)).thenReturn(expectedString);
 
-        String actualString = convertResourceOutputToString(classPathResource);
-
-        assertEquals(expectedString, actualString);
+        assertEquals(expectedString, convertResourceOutputToString(classPathResource));
         verify(classPathResource, times(1)).getInputStream();
     }
 
     @Test
     public void shouldThrowBatchResourceException() throws Exception {
-        expectedException.expect(BatchResourceException.class);
-        expectedException.expectMessage("Cannot load the provided resource. Unable to continue");
-
         ClassPathResource classPathResource = mock(ClassPathResource.class);
         when(classPathResource.getInputStream()).thenThrow(new IOException());
 
+        expectedException.expect(BatchResourceException.class);
+        expectedException.expectMessage("Cannot load the provided resource. Unable to continue");
         convertResourceOutputToString(classPathResource);
     }
 
@@ -69,6 +66,7 @@ public class BatchUtilsTest {
         assertNull(getPostgresCompatibleValue(null, "date"));
         assertNull(getPostgresCompatibleValue(null, "timestamp"));
         assertNull(getPostgresCompatibleValue(null, "time"));
+        assertNull(getPostgresCompatibleValue(null, "numeric"));
     }
 
     @Test

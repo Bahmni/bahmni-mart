@@ -12,8 +12,8 @@ public class BatchUtils {
     public static int stepNumber = 0;
 
     public static String convertResourceOutputToString(Resource resource) {
-        try (InputStream is = resource.getInputStream()) {
-            return IOUtils.toString(is);
+        try (InputStream inputStream = resource.getInputStream()) {
+            return IOUtils.toString(inputStream);
         } catch (IOException e) {
             throw new BatchResourceException("Cannot load the provided resource. Unable to continue", e);
         }
@@ -36,8 +36,7 @@ public class BatchUtils {
     }
 
     public static String constructSqlWithParameter(String sql, String parameter, String value) {
-        return sql.replaceAll(":" + parameter, "'" +
-                value + "'");
+        return sql.replaceAll(String.format(":%s", parameter), String.format("'%s'", value));
     }
 
     private static String getStringForPsql(String value) {

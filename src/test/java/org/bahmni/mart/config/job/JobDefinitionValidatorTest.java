@@ -16,14 +16,13 @@ import java.util.List;
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(PowerMockRunner.class)
 public class JobDefinitionValidatorTest {
     @Mock
-    private Logger logger = mock(Logger.class);
+    private Logger logger;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
