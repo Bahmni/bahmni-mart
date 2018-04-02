@@ -1,16 +1,11 @@
 package org.bahmni.mart;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.bahmni.mart.exception.BatchResourceException;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class BatchUtils {
 
@@ -22,13 +17,6 @@ public class BatchUtils {
         } catch (IOException e) {
             throw new BatchResourceException("Cannot load the provided resource. Unable to continue", e);
         }
-    }
-
-    public static List<String> convertConceptNamesToSet(String conceptNames) {
-        if (StringUtils.isEmpty(conceptNames))
-            return new ArrayList<>();
-        String[] tokens = conceptNames.split("\"(\\s*),(\\s*)\"");
-        return Arrays.stream(tokens).map(token -> token.replaceAll("\"", "")).collect(Collectors.toList());
     }
 
     public static String getPostgresCompatibleValue(String value, String dataType) {

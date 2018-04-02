@@ -13,16 +13,12 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import static org.bahmni.mart.BatchUtils.constructSqlWithParameter;
-import static org.bahmni.mart.BatchUtils.convertConceptNamesToSet;
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
 import static org.bahmni.mart.BatchUtils.getPostgresCompatibleValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -39,31 +35,6 @@ public class BatchUtilsTest {
     @Before
     public void setUp() throws Exception {
         mockStatic(IOUtils.class);
-    }
-
-    @Test
-    public void ensureThatTheCommaSeparatedConceptNamesAreConvertedToSet() {
-        List<String> conceptNames = convertConceptNamesToSet("\"a,b\",\"c\",\"d\"");
-
-        assertEquals(3, conceptNames.size());
-        assertTrue(conceptNames.contains("c"));
-        assertTrue(conceptNames.contains("d"));
-        assertTrue(conceptNames.contains("a,b"));
-    }
-
-
-    @Test
-    public void ensureThatSetIsNotNullWhenConceptNamesIsEmpty() {
-        List<String> conceptNames = convertConceptNamesToSet("");
-        assertNotNull(conceptNames);
-        assertEquals(0, conceptNames.size());
-    }
-
-    @Test
-    public void ensureThatSetIsNotNullWhenConceptNamesIsNull() {
-        List<String> conceptNames = convertConceptNamesToSet(null);
-        assertNotNull(conceptNames);
-        assertEquals(0, conceptNames.size());
     }
 
     @Test
