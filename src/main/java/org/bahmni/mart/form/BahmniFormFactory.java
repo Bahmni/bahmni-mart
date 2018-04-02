@@ -42,19 +42,9 @@ public class BahmniFormFactory {
         bahmniForm.setFormName(concept);
         bahmniForm.setDepthToParent(depth);
         bahmniForm.setParent(parentForm);
-        bahmniForm.setRootForm(getRootFormFor(parentForm));
 
         constructFormFields(concept, bahmniForm, depth);
         return bahmniForm;
-    }
-
-    private BahmniForm getRootFormFor(BahmniForm form) {
-        if (form == null) {
-            return null;
-        } else if (form.getDepthToParent() == 0) {
-            return form;
-        }
-        return getRootFormFor(form.getParent());
     }
 
     private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth) {

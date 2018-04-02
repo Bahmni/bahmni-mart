@@ -9,8 +9,6 @@ public class BahmniForm {
 
     private BahmniForm parent;
 
-    private BahmniForm rootForm;
-
     private Concept formName;
 
     private List<Concept> fields = new ArrayList<>();
@@ -56,13 +54,4 @@ public class BahmniForm {
     public void setDepthToParent(int depthToParent) {
         this.depthToParent = depthToParent;
     }
-
-    public void setRootForm(BahmniForm rootForm) {
-        this.rootForm = rootForm;
-    }
-
-    public BahmniForm getRootForm() {
-        return rootForm;
-    }
-
 }
