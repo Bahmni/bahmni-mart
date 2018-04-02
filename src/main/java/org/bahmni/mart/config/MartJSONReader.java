@@ -1,6 +1,7 @@
 package org.bahmni.mart.config;
 
 import com.google.gson.Gson;
+import org.apache.commons.collections.CollectionUtils;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
@@ -21,11 +22,11 @@ public class MartJSONReader {
     private static BahmniMartJSON bahmniMartJSON;
 
     public List<JobDefinition> getJobDefinitions() {
-        return bahmniMartJSON.getJobs() == null ? new ArrayList<>() : bahmniMartJSON.getJobs();
+        return CollectionUtils.isEmpty(bahmniMartJSON.getJobs()) ? new ArrayList<>() : bahmniMartJSON.getJobs();
     }
 
     public List<ViewDefinition> getViewDefinitions() {
-        return bahmniMartJSON.getViews() == null ? new ArrayList<>() : bahmniMartJSON.getViews();
+        return CollectionUtils.isEmpty(bahmniMartJSON.getViews()) ? new ArrayList<>() : bahmniMartJSON.getViews();
     }
 
     @PostConstruct

@@ -6,15 +6,21 @@ import org.bahmni.mart.config.view.ViewDefinition;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.List;
 
+import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.spy;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(BatchUtils.class)
@@ -40,8 +46,8 @@ public class MartJSONReaderTest {
                 "       \"sql\": \"select * from patient_program\"\n" +
                 "  }]\n" +
                 "}";
-        PowerMockito.mockStatic(BatchUtils.class);
-        when(BatchUtils.convertResourceOutputToString(any())).thenReturn(json);
+        mockStatic(BatchUtils.class);
+        when(convertResourceOutputToString(any())).thenReturn(json);
 
         martJSONReader = new MartJSONReader();
         martJSONReader.read();
@@ -69,5 +75,27 @@ public class MartJSONReaderTest {
         assertEquals("patient_program_view", viewDefinition.getName());
         assertEquals("select * from patient_program",
                 viewDefinition.getSql());
+    }
+
+    @Test
+    public void shouldGiveEmptyListAsJobDefinitionsIfJobsAreNotPresent() throws Exception {
+        BahmniMartJSON bahmniMartJSON = new BahmniMartJSON();
+        BahmniMartJSON spyMartJson = spy(bahmniMartJSON);
+        setValuesForMemberFields(martJSONReader, "bahmniMartJSON", spyMartJson);
+
+        assertTrue(martJSONReader.getJobDefinitions().isEmpty());
+        verify(spyMartJson, times(1)).getJobs();
+    }
+
+    @Test
+    public void shouldGiveEmptyListAsViewsIfViewsAreNotPresentInConfig() throws Exception {
+        BahmniMartJSON bahmniMartJSON = new BahmniMartJSON();
+        BahmniMartJSON spyMartJson = spy(bahmniMartJSON);
+
+        setValuesForMemberFields(martJSONReader, "bahmniMartJSON", spyMartJson);
+
+        assertTrue(martJSONReader.getViewDefinitions().isEmpty());
+        verify(spyMartJson, times(1)).getViews();
+
     }
 }
