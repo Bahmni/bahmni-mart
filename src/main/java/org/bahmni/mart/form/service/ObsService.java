@@ -22,9 +22,14 @@ public class ObsService {
     @Value("classpath:sql/conceptList.sql")
     private Resource conceptListSqlResource;
 
+    @Value("classpath:sql/freeTextConceptList.sql")
+    private Resource freeTextConceptSqlResource;
+
     private String conceptDetailsSql;
 
     private String conceptListSql;
+
+    private String freeTextConceptSql;
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -32,23 +37,27 @@ public class ObsService {
     public List<Concept> getConceptsByNames(List<String> conceptNames) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("conceptNames", conceptNames);
-
-        return jdbcTemplate.query(conceptDetailsSql, parameters, new BeanPropertyRowMapper<>(Concept.class));
+        return getConcepts(conceptDetailsSql, parameters);
     }
 
     public List<Concept> getChildConcepts(String parentConceptName) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("parentConceptName", parentConceptName);
-
-        return jdbcTemplate.query(conceptListSql, parameters, new BeanPropertyRowMapper<>(Concept.class));
-
+        return getConcepts(conceptListSql, parameters);
     }
 
     @PostConstruct
     public void postConstruct() {
         this.conceptDetailsSql = BatchUtils.convertResourceOutputToString(conceptDetailsSqlResource);
         this.conceptListSql = BatchUtils.convertResourceOutputToString(conceptListSqlResource);
+        this.freeTextConceptSql = BatchUtils.convertResourceOutputToString(freeTextConceptSqlResource);
     }
 
+    public List<Concept> getFreeTextConcepts() {
+        return getConcepts(freeTextConceptSql, new MapSqlParameterSource());
+    }
 
+    private List<Concept> getConcepts(String sql, MapSqlParameterSource parameters) {
+        return jdbcTemplate.query(sql, parameters, new BeanPropertyRowMapper<>(Concept.class));
+    }
 }

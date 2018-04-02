@@ -5,8 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.core.io.ClassPathResource;
@@ -14,12 +12,19 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 
 @PrepareForTest({BatchUtils.class, ObsService.class})
@@ -31,54 +36,58 @@ public class ObsServiceTest {
     @Mock
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Mock
+    private MapSqlParameterSource mapSqlParameterSource;
+
     @Before
     public void setUp() throws Exception {
-        PowerMockito.mockStatic(BatchUtils.class);
+        mockStatic(BatchUtils.class);
         obsService = new ObsService();
-        ClassPathResource conceptDetailsResource = Mockito.mock(ClassPathResource.class);
-        ClassPathResource conceptListResource = Mockito.mock(ClassPathResource.class);
-        PowerMockito.when(BatchUtils.convertResourceOutputToString(conceptDetailsResource))
-                .thenReturn("conceptDetailsSQL");
-        PowerMockito.when(BatchUtils.convertResourceOutputToString(conceptListResource)).thenReturn("conceptListSQL");
+        ClassPathResource conceptDetailsResource = mock(ClassPathResource.class);
+        ClassPathResource conceptListResource = mock(ClassPathResource.class);
+        ClassPathResource freeTextConceptSqlResource = mock(ClassPathResource.class);
+
+        when(convertResourceOutputToString(conceptDetailsResource)).thenReturn("conceptDetailsSQL");
+        when(convertResourceOutputToString(conceptListResource)).thenReturn("conceptListSQL");
+        when(convertResourceOutputToString(freeTextConceptSqlResource)).thenReturn("freeTextConceptSql");
+        whenNew(MapSqlParameterSource.class).withNoArguments().thenReturn(mapSqlParameterSource);
+
         setValuesForMemberFields(obsService, "jdbcTemplate", namedParameterJdbcTemplate);
         setValuesForMemberFields(obsService, "conceptDetailsSqlResource", conceptDetailsResource);
         setValuesForMemberFields(obsService, "conceptListSqlResource", conceptListResource);
+        setValuesForMemberFields(obsService, "freeTextConceptSqlResource", freeTextConceptSqlResource);
 
         obsService.postConstruct();
     }
 
     @Test
-    public void shouldGetConceptsByNames() throws Exception {
+    public void shouldGetConceptsByNames() {
         List<String> conceptNamesList = Arrays.asList("Video", "Image", "Radiology Documents");
-        MapSqlParameterSource mapSqlParameterSource = Mockito.mock(MapSqlParameterSource.class);
-        PowerMockito.whenNew(MapSqlParameterSource.class).withNoArguments().thenReturn(mapSqlParameterSource);
 
         obsService.getConceptsByNames(conceptNamesList);
 
-        Mockito.verify(mapSqlParameterSource, Mockito.times(1)).addValue("conceptNames", conceptNamesList);
-        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1))
+        verify(mapSqlParameterSource, times(1)).addValue("conceptNames", conceptNamesList);
+        verify(namedParameterJdbcTemplate, times(1))
                 .query(eq("conceptDetailsSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
     }
 
     @Test
-    public void shouldGetChildConcepts() throws Exception {
+    public void shouldGetChildConcepts() {
         String parentVideoConcept = "Patient Videos";
-        MapSqlParameterSource mapSqlParameterSource = Mockito.mock(MapSqlParameterSource.class);
-        PowerMockito.whenNew(MapSqlParameterSource.class).withNoArguments().thenReturn(mapSqlParameterSource);
 
         obsService.getChildConcepts(parentVideoConcept);
 
-        Mockito.verify(mapSqlParameterSource, Mockito.times(1)).addValue("parentConceptName", parentVideoConcept);
-        Mockito.verify(namedParameterJdbcTemplate, Mockito.times(1))
+        verify(mapSqlParameterSource, times(1)).addValue("parentConceptName", parentVideoConcept);
+        verify(namedParameterJdbcTemplate, times(1))
                 .query(eq("conceptListSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
     }
 
-    private void setValuesForMemberFields(
-            Object observationService, String fieldName, Object valueForMemberField)
-            throws NoSuchFieldException, IllegalAccessException {
+    @Test
+    public void shouldGetAllFreeTextConcepts() {
+        obsService.getFreeTextConcepts();
 
-        Field f1 = observationService.getClass().getDeclaredField(fieldName);
-        f1.setAccessible(true);
-        f1.set(observationService, valueForMemberField);
+        verify(namedParameterJdbcTemplate, times(1))
+                .query(eq("freeTextConceptSql"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
+
     }
 }

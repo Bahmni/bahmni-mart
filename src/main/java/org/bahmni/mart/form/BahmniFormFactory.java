@@ -77,6 +77,7 @@ public class BahmniFormFactory {
                 obsService.getConceptsByNames(allSeparateTableConceptNames) : Collections.emptyList();
         this.ignoreConcepts = isObsJobWithOutIgnoreColumns(jobDefinitions) ? Collections.emptyList() :
                 obsService.getConceptsByNames(getIgnoreConceptNamesForObsJob(jobDefinitions));
+        ignoreConcepts.addAll(obsService.getFreeTextConcepts());
     }
 
     private Boolean isObsJobWithOutIgnoreColumns(List<JobDefinition> jobDefinitions) {

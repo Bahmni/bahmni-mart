@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
@@ -97,6 +98,7 @@ public class BahmniFormFactoryTest {
         when(obsService.getConceptsByNames(separateTableConceptList))
                 .thenReturn(separateTableConcepts);
         when(obsService.getConceptsByNames(ignoreConceptsNameList)).thenReturn(ignoreConcepts);
+        when(obsService.getFreeTextConcepts()).thenReturn(Collections.emptyList());
         when(jobDefinition.getType()).thenReturn("obs");
     }
 
@@ -142,6 +144,7 @@ public class BahmniFormFactoryTest {
         assertEquals("BP", historyAndExaminationChildren.get(0).getFormName().getName());
         verify(obsService, times(1)).getConceptsByNames(separateTableConceptList);
         verify(obsService, times(1)).getConceptsByNames(ignoreConceptsNameList);
+        verify(obsService, times(1)).getFreeTextConcepts();
     }
 
     @Test
@@ -165,12 +168,12 @@ public class BahmniFormFactoryTest {
         assertEquals(hasTakenCourse, bahmniForm.getFields().get(0));
         verify(obsService, times(1)).getConceptsByNames(separateTableConceptList);
         verify(obsService, times(1)).getConceptsByNames(ignoreConceptsNameList);
+        verify(obsService, times(1)).getFreeTextConcepts();
     }
 
     @Test
     public void shouldCreateChildForMultiSelectAddMoreAndSeparateTable() {
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
-        bahmniFormFactory.postConstruct();
 
         historyAndExaminationConcepts.add(new Concept(3365, "Operation Notes Template", 1));
         historyAndExaminationConcepts.add(new Concept(1209, "Notes", 0));
@@ -202,6 +205,7 @@ public class BahmniFormFactoryTest {
         verify(obsService, times(1)).getChildConcepts("Chief Complaint Data");
         verify(obsService, times(1)).getChildConcepts("Operation Notes Template");
         verify(obsService, times(1)).getChildConcepts("BP");
+        verify(obsService, times(1)).getFreeTextConcepts();
     }
 
     @Test
@@ -229,4 +233,29 @@ public class BahmniFormFactoryTest {
         assertTrue(((List<Concept>) ignoreConcepts.get(bahmniFormFactory)).isEmpty());
     }
 
+
+    @Test
+    public void shouldAddAllFreeTextConceptsToIgnoreList() {
+        historyAndExaminationConcepts.remove(0);
+        when(obsService.getChildConcepts("History and Examination"))
+                .thenReturn(historyAndExaminationConcepts);
+
+        Concept chiefComplaintNotes = new Concept(1194, "Chief Complaint Notes", 0);
+        Concept history = new Concept(1843, "History", 0);
+        when(obsService.getFreeTextConcepts()).thenReturn(Arrays.asList(chiefComplaintNotes, history));
+
+        bahmniFormFactory.postConstruct();
+        BahmniForm historyAndExamination = bahmniFormFactory.createForm(
+                new Concept(1189, "History and Examination", 1),
+                null);
+
+        verify(obsService, times(1)).getFreeTextConcepts();
+
+        List<Concept> historyAndExaminationFields = historyAndExamination.getFields();
+        List<String> fieldNames = historyAndExaminationFields.stream()
+                .map(Concept::getName).collect(Collectors.toList());
+
+        assertEquals(2, historyAndExaminationFields.size());
+        assertTrue(fieldNames.containsAll(Arrays.asList("Examination", "Image")));
+    }
 }
