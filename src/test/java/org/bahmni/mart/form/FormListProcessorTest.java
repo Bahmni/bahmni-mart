@@ -1,5 +1,6 @@
 package org.bahmni.mart.form;
 
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
@@ -20,7 +21,7 @@ import java.util.List;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -55,7 +56,7 @@ public class FormListProcessorTest {
         List<Concept> conceptList = Collections.singletonList(conceptA);
 
         when(obsService.getChildConcepts(FormListProcessor.ALL_FORMS)).thenReturn(conceptList);
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
 
 
         BahmniForm a11 = new BahmniFormBuilder().withName("a11").build();
@@ -89,7 +90,8 @@ public class FormListProcessorTest {
         List<Concept> conceptList = Arrays.asList(conceptA, conceptB);
 
         when(obsService.getChildConcepts(FormListProcessor.ALL_FORMS)).thenReturn(conceptList);
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.singletonList("formB"));
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class)))
+                .thenReturn(Collections.singletonList("formB"));
 
         BahmniForm childFormOfA = new BahmniFormBuilder().withName("childFormOfA").build();
         BahmniForm childFormOfB = new BahmniFormBuilder().withName("childFormOfB").build();

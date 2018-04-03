@@ -10,7 +10,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getObsJobDefinition;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForObsJob;
 import static org.junit.Assert.assertEquals;
@@ -19,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @RunWith(PowerMockRunner.class)
 public class JobDefinitionUtilTest {
@@ -88,7 +91,7 @@ public class JobDefinitionUtilTest {
     }
 
     @Test
-    public void shouldGiveAllIgnoreConceptNamesForObsJob() {
+    public void shouldFindObsJobAndReturnAllIgnoreConceptNames() {
         List<String> ignoreColumnsConfig = Arrays.asList("concept_1", "concept_2");
 
         when(jobDefinition1.getType()).thenReturn("eav");
@@ -104,7 +107,7 @@ public class JobDefinitionUtilTest {
     }
 
     @Test
-    public void shouldGiveEmptyListAsIgnoreConceptNamesForObsJobIfConfigIsNotPresent() {
+    public void shouldFindObsJobAndGiveEmptyListAsIgnoreConceptNamesConfigIsNotPresent() {
         when(jobDefinition1.getType()).thenReturn("eav");
         when(jobDefinition2.getType()).thenReturn("obs");
         when(jobDefinition2.getColumnsToIgnore()).thenReturn(null);
@@ -113,6 +116,51 @@ public class JobDefinitionUtilTest {
         assertTrue(ignoreConcepts.isEmpty());
         verify(jobDefinition1, times(1)).getType();
         verify(jobDefinition2, times(1)).getType();
+        verify(jobDefinition2, times(1)).getColumnsToIgnore();
+    }
+
+    @Test
+    public void shouldFindObsJob() {
+        when(jobDefinition1.getType()).thenReturn("eav");
+        when(jobDefinition2.getType()).thenReturn("obs");
+
+        JobDefinition obsJobDefinition = getObsJobDefinition(Arrays.asList(jobDefinition1, jobDefinition2));
+
+        verify(jobDefinition1, times(1)).getType();
+        verify(jobDefinition2, times(1)).getType();
+        assertEquals(jobDefinition2, obsJobDefinition);
+
+    }
+
+    @Test
+    public void shouldGiveEmptyObsJobIfObsJobConfigIsNotPresent() throws Exception {
+        when(jobDefinition1.getType()).thenReturn("eav");
+        whenNew(JobDefinition.class).withNoArguments().thenReturn(jobDefinition2);
+
+        assertTrue(getObsJobDefinition(Arrays.asList(jobDefinition1)) instanceof JobDefinition);
+        verify(jobDefinition1, times(1)).getType();
+    }
+
+    @Test
+    public void shouldGiveAllIgnoreConceptNamesForObsJob() {
+        List<String> ignoreColumnsConfig = Arrays.asList("concept_1", "concept_2");
+
+        when(jobDefinition2.getColumnsToIgnore()).thenReturn(ignoreColumnsConfig);
+
+        List<String> ignoreConcepts = getIgnoreConceptNamesForJob(jobDefinition2);
+        assertEquals(2, ignoreConcepts.size());
+        assertTrue(ignoreColumnsConfig.containsAll(ignoreConcepts));
+        verify(jobDefinition2, times(0)).getType();
+        verify(jobDefinition2, times(1)).getColumnsToIgnore();
+    }
+
+    @Test
+    public void shouldGiveEmptyListAsIgnoreConceptNamesForObsJobIfConfigIsNotPresent() {
+        when(jobDefinition2.getColumnsToIgnore()).thenReturn(null);
+
+        List<String> ignoreConcepts = getIgnoreConceptNamesForJob(jobDefinition2);
+        assertTrue(ignoreConcepts.isEmpty());
+        verify(jobDefinition2, times(0)).getType();
         verify(jobDefinition2, times(1)).getColumnsToIgnore();
     }
 

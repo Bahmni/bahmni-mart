@@ -12,14 +12,12 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getObsJobDefinition;
 
 @Component
 public class BahmniFormFactory {
-
-    private static final String OBS_JOB_TYPE = "obs";
 
     @Autowired
     private ObsService obsService;
@@ -73,20 +71,17 @@ public class BahmniFormFactory {
         List<String> allSeparateTableConceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
         List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
 
-        this.allSeparateTableConcepts = isObsJobPresent(jobDefinitions) ?
-                obsService.getConceptsByNames(allSeparateTableConceptNames) : Collections.emptyList();
-        this.ignoreConcepts = isObsJobWithOutIgnoreColumns(jobDefinitions) ? Collections.emptyList() :
-                obsService.getConceptsByNames(getIgnoreConceptNamesForObsJob(jobDefinitions));
+        JobDefinition obsJobDefinition = getObsJobDefinition(jobDefinitions);
+
+        this.allSeparateTableConcepts = obsJobDefinition.isEmpty() ? Collections.emptyList() :
+                obsService.getConceptsByNames(allSeparateTableConceptNames);
+        this.ignoreConcepts = isObsJobWithOutIgnoreColumns(obsJobDefinition) ? Collections.emptyList() :
+                obsService.getConceptsByNames(getIgnoreConceptNamesForJob(obsJobDefinition));
+
         ignoreConcepts.addAll(obsService.getFreeTextConcepts());
     }
 
-    private Boolean isObsJobWithOutIgnoreColumns(List<JobDefinition> jobDefinitions) {
-        return getIgnoreConceptNamesForObsJob(jobDefinitions).isEmpty();
-    }
-
-    private Boolean isObsJobPresent(List<JobDefinition> jobDefinitions) {
-        return !jobDefinitions.stream()
-                .filter(jobDefinition -> OBS_JOB_TYPE.equals(jobDefinition.getType()))
-                .collect(Collectors.toList()).isEmpty();
+    private Boolean isObsJobWithOutIgnoreColumns(JobDefinition jobDefinition) {
+        return getIgnoreConceptNamesForJob(jobDefinition).isEmpty();
     }
 }

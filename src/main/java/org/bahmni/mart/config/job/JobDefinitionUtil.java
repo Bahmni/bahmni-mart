@@ -52,6 +52,10 @@ public class JobDefinitionUtil {
         return getDefaultIfNotPresent(getObsJobDefinition(jobDefinitions).getColumnsToIgnore());
     }
 
+    public static List<String> getIgnoreConceptNamesForJob(JobDefinition jobDefinition) {
+        return getDefaultIfNotPresent(jobDefinition.getColumnsToIgnore());
+    }
+
     public static List<String> getSeparateTableNamesForObsJob(List<JobDefinition> jobDefinitions) {
         return getDefaultIfNotPresent(getObsJobDefinition(jobDefinitions).getSeparateTables());
     }
@@ -60,7 +64,7 @@ public class JobDefinitionUtil {
         return isNull(names) ? new ArrayList<>() : names;
     }
 
-    private static JobDefinition getObsJobDefinition(List<JobDefinition> jobDefinitions) {
+    public static JobDefinition getObsJobDefinition(List<JobDefinition> jobDefinitions) {
         return jobDefinitions.stream()
                 .filter(jobDefinition -> jobDefinition.getType().equals(OBS_JOB_TYPE))
                 .findFirst().orElseGet(JobDefinition::new);

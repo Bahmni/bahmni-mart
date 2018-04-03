@@ -84,7 +84,7 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "jobDefinitionReader", jobDefinitionReader);
         
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
@@ -130,7 +130,7 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         String ignoreConcepts = "Test Concept, Video";
         
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsSet);
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(ignoreConceptsSet);
         
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
@@ -161,7 +161,7 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -180,7 +180,7 @@ public class SeparateTableConfigHelperTest {
         whenNew(FileReader.class).withArguments("test2.json").thenThrow(new FileNotFoundException());
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "test1.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "test2.json");
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
 
         assertTrue(separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames().isEmpty());
     }
@@ -218,7 +218,7 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         String ignoreConcepts = "Test Concept, Video";
         
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsSet);
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(ignoreConceptsSet);
         
         whenNew(FileReader.class).withArguments("conf/app.json").thenThrow(new FileNotFoundException());
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
@@ -264,7 +264,7 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsSet);
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(ignoreConceptsSet);
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenThrow(new FileNotFoundException());
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -317,7 +317,7 @@ public class SeparateTableConfigHelperTest {
         JsonElement implementationConfig = new JsonParser().parse(implementationJsonString);
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         
         
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
@@ -344,7 +344,8 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.singletonList("Test Concept, Video"));
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class)))
+                .thenReturn(Collections.singletonList("Test Concept, Video"));
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -372,7 +373,7 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -400,7 +401,7 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -453,7 +454,7 @@ public class SeparateTableConfigHelperTest {
         JsonElement implementationConfig = new JsonParser().parse(implementationJsonString);
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(implementationFileReader);
@@ -461,7 +462,7 @@ public class SeparateTableConfigHelperTest {
         when(jsonParser.parse(fileReader)).thenReturn(defaultConfig);
         when(jsonParser.parse(implementationFileReader)).thenReturn(implementationConfig);
 
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.singletonList(""));
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.singletonList(""));
         List<String> seprateTables = new ArrayList<>();
         seprateTables.add("separate table");
         when(JobDefinitionUtil.getSeparateTableNamesForObsJob(any())).thenReturn(seprateTables);
@@ -516,7 +517,7 @@ public class SeparateTableConfigHelperTest {
         JsonElement implementationConfig = new JsonParser().parse(implementationJsonString);
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
 
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(implementationFileReader);
@@ -524,7 +525,7 @@ public class SeparateTableConfigHelperTest {
         when(jsonParser.parse(fileReader)).thenReturn(defaultConfig);
         when(jsonParser.parse(implementationFileReader)).thenReturn(implementationConfig);
 
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.singletonList(""));
+        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.singletonList(""));
         when(JobDefinitionUtil.getSeparateTableNamesForObsJob(any()))
                 .thenReturn(Collections.singletonList("separate table"));
         List<String> expectedSeparateTables = Arrays.asList("OR, Operation performed", "Video");

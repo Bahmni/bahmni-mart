@@ -23,7 +23,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getObsJobDefinition;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -92,14 +93,19 @@ public class BahmniFormFactoryTest {
         setValuesForMemberFields(bahmniFormFactory, "jobDefinitionReader", jobDefinitionReader);
         mockStatic(BatchUtils.class);
         mockStatic(JobDefinitionUtil.class);
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(ignoreConceptsNameList);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForJob(any(JobDefinition.class))).thenReturn(ignoreConceptsNameList);
+
+        List<JobDefinition> emptyList = Collections.emptyList();
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(emptyList);
+        when(getObsJobDefinition(emptyList)).thenReturn(jobDefinition);
+        when(jobDefinition.isEmpty()).thenReturn(false);
+        when(getObsJobDefinition(Collections.singletonList(jobDefinition))).thenReturn(jobDefinition);
+
         when(separateTableConfigHelper.getAllSeparateTableConceptNames()).thenReturn(separateTableConceptList);
         when(obsService.getConceptsByNames(separateTableConceptList))
                 .thenReturn(separateTableConcepts);
         when(obsService.getConceptsByNames(ignoreConceptsNameList)).thenReturn(ignoreConcepts);
         when(obsService.getFreeTextConcepts()).thenReturn(Collections.emptyList());
-        when(jobDefinition.getType()).thenReturn("obs");
     }
 
     @Test
@@ -118,7 +124,7 @@ public class BahmniFormFactoryTest {
     @Test
     public void shouldCreateAForm() {
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
-        when(jobDefinition.getType()).thenReturn("obs");
+
         when(obsService.getChildConcepts("History and Examination"))
                 .thenReturn(historyAndExaminationConcepts);
         when(obsService.getChildConcepts("Chief Complaint Data"))
@@ -210,8 +216,8 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldReturnEmptySeparateTableListWhenThereIsNoObsJob() throws Exception {
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.emptyList());
-        when(jobDefinition.getType()).thenReturn("randonJob");
+        when(jobDefinition.isEmpty()).thenReturn(true);
+
         Field allSeparateTableConcepts = bahmniFormFactory.getClass().getDeclaredField("allSeparateTableConcepts");
         allSeparateTableConcepts.setAccessible(true);
 
@@ -222,9 +228,9 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldReturnEmptyIgnoreConceptsListWhenThereIsNoObsJob() throws Exception {
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.emptyList());
-        when(jobDefinition.getType()).thenReturn("randonJob");
-        when(getIgnoreConceptNamesForObsJob(any())).thenReturn(Collections.emptyList());
+        when(getIgnoreConceptNamesForJob(any(JobDefinition.class))).thenReturn(Collections.emptyList());
+        when(jobDefinition.isEmpty()).thenReturn(true);
+
         Field ignoreConcepts = bahmniFormFactory.getClass().getDeclaredField("ignoreConcepts");
         ignoreConcepts.setAccessible(true);
 
@@ -236,6 +242,7 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldAddAllFreeTextConceptsToIgnoreList() {
+        when(jobDefinition.isEmpty()).thenReturn(false);
         historyAndExaminationConcepts.remove(0);
         when(obsService.getChildConcepts("History and Examination"))
                 .thenReturn(historyAndExaminationConcepts);
