@@ -106,6 +106,7 @@ public class BahmniFormFactoryTest {
                 .thenReturn(separateTableConcepts);
         when(obsService.getConceptsByNames(ignoreConceptsNameList)).thenReturn(ignoreConcepts);
         when(obsService.getFreeTextConcepts()).thenReturn(Collections.emptyList());
+        when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(true);
     }
 
     @Test
@@ -264,5 +265,29 @@ public class BahmniFormFactoryTest {
 
         assertEquals(2, historyAndExaminationFields.size());
         assertTrue(fieldNames.containsAll(Arrays.asList("Examination", "Image")));
+    }
+
+    @Test
+    public void shouldNotAddAnyFreeTextConceptsToIgnoreListIfConfigIsDisabled() {
+        when(jobDefinition.isEmpty()).thenReturn(false);
+        when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(false);
+
+        historyAndExaminationConcepts.remove(0);
+        when(obsService.getChildConcepts("History and Examination"))
+                .thenReturn(historyAndExaminationConcepts);
+
+        bahmniFormFactory.postConstruct();
+        BahmniForm historyAndExamination = bahmniFormFactory.createForm(
+                new Concept(1189, "History and Examination", 1),
+                null);
+
+        verify(obsService, times(0)).getFreeTextConcepts();
+
+        List<Concept> historyAndExaminationFields = historyAndExamination.getFields();
+        List<String> fieldNames = historyAndExaminationFields.stream()
+                .map(Concept::getName).collect(Collectors.toList());
+
+        assertEquals(4, historyAndExaminationFields.size());
+        assertTrue(fieldNames.containsAll(Arrays.asList("Examination", "Image", "Chief Complaint Notes", "History")));
     }
 }

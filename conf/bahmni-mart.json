@@ -279,6 +279,7 @@
       "FV, Outcomes FV"
     ],
     "conceptReferenceSource": "MSF-INTERNAL",
+    "ignoreAllFreeTextConcepts": true,
     "columnsToIgnore": [
       "Video",
       "Image",

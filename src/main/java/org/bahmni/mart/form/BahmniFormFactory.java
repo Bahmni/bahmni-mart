@@ -69,16 +69,15 @@ public class BahmniFormFactory {
     @PostConstruct
     public void postConstruct() {
         List<String> allSeparateTableConceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
-        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
-
-        JobDefinition obsJobDefinition = getObsJobDefinition(jobDefinitions);
+        JobDefinition obsJobDefinition = getObsJobDefinition(jobDefinitionReader.getJobDefinitions());
 
         this.allSeparateTableConcepts = obsJobDefinition.isEmpty() ? Collections.emptyList() :
                 obsService.getConceptsByNames(allSeparateTableConceptNames);
         this.ignoreConcepts = isObsJobWithOutIgnoreColumns(obsJobDefinition) ? Collections.emptyList() :
                 obsService.getConceptsByNames(getIgnoreConceptNamesForJob(obsJobDefinition));
 
-        ignoreConcepts.addAll(obsService.getFreeTextConcepts());
+        if (obsJobDefinition.getIgnoreAllFreeTextConcepts())
+            ignoreConcepts.addAll(obsService.getFreeTextConcepts());
     }
 
     private Boolean isObsJobWithOutIgnoreColumns(JobDefinition jobDefinition) {

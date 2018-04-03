@@ -17,6 +17,7 @@ public class JobDefinition {
     private String conceptReferenceSource;
     private List<String> columnsToIgnore;
     private EavAttributes eavAttributes;
+    private boolean ignoreAllFreeTextConcepts;
 
     public List<String> getSeparateTables() {
         return separateTables;
@@ -96,4 +97,9 @@ public class JobDefinition {
                 CollectionUtils.isEmpty(columnsToIgnore) && CollectionUtils.isEmpty(separateTables) &&
                 isNull(eavAttributes) && chunkSizeToRead == 0;
     }
+
+    public boolean getIgnoreAllFreeTextConcepts() {
+        return ignoreAllFreeTextConcepts;
+    }
+
 }
