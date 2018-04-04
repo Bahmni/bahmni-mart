@@ -2,6 +2,8 @@ package org.bahmni.mart.config.job;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.bahmni.mart.BatchUtils;
+import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,4 +71,13 @@ public class JobDefinitionUtil {
                 .filter(jobDefinition -> jobDefinition.getType().equals(OBS_JOB_TYPE))
                 .findFirst().orElseGet(JobDefinition::new);
     }
+
+    public static String getReaderSQL(JobDefinition jobDefinition) {
+        if (StringUtils.isNotEmpty(jobDefinition.getReaderSql())) {
+            return jobDefinition.getReaderSql();
+        }
+        Resource readerSqlResource = ReaderSQLFileLoader.loadResource(jobDefinition.getReaderSqlFilePath());
+        return BatchUtils.convertResourceOutputToString(readerSqlResource);
+    }
+
 }

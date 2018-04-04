@@ -48,6 +48,7 @@ public class SimpleJobTemplateTest {
         jobDefinition.setReaderSql(readerSql);
 
         doReturn(job).when((JobTemplate) spyJobTemplate).buildJob(jobDefinition, listener, readerSql);
+        when(JobDefinitionUtil.getReaderSQL(jobDefinition)).thenReturn(readerSql);
         when(JobDefinitionUtil.getReaderSQLByIgnoringColumns(any(), anyString())).thenReturn(readerSql);
 
         spyJobTemplate.buildJob(jobDefinition);

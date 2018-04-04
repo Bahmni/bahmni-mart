@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQL;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
 
 @Component
@@ -33,7 +34,8 @@ public class TableGeneratorJobListener extends AbstractJobListener {
     }
 
     private String getSql(JobDefinition jobDefinition) {
-        String sql = getReaderSQLByIgnoringColumns(jobDefinition.getColumnsToIgnore(), jobDefinition.getReaderSql());
+        String sql = getReaderSQLByIgnoringColumns(jobDefinition.getColumnsToIgnore(),
+                getReaderSQL(jobDefinition));
 
         if (StringUtils.isEmpty(sql)) {
             throw new InvalidJobConfiguration(String

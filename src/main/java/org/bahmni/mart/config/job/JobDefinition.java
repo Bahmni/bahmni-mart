@@ -17,6 +17,7 @@ public class JobDefinition {
     private String conceptReferenceSource;
     private List<String> columnsToIgnore;
     private EavAttributes eavAttributes;
+    private String readerSqlFilePath;
     private boolean ignoreAllFreeTextConcepts;
 
     public List<String> getSeparateTables() {
@@ -102,4 +103,7 @@ public class JobDefinition {
         return ignoreAllFreeTextConcepts;
     }
 
+    public String getReaderSqlFilePath() {
+        return readerSqlFilePath;
+    }
 }

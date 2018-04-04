@@ -96,6 +96,13 @@
     "tableName": "patient_allergy_status"
   },
   {
+    "name": "Medication Data",
+    "type": "generic",
+    "readerSqlFilePath": "classpath:readerSql/drugOrder.sql",
+    "chunkSizeToRead": "500",
+    "tableName": "medication_data"
+  },
+  {
     "name": "Appointment service",
     "type": "generic",
     "readerSql": "SELECT appser.appointment_service_id, appser.name AS `service_name`, appser.description AS `service_description`, appser.start_time AS `service_start_time`, appser.end_time AS `service_end_time`, appser.max_appointments_limit AS `service_max_load`, appser.duration_mins AS `service_duration`, l.name AS `location_name`, ast.name AS `service_type`, ast.duration_mins AS `service_type_duration`, spec.name AS `speciality` FROM (SELECT appointment_service_id, name, description, start_time, end_time, max_appointments_limit, duration_mins, location_id, speciality_id, voided FROM appointment_service WHERE voided IS FALSE) appser LEFT OUTER JOIN appointment_service_type ast ON ast.appointment_service_id = appser.appointment_service_id AND ast.voided IS FALSE LEFT OUTER JOIN location l ON l.location_id = appser.location_id AND l.retired IS FALSE LEFT OUTER JOIN appointment_speciality spec ON spec.speciality_id = appser.speciality_id AND spec.voided IS FALSE",

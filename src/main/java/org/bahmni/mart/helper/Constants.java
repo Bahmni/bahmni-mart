@@ -18,6 +18,7 @@ public class Constants {
             put("char", "text");
             put("varchar", "text");
             put("complex", "text");
+            put("double","double precision");
         }
     };
 

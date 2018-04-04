@@ -1,9 +1,14 @@
 package org.bahmni.mart.config.job;
 
+import org.bahmni.mart.BatchUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.internal.verification.VerificationModeFactory;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,11 +23,14 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNames
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
+@PrepareForTest({ReaderSQLFileLoader.class, BatchUtils.class})
 @RunWith(PowerMockRunner.class)
 public class JobDefinitionUtilTest {
 
@@ -191,5 +199,38 @@ public class JobDefinitionUtilTest {
         verify(jobDefinition1, times(1)).getType();
         verify(jobDefinition2, times(1)).getType();
         verify(jobDefinition2, times(1)).getSeparateTables();
+    }
+
+    @Test
+    public void shouldReturnReaderSqlWhenItIsNotEmpty() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        String expectedSQL = "select * from table";
+        when(jobDefinition.getReaderSql()).thenReturn(expectedSQL);
+
+        String actualSql = JobDefinitionUtil.getReaderSQL(jobDefinition);
+
+        assertEquals(expectedSQL, actualSql);
+    }
+
+    @Test
+    public void shouldReturnSqlFromFileWhenReaderSqlIsEmpty() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinition.getReaderSql()).thenReturn("");
+        String filePath = "some path";
+        when(jobDefinition.getReaderSqlFilePath()).thenReturn(filePath);
+        String expectedSql = "select * from table";
+        Resource resource = mock(Resource.class);
+        mockStatic(ReaderSQLFileLoader.class);
+        mockStatic(BatchUtils.class);
+        when(ReaderSQLFileLoader.loadResource(filePath)).thenReturn(resource);
+        when(BatchUtils.convertResourceOutputToString(resource)).thenReturn(expectedSql);
+
+        String actualSql = JobDefinitionUtil.getReaderSQL(jobDefinition);
+
+        assertEquals(expectedSql, actualSql);
+        PowerMockito.verifyStatic(VerificationModeFactory.times(1));
+        BatchUtils.convertResourceOutputToString(resource);
+        PowerMockito.verifyStatic(VerificationModeFactory.times(1));
+        ReaderSQLFileLoader.loadResource(filePath);
     }
 }
