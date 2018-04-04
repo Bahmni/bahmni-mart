@@ -19,7 +19,7 @@ ALL_CONCEPT_IDS_AS_CSV=""
 
 join_by(){
     create_array
-    temp=$(printf ",%s" "${CONCEPT_IDS_AS_ARRAY[@]}")
+    local temp=$(printf ",%s" "${CONCEPT_IDS_AS_ARRAY[@]}")
     if [ ! -z "${ALL_CONCEPT_IDS_AS_CSV}" ]
      then
         ALL_CONCEPT_IDS_AS_CSV+=","
@@ -40,4 +40,5 @@ add_concept_ids(){
 
 add_concept_ids
 
-${CONNECTION_STRING} "select concept_full_name from concept_view where retired = 0 and concept_datatype_name = 'Text' AND concept_id in (${ALL_CONCEPT_IDS_AS_CSV})"
+${CONNECTION_STRING} "select concept_full_name from concept_view where retired = 0 and concept_datatype_name = 'Text' AND concept_id in (${ALL_CONCEPT_IDS_AS_CSV})" | while read -r line; do echo "\"$line\""; done | sed '$!s/$/,/'
+
