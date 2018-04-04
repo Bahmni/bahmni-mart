@@ -75,11 +75,11 @@
     "tableName": "address_hierarchy_level"
   },
   {
-    "name": "Person information",
+    "name": "Person Attribute Info",
     "type": "generic",
     "readerSql": "SELECT person_attribute_type_id, name, description FROM person_attribute_type",
     "chunkSizeToRead": "500",
-    "tableName": "person_information"
+    "tableName": "person_attribute_info"
   },
   {
     "name": "Patient identification",
