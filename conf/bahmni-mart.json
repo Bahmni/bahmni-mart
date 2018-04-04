@@ -77,7 +77,7 @@
   {
     "name": "Person information",
     "type": "generic",
-    "readerSql": "SELECT p.person_id, pat.person_attribute_type_id, pat.name AS `person_attribute_name`, pat.description AS `person_attribute_description`, pa.value FROM person p INNER JOIN person_attribute pa ON pa.person_id = p.person_id AND p.voided IS FALSE AND pa.voided IS FALSE INNER JOIN person_attribute_type pat ON pat.person_attribute_type_id = pa.person_attribute_type_id AND pat.retired IS FALSE",
+    "readerSql": "SELECT person_attribute_type_id, name, description FROM person_attribute_type",
     "chunkSizeToRead": "500",
     "tableName": "person_information"
   },
@@ -224,14 +224,14 @@
   {
     "name": "Surgical Block",
     "type": "generic",
-    "readerSql": "SELECT sb.surgical_block_id, concat(ifnull(pn.given_name, ''), ' ', ifnull(pn.family_name, '')) AS primary_provider_name, concat(ifnull(pn2.given_name, ''), ' ', ifnull(pn2.family_name, '')) AS creator_name, l.name AS location_name, sb.start_datetime AS block_starttime, sb.end_datetime AS block_endtime, sb.date_created AS date_created, sb.date_changed AS date_changed, cb.changed_by AS changed_by FROM surgical_block sb INNER JOIN location l ON sb.location_id = l.location_id AND l.retired = 0 INNER JOIN provider p ON sb.primary_provider_id = p.provider_id AND p.retired = 0 INNER JOIN person_name pn ON p.person_id = pn.person_id AND pn.voided = 0 INNER JOIN provider p2 ON sb.creator = p2.provider_id AND p2.retired = 0 INNER JOIN person_name pn2 ON p2.person_id = pn2.person_id AND pn2.voided = 0 LEFT OUTER JOIN (SELECT surgical_block_id, concat(ifnull(pn4.given_name, ''), ' ', ifnull(pn4.family_name, '')) AS changed_by FROM surgical_block sb1 INNER JOIN provider p3 ON sb1.changed_by = p3.provider_id INNER JOIN person_name pn4 ON pn4.person_id = p3.person_id AND sb1.voided = 0) cb ON cb.surgical_block_id = sb.surgical_block_id WHERE sb.voided = 0",
+    "readerSql": "SELECT sb.surgical_block_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS primary_provider_name, concat_ws(' ', ifnull(pn2.given_name, ''), ifnull(pn2.family_name, '')) AS creator_name, l.name AS location_name, sb.start_datetime AS block_starttime, sb.end_datetime AS block_endtime, sb.date_created AS date_created, sb.date_changed AS date_changed, cb.changed_by AS changed_by FROM surgical_block sb INNER JOIN location l ON l.location_id = sb.location_id AND l.retired = 0 AND sb.voided = 0 INNER JOIN provider p ON p.provider_id = sb.primary_provider_id AND p.retired = 0 INNER JOIN person_name pn ON pn.person_id = p.person_id AND pn.voided = 0 INNER JOIN provider p2 ON p2.provider_id = sb.creator AND p2.retired = 0 INNER JOIN person_name pn2 ON pn2.person_id = p2.person_id AND pn2.voided = 0 LEFT OUTER JOIN (SELECT surgical_block_id, concat_ws(' ', ifnull(pn4.given_name, ''), ifnull(pn4.family_name, '')) AS changed_by FROM surgical_block sb1 INNER JOIN provider p3 ON p3.provider_id = sb1.changed_by AND sb1.voided = 0 INNER JOIN person_name pn4 ON pn4.person_id = p3.person_id) cb ON cb.surgical_block_id = sb.surgical_block_id",
     "chunkSizeToRead": "500",
     "tableName": "surgical_block"
   },
   {
     "name": "Surgical Appointment",
     "type": "generic",
-    "readerSql": "SELECT sa.surgical_appointment_id, sa.surgical_block_id, sa.patient_id, sa.sort_weight, sa.status, sa.actual_start_datetime, sa.actual_end_datetime, sa.notes, sa.date_created, sa.date_changed, concat(ifnull(pn.given_name, ''), ' ', ifnull(pn.family_name, '')) AS creator_name, cb.changed_by AS change_by FROM surgical_appointment sa INNER JOIN provider pr ON sa.creator = pr.provider_id AND pr.retired = 0 INNER JOIN person_name pn ON pr.person_id = pn.person_id LEFT OUTER JOIN (SELECT surgical_appointment_id, concat(ifnull(pn2.given_name, ''), ' ', ifnull(pn2.family_name, '')) AS changed_by FROM surgical_appointment sa1 INNER JOIN provider p2 ON sa1.changed_by = p2.provider_id INNER JOIN person_name pn2 ON pn2.person_id = p2.person_id AND sa1.voided = 0) cb ON cb.surgical_appointment_id = sa.surgical_appointment_id WHERE sa.voided = 0",
+    "readerSql": "SELECT sa.surgical_appointment_id, sa.surgical_block_id, sa.patient_id, sa.sort_weight, sa.status, sa.actual_start_datetime, sa.actual_end_datetime, sa.notes, sa.date_created, sa.date_changed, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name, cb.changed_by AS change_by FROM surgical_appointment sa INNER JOIN provider pr ON pr.provider_id = sa.creator AND pr.retired = 0 AND sa.voided = 0 INNER JOIN person_name pn ON pn.person_id = pr.person_id LEFT OUTER JOIN (SELECT surgical_appointment_id, concat_ws(' ', ifnull(pn2.given_name, ''), ifnull(pn2.family_name, '')) AS changed_by FROM surgical_appointment sa1 INNER JOIN provider p2 ON p2.provider_id = sa1.changed_by AND sa1.voided = 0 INNER JOIN person_name pn2 ON pn2.person_id = p2.person_id) cb ON cb.surgical_appointment_id = sa.surgical_appointment_id",
     "chunkSizeToRead": "500",
     "tableName": "surgical_appointment"
   },
