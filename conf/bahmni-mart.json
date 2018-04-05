@@ -355,6 +355,10 @@
     {
       "name": "appointment_admin_panel_view",
       "sql": "SELECT * FROM appointment_service LEFT OUTER JOIN service_availability USING (appointment_service_id, service_name)"
+    },
+    {
+      "name": "patient_details_view",
+      "sql": "select pi.*, gender, birthdate, birthtime, birthdate_estimated, dead, death_date, deathdate_estimated, cause_of_death, pat.* from patient_identifier pi LEFT OUTER JOIN person_details pd on pd.person_id = pi.patient_id LEFT OUTER JOIN person_attributes pat on pat.person_id = pi.patient_id"
     }
   ]
 }
