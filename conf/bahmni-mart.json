@@ -82,13 +82,6 @@
     "tableName": "person_attribute_info"
   },
   {
-    "name": "Patient identification",
-    "type": "generic",
-    "readerSql": "SELECT pe.person_id, pa.patient_id, pi.identifier, pi.identifier_type, pi.preferred, pi.location_id, l.name AS `location_name`, pit.patient_identifier_type_id from person pe INNER JOIN patient pa ON pa.patient_id = pe.person_id AND pe.voided IS FALSE AND pa.voided IS FALSE INNER JOIN patient_identifier pi ON pi.patient_id = pa.patient_id AND pi.voided IS FALSE INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id = pi.identifier_type AND pit.retired IS FALSE LEFT OUTER JOIN location l ON l.location_id = pi.location_id AND l.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "patient_identifier"
-  },
-  {
     "name": "Patient allergy status",
     "type": "generic",
     "readerSql": "SELECT patient_id, allergy_status FROM patient WHERE voided IS FALSE",
@@ -296,6 +289,20 @@
       "typeTableJoiningId": "provider_attribute_type_id",
       "valueColumnName": "value_reference",
       "primaryKey": "provider_id"
+    }
+  },
+  {
+    "name": "Patient identification",
+    "type": "eav",
+    "chunkSizeToRead": "500",
+    "tableName": "patient_identifier",
+    "eavAttributes": {
+      "attributeTypeTableName": "patient_identifier_type",
+      "attributeTableName": "patient_identifier",
+      "valueTableJoiningId": "identifier_type",
+      "typeTableJoiningId": "patient_identifier_type_id",
+      "valueColumnName": "identifier",
+      "primaryKey": "patient_id"
     }
   },
   {
