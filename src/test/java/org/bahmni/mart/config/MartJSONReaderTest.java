@@ -33,7 +33,7 @@ public class MartJSONReaderTest {
                 "\"jobs\": [\n" +
                 "  {\n" +
                 "    \"name\": \"Program Data\",\n" +
-                "    \"type\": \"generic\",\n" +
+                "    \"type\": \"customSql\",\n" +
                 "    \"readerSql\": \"select * from program\",\n" +
                 "    \"chunkSizeToRead\": \"1000\",\n" +
                 "    \"tableName\": \"MyProgram\"\n" +
@@ -59,7 +59,7 @@ public class MartJSONReaderTest {
         assertEquals(1, actualJobDefinitions.size());
         JobDefinition jobDefinition = actualJobDefinitions.get(0);
         assertEquals("Program Data", jobDefinition.getName());
-        assertEquals("generic", jobDefinition.getType());
+        assertEquals("customSql", jobDefinition.getType());
         assertEquals("select * from program", jobDefinition.getReaderSql());
         assertEquals(1000, jobDefinition.getChunkSizeToRead());
         assertEquals("MyProgram", jobDefinition.getTableName());

@@ -13,11 +13,11 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public class JobDefinitionValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(JobDefinitionValidator.class);
-    private static final String GENERIC_TYPE = "generic";
+    private static final String CUSTOM_SQL = "customSql";
 
     public static boolean validate(List<JobDefinition> jobDefinitions) {
         List<JobDefinition> genericJobDefinitions = jobDefinitions.stream().filter(jobDefinition ->
-                jobDefinition.getType().equals(GENERIC_TYPE)).collect(Collectors.toList());
+                jobDefinition.getType().equals(CUSTOM_SQL)).collect(Collectors.toList());
         return hasNoEmptyReaderSqlOrTableName(genericJobDefinitions) &&
                 hasUniqueJobNamesAndTableNames(genericJobDefinitions);
     }

@@ -34,7 +34,7 @@ public class JobDefinitionReaderTest {
         json = "{\"jobs\": [\n" +
                 "  {\n" +
                 "    \"name\": \"Program Data\",\n" +
-                "    \"type\": \"generic\",\n" +
+                "    \"type\": \"customSql\",\n" +
                 "    \"readerSql\": \"select * from program\",\n" +
                 "    \"chunkSizeToRead\": \"1000\",\n" +
                 "    \"tableName\": \"MyProgram\"\n" +
@@ -66,7 +66,7 @@ public class JobDefinitionReaderTest {
         assertEquals(2, jobDefinitions.size());
         JobDefinition genericJobDefinition = jobDefinitions.get(0);
         assertEquals("Program Data", genericJobDefinition.getName());
-        assertEquals("generic", genericJobDefinition.getType());
+        assertEquals("customSql", genericJobDefinition.getType());
         assertEquals("select * from program", genericJobDefinition.getReaderSql());
         assertEquals(1000, genericJobDefinition.getChunkSizeToRead());
         assertEquals("MyProgram", genericJobDefinition.getTableName());
@@ -103,7 +103,7 @@ public class JobDefinitionReaderTest {
         JobDefinition programDataDefinition = jobDefinitionReader.getJobDefinitionByName("Program Data");
 
         assertEquals("Program Data", programDataDefinition.getName());
-        assertEquals("generic", programDataDefinition.getType());
+        assertEquals("customSql", programDataDefinition.getType());
         assertEquals("select * from program", programDataDefinition.getReaderSql());
         assertEquals(1000, programDataDefinition.getChunkSizeToRead());
         assertEquals("MyProgram", programDataDefinition.getTableName());

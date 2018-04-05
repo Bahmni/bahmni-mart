@@ -149,7 +149,7 @@ public class BatchConfigurationTest {
     public void shouldRunJobsForValidJobConfiguration() throws Exception {
         List<JobDefinition> jobDefinitions = Arrays.asList(jobDefinition, jobDefinition);
 
-        when(jobDefinition.getType()).thenReturn("generic");
+        when(jobDefinition.getType()).thenReturn("customSql");
         when(jobDefinition.getReaderSql()).thenReturn("Some sql");
 
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
@@ -173,7 +173,7 @@ public class BatchConfigurationTest {
 
         when(JobDefinitionValidator.validate(anyListOf(JobDefinition.class))).thenReturn(false);
         when(jobDefinition.getTableName()).thenReturn("table");
-        when(jobDefinition.getType()).thenReturn("generic");
+        when(jobDefinition.getType()).thenReturn("customSql");
 
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
         when(simpleJobTemplate.buildJob(jobDefinition)).thenReturn(job);

@@ -2,14 +2,14 @@
   "jobs": [
     {
       "name": "Patient allergy status",
-      "type": "generic",
+      "type": "customSql",
       "readerSql": "SELECT patient_id, allergy_status FROM patient",
       "chunkSizeToRead": "500",
       "tableName": "patient_allergy_status_test"
     },
     {
       "name": "Patient allergy status1",
-      "type": "generic",
+      "type": "customSql",
       "readerSql": "SELECT p.patient_id, p.allergy_status, p.creator, p.date_changed AS `date` FROM patient p",
       "chunkSizeToRead": "500",
       "tableName": "patient_allergy_status_test1",

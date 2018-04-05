@@ -28,7 +28,7 @@ public class JobDefinitionValidatorTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-    private static final String GENERIC = "generic";
+    private static final String CUSTOM_SQL = "customSql";
 
     @Before
     public void setUp() throws Exception {
@@ -42,7 +42,7 @@ public class JobDefinitionValidatorTest {
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition.getReaderSql()).thenReturn("");
         when(jobDefinition.getReaderSqlFilePath()).thenReturn("");
-        when(jobDefinition.getType()).thenReturn(GENERIC);
+        when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
 
         JobDefinitionValidator.validate(Arrays.asList(jobDefinition));
 
@@ -56,7 +56,7 @@ public class JobDefinitionValidatorTest {
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition.getReaderSql()).thenReturn(null);
         when(jobDefinition.getReaderSqlFilePath()).thenReturn(null);
-        when(jobDefinition.getType()).thenReturn(GENERIC);
+        when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
 
         JobDefinitionValidator.validate(Arrays.asList(jobDefinition));
 
@@ -69,13 +69,13 @@ public class JobDefinitionValidatorTest {
         jobDefinition.setName("test");
         jobDefinition.setReaderSql("select * from program");
         jobDefinition.setTableName("table");
-        jobDefinition.setType(GENERIC);
+        jobDefinition.setType(CUSTOM_SQL);
 
         JobDefinition jobDefinition1 = new JobDefinition();
         jobDefinition1.setName("test1");
         jobDefinition1.setReaderSql("select * from program");
         jobDefinition1.setTableName("");
-        jobDefinition1.setType(GENERIC);
+        jobDefinition1.setType(CUSTOM_SQL);
 
         JobDefinitionValidator.validate(Arrays.asList(jobDefinition, jobDefinition1));
         verify(logger, times(1)).error("Table name is empty for the job 'test1'");
@@ -88,13 +88,13 @@ public class JobDefinitionValidatorTest {
         jobDefinition.setName("test");
         jobDefinition.setReaderSql("select * from program");
         jobDefinition.setTableName("table");
-        jobDefinition.setType(GENERIC);
+        jobDefinition.setType(CUSTOM_SQL);
 
         JobDefinition jobDefinition1 = new JobDefinition();
         jobDefinition1.setName("test1");
         jobDefinition1.setReaderSql("select * from program");
         jobDefinition1.setTableName(null);
-        jobDefinition1.setType(GENERIC);
+        jobDefinition1.setType(CUSTOM_SQL);
 
         JobDefinitionValidator.validate(Arrays.asList(jobDefinition, jobDefinition1));
         verify(logger, times(1)).error("Table name is empty for the job 'test1'");
@@ -110,21 +110,21 @@ public class JobDefinitionValidatorTest {
         when(jobDefinition.getName()).thenReturn("test");
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition.getReaderSql()).thenReturn("select * form program");
-        when(jobDefinition.getType()).thenReturn(GENERIC);
+        when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
         when(jobDefinition.getReaderSqlFilePath()).thenReturn("some file path");
 
         JobDefinition jobDefinition1 = mock(JobDefinition.class);
         when(jobDefinition1.getName()).thenReturn("test1");
         when(jobDefinition1.getTableName()).thenReturn("table1");
         when(jobDefinition1.getReaderSql()).thenReturn("select * form program1");
-        when(jobDefinition1.getType()).thenReturn(GENERIC);
+        when(jobDefinition1.getType()).thenReturn(CUSTOM_SQL);
         when(jobDefinition1.getReaderSqlFilePath()).thenReturn("some file path1");
 
         JobDefinition jobDefinition2 = mock(JobDefinition.class);
         when(jobDefinition2.getName()).thenReturn("test2");
         when(jobDefinition2.getTableName()).thenReturn("table2");
         when(jobDefinition2.getReaderSql()).thenReturn("select * form program2");
-        when(jobDefinition2.getType()).thenReturn(GENERIC);
+        when(jobDefinition2.getType()).thenReturn(CUSTOM_SQL);
         when(jobDefinition2.getReaderSqlFilePath()).thenReturn("some file path2");
 
         jobDefinitions.add(jobDefinition);
@@ -141,7 +141,7 @@ public class JobDefinitionValidatorTest {
         when(jobDefinition.getTableName()).thenReturn("table1");
         when(jobDefinition.getReaderSql()).thenReturn("");
         when(jobDefinition.getReaderSqlFilePath()).thenReturn("some path to sql file");
-        when(jobDefinition.getType()).thenReturn(GENERIC);
+        when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
 
         assertTrue(JobDefinitionValidator.validate(Arrays.asList(jobDefinition)));
     }
@@ -154,19 +154,19 @@ public class JobDefinitionValidatorTest {
         jobDefinition.setName("test");
         jobDefinition.setTableName("table");
         jobDefinition.setReaderSql("select * from program");
-        jobDefinition.setType(GENERIC);
+        jobDefinition.setType(CUSTOM_SQL);
 
         JobDefinition jobDefinition1 = new JobDefinition();
         jobDefinition1.setName("test");
         jobDefinition1.setTableName("table1");
         jobDefinition1.setReaderSql("select * from program1");
-        jobDefinition1.setType(GENERIC);
+        jobDefinition1.setType(CUSTOM_SQL);
 
         JobDefinition jobDefinition2 = new JobDefinition();
         jobDefinition2.setName("test2");
         jobDefinition2.setTableName("table2");
         jobDefinition2.setReaderSql("select * from program2");
-        jobDefinition2.setType(GENERIC);
+        jobDefinition2.setType(CUSTOM_SQL);
 
         jobDefinitions.add(jobDefinition2);
         jobDefinitions.add(jobDefinition1);
@@ -182,19 +182,19 @@ public class JobDefinitionValidatorTest {
         jobDefinition.setName("test");
         jobDefinition.setTableName("table");
         jobDefinition.setReaderSql("select * from program");
-        jobDefinition.setType(GENERIC);
+        jobDefinition.setType(CUSTOM_SQL);
 
         JobDefinition jobDefinition1 = new JobDefinition();
         jobDefinition1.setName("test1");
         jobDefinition1.setTableName("table1");
         jobDefinition1.setReaderSql("select * from program1");
-        jobDefinition1.setType(GENERIC);
+        jobDefinition1.setType(CUSTOM_SQL);
 
         JobDefinition jobDefinition2 = new JobDefinition();
         jobDefinition2.setName("test2");
         jobDefinition2.setTableName("table1");
         jobDefinition2.setReaderSql("select * from program2");
-        jobDefinition2.setType(GENERIC);
+        jobDefinition2.setType(CUSTOM_SQL);
 
         jobDefinitions.add(jobDefinition2);
         jobDefinitions.add(jobDefinition1);
