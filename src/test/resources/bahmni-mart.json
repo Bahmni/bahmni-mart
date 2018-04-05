@@ -16,6 +16,14 @@
       "columnsToIgnore": ["creator", "date"]
     },
     {
+      "name": "Patient Details",
+      "type": "generic",
+      "readerSqlFilePath": "classpath:readerSql/reader.sql",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_details",
+      "columnsToIgnore": ["date_created"]
+    },
+    {
       "name": "Person Attributes",
       "type": "eav",
       "chunkSizeToRead": "500",

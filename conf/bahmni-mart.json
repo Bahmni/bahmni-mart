@@ -93,7 +93,8 @@
     "type": "customSql",
     "readerSqlFilePath": "classpath:readerSql/drugOrder.sql",
     "chunkSizeToRead": "500",
-    "tableName": "medication_data"
+    "tableName": "medication_data",
+    "columnsToIgnore": ["instructions", "stop_notes"]
   },
   {
     "name": "Appointment service",

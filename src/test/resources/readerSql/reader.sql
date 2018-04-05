@@ -1,0 +1,1 @@
+select patient_id, allergy_status, date_created from patient

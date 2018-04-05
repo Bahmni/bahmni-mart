@@ -64,14 +64,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyViews();
     }
 
-    private void verifyRecords(List<Map<String, Object>> patientList) {
-        for (Map<String, Object> row : patientList) {
-            String patientId = row.get("patient_id").toString();
-            String allergyStatus = row.get("allergy_status").toString();
-            assertEquals(expectedPatientList.get(patientId), allergyStatus);
-        }
-    }
-
     @Test
     @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
     @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
@@ -95,6 +87,24 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyRecords(patientList);
     }
 
+    @Test
+    @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
+    @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void shouldCreateTablesBasedOnTheSqlFilePathConfiguration() {
+        batchConfiguration.run();
+
+        List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_details'" +
+                " AND TABLE_SCHEMA='PUBLIC';")
+                .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
+        List<String> columnsName = tableDataColumns.stream().map(name -> name.toString().toLowerCase())
+                .collect(Collectors.toList());
+
+        assertEquals(2, tableDataColumns.size());
+        assertTrue(columnsName.containsAll(Arrays.asList("patient_id", "allergy_status")));
+        verifyRecords(martJdbcTemplate.queryForList("SELECT * FROM \"patient_details\""));
+    }
+
     private void verifyViews() {
         List<Map<String, Object>> view = martJdbcTemplate.queryForList("SELECT * from test_view");
         Set<String> columnNames = view.get(0).keySet();
@@ -102,6 +112,14 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertThat(Arrays.asList("PATIENT_ID", "ALLERGY_STATUS"), containsInAnyOrder(columnNames.toArray()));
         assertEquals(10, view.size());
         verifyRecords(view);
+    }
+
+    private void verifyRecords(List<Map<String, Object>> patientList) {
+        for (Map<String, Object> row : patientList) {
+            String patientId = row.get("patient_id").toString();
+            String allergyStatus = row.get("allergy_status").toString();
+            assertEquals(expectedPatientList.get(patientId), allergyStatus);
+        }
     }
 
     private void verifyTableColumns() {
