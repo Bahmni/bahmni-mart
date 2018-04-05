@@ -1,6 +1,6 @@
 package org.bahmni.mart.table.listener;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.helper.Constants;
