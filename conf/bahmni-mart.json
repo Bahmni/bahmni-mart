@@ -320,6 +320,20 @@
     }
   },
   {
+    "name": "Program Attributes",
+    "type": "eav",
+    "chunkSizeToRead": "500",
+    "tableName": "program_attributes",
+    "eavAttributes": {
+      "attributeTypeTableName": "program_attribute_type",
+      "attributeTableName": "patient_program_attribute",
+      "valueTableJoiningId": "attribute_type_id",
+      "typeTableJoiningId": "program_attribute_type_id",
+      "valueColumnName": "value_reference",
+      "primaryKey": "patient_program_id"
+    }
+  },
+  {
     "name": "Obs Data",
     "type": "obs",
     "separateTables": [

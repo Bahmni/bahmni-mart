@@ -5,7 +5,8 @@ public enum AttributeColumnName {
     surgical_appointment_attribute_type("format"),
     visit_attribute_type("datatype"),
     provider_attribute_type("datatype"),
-    patient_identifier_type("format");
+    patient_identifier_type("format"),
+    program_attribute_type("datatype");
 
     private String datatype;
 
