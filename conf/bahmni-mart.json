@@ -226,7 +226,20 @@
     },
     "columnsToIgnore": [
       "id3DateOfExpiry",
-      "id3DocNumber"
+      "id3DocNumber",
+      "familyNameLocal",
+      "givenNameLocal",
+      "id1DocNumber",
+      "id1Document",
+      "id1FullNameArabic",
+      "id1FullNameEnglish",
+      "id2FullNameArabic",
+      "id2FullNameEnglish",
+      "id3FullNameArabic",
+      "id3FullNameEnglish",
+      "middleNameLocal",
+      "legalRepFullNameEnglish",
+      "legalRepFullNameArabic"
     ]
   },
   {
