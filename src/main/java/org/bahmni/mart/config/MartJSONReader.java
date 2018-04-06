@@ -22,11 +22,13 @@ public class MartJSONReader {
     private static BahmniMartJSON bahmniMartJSON;
 
     public List<JobDefinition> getJobDefinitions() {
-        return CollectionUtils.isEmpty(bahmniMartJSON.getJobs()) ? new ArrayList<>() : bahmniMartJSON.getJobs();
+        List<JobDefinition> jobDefinitions = bahmniMartJSON.getJobs();
+        return CollectionUtils.isEmpty(jobDefinitions) ? new ArrayList<>() : jobDefinitions;
     }
 
     public List<ViewDefinition> getViewDefinitions() {
-        return CollectionUtils.isEmpty(bahmniMartJSON.getViews()) ? new ArrayList<>() : bahmniMartJSON.getViews();
+        List<ViewDefinition> viewDefinitions = bahmniMartJSON.getViews();
+        return CollectionUtils.isEmpty(viewDefinitions) ? new ArrayList<>() : viewDefinitions;
     }
 
     @PostConstruct
