@@ -16,11 +16,14 @@ import java.util.List;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(BatchUtils.class)
@@ -96,6 +99,36 @@ public class MartJSONReaderTest {
 
         assertTrue(martJSONReader.getViewDefinitions().isEmpty());
         verify(spyMartJson, times(1)).getViews();
+    }
 
+    @Test
+    public void shouldReadJSONForFirstTime() throws NoSuchFieldException, IllegalAccessException {
+        mockStatic(BatchUtils.class);
+        String json = "{\n" +
+                "  \"jobs\": [\n" +
+                "    {\n" +
+                "      \"name\": \"test name\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        when(BatchUtils.convertResourceOutputToString(any())).thenReturn(json);
+        setValuesForMemberFields(martJSONReader, "bahmniMartJSON", null);
+
+        martJSONReader.read();
+
+        verifyStatic(times(1));
+        BatchUtils.convertResourceOutputToString(any());
+
+        assertEquals(1, martJSONReader.getJobDefinitions().size());
+    }
+
+    @Test
+    public void shouldNotReadJSONIfItIsReadAlready() {
+        mockStatic(BatchUtils.class);
+
+        martJSONReader.read();
+
+        verifyStatic(times(0));
+        BatchUtils.convertResourceOutputToString(any());
     }
 }
