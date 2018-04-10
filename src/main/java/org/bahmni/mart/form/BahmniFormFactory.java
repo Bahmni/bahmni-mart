@@ -13,8 +13,9 @@ import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 
+import static org.bahmni.mart.config.job.JobDefinitionUtil.OBS_JOB_TYPE;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getObsJobDefinition;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 
 @Component
 public class BahmniFormFactory {
@@ -69,7 +70,7 @@ public class BahmniFormFactory {
     @PostConstruct
     public void postConstruct() {
         List<String> allSeparateTableConceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
-        JobDefinition obsJobDefinition = getObsJobDefinition(jobDefinitionReader.getJobDefinitions());
+        JobDefinition obsJobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), OBS_JOB_TYPE);
 
         this.allSeparateTableConcepts = obsJobDefinition.isEmpty() ? Collections.emptyList() :
                 obsService.getConceptsByNames(allSeparateTableConceptNames);

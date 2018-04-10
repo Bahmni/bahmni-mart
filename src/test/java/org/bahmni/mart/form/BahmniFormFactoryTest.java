@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getObsJobDefinition;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -97,9 +97,9 @@ public class BahmniFormFactoryTest {
 
         List<JobDefinition> emptyList = Collections.emptyList();
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(emptyList);
-        when(getObsJobDefinition(emptyList)).thenReturn(jobDefinition);
+        when(getJobDefinitionByType(emptyList, "obs")).thenReturn(jobDefinition);
         when(jobDefinition.isEmpty()).thenReturn(false);
-        when(getObsJobDefinition(Collections.singletonList(jobDefinition))).thenReturn(jobDefinition);
+        when(getJobDefinitionByType(Collections.singletonList(jobDefinition), "obs")).thenReturn(jobDefinition);
 
         when(separateTableConfigHelper.getAllSeparateTableConceptNames()).thenReturn(separateTableConceptList);
         when(obsService.getConceptsByNames(separateTableConceptList))

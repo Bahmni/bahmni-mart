@@ -17,7 +17,7 @@ public class JobDefinitionUtil {
 
     private static final String TO_SPLIT_FROM = "(?i)from";
     private static final String TO_SPLIT_SELECT = "(?i)select";
-    private static final String OBS_JOB_TYPE = "obs";
+    public static final String OBS_JOB_TYPE = "obs";
 
     public static String getReaderSQLByIgnoringColumns(List<String> columnsToIgnore, String readerSQL) {
         if (StringUtils.isEmpty(readerSQL) || CollectionUtils.isEmpty(columnsToIgnore)) {
@@ -51,7 +51,7 @@ public class JobDefinitionUtil {
     }
 
     public static List<String> getIgnoreConceptNamesForObsJob(List<JobDefinition> jobDefinitions) {
-        return getDefaultIfNotPresent(getObsJobDefinition(jobDefinitions).getColumnsToIgnore());
+        return getDefaultIfNotPresent(getJobDefinitionByType(jobDefinitions, OBS_JOB_TYPE).getColumnsToIgnore());
     }
 
     public static List<String> getIgnoreConceptNamesForJob(JobDefinition jobDefinition) {
@@ -59,16 +59,16 @@ public class JobDefinitionUtil {
     }
 
     public static List<String> getSeparateTableNamesForObsJob(List<JobDefinition> jobDefinitions) {
-        return getDefaultIfNotPresent(getObsJobDefinition(jobDefinitions).getSeparateTables());
+        return getDefaultIfNotPresent(getJobDefinitionByType(jobDefinitions, OBS_JOB_TYPE).getSeparateTables());
     }
 
     private static List<String> getDefaultIfNotPresent(List<String> names) {
         return isNull(names) ? new ArrayList<>() : names;
     }
 
-    public static JobDefinition getObsJobDefinition(List<JobDefinition> jobDefinitions) {
+    public static JobDefinition getJobDefinitionByType(List<JobDefinition> jobDefinitions, String type) {
         return jobDefinitions.stream()
-                .filter(jobDefinition -> jobDefinition.getType().equals(OBS_JOB_TYPE))
+                .filter(jobDefinition -> jobDefinition.getType().equals(type))
                 .findFirst().orElseGet(JobDefinition::new);
     }
 

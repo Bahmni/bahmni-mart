@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getObsJobDefinition;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForObsJob;
 import static org.junit.Assert.assertEquals;
@@ -132,7 +132,7 @@ public class JobDefinitionUtilTest {
         when(jobDefinition1.getType()).thenReturn("eav");
         when(jobDefinition2.getType()).thenReturn("obs");
 
-        JobDefinition obsJobDefinition = getObsJobDefinition(Arrays.asList(jobDefinition1, jobDefinition2));
+        JobDefinition obsJobDefinition = getJobDefinitionByType(Arrays.asList(jobDefinition1, jobDefinition2), "obs");
 
         verify(jobDefinition1, times(1)).getType();
         verify(jobDefinition2, times(1)).getType();
@@ -145,7 +145,7 @@ public class JobDefinitionUtilTest {
         when(jobDefinition1.getType()).thenReturn("eav");
         whenNew(JobDefinition.class).withNoArguments().thenReturn(jobDefinition2);
 
-        assertTrue(getObsJobDefinition(Arrays.asList(jobDefinition1)) instanceof JobDefinition);
+        assertTrue(getJobDefinitionByType(Arrays.asList(jobDefinition1), "obs") instanceof JobDefinition);
         verify(jobDefinition1, times(1)).getType();
     }
 
