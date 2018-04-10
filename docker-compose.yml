@@ -1,23 +1,13 @@
 javaapp:
   image: anallytics/bahmni-mart
   container_name: mart
+  ports:
+    - "9393:9393"
   links:
     - postgres-server
   restart: on-failure:10
   volumes:
     - /var/www:/var/www:rw
-  environment:
-    OPENMRS_DB_SERVER: 172.17.42.1
-    OPENMRS_DB_USER: "openmrs-user"
-    OPENMRS_DB_PASSWORD: ""
-    ANALYTICS_DB_SERVER: postgres-server
-    ANALYTICS_DB_USER: "analytics"
-    MYSQL_DB_NAME: "openmrs"
-    POSTGRES_DB_NAME: "analytics"
-    MULTI_SELECT_CONCEPTS: "[]"
-    DEFAULT_CONFIG_FILE_PATH: "/var/www/bahmni_config/openmrs/apps/clinical/app.json"
-    IMPLEMENTATION_CONFIG_FILE_PATH: "/var/www/implementation_config/openmrs/apps/clinical/app.json"
-    BAHMNI_MART_CONFIG_FILE: "file:/opt/bahmni-mart/conf/bahmni-mart.json"
 postgres-server:
   image: anallytics/postgres
   volumes:

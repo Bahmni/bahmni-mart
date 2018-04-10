@@ -1,5 +1,15 @@
 FROM openjdk:8-jdk-alpine
-ADD build/libs/bahmni-mart-1.0.0.jar bahmni-mart.jar
-ADD conf/bahmni-mart.json /opt/bahmni-mart/conf/bahmni-mart.json
+COPY build/libs/bahmni-mart-*.jar /opt/bahmni-mart/bahmni-mart.jar
 
-ENTRYPOINT sleep 20; java -Xms768m -Xmx2048m -Djava.security.egd=file:/dev/./urandom -jar /bahmni-mart.jar
+COPY conf/bahmni-mart.json /opt/bahmni-mart/conf/bahmni-mart.json
+COPY conf/application-prod.properties /opt/bahmni-mart/conf/application-prod.properties
+COPY scripts/addTask.sh /opt/bahmni-mart/scripts/addTask.sh
+
+COPY scripts/javaDockerEntryPoint.sh /opt/bahmni-mart/scripts/javaDockerEntryPoint.sh
+RUN chmod +x /opt/bahmni-mart/scripts/javaDockerEntryPoint.sh
+
+
+ADD https://repo.spring.io/release/org/springframework/cloud/spring-cloud-dataflow-server-local/1.3.1.RELEASE/spring-cloud-dataflow-server-local-1.3.1.RELEASE.jar spring-cloud-dataflow-server.jar
+ADD https://repo.spring.io/release/org/springframework/cloud/spring-cloud-dataflow-shell/1.3.1.RELEASE/spring-cloud-dataflow-shell-1.3.1.RELEASE.jar spring-cloud-dataflow-shell.jar
+
+ENTRYPOINT ./opt/bahmni-mart/scripts/javaDockerEntryPoint.sh
