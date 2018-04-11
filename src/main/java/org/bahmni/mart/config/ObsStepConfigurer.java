@@ -1,5 +1,6 @@
 package org.bahmni.mart.config;
 
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.form.FormListProcessor;
@@ -41,10 +42,11 @@ public abstract class ObsStepConfigurer implements StepConfigurer {
     }
 
     @Override
-    public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport) {
+    public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition) {
         List<BahmniForm> forms = getAllForms();
         for (BahmniForm form : forms) {
             ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
+            observationExportStep.setJobDefinition(jobDefinition);
             observationExportStep.setForm(form);
             completeDataExport.next(observationExportStep.getStep());
             formTableMetadataGenerator.addMetadataForForm(form);

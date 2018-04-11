@@ -1,6 +1,7 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
@@ -35,6 +36,8 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
     private String formObsSql;
 
     private BahmniForm form;
+
+    private JobDefinition jobDefinition;
 
     @Value("classpath:sql/obsDetail.sql")
     private Resource obsDetailSqlResource;
@@ -74,7 +77,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
     private List<Obs> formObs(Integer obsId) {
         Map<String, Object> params = new HashMap<>();
         params.put("obsId", obsId);
-        params.put("conceptReferenceSource", jobDefinitionReader.getConceptReferenceSource());
+        params.put("conceptReferenceSource", jobDefinition.getConceptReferenceSource());
         return getObs(params, formObsSql);
     }
 
@@ -98,7 +101,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
             Map<String, Object> params = new HashMap<>();
             params.put("childObsIds", allChildObsGroupIds);
             params.put("leafConceptIds", leafConcepts);
-            params.put("conceptReferenceSource", jobDefinitionReader.getConceptReferenceSource());
+            params.put("conceptReferenceSource", jobDefinition.getConceptReferenceSource());
             return getObs(params, leafObsSql);
         }
         return new ArrayList<>();
@@ -137,5 +140,9 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
             child.setParentId(parentObsId);
             child.setId(obsId);
         }
+    }
+
+    public void setJobDefinition(JobDefinition jobDefinition) {
+        this.jobDefinition = jobDefinition;
     }
 }

@@ -79,14 +79,14 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private ViewExecutor viewExecutor;
 
-    private Job buildObsJob(String name) {
-        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(name);
-        return getJob(completeDataExport, getObsStepConfigurers());
+    private Job buildObsJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, getObsStepConfigurers(), jobDefinition);
     }
 
-    private Job buildBacteriologyJob(String name) {
-        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(name);
-        return getJob(completeDataExport, getBacteriologyStepConfigurers());
+    private Job buildBacteriologyJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, getBacteriologyStepConfigurers(), jobDefinition);
     }
 
     private FlowBuilder<FlowJobBuilder> getFlowJobBuilderFlowBuilder(String jobName) {
@@ -96,9 +96,10 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
                 .flow(treatmentRegistrationBaseExportStep.getStep());
     }
 
-    private Job getJob(FlowBuilder<FlowJobBuilder> completeDataExport, List<StepConfigurer> stepConfigurers) {
+    private Job getJob(FlowBuilder<FlowJobBuilder> completeDataExport,
+                       List<StepConfigurer> stepConfigurers, JobDefinition jobDefinition) {
         stepConfigurers.forEach(stepConfigurer -> {
-            stepConfigurer.registerSteps(completeDataExport);
+            stepConfigurer.registerSteps(completeDataExport, jobDefinition);
             stepConfigurer.createTables();
         });
 
@@ -151,11 +152,11 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private Job getJobByType(JobDefinition jobDefinition) {
         switch (jobDefinition.getType()) {
           case "obs":
-              return buildObsJob(jobDefinition.getName());
+              return buildObsJob(jobDefinition);
           case "eav":
               return eavJobTemplate.buildJob(jobDefinition);
           case "bacteriology":
-              return buildBacteriologyJob(jobDefinition.getName());
+              return buildBacteriologyJob(jobDefinition);
           default:
               return simpleJobTemplate.buildJob(jobDefinition);
         }

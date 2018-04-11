@@ -102,7 +102,7 @@ public class FormStepConfigurerTest {
         when(medicalHistoryObservationExportStep.getStep()).thenReturn(medicalHistoryStep);
         when(fstgObservationExportStep.getStep()).thenReturn(fstgStep);
 
-        formStepConfigurer.registerSteps(completeDataExport);
+        formStepConfigurer.registerSteps(completeDataExport, new JobDefinition());
 
         verify(formListProcessor, times(1)).retrieveAllForms(any(), any());
         verify(observationExportStepFactory,times(2)).getObject();

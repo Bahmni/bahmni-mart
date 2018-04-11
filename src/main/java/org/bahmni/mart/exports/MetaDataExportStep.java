@@ -1,6 +1,6 @@
 package org.bahmni.mart.exports;
 
-import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.table.TableDataProcessor;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
@@ -32,8 +32,7 @@ public class MetaDataExportStep {
     @Autowired
     private ObjectFactory<TableRecordWriter> recordWriterObjectFactory;
 
-    @Autowired
-    private JobDefinitionReader jobDefinitionReader;
+    private JobDefinition jobDefinition;
 
     @Value("classpath:sql/metaDataCodeDictionary.sql")
     private Resource metaDataSqlResource;
@@ -51,7 +50,7 @@ public class MetaDataExportStep {
 
     private JdbcCursorItemReader<Map<String, Object>> metaDataReader() {
         String sql = convertResourceOutputToString(metaDataSqlResource);
-        sql = constructSqlWithParameter(sql,"conceptReferenceSource", jobDefinitionReader.getConceptReferenceSource());
+        sql = constructSqlWithParameter(sql,"conceptReferenceSource", jobDefinition.getConceptReferenceSource());
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);
@@ -77,6 +76,10 @@ public class MetaDataExportStep {
 
     public void setTableData(TableData tableData) {
         this.tableData = tableData;
+    }
+
+    public void setJobDefinition(JobDefinition jobDefinition) {
+        this.jobDefinition = jobDefinition;
     }
 }
 

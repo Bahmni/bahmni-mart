@@ -146,7 +146,7 @@ public class BatchConfigurationTest {
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
         verify(formStepConfigurer, times(1)).createTables();
-        verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder);
+        verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
 
     }
@@ -209,7 +209,7 @@ public class BatchConfigurationTest {
         verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(1)).createTables();
-        verify(metaDataStepConfigurer, times(1)).registerSteps(any(FlowBuilder.class));
+        verify(metaDataStepConfigurer, times(1)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
         verify(jobDefinitionReader, times(1)).getConceptReferenceSource();
         verify(jobDefinition, times(1)).getType();
     }
@@ -226,7 +226,7 @@ public class BatchConfigurationTest {
         verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(0)).createTables();
-        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));
+        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
         verify(jobDefinitionReader, times(1)).getConceptReferenceSource();
         verify(jobDefinition, times(1)).getType();
     }
@@ -242,7 +242,7 @@ public class BatchConfigurationTest {
         verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(0)).createTables();
-        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));
+        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
     }
 
@@ -271,7 +271,7 @@ public class BatchConfigurationTest {
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verify(jobBuilderFactory, times(1)).get("Bacteriology Data");
         verify(bacteriologyStepConfigurer, times(1)).createTables();
-        verify(bacteriologyStepConfigurer, times(1)).registerSteps(jobFlowBuilder);
+        verify(bacteriologyStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
     }
 }
