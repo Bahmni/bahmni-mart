@@ -334,6 +334,10 @@
     }
   },
   {
+    "name": "Bacteriology Data",
+    "type": "bacteriology"
+  },
+  {
     "name": "Obs Data",
     "type": "obs",
     "separateTables": [
@@ -341,7 +345,6 @@
       "SMH, Pain Assessment",
       "FV, Outcomes FV"
     ],
-    "conceptReferenceSource": "MSF-INTERNAL",
     "ignoreAllFreeTextConcepts": true,
     "columnsToIgnore": [
       "Video",

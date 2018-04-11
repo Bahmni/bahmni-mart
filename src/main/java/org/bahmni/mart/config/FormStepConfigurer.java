@@ -17,6 +17,6 @@ public class FormStepConfigurer extends ObsStepConfigurer {
         List<String> ignoreConcepts = JobDefinitionUtil
                 .getIgnoreConceptNamesForObsJob(jobDefinitionReader.getJobDefinitions());
         List<Concept> allFormConcepts = obsService.getChildConcepts(ALL_FORMS);
-        return formListProcessor.retrieveAllForms(allFormConcepts,ignoreConcepts);
+        return formListProcessor.retrieveAllForms(allFormConcepts, ignoreConcepts);
     }
 }
