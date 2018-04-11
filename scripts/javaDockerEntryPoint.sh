@@ -1,4 +1,3 @@
-#!/usr/bin/env /bin/sh
 nohup java -Xms768m -Xmx2048m -Djava.security.egd=file:/dev/./urandom -jar /spring-cloud-dataflow-server.jar &>/dev/null &
 while ! nc -z localhost 9393; do
     sleep 1;
