@@ -1,23 +1,20 @@
-javaapp:
-  image: anallytics/bahmni-mart
-  container_name: mart
-  links:
-    - postgres-server
-  restart: on-failure:10
-  volumes:
-    - /var/www:/var/www:rw
-  environment:
-    OPENMRS_DB_SERVER: 172.17.42.1
-    OPENMRS_DB_USER: "openmrs-user"
-    OPENMRS_DB_PASSWORD: ""
-    ANALYTICS_DB_SERVER: postgres-server
-    ANALYTICS_DB_USER: "analytics"
-    MYSQL_DB_NAME: "openmrs"
-    POSTGRES_DB_NAME: "analytics"
-    MULTI_SELECT_CONCEPTS: "[]"
-    DEFAULT_CONFIG_FILE_PATH: "/var/www/bahmni_config/openmrs/apps/clinical/app.json"
-    IMPLEMENTATION_CONFIG_FILE_PATH: "/var/www/implementation_config/openmrs/apps/clinical/app.json"
-    BAHMNI_MART_CONFIG_FILE: "file:/opt/bahmni-mart/conf/bahmni-mart.json"
+dataflow-server:
+    image: springcloud/spring-cloud-dataflow-server-local:1.4.0.RELEASE
+    container_name: dataflow-server
+    volumes:
+      - /opt/bahmni-mart:/opt/bahmni-mart:rw
+      - /var/www:/var/www:rw
+      - /var/log:/var/log:rw
+    ports:
+      - "9393:9393"
+    links:
+      - postgres-server
+    environment:
+      - spring_datasource_url=jdbc:postgresql://postgres-server:5432/analytics?currentSchema=bahmni_mart_scdf
+      - spring_datasource_username=analytics
+      - spring_datasource_password=""
+      - spring_datasource_driver-class-name=org.postgresql.Driver
+
 postgres-server:
   image: anallytics/postgres
   volumes:
