@@ -51,12 +51,26 @@ To run all chesks present in bahmni mart run the following command
 * ```./gradlew clean check```
 
 ---
+### Deployment Steps
+To deploy/install bahmni-mart using docker follow the steps given below
+* install docker-1.7.1
+* install docker-compose-1.5.2
+* set **BAHMNI_MART_ZIP_URL** environment variable
+* download **bahmni-mart/scripts/install.sh** from github
+* run ```sh install.sh```
+* download **bahmni-mart/docker-compose.yml** from github
+* Change any config if needed. Bahmni-mart related config files will be present in **/opt/bahmni-mart/conf**. Change **application-prod.properties** if you want modify given parameters to bahmni-mart application or Spring cloud dataflow server
+* run ```docker-compose up -d```
+
+---
 ### Commands to Remember
 * ```docker-compose up -d``` (Fetch docker images from remote if images are not present in local and run in headless mode)
 * ```docker ps -a``` (Check status of docker containers)
 * ```docker logs -f postgres-server``` (Check logs of postgres-server container)
+* ```docker logs -f dataflow-server``` (Check logs of dataflow-server container)
 * ```docker-compose stop``` (Stop all docker containers)
 * ```docker-compose rm -f``` (Remove all stopped containers)
 * ```docker start <CONTAINER ID>``` (Start specific docker container)
 * ```docker exec -it postgres-server psql -Uanalytics``` (Access PSQL database of postgres-server container)
- 
+* ```curl -X POST <HOST NAME>:9393/tasks/executions\?name\=create-bahmni-mart``` (Once Spring Cloud Dataflow Server is up, you can launch task using UI. But if you want to do it from command line you can run this command. It will launch **create-bahmni-mart** task)
+* ```tail -100f /var/log/bahmni-mart/bahmmni-mart.log``` (Log of **create-bahmni-mart** task will be present in **/var/log/bahmni-mart/bahmni-mart.log** of your host machine. Use this command to get last 100 lines of the file)
