@@ -52,7 +52,10 @@
     {
       "name": "Bacteriology Data",
       "conceptReferenceSource": "",
-      "type": "bacteriology"
+      "type": "bacteriology",
+      "columnsToIgnore": [
+        "Specimen Collection Date"
+      ]
     }
   ],
   "views": [

@@ -21,6 +21,8 @@ import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForBacteriologyJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForObsJob;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -464,18 +466,23 @@ public class SeparateTableConfigHelperTest {
 
         when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.singletonList(""));
         List<String> seprateTables = new ArrayList<>();
-        seprateTables.add("separate table");
-        when(JobDefinitionUtil.getSeparateTableNamesForObsJob(any())).thenReturn(seprateTables);
+        seprateTables.add("obs separate table");
+        when(getSeparateTableNamesForObsJob(any())).thenReturn(seprateTables);
+        when(getSeparateTableNamesForBacteriologyJob(any())).thenReturn(Arrays.asList("bacteriology seperate table"));
         List<String> expectedSeparateTables = Arrays.asList("OR, Operation performed", "Video", "Test Concept",
-                "separate table");
+                "obs separate table", "bacteriology seperate table");
 
         List<String> allSeparateConceptNames = separateTableConfigHelper
                 .getAllSeparateTableConceptNames();
 
-        assertEquals(4, allSeparateConceptNames.size());
+        assertEquals(5, allSeparateConceptNames.size());
         assertThat(expectedSeparateTables, containsInAnyOrder(allSeparateConceptNames.toArray()));
         verifyStatic(times(1));
         getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
+        verifyStatic(times(1));
+        getSeparateTableNamesForObsJob(any());
+        verifyStatic(times(1));
+        getSeparateTableNamesForBacteriologyJob(any());
     }
 
     @Test
@@ -526,7 +533,7 @@ public class SeparateTableConfigHelperTest {
         when(jsonParser.parse(implementationFileReader)).thenReturn(implementationConfig);
 
         when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.singletonList(""));
-        when(JobDefinitionUtil.getSeparateTableNamesForObsJob(any()))
+        when(getSeparateTableNamesForObsJob(any()))
                 .thenReturn(Collections.singletonList("separate table"));
         List<String> expectedSeparateTables = Arrays.asList("OR, Operation performed", "Video");
 

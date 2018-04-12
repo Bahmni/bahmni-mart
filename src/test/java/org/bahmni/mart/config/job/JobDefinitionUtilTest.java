@@ -19,8 +19,10 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNames
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForBacteriologyJob;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForObsJob;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -232,5 +234,20 @@ public class JobDefinitionUtilTest {
         BatchUtils.convertResourceOutputToString(resource);
         PowerMockito.verifyStatic(VerificationModeFactory.times(1));
         ReaderSQLFileLoader.loadResource(filePath);
+    }
+
+    @Test
+    public void shouldReturnSeperateTableListForBacteriologyJob() throws Exception {
+        JobDefinition bacteriologyJob = mock(JobDefinition.class);
+        when(bacteriologyJob.getType()).thenReturn("bacteriology");
+        List<String> seperateTables = Arrays.asList("table1", "table2");
+        when(bacteriologyJob.getSeparateTables()).thenReturn(seperateTables);
+
+        List<String> expected = getSeparateTableNamesForBacteriologyJob(Collections.singletonList(bacteriologyJob));
+
+        assertNotNull(expected);
+        assertEquals(2,expected.size());
+        assertEquals(seperateTables.get(0),expected.get(0));
+        assertEquals(seperateTables.get(1),expected.get(1));
     }
 }
