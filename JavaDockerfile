@@ -1,5 +1,0 @@
-FROM openjdk:8-jdk-alpine
-COPY build/libs/bahmni-mart-*.jar /opt/bahmni-mart/bahmni-mart.jar
-
-COPY conf/bahmni-mart.json /opt/bahmni-mart/conf/bahmni-mart.json
-COPY conf/application-prod.properties /opt/bahmni-mart/conf/application-prod.properties

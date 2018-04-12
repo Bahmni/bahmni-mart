@@ -28,10 +28,6 @@ To setup git hooks please run the following command
 To build JAR run the following command
 * ```./gradlew clean build```
  
-#### Bahmni mart docker image
-To build bahmni mart docker image run the following command
-* ```docker build -f JavaDockerfile -t anallytics/bahmni-mart .```
- 
 #### Postgres docker image
 To build postgres docker image for bahmni mart run the following command
 * ```docker build -f PostgresqlDockerfile -t anallytics/postgres .```
@@ -58,7 +54,6 @@ To run all chesks present in bahmni mart run the following command
 ### Commands to Remember
 * ```docker-compose up -d``` (Fetch docker images from remote if images are not present in local and run in headless mode)
 * ```docker ps -a``` (Check status of docker containers)
-* ```docker logs -f mart``` (Check logs of bahmni-mart container)
 * ```docker logs -f postgres-server``` (Check logs of postgres-server container)
 * ```docker-compose stop``` (Stop all docker containers)
 * ```docker-compose rm -f``` (Remove all stopped containers)
