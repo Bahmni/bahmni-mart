@@ -52,7 +52,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         List<String> tableNames = tables.stream().map(table -> table.get("TABLE_NAME").toString())
                 .collect(Collectors.toList());
         List<String> expectedTableNames = Arrays.asList("patient_allergy_status_test", "first_stage_validation",
-                "fstg,_specialty_determined_by_mlo", "follow-up_validation", "stage", "person_attributes");
+                "fstg,_specialty_determined_by_mlo", "follow-up_validation", "stage",
+                "person_attributes", "bacteriology_concept_set");
         assertTrue(tableNames.containsAll(expectedTableNames));
         verifyTableColumns();
 
@@ -135,6 +136,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 "stage", "id_follow-up_validation"));
         tableMap.put("person_attributes", Arrays.asList("person_id", "givennamelocal", "familynamelocal",
                 "middlenamelocal", "viber", "phonenumber2"));
+        tableMap.put("bacteriology_concept_set", Arrays.asList("id_bacteriology_concept_set", "patient_id",
+                "encounter_id", "specimen_collection_date", "specimen_sample_source", "specimen_id"));
 
         for (String tableName : tableMap.keySet()) {
             String sql = String.format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' " +

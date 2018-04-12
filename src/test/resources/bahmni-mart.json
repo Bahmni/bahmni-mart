@@ -48,6 +48,11 @@
       "columnsToIgnore": [
         "MH, Name of MLO"
       ]
+    },
+    {
+      "name": "Bacteriology Data",
+      "conceptReferenceSource": "",
+      "type": "bacteriology"
     }
   ],
   "views": [
