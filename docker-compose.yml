@@ -4,7 +4,7 @@ dataflow-server:
     volumes:
       - /opt/bahmni-mart:/opt/bahmni-mart:rw
       - /var/www:/var/www:rw
-      - /var/log/bahmni-mart:/var/log/bahmni-mart:rw
+      - /var/log:/var/log:rw
     ports:
       - "9393:9393"
     links:

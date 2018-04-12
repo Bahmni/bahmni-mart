@@ -154,3 +154,24 @@ checkstyle {
         checkstyle "com.github.sevntu-checkstyle:sevntu-checks:${sevntuChecksVersion}"
     }
 }
+
+task createZip(type: Tar) {
+    extension = 'tar.gz'
+    baseName= project.name
+    archiveName = String.format("%s.%s", baseName, extension)
+    compression = Compression.GZIP
+
+    into("conf") {
+        from ("conf/")
+        exclude("app.json")
+    }
+
+    into("/") {
+        from("build/libs")
+        include(String.format("%s-%s.jar", baseName, project.version))
+        rename(String.format("%s-%s.jar", baseName, project.version), String.format("%s.jar", baseName))
+    }
+    destinationDir file('build/artifacts')
+
+    dependsOn("build")
+}
