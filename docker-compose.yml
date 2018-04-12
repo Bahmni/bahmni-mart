@@ -4,16 +4,15 @@ dataflow-server:
     volumes:
       - /opt/bahmni-mart:/opt/bahmni-mart:rw
       - /var/www:/var/www:rw
-      - /var/log:/var/log:rw
+      - /var/log/bahmni-mart:/var/log/bahmni-mart:rw
     ports:
       - "9393:9393"
     links:
       - postgres-server
     environment:
-      - spring_datasource_url=jdbc:postgresql://postgres-server:5432/analytics?currentSchema=bahmni_mart_scdf
-      - spring_datasource_username=analytics
-      - spring_datasource_password=""
-      - spring_datasource_driver-class-name=org.postgresql.Driver
+      - spring.dataflow.embedded.database.enabled=false
+      - spring.config.location=/opt/bahmni-mart/conf/
+      - spring.profiles.active=prod
 
 postgres-server:
   image: anallytics/postgres
