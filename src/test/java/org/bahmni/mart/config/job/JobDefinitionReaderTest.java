@@ -17,7 +17,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @PrepareForTest(BatchUtils.class)
@@ -84,18 +83,6 @@ public class JobDefinitionReaderTest {
         List<String> actualColumnsToIgnore = obsJobDefinition.getColumnsToIgnore();
         assertEquals(1, actualColumnsToIgnore.size());
         assertThat(expectedIgnoredColumns, containsInAnyOrder(actualColumnsToIgnore.toArray()));
-    }
-
-    @Test
-    public void shouldReturnConceptReferenceSourceIfItIsPresent() {
-        JobDefinition jobDefinition = mock(JobDefinition.class);
-        when(jobDefinition.getType()).thenReturn("obs");
-        when(jobDefinition.getConceptReferenceSource()).thenReturn("BAHMNI_INTERNAL");
-
-        String conceptReferenceSource = jobDefinitionReader.getConceptReferenceSource();
-
-        assertEquals("BAHMNI_INTERNAL", conceptReferenceSource);
-
     }
 
     @Test

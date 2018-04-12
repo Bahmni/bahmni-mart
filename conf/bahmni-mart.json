@@ -339,6 +339,11 @@
     "type": "bacteriology"
   },
   {
+    "name": "MetaData Dictionary",
+    "type": "metadata",
+    "conceptReferenceSource": "MSF-INTERNAL"
+  },
+  {
     "name": "Obs Data",
     "type": "obs",
     "separateTables": [

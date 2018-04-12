@@ -38,8 +38,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
 @Configuration
 @EnableBatchProcessing
 public class BatchConfiguration extends DefaultBatchConfigurer implements CommandLineRunner {
@@ -81,12 +79,12 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     private Job buildObsJob(JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, getObsStepConfigurers(), jobDefinition);
+        return getJob(completeDataExport, formStepConfigurer, jobDefinition);
     }
 
     private Job buildBacteriologyJob(JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, getBacteriologyStepConfigurers(), jobDefinition);
+        return getJob(completeDataExport, bacteriologyStepConfigurer, jobDefinition);
     }
 
     private FlowBuilder<FlowJobBuilder> getFlowJobBuilderFlowBuilder(String jobName) {
@@ -97,11 +95,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     }
 
     private Job getJob(FlowBuilder<FlowJobBuilder> completeDataExport,
-                       List<StepConfigurer> stepConfigurers, JobDefinition jobDefinition) {
-        stepConfigurers.forEach(stepConfigurer -> {
-            stepConfigurer.registerSteps(completeDataExport, jobDefinition);
-            stepConfigurer.createTables();
-        });
+                       StepConfigurer stepConfigurer, JobDefinition jobDefinition) {
+        stepConfigurer.registerSteps(completeDataExport, jobDefinition);
+        stepConfigurer.createTables();
 
         return completeDataExport.end().build();
     }
@@ -117,8 +113,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         ArrayList<StepConfigurer> stepConfigurers = new ArrayList<>();
         stepConfigurers.add(formStepConfigurer);
 
-        if (!isEmpty(jobDefinitionReader.getConceptReferenceSource()))
-            stepConfigurers.add(metaDataStepConfigurer);
         return stepConfigurers;
     }
 
@@ -157,8 +151,15 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
               return eavJobTemplate.buildJob(jobDefinition);
           case "bacteriology":
               return buildBacteriologyJob(jobDefinition);
+          case "metadata":
+              return buildMetaDataJob(jobDefinition);
           default:
               return simpleJobTemplate.buildJob(jobDefinition);
         }
+    }
+
+    private Job buildMetaDataJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, metaDataStepConfigurer, jobDefinition);
     }
 }
