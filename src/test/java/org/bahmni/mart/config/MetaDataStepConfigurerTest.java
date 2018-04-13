@@ -1,6 +1,6 @@
 package org.bahmni.mart.config;
 
-import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.exports.MetaDataExportStep;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.domain.TableColumn;
@@ -47,10 +47,6 @@ public class MetaDataStepConfigurerTest {
     @Mock
     private ObjectFactory<MetaDataExportStep> metaDataExportStepObjectFactory;
 
-    @Mock
-    private JobDefinitionReader jobDefinitionReader;
-
-
     private MetaDataStepConfigurer metaDataStepConfigurer;
 
     @Before
@@ -61,7 +57,6 @@ public class MetaDataStepConfigurerTest {
         setValuesForMemberFields(metaDataStepConfigurer, "metaDataExportStepObjectFactory",
                 metaDataExportStepObjectFactory);
         setValuesForMemberFields(metaDataStepConfigurer, "openmrsJDBCTemplate", openmrsJDBCTemplate);
-        setValuesForMemberFields(metaDataStepConfigurer, "jobDefinitionReader", jobDefinitionReader);
         setValuesForMemberFields(metaDataStepConfigurer, "metaDataSqlResource",
                 new ByteArrayResource("Some sql".getBytes()));
     }
@@ -82,14 +77,17 @@ public class MetaDataStepConfigurerTest {
         FlowBuilder completeDataExport = mock(FlowBuilder.class);
         tableData.addColumn(new TableColumn("column", "text", true, null));
         when(openmrsJDBCTemplate.query(anyString(), any(ResultSetExtractor.class))).thenReturn(tableData);
+        JobDefinition jobDefinition = mock(JobDefinition.class);
 
-        metaDataStepConfigurer.registerSteps(completeDataExport);
+        metaDataStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 
         assertEquals("meta_data_dictionary", tableData.getName());
-        verify(jobDefinitionReader,times(1)).getConceptReferenceSource();
         verify(metaDataExportStepObjectFactory,times(1)).getObject();
         verify(metaDataExportStep, times(1)).setTableData(tableData);
         verify(metaDataExportStep, times(1)).getStep();
+        verify(metaDataExportStep, times(1)).setJobDefinition(jobDefinition);
         verify(completeDataExport, times(1)).next(step);
+        verify(jobDefinition,times(1)).getConceptReferenceSource();
+        verify(openmrsJDBCTemplate,times(1)).query(anyString(), any(ResultSetExtractor.class));
     }
 }

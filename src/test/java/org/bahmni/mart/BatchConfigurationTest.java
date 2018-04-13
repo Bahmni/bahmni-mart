@@ -1,6 +1,7 @@
 package org.bahmni.mart;
 
 import org.apache.commons.io.FileUtils;
+import org.bahmni.mart.config.BacteriologyStepConfigurer;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
@@ -64,6 +65,9 @@ public class BatchConfigurationTest {
     private FormStepConfigurer formStepConfigurer;
 
     @Mock
+    private BacteriologyStepConfigurer bacteriologyStepConfigurer;
+
+    @Mock
     private JobDefinitionReader jobDefinitionReader;
 
     @Mock
@@ -93,6 +97,8 @@ public class BatchConfigurationTest {
     private JobFlowBuilder jobFlowBuilder;
 
     private BatchConfiguration batchConfiguration;
+    
+    private static final String OBS_DATA_FLATTENING_JOB_NAME = "Obs Data";
 
     @Before
     public void setUp() throws Exception {
@@ -100,6 +106,7 @@ public class BatchConfigurationTest {
         mockStatic(JobDefinitionValidator.class);
         batchConfiguration = new BatchConfiguration();
         setValuesForMemberFields(batchConfiguration, "formStepConfigurer", formStepConfigurer);
+        setValuesForMemberFields(batchConfiguration, "bacteriologyStepConfigurer", bacteriologyStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "jobDefinitionReader", jobDefinitionReader);
         setValuesForMemberFields(batchConfiguration, "simpleJobTemplate", simpleJobTemplate);
         setValuesForMemberFields(batchConfiguration, "jobLauncher", jobLauncher);
@@ -112,7 +119,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "viewExecutor", viewExecutor);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
-        when(jobBuilderFactory.get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME)).thenReturn(jobBuilder);
+        when(jobBuilderFactory.get(any())).thenReturn(jobBuilder);
         when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
         when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
         Step treatmentStep = mock(Step.class);
@@ -130,17 +137,16 @@ public class BatchConfigurationTest {
 
     @Test
     public void shouldRunObsJob() throws Exception {
-        when(jobDefinition.getReaderSql()).thenReturn("Some sql");
-        when(jobDefinition.getTableName()).thenReturn("Some table");
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinition.getName()).thenReturn(OBS_DATA_FLATTENING_JOB_NAME);
 
         batchConfiguration.run();
 
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
-        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME);
+        verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
         verify(formStepConfigurer, times(1)).createTables();
-        verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder);
+        verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
 
     }
@@ -195,14 +201,15 @@ public class BatchConfigurationTest {
     public void shouldAddMetaDataStepGivenConceptReferenceSource() throws Exception {
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinition.getName()).thenReturn(OBS_DATA_FLATTENING_JOB_NAME);
         when(jobDefinitionReader.getConceptReferenceSource()).thenReturn("Bahmni-Internal");
 
         batchConfiguration.run();
 
-        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME);
+        verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(1)).createTables();
-        verify(metaDataStepConfigurer, times(1)).registerSteps(any(FlowBuilder.class));
+        verify(metaDataStepConfigurer, times(1)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
         verify(jobDefinitionReader, times(1)).getConceptReferenceSource();
         verify(jobDefinition, times(1)).getType();
     }
@@ -211,14 +218,15 @@ public class BatchConfigurationTest {
     public void shouldNotAddMetaDataStepGivenConceptReferenceSourceIsNull() throws Exception {
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinition.getName()).thenReturn(OBS_DATA_FLATTENING_JOB_NAME);
         when(jobDefinitionReader.getConceptReferenceSource()).thenReturn(null);
 
         batchConfiguration.run();
 
-        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME);
+        verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(0)).createTables();
-        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));
+        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
         verify(jobDefinitionReader, times(1)).getConceptReferenceSource();
         verify(jobDefinition, times(1)).getType();
     }
@@ -227,13 +235,14 @@ public class BatchConfigurationTest {
     public void shouldNotAddMetaDataStepGivenNoConceptReferenceSource() throws Exception {
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinition.getName()).thenReturn(OBS_DATA_FLATTENING_JOB_NAME);
 
         batchConfiguration.run();
 
-        verify(jobBuilderFactory, times(1)).get(BatchConfiguration.OBS_DATA_FLATTENING_JOB_NAME);
+        verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(metaDataStepConfigurer, times(0)).createTables();
-        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class));
+        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
     }
 
@@ -249,5 +258,20 @@ public class BatchConfigurationTest {
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(eavJobTemplate, times(1)).buildJob(jobDefinition);
         verify(jobDefinition, times(1)).getType();
+    }
+
+    @Test
+    public void shouldRunBacteriologyJob() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinition.getName()).thenReturn("Bacteriology Data");
+        when(jobDefinition.getType()).thenReturn("bacteriology");
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobBuilderFactory, times(1)).get("Bacteriology Data");
+        verify(bacteriologyStepConfigurer, times(1)).createTables();
+        verify(bacteriologyStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
     }
 }

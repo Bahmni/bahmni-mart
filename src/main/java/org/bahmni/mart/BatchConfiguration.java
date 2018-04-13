@@ -1,5 +1,6 @@
 package org.bahmni.mart;
 
+import org.bahmni.mart.config.BacteriologyStepConfigurer;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
@@ -45,8 +46,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     private static final Logger log = LoggerFactory.getLogger(BatchConfiguration.class);
 
-    protected static final String OBS_DATA_FLATTENING_JOB_NAME = "flattenObs";
-
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
 
@@ -55,6 +54,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     @Autowired
     private FormStepConfigurer formStepConfigurer;
+
+    @Autowired
+    private BacteriologyStepConfigurer bacteriologyStepConfigurer;
 
     @Autowired
     private SimpleJobTemplate simpleJobTemplate;
@@ -77,21 +79,41 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private ViewExecutor viewExecutor;
 
-    private Job buildObsJob() {
-        FlowBuilder<FlowJobBuilder> completeDataExport = jobBuilderFactory.get(OBS_DATA_FLATTENING_JOB_NAME)
+    private Job buildObsJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, getObsStepConfigurers(), jobDefinition);
+    }
+
+    private Job buildBacteriologyJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, getBacteriologyStepConfigurers(), jobDefinition);
+    }
+
+    private FlowBuilder<FlowJobBuilder> getFlowJobBuilderFlowBuilder(String jobName) {
+        //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
+        return jobBuilderFactory.get(jobName)
                 .incrementer(new RunIdIncrementer()).preventRestart()
                 .flow(treatmentRegistrationBaseExportStep.getStep());
-        //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
+    }
 
-        getStepConfigurers().forEach(stepConfigurer -> {
-            stepConfigurer.registerSteps(completeDataExport);
+    private Job getJob(FlowBuilder<FlowJobBuilder> completeDataExport,
+                       List<StepConfigurer> stepConfigurers, JobDefinition jobDefinition) {
+        stepConfigurers.forEach(stepConfigurer -> {
+            stepConfigurer.registerSteps(completeDataExport, jobDefinition);
             stepConfigurer.createTables();
         });
 
         return completeDataExport.end().build();
     }
 
-    private List<StepConfigurer> getStepConfigurers() {
+    private List<StepConfigurer> getBacteriologyStepConfigurers() {
+        ArrayList<StepConfigurer> stepConfigurers = new ArrayList<>();
+        stepConfigurers.add(bacteriologyStepConfigurer);
+
+        return stepConfigurers;
+    }
+
+    private List<StepConfigurer> getObsStepConfigurers() {
         ArrayList<StepConfigurer> stepConfigurers = new ArrayList<>();
         stepConfigurers.add(formStepConfigurer);
 
@@ -130,9 +152,11 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private Job getJobByType(JobDefinition jobDefinition) {
         switch (jobDefinition.getType()) {
           case "obs":
-              return buildObsJob();
+              return buildObsJob(jobDefinition);
           case "eav":
               return eavJobTemplate.buildJob(jobDefinition);
+          case "bacteriology":
+              return buildBacteriologyJob(jobDefinition);
           default:
               return simpleJobTemplate.buildJob(jobDefinition);
         }

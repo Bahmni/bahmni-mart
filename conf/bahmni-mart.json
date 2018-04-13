@@ -334,6 +334,11 @@
     }
   },
   {
+    "name": "Bacteriology Data",
+    "conceptReferenceSource": "MSF-INTERNAL",
+    "type": "bacteriology"
+  },
+  {
     "name": "Obs Data",
     "type": "obs",
     "separateTables": [

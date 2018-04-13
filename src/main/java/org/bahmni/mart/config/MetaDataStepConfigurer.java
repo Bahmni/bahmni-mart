@@ -1,6 +1,7 @@
 package org.bahmni.mart.config;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exports.MetaDataExportStep;
 import org.bahmni.mart.table.TableDataExtractor;
@@ -50,18 +51,19 @@ public class MetaDataStepConfigurer implements StepConfigurer {
     }
 
     @Override
-    public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport) {
-        createTableData();
+    public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition) {
+        createTableData(jobDefinition);
         MetaDataExportStep metaDataExportStep = metaDataExportStepObjectFactory.getObject();
+        metaDataExportStep.setJobDefinition(jobDefinition);
         metaDataExportStep.setTableData(tableData);
         completeDataExport.next(metaDataExportStep.getStep());
     }
 
-    private void createTableData() {
+    private void createTableData(JobDefinition jobDefinition) {
         String sql = convertResourceOutputToString(metaDataSqlResource);
         ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
         sql = BatchUtils.constructSqlWithParameter(sql,"conceptReferenceSource",
-                jobDefinitionReader.getConceptReferenceSource());
+                jobDefinition.getConceptReferenceSource());
         tableData = openmrsJDBCTemplate.query(sql + LIMIT, resultSetExtractor);
         tableData.setName("meta_data_dictionary");
     }

@@ -1,7 +1,6 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
@@ -26,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +39,7 @@ public class ObservationProcessorTest {
     private FormFieldTransformer formFieldTransformer;
 
     @Mock
-    private JobDefinitionReader jobDefinitionReader;
+    private JobDefinition jobDefinition;
 
     private List<Obs> obsList;
 
@@ -57,7 +55,6 @@ public class ObservationProcessorTest {
         form.setFormName(new Concept(1, "formName", 0));
 
         observationProcessor = new ObservationProcessor();
-        setValuesForMemberFields(observationProcessor, "jobDefinitionReader", jobDefinitionReader);
         setValuesForMemberFields(observationProcessor, "jdbcTemplate", namedParameterJdbcTemplate);
         setValuesForMemberFields(observationProcessor, "obsDetailSqlResource",
                 new ByteArrayResource("blah..blah..blah".getBytes()));
@@ -66,6 +63,7 @@ public class ObservationProcessorTest {
         setValuesForMemberFields(observationProcessor, "formObsSqlResource",
                 new ByteArrayResource("get..some..child".getBytes()));
         setValuesForMemberFields(observationProcessor, "formFieldTransformer", formFieldTransformer);
+        setValuesForMemberFields(observationProcessor, "jobDefinition", jobDefinition);
 
         obsList = new ArrayList<>();
         obsList.add(new Obs(1, null, new Concept(1, "systolic", 0), "120"));
@@ -183,11 +181,9 @@ public class ObservationProcessorTest {
         fieldIds.add(1);
         when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(fieldIds);
 
-        JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getType()).thenReturn("obs");
         String conceptReferenceSource = "BAHMNI-INTERNAL";
-        when(jobDefinitionReader.getConceptReferenceSource()).thenReturn(conceptReferenceSource);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition));
+        when(jobDefinition.getConceptReferenceSource()).thenReturn(conceptReferenceSource);
 
         observationProcessor.process(obsRow);
 

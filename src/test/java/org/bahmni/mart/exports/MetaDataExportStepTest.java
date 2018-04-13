@@ -1,7 +1,7 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Assert;
@@ -41,8 +41,7 @@ public class MetaDataExportStepTest {
     private ObjectFactory<TableRecordWriter> recordWriterObjectFactory;
 
     @Mock
-    private JobDefinitionReader jobDefinitionReader;
-
+    private JobDefinition jobDefinition;
 
     private MetaDataExportStep metaDataExportStep;
 
@@ -53,7 +52,7 @@ public class MetaDataExportStepTest {
         setValuesForMemberFields(metaDataExportStep, "dataSource", dataSource);
         setValuesForMemberFields(metaDataExportStep, "stepBuilderFactory", stepBuilderFactory);
         setValuesForMemberFields(metaDataExportStep, "recordWriterObjectFactory", recordWriterObjectFactory);
-        setValuesForMemberFields(metaDataExportStep, "jobDefinitionReader", jobDefinitionReader);
+        setValuesForMemberFields(metaDataExportStep, "jobDefinition", jobDefinition);
         setValuesForMemberFields(metaDataExportStep, "metaDataSqlResource",
                 new ByteArrayResource("some sql".getBytes()));
     }
@@ -77,7 +76,7 @@ public class MetaDataExportStepTest {
 
         Assert.assertNotNull(metaDataExportStepStep);
         Assert.assertEquals(expectedBaseExportStep, metaDataExportStepStep);
-        verify(jobDefinitionReader,times(1)).getConceptReferenceSource();
+        verify(jobDefinition,times(1)).getConceptReferenceSource();
         verify(recordWriterObjectFactory, times(1)).getObject();
     }
 }

@@ -1,5 +1,6 @@
 package org.bahmni.mart.exports;
 
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
@@ -40,6 +41,7 @@ public class ObservationExportStep {
     @Autowired
     private ObjectFactory<DatabaseObsWriter> databaseObsWriterObjectFactory;
 
+    private JobDefinition jobDefinition;
 
     public Step getStep() {
         return stepBuilderFactory.get(getStepName())
@@ -61,6 +63,7 @@ public class ObservationExportStep {
 
     private ObservationProcessor observationProcessor() {
         ObservationProcessor observationProcessor = observationProcessorFactory.getObject();
+        observationProcessor.setJobDefinition(jobDefinition);
         observationProcessor.setForm(form);
         return observationProcessor;
     }
@@ -79,5 +82,9 @@ public class ObservationExportStep {
         stepNumber++;
         String formName = String.format("Step-%d %s", stepNumber, form.getFormName().getName());
         return formName.substring(0, Math.min(formName.length(), 100));
+    }
+
+    public void setJobDefinition(JobDefinition jobDefinition) {
+        this.jobDefinition = jobDefinition;
     }
 }
