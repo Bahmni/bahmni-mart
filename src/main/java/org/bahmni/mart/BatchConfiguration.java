@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -100,20 +99,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         stepConfigurer.createTables();
 
         return completeDataExport.end().build();
-    }
-
-    private List<StepConfigurer> getBacteriologyStepConfigurers() {
-        ArrayList<StepConfigurer> stepConfigurers = new ArrayList<>();
-        stepConfigurers.add(bacteriologyStepConfigurer);
-
-        return stepConfigurers;
-    }
-
-    private List<StepConfigurer> getObsStepConfigurers() {
-        ArrayList<StepConfigurer> stepConfigurers = new ArrayList<>();
-        stepConfigurers.add(formStepConfigurer);
-
-        return stepConfigurers;
     }
 
     @Override
