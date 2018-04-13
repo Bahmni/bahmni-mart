@@ -4,6 +4,7 @@ import org.bahmni.mart.config.BacteriologyStepConfigurer;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
+import org.bahmni.mart.config.OrderStepConfigurer;
 import org.bahmni.mart.config.StepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
@@ -76,6 +77,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private ViewExecutor viewExecutor;
 
+    @Autowired
+    private OrderStepConfigurer orderStepConfigurer;
+
     private Job buildObsJob(JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
         return getJob(completeDataExport, formStepConfigurer, jobDefinition);
@@ -138,9 +142,16 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
               return buildBacteriologyJob(jobDefinition);
           case "metadata":
               return buildMetaDataJob(jobDefinition);
+          case "orders":
+              return buildOrdersJob(jobDefinition);
           default:
               return simpleJobTemplate.buildJob(jobDefinition);
         }
+    }
+
+    private Job buildOrdersJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, orderStepConfigurer, jobDefinition);
     }
 
     private Job buildMetaDataJob(JobDefinition jobDefinition) {

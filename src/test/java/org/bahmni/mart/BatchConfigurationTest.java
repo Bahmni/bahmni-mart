@@ -5,6 +5,7 @@ import org.bahmni.mart.config.BacteriologyStepConfigurer;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
+import org.bahmni.mart.config.OrderStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
@@ -93,6 +94,9 @@ public class BatchConfigurationTest {
     @Mock
     private MetaDataStepConfigurer metaDataStepConfigurer;
 
+    @Mock
+    private OrderStepConfigurer orderStepConfigurer;
+
     private JobFlowBuilder jobFlowBuilder;
 
     private BatchConfiguration batchConfiguration;
@@ -116,6 +120,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "eavJobTemplate", eavJobTemplate);
         setValuesForMemberFields(batchConfiguration, "martJSONReader", martJSONReader);
         setValuesForMemberFields(batchConfiguration, "viewExecutor", viewExecutor);
+        setValuesForMemberFields(batchConfiguration, "orderStepConfigurer", orderStepConfigurer);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(any())).thenReturn(jobBuilder);
@@ -236,6 +241,21 @@ public class BatchConfigurationTest {
         verify(jobBuilderFactory, times(1)).get("MetaData Dictionary");
         verify(metaDataStepConfigurer, times(1)).createTables();
         verify(metaDataStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+    }
+
+    @Test
+    public void shouldRunOrdersJob() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinition.getName()).thenReturn("Order Data");
+        when(jobDefinition.getType()).thenReturn("orders");
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobBuilderFactory, times(1)).get("Order Data");
+        verify(orderStepConfigurer, times(1)).createTables();
+        verify(orderStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
     }
 }
