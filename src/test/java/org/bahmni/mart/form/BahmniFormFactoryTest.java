@@ -222,8 +222,7 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldReturnEmptySeparateTableListWhenThereIsNoObsJob() throws Exception {
-        when(obsJobDefinition.isEmpty()).thenReturn(true);
-
+        when(separateTableConfigHelper.getAllSeparateTableConceptNames()).thenReturn(Collections.emptyList());
         Field allSeparateTableConcepts = bahmniFormFactory.getClass().getDeclaredField("allSeparateTableConcepts");
         allSeparateTableConcepts.setAccessible(true);
 

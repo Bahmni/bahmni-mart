@@ -77,7 +77,7 @@ public class BahmniFormFactory {
         JobDefinition obsJobDefinition = getJobDefinitionByType(jobDefinitions, OBS_JOB_TYPE);
         JobDefinition bacteriologyJobDefinition = getJobDefinitionByType(jobDefinitions, BACTERIOLOGY_JOB_TYPE);
 
-        this.allSeparateTableConcepts = obsJobDefinition.isEmpty() ? EMPTY_LIST :
+        this.allSeparateTableConcepts = allSeparateTableConceptNames.isEmpty() ? EMPTY_LIST :
                 obsService.getConceptsByNames(allSeparateTableConceptNames);
         this.ignoreConcepts = isJobWithOutIgnoreColumns(obsJobDefinition) ? EMPTY_LIST :
                 obsService.getConceptsByNames(getIgnoreConceptNamesForJob(obsJobDefinition));
