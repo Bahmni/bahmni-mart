@@ -55,6 +55,7 @@ public class FreeMarkerEvaluatorIT extends AbstractBaseBatchIT {
         BahmniForm child = new BahmniForm();
         child.setParent(parent);
         child.setFormName(new Concept(10, "Systolic", 1));
+        child.setRootForm(parent);
         child.setDepthToParent(2);
 
 
@@ -75,11 +76,13 @@ public class FreeMarkerEvaluatorIT extends AbstractBaseBatchIT {
         BahmniForm parent = new BahmniForm();
         parent.setParent(geandParent);
         parent.setFormName(new Concept(10, "Systolic", 1));
+        parent.setRootForm(geandParent);
         parent.setDepthToParent(2);
 
         BahmniForm child = new BahmniForm();
         child.setParent(parent);
         child.setFormName(new Concept(12, "Systolic Notes", 0));
+        child.setRootForm(parent);
         child.setDepthToParent(3);
 
 
