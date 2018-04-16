@@ -15,14 +15,26 @@ addons:
 jobs:
   include:
     - stage : compile
-      script: ./scripts/compile.sh
+      script: ./scripts/travis/compile.sh
     - stage : test
-      script: ./scripts/test.sh
+      script: ./scripts/travis/test.sh
+    - stage:  createZip
+      script: ./scripts/travis/createArtifacts.sh
     - stage : buildDocker
-      script: ./scripts/buildDocker.sh
+      script: ./scripts/travis/buildDocker.sh
 
 stages:
-      - compile
-      - test
-      - buildDocker
+  - compile
+  - test
+  - buildDocker
 
+deploy:
+  provider: s3
+  access_key_id:
+    secure: $AWS_SECURE_ACCESS_KEY_ID
+  secret_access_key:
+    secure: $AWS_SECURE_ACCESS_KEY
+  bucket: bahmni-mart
+  skip_cleanup: true
+  local-dir: build/artifacts
+  upload-dir: travis-builds
