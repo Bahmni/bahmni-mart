@@ -18,9 +18,8 @@ jobs:
       script: ./scripts/travis/compile.sh
     - stage : test
       script: ./scripts/travis/test.sh
-    - stage:  createZip
+    - stage: deployToAWS
       script: ./scripts/travis/createArtifacts.sh
-    - stage: deploy
       deploy:
         provider: s3
         access_key_id:
@@ -29,7 +28,7 @@ jobs:
           secure: $AWS_SECURE_ACCESS_KEY
         bucket: bahmni-mart
         skip_cleanup: true
-        local-dir: build/artifacts
+        local-dir: ./build/artifacts
         upload-dir: travis-builds
         acl: public_read
     - stage : buildDocker
@@ -38,6 +37,5 @@ jobs:
 stages:
   - compile
   - test
-  - createZip
-  - deploy
+  - deployToAWS
   - buildDocker
