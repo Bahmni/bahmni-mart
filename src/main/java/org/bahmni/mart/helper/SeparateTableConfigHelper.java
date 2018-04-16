@@ -3,6 +3,7 @@ package org.bahmni.mart.helper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForBacteriologyJob;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForObsJob;
 
 @Component
@@ -94,8 +96,10 @@ public class SeparateTableConfigHelper {
 
     public List<String> getAllSeparateTableConceptNames() {
         List<String> multiSelectAndAddMoreConceptsNames = getAddMoreAndMultiSelectConceptNames();
+        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
         List<String> separateTableConceptsNames =
-                getSeparateTableNamesForObsJob(jobDefinitionReader.getJobDefinitions());
+                getSeparateTableNamesForObsJob(jobDefinitions);
+        separateTableConceptsNames.addAll(getSeparateTableNamesForBacteriologyJob(jobDefinitions));
 
         for (String conceptName : multiSelectAndAddMoreConceptsNames) {
             if (!separateTableConceptsNames.contains(conceptName)) {

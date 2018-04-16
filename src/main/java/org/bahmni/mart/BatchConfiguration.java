@@ -4,6 +4,7 @@ import org.bahmni.mart.config.BacteriologyStepConfigurer;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
+import org.bahmni.mart.config.OrderStepConfigurer;
 import org.bahmni.mart.config.StepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
@@ -32,13 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 @Configuration
 @EnableBatchProcessing
@@ -79,14 +77,17 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private ViewExecutor viewExecutor;
 
+    @Autowired
+    private OrderStepConfigurer orderStepConfigurer;
+
     private Job buildObsJob(JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, getObsStepConfigurers(), jobDefinition);
+        return getJob(completeDataExport, formStepConfigurer, jobDefinition);
     }
 
     private Job buildBacteriologyJob(JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, getBacteriologyStepConfigurers(), jobDefinition);
+        return getJob(completeDataExport, bacteriologyStepConfigurer, jobDefinition);
     }
 
     private FlowBuilder<FlowJobBuilder> getFlowJobBuilderFlowBuilder(String jobName) {
@@ -97,29 +98,11 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     }
 
     private Job getJob(FlowBuilder<FlowJobBuilder> completeDataExport,
-                       List<StepConfigurer> stepConfigurers, JobDefinition jobDefinition) {
-        stepConfigurers.forEach(stepConfigurer -> {
-            stepConfigurer.registerSteps(completeDataExport, jobDefinition);
-            stepConfigurer.createTables();
-        });
+                       StepConfigurer stepConfigurer, JobDefinition jobDefinition) {
+        stepConfigurer.registerSteps(completeDataExport, jobDefinition);
+        stepConfigurer.createTables();
 
         return completeDataExport.end().build();
-    }
-
-    private List<StepConfigurer> getBacteriologyStepConfigurers() {
-        ArrayList<StepConfigurer> stepConfigurers = new ArrayList<>();
-        stepConfigurers.add(bacteriologyStepConfigurer);
-
-        return stepConfigurers;
-    }
-
-    private List<StepConfigurer> getObsStepConfigurers() {
-        ArrayList<StepConfigurer> stepConfigurers = new ArrayList<>();
-        stepConfigurers.add(formStepConfigurer);
-
-        if (!isEmpty(jobDefinitionReader.getConceptReferenceSource()))
-            stepConfigurers.add(metaDataStepConfigurer);
-        return stepConfigurers;
     }
 
     @Override
@@ -157,8 +140,22 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
               return eavJobTemplate.buildJob(jobDefinition);
           case "bacteriology":
               return buildBacteriologyJob(jobDefinition);
+          case "metadata":
+              return buildMetaDataJob(jobDefinition);
+          case "orders":
+              return buildOrdersJob(jobDefinition);
           default:
               return simpleJobTemplate.buildJob(jobDefinition);
         }
+    }
+
+    private Job buildOrdersJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, orderStepConfigurer, jobDefinition);
+    }
+
+    private Job buildMetaDataJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, metaDataStepConfigurer, jobDefinition);
     }
 }

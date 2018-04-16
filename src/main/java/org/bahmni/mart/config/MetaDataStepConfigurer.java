@@ -2,7 +2,6 @@ package org.bahmni.mart.config;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exports.MetaDataExportStep;
 import org.bahmni.mart.table.TableDataExtractor;
 import org.bahmni.mart.table.TableGeneratorStep;
@@ -39,9 +38,6 @@ public class MetaDataStepConfigurer implements StepConfigurer {
 
     @Autowired
     private TableGeneratorStep tableGeneratorStep;
-
-    @Autowired
-    private JobDefinitionReader jobDefinitionReader;
 
     private TableData tableData;
 

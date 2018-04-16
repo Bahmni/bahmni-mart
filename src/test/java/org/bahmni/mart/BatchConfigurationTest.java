@@ -5,6 +5,7 @@ import org.bahmni.mart.config.BacteriologyStepConfigurer;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
+import org.bahmni.mart.config.OrderStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
@@ -25,7 +26,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.JobFlowBuilder;
@@ -94,6 +94,9 @@ public class BatchConfigurationTest {
     @Mock
     private MetaDataStepConfigurer metaDataStepConfigurer;
 
+    @Mock
+    private OrderStepConfigurer orderStepConfigurer;
+
     private JobFlowBuilder jobFlowBuilder;
 
     private BatchConfiguration batchConfiguration;
@@ -117,6 +120,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "eavJobTemplate", eavJobTemplate);
         setValuesForMemberFields(batchConfiguration, "martJSONReader", martJSONReader);
         setValuesForMemberFields(batchConfiguration, "viewExecutor", viewExecutor);
+        setValuesForMemberFields(batchConfiguration, "orderStepConfigurer", orderStepConfigurer);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(any())).thenReturn(jobBuilder);
@@ -130,7 +134,6 @@ public class BatchConfigurationTest {
         FlowJobBuilder flowJobBuilder = mock(FlowJobBuilder.class);
         when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
         when(flowJobBuilder.build()).thenReturn(job);
-        when(jobDefinitionReader.getConceptReferenceSource()).thenReturn("");
         when(martJSONReader.getViewDefinitions()).thenReturn(new ArrayList<>());
         when(JobDefinitionValidator.validate(anyListOf(JobDefinition.class))).thenReturn(true);
     }
@@ -198,55 +201,6 @@ public class BatchConfigurationTest {
     }
 
     @Test
-    public void shouldAddMetaDataStepGivenConceptReferenceSource() throws Exception {
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
-        when(jobDefinition.getType()).thenReturn("obs");
-        when(jobDefinition.getName()).thenReturn(OBS_DATA_FLATTENING_JOB_NAME);
-        when(jobDefinitionReader.getConceptReferenceSource()).thenReturn("Bahmni-Internal");
-
-        batchConfiguration.run();
-
-        verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
-        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
-        verify(metaDataStepConfigurer, times(1)).createTables();
-        verify(metaDataStepConfigurer, times(1)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
-        verify(jobDefinitionReader, times(1)).getConceptReferenceSource();
-        verify(jobDefinition, times(1)).getType();
-    }
-
-    @Test
-    public void shouldNotAddMetaDataStepGivenConceptReferenceSourceIsNull() throws Exception {
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
-        when(jobDefinition.getType()).thenReturn("obs");
-        when(jobDefinition.getName()).thenReturn(OBS_DATA_FLATTENING_JOB_NAME);
-        when(jobDefinitionReader.getConceptReferenceSource()).thenReturn(null);
-
-        batchConfiguration.run();
-
-        verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
-        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
-        verify(metaDataStepConfigurer, times(0)).createTables();
-        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
-        verify(jobDefinitionReader, times(1)).getConceptReferenceSource();
-        verify(jobDefinition, times(1)).getType();
-    }
-
-    @Test
-    public void shouldNotAddMetaDataStepGivenNoConceptReferenceSource() throws Exception {
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
-        when(jobDefinition.getType()).thenReturn("obs");
-        when(jobDefinition.getName()).thenReturn(OBS_DATA_FLATTENING_JOB_NAME);
-
-        batchConfiguration.run();
-
-        verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
-        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
-        verify(metaDataStepConfigurer, times(0)).createTables();
-        verify(metaDataStepConfigurer, times(0)).registerSteps(any(FlowBuilder.class), any(JobDefinition.class));
-        verify(jobDefinitionReader, times(1)).getJobDefinitions();
-    }
-
-    @Test
     public void shouldRunEavJob() throws Exception {
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getType()).thenReturn("eav");
@@ -272,6 +226,36 @@ public class BatchConfigurationTest {
         verify(jobBuilderFactory, times(1)).get("Bacteriology Data");
         verify(bacteriologyStepConfigurer, times(1)).createTables();
         verify(bacteriologyStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+    }
+
+    @Test
+    public void shouldRunMetaDataDictionaryJob() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinition.getName()).thenReturn("MetaData Dictionary");
+        when(jobDefinition.getType()).thenReturn("metadata");
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobBuilderFactory, times(1)).get("MetaData Dictionary");
+        verify(metaDataStepConfigurer, times(1)).createTables();
+        verify(metaDataStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+    }
+
+    @Test
+    public void shouldRunOrdersJob() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinition.getName()).thenReturn("Order Data");
+        when(jobDefinition.getType()).thenReturn("orders");
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobBuilderFactory, times(1)).get("Order Data");
+        verify(orderStepConfigurer, times(1)).createTables();
+        verify(orderStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
     }
 }

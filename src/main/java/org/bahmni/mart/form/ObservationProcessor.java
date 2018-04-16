@@ -2,7 +2,6 @@ package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
@@ -53,9 +52,6 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private JobDefinitionReader jobDefinitionReader;
 
     @Override
     public List<Obs> process(Map<String, Object> obsRow) throws Exception {

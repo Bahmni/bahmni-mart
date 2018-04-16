@@ -13,12 +13,15 @@ import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 
+import static org.bahmni.mart.config.job.JobDefinitionUtil.BACTERIOLOGY_JOB_TYPE;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.OBS_JOB_TYPE;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 
 @Component
 public class BahmniFormFactory {
+
+    private static final List<Concept> EMPTY_LIST = Collections.emptyList();
 
     @Autowired
     private ObsService obsService;
@@ -41,9 +44,19 @@ public class BahmniFormFactory {
         bahmniForm.setFormName(concept);
         bahmniForm.setDepthToParent(depth);
         bahmniForm.setParent(parentForm);
+        bahmniForm.setRootForm(getRootFormFor(parentForm));
 
         constructFormFields(concept, bahmniForm, depth);
         return bahmniForm;
+    }
+
+    private BahmniForm getRootFormFor(BahmniForm form) {
+        if (form == null) {
+            return null;
+        } else if (form.getDepthToParent() == 0) {
+            return form;
+        }
+        return getRootFormFor(form.getParent());
     }
 
     private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth) {
@@ -70,18 +83,22 @@ public class BahmniFormFactory {
     @PostConstruct
     public void postConstruct() {
         List<String> allSeparateTableConceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
-        JobDefinition obsJobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), OBS_JOB_TYPE);
+        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
+        JobDefinition obsJobDefinition = getJobDefinitionByType(jobDefinitions, OBS_JOB_TYPE);
+        JobDefinition bacteriologyJobDefinition = getJobDefinitionByType(jobDefinitions, BACTERIOLOGY_JOB_TYPE);
 
-        this.allSeparateTableConcepts = obsJobDefinition.isEmpty() ? Collections.emptyList() :
+        this.allSeparateTableConcepts = allSeparateTableConceptNames.isEmpty() ? EMPTY_LIST :
                 obsService.getConceptsByNames(allSeparateTableConceptNames);
-        this.ignoreConcepts = isObsJobWithOutIgnoreColumns(obsJobDefinition) ? Collections.emptyList() :
+        this.ignoreConcepts = isJobWithOutIgnoreColumns(obsJobDefinition) ? EMPTY_LIST :
                 obsService.getConceptsByNames(getIgnoreConceptNamesForJob(obsJobDefinition));
-
+        List<Concept> bacteriologyIgnoreConcepts = isJobWithOutIgnoreColumns(bacteriologyJobDefinition) ?
+                EMPTY_LIST : obsService.getConceptsByNames(getIgnoreConceptNamesForJob(bacteriologyJobDefinition));
+        ignoreConcepts.addAll(bacteriologyIgnoreConcepts);
         if (obsJobDefinition.getIgnoreAllFreeTextConcepts())
             ignoreConcepts.addAll(obsService.getFreeTextConcepts());
     }
 
-    private Boolean isObsJobWithOutIgnoreColumns(JobDefinition jobDefinition) {
+    private Boolean isJobWithOutIgnoreColumns(JobDefinition jobDefinition) {
         return getIgnoreConceptNamesForJob(jobDefinition).isEmpty();
     }
 }

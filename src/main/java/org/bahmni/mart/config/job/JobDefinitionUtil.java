@@ -18,6 +18,7 @@ public class JobDefinitionUtil {
     private static final String TO_SPLIT_FROM = "(?i)from";
     private static final String TO_SPLIT_SELECT = "(?i)select";
     public static final String OBS_JOB_TYPE = "obs";
+    public static final String BACTERIOLOGY_JOB_TYPE = "bacteriology";
 
     public static String getReaderSQLByIgnoringColumns(List<String> columnsToIgnore, String readerSQL) {
         if (StringUtils.isEmpty(readerSQL) || CollectionUtils.isEmpty(columnsToIgnore)) {
@@ -78,6 +79,11 @@ public class JobDefinitionUtil {
         }
         Resource readerSqlResource = ReaderSQLFileLoader.loadResource(jobDefinition.getReaderSqlFilePath());
         return BatchUtils.convertResourceOutputToString(readerSqlResource);
+    }
+
+    public static List<String> getSeparateTableNamesForBacteriologyJob(List<JobDefinition> jobDefinitions) {
+        JobDefinition bacteriologyJob = getJobDefinitionByType(jobDefinitions, BACTERIOLOGY_JOB_TYPE);
+        return getDefaultIfNotPresent(bacteriologyJob.getSeparateTables());
     }
 
 }
