@@ -20,11 +20,11 @@ public abstract class AbstractBaseBatchIT {
 
     @Before
     public void setUp() throws Exception {
-        martJdbcTemplate.execute("DROP SCHEMA PUBLIC CASCADE;");
+        martJdbcTemplate.execute("DROP SCHEMA IF EXISTS PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
     }
 
     @After
     public void tearDown() throws Exception {
-        martJdbcTemplate.execute("DROP SCHEMA PUBLIC CASCADE");
+        martJdbcTemplate.execute("DROP SCHEMA IF EXISTS PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
     }
 }

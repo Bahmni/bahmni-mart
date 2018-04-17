@@ -42,7 +42,7 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
         tableGeneratorStep.createTables(Arrays.asList(tableData));
         martJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
-                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='PUBLIC';")
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 
         assertEquals(3, tableDataColumns.size());
@@ -65,7 +65,7 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
         tableGeneratorStep.createTables(Arrays.asList(referenceTableData, tableData));
         martJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
-                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='PUBLIC';")
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 
         assertEquals(3, tableDataColumns.size());
@@ -75,7 +75,7 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
 
         martJdbcTemplate.queryForList("SELECT * FROM \"foreignkeytable\"");
         List<Object> referenceTableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
-                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'foreignkeytable' AND TABLE_SCHEMA='PUBLIC';")
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'foreignkeytable' AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 
         assertEquals(1, referenceTableDataColumns.size());

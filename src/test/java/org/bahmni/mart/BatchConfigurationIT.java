@@ -24,7 +24,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     private Map<String, String> expectedPatientList;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         expectedPatientList = new HashMap<>();
         expectedPatientList.put("124", "Test");
         expectedPatientList.put("125", "Unknown");
@@ -46,7 +47,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         batchConfiguration.run();
 
         List<Map<String, Object>> tables = martJdbcTemplate.queryForList("SELECT TABLE_NAME FROM " +
-                "INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='PUBLIC' AND TABLE_NAME <> 'test'");
+                "INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='public' AND TABLE_NAME <> 'test'");
         assertTrue(tables.size() >= 6);
 
         List<String> tableNames = tables.stream().map(table -> table.get("TABLE_NAME").toString())
@@ -74,7 +75,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
                 "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_allergy_status_test1'" +
-                " AND TABLE_SCHEMA='PUBLIC';")
+                " AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
         List<Map<String, Object>> patientList = martJdbcTemplate
                 .queryForList("SELECT * FROM \"patient_allergy_status_test1\"");
@@ -96,7 +97,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
                 "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_details'" +
-                " AND TABLE_SCHEMA='PUBLIC';")
+                " AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
         List<String> columnsName = tableDataColumns.stream().map(name -> name.toString().toLowerCase())
                 .collect(Collectors.toList());
@@ -110,7 +111,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         List<Map<String, Object>> view = martJdbcTemplate.queryForList("SELECT * from test_view");
         Set<String> columnNames = view.get(0).keySet();
         assertEquals(2, columnNames.size());
-        assertThat(Arrays.asList("PATIENT_ID", "ALLERGY_STATUS"), containsInAnyOrder(columnNames.toArray()));
+        assertThat(Arrays.asList("patient_id", "allergy_status"), containsInAnyOrder(columnNames.toArray()));
         assertEquals(10, view.size());
         verifyRecords(view);
     }
@@ -141,7 +142,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         for (String tableName : tableMap.keySet()) {
             String sql = String.format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' " +
-                    "AND TABLE_SCHEMA='PUBLIC';", tableName);
+                    "AND TABLE_SCHEMA='public';", tableName);
             List<String> columnNames = martJdbcTemplate.queryForList(sql).stream()
                     .map(columns -> columns.get("COLUMN_NAME").toString().toLowerCase()).collect(Collectors.toList());
 

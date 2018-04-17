@@ -27,6 +27,7 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
     @Override
     @After
     public void tearDown() throws Exception {
+        super.tearDown();
         FileUtils.deleteQuietly(new File(emptyDefaultConfPath));
         FileUtils.deleteQuietly(new File(emptyImplConfPath));
     }

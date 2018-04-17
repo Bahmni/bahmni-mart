@@ -1,3 +1,7 @@
+SET FOREIGN_KEY_CHECKS=0;
+
+
+DROP TABLE IF EXISTS test_openmrs.concept_class CASCADE;
 CREATE TABLE concept_class
 (
   concept_class_id INT AUTO_INCREMENT
@@ -17,6 +21,7 @@ CREATE TABLE concept_class
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS concept_datatype CASCADE;
 CREATE TABLE concept_datatype
 (
   concept_datatype_id INT AUTO_INCREMENT
@@ -35,6 +40,7 @@ CREATE TABLE concept_datatype
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS concept CASCADE;
 CREATE TABLE concept
 (
   concept_id    INT AUTO_INCREMENT PRIMARY KEY,
@@ -62,6 +68,7 @@ CREATE TABLE concept
   FOREIGN KEY (class_id) REFERENCES concept_class (concept_class_id)
 );
 
+DROP TABLE IF EXISTS concept_name CASCADE;
 CREATE TABLE concept_name
 (
   concept_name_id   INT AUTO_INCREMENT
@@ -86,6 +93,7 @@ CREATE TABLE concept_name
   FOREIGN KEY (concept_id) REFERENCES concept (concept_id)
 );
 
+DROP TABLE IF EXISTS concept_set CASCADE;
 CREATE TABLE concept_set
 (
   concept_set_id INT AUTO_INCREMENT
@@ -102,6 +110,7 @@ CREATE TABLE concept_set
   FOREIGN KEY (concept_set) REFERENCES concept (concept_id)
 );
 
+DROP TABLE IF EXISTS concept_map_type CASCADE;
 CREATE TABLE concept_map_type
 (
   concept_map_type_id INT AUTO_INCREMENT
@@ -124,7 +133,7 @@ CREATE TABLE concept_map_type
   UNIQUE (uuid)
 );
 
-
+DROP TABLE IF EXISTS concept_reference_source CASCADE;
 CREATE TABLE concept_reference_source
 (
   concept_source_id INT AUTO_INCREMENT
@@ -150,7 +159,7 @@ CREATE TABLE concept_reference_source
   UNIQUE (unique_id)
 );
 
-
+DROP TABLE IF EXISTS concept_reference_term CASCADE;
 CREATE TABLE concept_reference_term
 (
   concept_reference_term_id INT AUTO_INCREMENT
@@ -176,7 +185,7 @@ CREATE TABLE concept_reference_term
 
 );
 
-
+DROP TABLE IF EXISTS concept_reference_map CASCADE;
 CREATE TABLE concept_reference_map
 (
   concept_map_id            INT AUTO_INCREMENT
@@ -199,6 +208,7 @@ CREATE TABLE concept_reference_map
   FOREIGN KEY (concept_id) REFERENCES concept (concept_id)
 );
 
+DROP TABLE IF EXISTS visit_attribute_type CASCADE;
 CREATE TABLE visit_attribute_type
 (
   visit_attribute_type_id INT AUTO_INCREMENT
@@ -224,6 +234,7 @@ CREATE TABLE visit_attribute_type
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS program_attribute_type CASCADE;
 CREATE TABLE program_attribute_type
 (
   program_attribute_type_id INT AUTO_INCREMENT
@@ -251,7 +262,7 @@ CREATE TABLE program_attribute_type
   UNIQUE (uuid)
 );
 
-
+DROP TABLE IF EXISTS person CASCADE;
 CREATE TABLE person
 (
   person_id           INT AUTO_INCREMENT
@@ -277,6 +288,7 @@ CREATE TABLE person
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS program CASCADE;
 CREATE TABLE program
 (
   program_id          INT AUTO_INCREMENT
@@ -295,6 +307,7 @@ CREATE TABLE program
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS patient_state CASCADE;
 CREATE TABLE patient_state
 (
   patient_state_id   INT AUTO_INCREMENT
@@ -316,6 +329,7 @@ CREATE TABLE patient_state
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS program_workflow_state CASCADE;
 CREATE TABLE program_workflow_state
 (
   program_workflow_state_id INT AUTO_INCREMENT
@@ -334,6 +348,7 @@ CREATE TABLE program_workflow_state
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS person_attribute_type CASCADE;
 CREATE TABLE person_attribute_type
 (
   person_attribute_type_id INT AUTO_INCREMENT
@@ -358,6 +373,7 @@ CREATE TABLE person_attribute_type
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS patient CASCADE;
 CREATE TABLE patient
 (
   patient_id     INT                           NOT NULL
@@ -373,7 +389,7 @@ CREATE TABLE patient
   allergy_status VARCHAR(50) DEFAULT 'Unknown' NOT NULL
 );
 
-
+DROP TABLE IF EXISTS encounter CASCADE;
 CREATE TABLE encounter
 (
   encounter_id       INT AUTO_INCREMENT
@@ -397,6 +413,7 @@ CREATE TABLE encounter
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS obs CASCADE;
 CREATE TABLE obs
 (
   obs_id                  INT AUTO_INCREMENT
@@ -444,6 +461,7 @@ CREATE TABLE obs
   FOREIGN KEY (previous_version) REFERENCES obs (obs_id)
 );
 
+DROP TABLE IF EXISTS patient_program CASCADE;
 CREATE TABLE patient_program
 (
   patient_program_id INT AUTO_INCREMENT
@@ -467,6 +485,7 @@ CREATE TABLE patient_program
   UNIQUE (uuid)
 );
 
+DROP VIEW IF EXISTS concept_view CASCADE;
 CREATE VIEW concept_view AS
   SELECT
     concept.concept_id      AS concept_id,
@@ -490,7 +509,7 @@ CREATE VIEW concept_view AS
     concept_datatype
       ON ((concept_datatype.concept_datatype_id = concept.datatype_id)));
 
-
+DROP VIEW IF EXISTS concept_reference_term_map_view CASCADE;
 CREATE VIEW concept_reference_term_map_view AS
   SELECT
     concept_reference_map.concept_id AS concept_id,
@@ -510,5 +529,5 @@ CREATE VIEW concept_reference_term_map_view AS
            concept_reference_term.concept_source_id)));
 
 
-
+SET FOREIGN_KEY_CHECKS=1;
 
