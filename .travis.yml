@@ -6,6 +6,8 @@ jdk:
 
 services:
   - docker
+  - postgresql
+  - mysql
 
 addons:
   apt:
@@ -17,6 +19,9 @@ jobs:
     - stage : compile
       script: ./scripts/travis/compile.sh
     - stage : test
+      before-script:
+        - psql -c 'CREATE USER test_user WITH PASSWORD 'password' NOCREATEROLE SUPERUSER; CREATE DATABASE test_analytics WITH OWNER test_user;' -U postgres
+        - mysql -e "CREATE DATABASE IF NOT EXISTS test_openmrs; CREATE USER 'test_user'@'%' IDENTIFIED BY 'password';"
       script: ./scripts/travis/test.sh
     - stage: deployToAWS
       script: ./scripts/travis/createArtifacts.sh
