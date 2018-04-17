@@ -39,6 +39,10 @@ jacocoTestReport {
     dependsOn "test"
 }
 
+test {
+    systemProperties System.properties
+}
+
 jacocoTestCoverageVerification {
     dependsOn "jacocoTestReport"
     violationRules {
