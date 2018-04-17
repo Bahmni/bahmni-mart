@@ -1,0 +1,2 @@
+CREATE USER test_user WITH PASSWORD 'password' NOCREATEROLE SUPERUSER;
+CREATE DATABASE test_analytics WITH OWNER test_user;
