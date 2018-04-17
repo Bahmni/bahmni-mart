@@ -11,6 +11,4 @@ docker tag $POSTGRESREPO:$COMMIT $POSTGRESREPO:$TAG
 docker tag $POSTGRESREPO:$COMMIT $POSTGRESREPO:postgres-$TRAVIS_BUILD_NUMBER
 docker push $POSTGRESREPO
 
-if [ "$?" != 0 ]; then
-   exit "$?"
-fi
+exit "$?"
