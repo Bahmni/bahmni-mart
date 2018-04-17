@@ -55,7 +55,6 @@ To run all chesks present in bahmni mart run the following command
 To deploy/install bahmni-mart using docker follow the steps given below
 * install docker-1.7.1
 * install docker-compose-1.5.2
-* set **BAHMNI_MART_ZIP_URL** environment variable
 * download **bahmni-mart/scripts/install.sh** from github
 * run ```sh install.sh```
 * download **bahmni-mart/docker-compose.yml** from github
