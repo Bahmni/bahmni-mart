@@ -3,4 +3,3 @@
 ./gradlew -Dspring.profiles.active=ci clean check
 
 exit "$?"
-
