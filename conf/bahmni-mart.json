@@ -215,6 +215,13 @@
       "tableName": "current_bed_details"
     },
     {
+      "name": "Conditions",
+      "type": "customSql",
+      "readerSql": "SELECT condition_id, previous_condition_id, patient_id, status, coalesce(condition_non_coded, cv.concept_full_name) AS condition_name, CASE WHEN condition_non_coded IS NULL THEN TRUE ELSE FALSE END AS is_coded_condition_name, onset_date, additional_detail, end_date, end_reason, creator, conditions.date_created FROM conditions INNER JOIN concept_view cv ON cv.concept_id = conditions.concept_id AND conditions.voided = 0 AND cv.retired = 0",
+      "chunkSizeToRead": "500",
+      "tableName": "conditions"
+    },
+    {
       "name": "Person Attributes",
       "type": "eav",
       "chunkSizeToRead": "500",
@@ -345,29 +352,6 @@
       "name": "MetaData Dictionary",
       "type": "metadata",
       "conceptReferenceSource": "MSF-INTERNAL"
-    },
-    {
-      "name": "Obs Data",
-      "type": "obs",
-      "separateTables": [
-        "PA, Location of Assessment",
-        "SMH, Pain Assessment",
-        "FV, Outcomes FV"
-      ],
-      "conceptReferenceSource": "MSF-INTERNAL",
-      "ignoreAllFreeTextConcepts": true,
-      "columnsToIgnore": [
-        "Video",
-        "Image",
-        "Documents, Image Upload",
-        "Documents, Image",
-        "Radiology Documents",
-        "FSTG, Comments",
-        "CC, Additional comments, complications",
-        "FUP, Comments about dismissal",
-        "FUP, Comments about next follow-up",
-        "FSTG, Comments about refusal"
-      ]
     },
     {
       "name": "Orders Data",
