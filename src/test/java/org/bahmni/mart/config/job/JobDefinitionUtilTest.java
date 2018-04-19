@@ -1,6 +1,7 @@
 package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.jsql.SqlParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -32,7 +33,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
-@PrepareForTest({ReaderSQLFileLoader.class, BatchUtils.class})
+@PrepareForTest({ReaderSQLFileLoader.class, BatchUtils.class, SqlParser.class})
 @RunWith(PowerMockRunner.class)
 public class JobDefinitionUtilTest {
 
@@ -44,49 +45,42 @@ public class JobDefinitionUtilTest {
 
     @Test
     public void shouldReturnSameReaderSQLWhenIgnoreColumnsAreNull() {
-        String expectedReaderSQL = "select patient_program_id, program_id, patient_id, date_enrolled as `enrolled_on`" +
-                "from patient_program ";
+        String expectedReaderSQL = "SELECT patient_program_id, program_id, patient_id, date_enrolled AS `enrolled_on`" +
+                "FROM patient_program ";
 
         assertEquals(expectedReaderSQL, getReaderSQLByIgnoringColumns(null, expectedReaderSQL));
     }
 
     @Test
     public void shouldReturnSameReaderSQLWhenIgnoreColumnsAreEmpty() {
-        String expectedReaderSQL = "select patient_program_id, program_id, patient_id, date_enrolled as `enrolled_on`" +
-                "from patient_program ";
+        String expectedReaderSQL = "SELECT patient_program_id, program_id, patient_id, date_enrolled AS `enrolled_on`" +
+                "FROM patient_program ";
 
         assertEquals(expectedReaderSQL, getReaderSQLByIgnoringColumns(new ArrayList<>(), expectedReaderSQL));
     }
 
     @Test
     public void shouldReturnReaderSqlByFilteringIgnoredColumns() {
-        String readerSQL = "select patient_program_id, program_id as `programId`, p.patient_id, " +
-                "p.date_enrolled as `enrolled_on`" +
-                "from patient_program p";
-        String expectedReaderSQL = "select patient_program_id from patient_program p";
+        String readerSQL = "SELECT patient_program_id, program_id AS `programId`, p.patient_id, " +
+                "p.date_enrolled AS `enrolled_on`" +
+                "FROM patient_program p";
+        String expectedReaderSQL = "SELECT patient_program_id FROM patient_program p";
+
         List<String> ignoreColumns = Arrays.asList("patient_id", "enrolled_on", "programId");
 
+        mockStatic(SqlParser.class);
+        when(SqlParser.getUpdatedReaderSql(ignoreColumns, readerSQL)).thenReturn(expectedReaderSQL);
         assertEquals(expectedReaderSQL, getReaderSQLByIgnoringColumns(ignoreColumns, readerSQL));
     }
 
     @Test
-    public void shouldReturnReaderSqlByFilteringIgnoredColumn() {
-        String readerSQL = "select patient_program_id, program_id as `programId`, p.patient_id, " +
-                "p.date_enrolled as `enrolled_on`" +
-                "from patient_program p";
-        String expectedReaderSQL = "select patient_program_id, program_id as `programId`, " +
-                "p.date_enrolled as `enrolled_on` from patient_program p";
-
-        assertEquals(expectedReaderSQL, getReaderSQLByIgnoringColumns(Arrays.asList("patient_id"), readerSQL));
-    }
-
-    @Test
     public void shouldReturnEmptySQLIfAllTheColumnsAreIgnored() {
-        String readerSQL = "select patient_program_id, program_id as `programId`, p.patient_id, " +
-                "p.date_enrolled as `enrolled_on`" +
-                "from patient_program p";
+        String readerSQL = "SELECT patient_program_id, program_id AS `programId`, p.patient_id, " +
+                "p.date_enrolled AS `enrolled_on`";
         List<String> ignoreColumns = Arrays.asList("patient_id", "enrolled_on", "programId", "patient_program_id");
 
+        mockStatic(SqlParser.class);
+        when(SqlParser.getUpdatedReaderSql(ignoreColumns, readerSQL)).thenReturn("");
         assertEquals("", getReaderSQLByIgnoringColumns(ignoreColumns, readerSQL));
     }
 
@@ -206,7 +200,7 @@ public class JobDefinitionUtilTest {
     @Test
     public void shouldReturnReaderSqlWhenItIsNotEmpty() throws Exception {
         JobDefinition jobDefinition = mock(JobDefinition.class);
-        String expectedSQL = "select * from table";
+        String expectedSQL = "SELECT * FROM table";
         when(jobDefinition.getReaderSql()).thenReturn(expectedSQL);
 
         String actualSql = JobDefinitionUtil.getReaderSQL(jobDefinition);
@@ -220,7 +214,7 @@ public class JobDefinitionUtilTest {
         when(jobDefinition.getReaderSql()).thenReturn("");
         String filePath = "some path";
         when(jobDefinition.getReaderSqlFilePath()).thenReturn(filePath);
-        String expectedSql = "select * from table";
+        String expectedSql = "SELECT * FROM table";
         Resource resource = mock(Resource.class);
         mockStatic(ReaderSQLFileLoader.class);
         mockStatic(BatchUtils.class);

@@ -2,6 +2,7 @@ package org.bahmni.mart.config;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
 import org.bahmni.mart.form.domain.Concept;
@@ -76,6 +77,9 @@ public class OrderStepConfigurerTest {
     @Mock
     private JobDefinition jobDefinition;
 
+    @Mock
+    private JobDefinitionReader jobDefinitionReader;
+
     private  OrderStepConfigurer orderStepConfigurer;
 
     private String orderables = "All Orderables";
@@ -90,6 +94,7 @@ public class OrderStepConfigurerTest {
         setValuesForMemberFields(orderStepConfigurer, "orderConceptUtil", orderConceptUtil);
         setValuesForMemberFields(orderStepConfigurer, "tableDataGenerator", tableDataGenerator);
         setValuesForMemberFields(orderStepConfigurer, "stepBuilderFactory", stepBuilderFactory);
+        setValuesForMemberFields(orderStepConfigurer, "jobDefinitionReader", jobDefinitionReader);
         setValuesForMemberFields(orderStepConfigurer, "recordWriterObjectFactory",
                 recordWriterObjectFactory);
         setValueForFinalStaticField(OrderStepConfigurer.class, "logger", logger);
@@ -107,6 +112,8 @@ public class OrderStepConfigurerTest {
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(sql);
         when(BatchUtils.constructSqlWithParameter(sql, "orderTypeId", "1")).thenReturn(sql);
         when(tableDataGenerator.getTableData(orderable, sql)).thenReturn(tableData);
+        when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
+        when(jobDefinition.getColumnsToIgnore()).thenReturn(Collections.emptyList());
 
         orderStepConfigurer.createTables();
 
@@ -127,6 +134,8 @@ public class OrderStepConfigurerTest {
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(sql);
         when(BatchUtils.constructSqlWithParameter(sql, "orderTypeId", "1")).thenReturn(sql);
         when(tableDataGenerator.getTableData(orderable, sql)).thenReturn(tableData);
+        when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
+        when(jobDefinition.getColumnsToIgnore()).thenReturn(Collections.emptyList());
 
         setValuesForMemberFields(orderStepConfigurer, "orderableConceptNames", Arrays.asList("Lab Samples"));
 
@@ -217,6 +226,8 @@ public class OrderStepConfigurerTest {
         when(recordWriterObjectFactory.getObject()).thenReturn(new TableRecordWriter());
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
+        when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
+        when(jobDefinition.getColumnsToIgnore()).thenReturn(Collections.emptyList());
 
         orderStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 

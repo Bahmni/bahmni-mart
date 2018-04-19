@@ -1,6 +1,8 @@
 package org.bahmni.mart.config;
 
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
 import org.bahmni.mart.form.domain.Concept;
@@ -65,6 +67,9 @@ public class OrderStepConfigurer implements StepConfigurer {
     @Autowired
     private OrderConceptUtil orderConceptUtil;
 
+    @Autowired
+    private JobDefinitionReader jobDefinitionReader;
+
     @Value("classpath:sql/orders.sql")
     private Resource ordersSQLResource;
 
@@ -106,7 +111,8 @@ public class OrderStepConfigurer implements StepConfigurer {
         int orderTypeId = orderConceptUtil.getOrderTypeId(orderable);
         String orderSQL = convertResourceOutputToString(ordersSQLResource);
         orderSQL = constructSqlWithParameter(orderSQL, "orderTypeId", Integer.toString(orderTypeId));
-        return orderSQL;
+        JobDefinition ordersJobDefinition = jobDefinitionReader.getJobDefinitionByName("Orders Data");
+        return JobDefinitionUtil.getReaderSQLByIgnoringColumns(ordersJobDefinition.getColumnsToIgnore(), orderSQL);
     }
 
     @Override
