@@ -1,378 +1,381 @@
 {
   "jobs": [
-  {
-    "name": "Program data",
-    "type": "customSql",
-    "readerSql": "SELECT program_id, name AS program_name, description AS program_description, creator, date_created, date_changed, changed_by FROM program WHERE retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "programs",
-    "columnsToIgnore": []
-  },
-  {
-    "name": "Program outcomes",
-    "type": "customSql",
-    "readerSql": "SELECT p.program_id, p.name AS `program_name`, cv.concept_full_name AS `program_outcome` FROM program p INNER JOIN concept c ON c.concept_id = p.outcomes_concept_id AND c.retired IS FALSE AND p.retired IS FALSE INNER JOIN concept_set cs ON cs.concept_set = c.concept_id LEFT OUTER JOIN concept_view cv ON cv.concept_id = cs.concept_id AND cv.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "program_outcomes",
-    "columnsToIgnore": []
-  },
-  {
-    "name": "Patient program data",
-    "type": "customSql",
-    "readerSql": "SELECT pp.patient_id, ee.encounter_id, pp.program_id, epp.episode_id, pp.patient_program_id, pp.date_enrolled, pp.date_completed, pp.location_id, l.name AS location_name, cn_outcome.concept_full_name AS program_outcome, pp.creator, pp.date_created, pp.date_changed, pp.changed_by FROM patient_program pp INNER JOIN episode_patient_program epp ON epp.patient_program_id = pp.patient_program_id AND pp.voided IS FALSE LEFT JOIN episode_encounter ee ON ee.episode_id = epp.episode_id LEFT OUTER JOIN concept_view cn_outcome ON cn_outcome.concept_id = pp.outcome_concept_id AND cn_outcome.retired IS FALSE LEFT OUTER JOIN location l ON l.location_id = pp.location_id AND l.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "patient_program_data"
-  },
-  {
-    "name": "Patient State",
-    "type": "customSql",
-    "readerSql": "SELECT ps.patient_state_id, ps.patient_program_id, p.patient_id, pp.program_id, pr.name AS program_name, ps.state, cv.concept_full_name AS state_name, ps.start_date, ps.end_date, ps.creator, ps.date_created, ps.date_changed, ps.changed_by FROM patient p INNER JOIN patient_program pp ON pp.patient_id = p.patient_id AND p.voided IS FALSE AND pp.voided IS FALSE INNER JOIN program pr ON pr.program_id = pp.program_id AND pr.retired IS FALSE INNER JOIN patient_state ps ON ps.patient_program_id = pp.patient_program_id AND ps.voided IS FALSE INNER JOIN program_workflow_state pws ON pws.program_workflow_state_id = ps.state AND ps.voided IS FALSE AND pws.retired IS FALSE LEFT OUTER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "patient_state"
-  },
-  {
-    "name": "Program Workflow",
-    "type": "customSql",
-    "readerSql": "SELECT pw.program_id, pw.program_workflow_id, cv.concept_full_name AS program_workflow_name FROM program_workflow pw INNER JOIN concept_view cv ON cv.concept_id = pw.concept_id AND cv.retired IS FALSE AND pw.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "program_workflow"
-  },
-  {
-    "name": "Program Workflow States",
-    "type": "customSql",
-    "readerSql": "SELECT pws.program_workflow_state_id, pws.program_workflow_id, pwscv.concept_full_name AS state_name, pwcv.concept_full_name AS program_workflow_name, pws.initial, pws.terminal, pws.creator, pws.date_created, pws.date_changed, pws.changed_by FROM program_workflow_state pws INNER JOIN program_workflow pw ON pw.program_workflow_id = pws.program_workflow_id AND pws.retired IS FALSE AND pw.retired IS FALSE LEFT JOIN concept_view pwcv ON pwcv.concept_id = pw.concept_id AND pwcv.retired IS FALSE LEFT JOIN concept_view pwscv ON pwscv.concept_id = pws.concept_id AND pwscv.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "program_workflow_states"
-  },
-  {
-    "name": "Person details",
-    "type": "customSql",
-    "readerSql": "SELECT p.person_id, pn.person_name_id, pn.preferred, pn.prefix, pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name2, pn.family_name_suffix, p.gender, p.birthdate, p.birthtime, p.birthdate_estimated, p.dead, p.death_date, p.deathdate_estimated, p.cause_of_death FROM person p INNER JOIN person_name pn ON p.person_id = pn.person_id AND p.voided IS FALSE AND pn.voided IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "person_details",
-    "columnsToIgnore": [
-      "prefix",
-      "given_name",
-      "middle_name",
-      "family_name_prefix",
-      "family_name",
-      "family_name2",
-      "family_name_suffix"
-    ]
-  },
-  {
-    "name": "Person address",
-    "type": "customSql",
-    "readerSql": "SELECT person_id, preferred, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14, address15, city_village, state_province, postal_code, country, county_district, latitude, longitude, start_date, end_date FROM person_address WHERE voided IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "person_address"
-  },
-  {
-    "name": "Address hierarchy levels",
-    "type": "customSql",
-    "readerSql": "SELECT address_hierarchy_level_id, name, parent_level_id, address_field FROM address_hierarchy_level",
-    "chunkSizeToRead": "500",
-    "tableName": "address_hierarchy_level"
-  },
-  {
-    "name": "Person Attribute Info",
-    "type": "customSql",
-    "readerSql": "SELECT person_attribute_type_id, name, description FROM person_attribute_type",
-    "chunkSizeToRead": "500",
-    "tableName": "person_attribute_info"
-  },
-  {
-    "name": "Patient allergy status",
-    "type": "customSql",
-    "readerSql": "SELECT patient_id, allergy_status FROM patient WHERE voided IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "patient_allergy_status"
-  },
-  {
-    "name": "Medication Data",
-    "type": "customSql",
-    "readerSqlFilePath": "classpath:readerSql/drugOrder.sql",
-    "chunkSizeToRead": "500",
-    "tableName": "medication_data",
-    "columnsToIgnore": ["instructions", "stop_notes"]
-  },
-  {
-    "name": "Appointment service",
-    "type": "customSql",
-    "readerSql": "SELECT appser.appointment_service_id, appser.name AS `service_name`, appser.description AS `service_description`, appser.start_time AS `service_start_time`, appser.end_time AS `service_end_time`, appser.max_appointments_limit AS `service_max_load`, appser.duration_mins AS `service_duration`, l.name AS `location_name`, ast.name AS `service_type`, ast.duration_mins AS `service_type_duration`, spec.name AS `speciality` FROM (SELECT appointment_service_id, name, description, start_time, end_time, max_appointments_limit, duration_mins, location_id, speciality_id, voided FROM appointment_service WHERE voided IS FALSE) appser LEFT OUTER JOIN appointment_service_type ast ON ast.appointment_service_id = appser.appointment_service_id AND ast.voided IS FALSE LEFT OUTER JOIN location l ON l.location_id = appser.location_id AND l.retired IS FALSE LEFT OUTER JOIN appointment_speciality spec ON spec.speciality_id = appser.speciality_id AND spec.voided IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "appointment_service",
-    "columnsToIgnore": [
-      "speciality"
-    ]
-  },
-  {
-    "name": "Appointment service availability",
-    "type": "customSql",
-    "readerSql": "SELECT appser.appointment_service_id, appser.name AS `service_name`, l.name AS `service_location`, aswa.day_of_week AS `availability_day_of_week`, aswa.start_time AS `availability_start_time`, aswa.end_time AS `availability_end_time`, aswa.max_appointments_limit AS `availability_max_load` FROM (SELECT appointment_service_id, name, location_id, voided FROM appointment_service WHERE voided IS FALSE) appser LEFT OUTER JOIN appointment_service_weekly_availability aswa ON aswa.service_id = appser.appointment_service_id AND aswa.voided IS FALSE LEFT OUTER JOIN location l ON l.location_id = appser.location_id AND l.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "service_availability"
-  },
-  {
-    "name": "Appointment speciality",
-    "type": "customSql",
-    "readerSql": "SELECT speciality_id, name AS `speciality` FROM appointment_speciality WHERE voided IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "appointment_speciality"
-  },
-  {
-    "name": "Patient appointment",
-    "type": "customSql",
-    "readerSql": "SELECT pa.patient_id, pa.patient_appointment_id AS `appointment_id`, prov.provider_name AS `appointment_provider`, pa.start_date_time AS `appointment_start_time`, pa.end_date_time AS `appointment_end_time`, aspec.name AS `appointment_speciality`, appser.name AS `appointment_service`, ast.name AS `appointment_service_type`, pa.status AS `appointment_status`, l.name AS `appointment_location`, pa.appointment_kind, pa.comments FROM patient_appointment pa INNER JOIN appointment_service appser ON appser.appointment_service_id = pa.appointment_service_id AND pa.voided IS FALSE AND appser.voided IS FALSE LEFT OUTER JOIN appointment_speciality aspec ON aspec.speciality_id = appser.speciality_id AND aspec.voided IS FALSE LEFT OUTER JOIN appointment_service_type ast ON ast.appointment_service_type_id = pa.appointment_service_type_id AND ast.voided IS FALSE LEFT OUTER JOIN location l ON l.location_id = pa.location_id AND l.retired IS FALSE LEFT OUTER JOIN (SELECT p.provider_id, CONCAT_WS(' ', pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name_suffix) AS `provider_name` from provider p INNER JOIN person_name pn ON pn.person_id = p.person_id AND pn.voided IS FALSE AND p.retired IS FALSE) AS prov ON prov.provider_id = pa.provider_id",
-    "chunkSizeToRead": "500",
-    "tableName": "patient_appointment"
-  },
-  {
-    "name": "Patient Visit Details",
-    "type": "customSql",
-    "readerSql": "SELECT visit_id, patient.patient_id AS patient_id, visit.visit_type_id AS visit_type_id, vt.name AS visit_type_name, vt.description AS visit_type_description, date_started AS visit_start_date, date_stopped AS visit_end_date, indication_concept_id, visit.location_id AS location_id, location.name AS location_name FROM patient INNER JOIN visit ON patient.patient_id = visit.patient_id AND patient.voided IS FALSE AND visit.voided IS FALSE INNER JOIN visit_type vt ON visit.visit_type_id = vt.visit_type_id AND vt.retired IS FALSE LEFT OUTER JOIN location ON visit.location_id = location.location_id AND location.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "patient_visit_details"
-  },
-  {
-    "name": "Patient Encounter Details",
-    "type": "customSql",
-    "readerSql": "SELECT patient.patient_id, visit_id, encounter_id, et.encounter_type_id AS encounter_type_id, et.name AS encounter_type_name, et.description AS encounter_type_description, et.edit_privilege AS edit_privilege, et.view_privilege AS view_privilege, location.name AS location_name, form_id, encounter_datetime FROM patient INNER JOIN encounter ON patient.patient_id = encounter.patient_id AND patient.voided IS FALSE AND encounter.voided IS FALSE INNER JOIN encounter_type et ON encounter.encounter_type = et.encounter_type_id AND et.retired IS FALSE LEFT OUTER JOIN location ON encounter.location_id = location.location_id AND location.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "patient_encounter_details"
-  },
-  {
-    "name": "Encounter Provider and Role",
-    "type": "customSql",
-    "readerSql": "SELECT ep.encounter_provider_id as encounter_provider_id, ep.encounter_id as encounter_id, ep.provider_id as provider_id, er.encounter_role_id as encounter_role_id, er.name as encounter_role_name, er.description as encounter_role_description from encounter_provider ep INNER JOIN encounter_role er on ep.encounter_role_id = er.encounter_role_id AND ep.voided IS FALSE AND er.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "encounter_provider_and_role"
-  },
-  {
-    "name": "Provider",
-    "type": "customSql",
-    "readerSql": "SELECT provider_id, person_id, name, identifier, provider_role_id from provider WHERE provider.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "provider"
-  },
-  {
-    "name": "Location",
-    "type": "customSql",
-    "readerSql": "SELECT location_id, name, description, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14,  address15, city_village, state_province, postal_code, country, latitude, longitude, county_district, parent_location from location WHERE retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "location"
-  },
-  {
-    "name": "Location Tag Map",
-    "type": "customSql",
-    "readerSql": "SELECT ltm.location_id as location_id, lt.location_tag_id as location_tag_id, lt.name as location_tag_name, lt.description as location_tag_description from location_tag_map ltm INNER JOIN location_tag lt on ltm.location_tag_id = lt.location_tag_id AND lt.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "location_tag_map"
-  },
-  {
-    "name": "Location Attribute Details",
-    "type": "customSql",
-    "readerSql": "SELECT location_attribute_id, location_id, lat.location_attribute_type_id as attribute_type_id, la.value_reference as value_reference, lat.name as location_attribute_type_name, lat.description as location_attribute_type_description, lat.datatype as location_attribute_type_datatype, lat.datatype_config as location_attribute_type_datatype_config, lat.preferred_handler as location_attribute_type_preferred_handler, lat.handler_config as location_attribute_type_handler_config, lat.min_occurs as location_attribute_type_min_occurs, lat.max_occurs as location_attribute_type_max_occurs from location_attribute la INNER JOIN location_attribute_type lat on la.attribute_type_id = lat.location_attribute_type_id AND la.voided IS FALSE AND lat.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "location_attribute_details"
-  },
-  {
-    "name": "Visit Attribute Details",
-    "type": "customSql",
-    "readerSql": "SELECT va.visit_id AS visit_id, va.visit_attribute_id AS visit_attribute_id, va.value_reference AS value_reference, vat.visit_attribute_type_id AS visit_attribute_type_id, vat.name AS visit_attribute_type_name, vat.description AS visit_attribute_type_description, vat.datatype AS visit_attribute_type_datatype, vat.datatype_config AS visit_attribute_type_datatype_config, vat.preferred_handler AS visit_attribute_type_preferred_handler, vat.handler_config AS visit_attribute_type_handler_config, vat.min_occurs AS visit_attribute_type_min_occurs, vat.max_occurs AS visit_attribute_type_max_occurs FROM visit INNER JOIN visit_attribute va on visit.visit_id = va.visit_id AND visit.voided is FALSE INNER JOIN visit_attribute_type vat ON va.attribute_type_id = vat.visit_attribute_type_id AND va.voided IS FALSE AND vat.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "visit_attribute_details"
-  },
-  {
-    "name": "Provider Attribute Details",
-    "type": "customSql",
-    "readerSql": "SELECT pa.provider_attribute_id AS provider_attribute_id, pat.provider_attribute_type_id AS attribute_type_id, pa.provider_id AS provider_id, pa.value_reference AS value_reference, pat.name AS provider_attribute_type_name, pat.description AS provider_attribute_type_description, pat.datatype AS provider_attribute_datatype, pat.datatype_config AS provider_attribute_datatype_config, pat.preferred_handler AS provider_attribute_type_preferred_handler, pat.handler_config AS provider_attribute_type_handler_config, pat.min_occurs AS provider_attribute_type_min_occurs, pat.max_occurs AS provider_attribute_type_max_occurs FROM provider INNER JOIN provider_attribute pa on provider.provider_id = pa.provider_id AND provider.retired IS FALSE INNER JOIN provider_attribute_type pat ON pa.attribute_type_id = pat.provider_attribute_type_id AND pa.voided IS FALSE AND pat.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "provider_attribute_details"
-  },
-  {
-    "name": "Bed Patient Assignment",
-    "type": "customSql",
-    "readerSql": "SELECT bpam.patient_id, bpam.bed_id, b.bed_number, bpam.date_started, bpam.date_stopped, bpam.encounter_id, e.encounter_datetime, e.visit_id, vt.name AS visit_type FROM bed_patient_assignment_map bpam INNER JOIN bed b ON b.bed_id = bpam.bed_id AND b.voided IS FALSE AND bpam.voided IS FALSE INNER JOIN encounter e ON e.encounter_id = bpam.encounter_id AND e.voided IS FALSE INNER JOIN visit v ON v.visit_id = e.visit_id AND v.voided IS FALSE INNER JOIN visit_type vt ON vt.visit_type_id = v.visit_type_id AND vt.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "bed_patient_assignment"
-  },
-  {
-    "name": "Bed Tags",
-    "type": "customSql",
-    "readerSql": "SELECT b.bed_id, l.name AS bed_location, b.bed_number, b.status AS bed_status, bt.name AS bed_tag_name, btm.date_created, btm.date_changed, btm.date_voided AS date_stopped FROM bed b INNER JOIN bed_tag_map btm ON btm.bed_id = b.bed_id AND b.voided IS FALSE INNER JOIN bed_tag bt ON bt.bed_tag_id = btm.bed_tag_id AND bt.voided IS FALSE INNER JOIN bed_location_map blm ON blm.bed_id = b.bed_id INNER JOIN location l ON blm.location_id = l.location_id AND l.retired IS FALSE",
-    "chunkSizeToRead": "500",
-    "tableName": "bed_tags"
-  },
-  {
-    "name": "Current Bed Details",
-    "type": "customSql",
-    "readerSql": "SELECT b.bed_id, l.name AS bed_location, b.bed_number, bt.name AS bed_type, b.status AS bed_status FROM bed b INNER JOIN bed_location_map blm ON blm.bed_id = b.bed_id AND b.voided IS FALSE INNER JOIN location l ON blm.location_id = l.location_id AND l.retired IS FALSE INNER JOIN bed_type bt ON bt.bed_type_id = b.bed_type_id",
-    "chunkSizeToRead": "500",
-    "tableName": "current_bed_details"
-  },
-  {
-    "name": "Person Attributes",
-    "type": "eav",
-    "chunkSizeToRead": "500",
-    "tableName": "person_attributes",
-    "eavAttributes": {
-      "attributeTypeTableName": "person_attribute_type",
-      "attributeTableName": "person_attribute",
-      "valueTableJoiningId": "person_attribute_type_id",
-      "typeTableJoiningId": "person_attribute_type_id",
-      "valueColumnName": "value",
-      "primaryKey": "person_id"
+    {
+      "name": "Program data",
+      "type": "customSql",
+      "readerSql": "SELECT program_id, name AS program_name, description AS program_description, creator, date_created, date_changed, changed_by FROM program WHERE retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "programs",
+      "columnsToIgnore": []
     },
-    "columnsToIgnore": [
-      "id3DateOfExpiry",
-      "id3DocNumber",
-      "familyNameLocal",
-      "givenNameLocal",
-      "id1DocNumber",
-      "id1Document",
-      "id1FullNameArabic",
-      "id1FullNameEnglish",
-      "id2FullNameArabic",
-      "id2FullNameEnglish",
-      "id3FullNameArabic",
-      "id3FullNameEnglish",
-      "middleNameLocal",
-      "legalRepFullNameEnglish",
-      "legalRepFullNameArabic"
-    ]
-  },
-  {
-    "name": "Visit Attributes",
-    "type": "eav",
-    "chunkSizeToRead": "500",
-    "tableName": "visit_attributes",
-    "eavAttributes": {
-      "attributeTypeTableName": "visit_attribute_type",
-      "attributeTableName": "visit_attribute",
-      "valueTableJoiningId": "attribute_type_id",
-      "typeTableJoiningId": "visit_attribute_type_id",
-      "valueColumnName": "value_reference",
-      "primaryKey": "visit_id"
-    }
-  },
-  {
-    "name": "Surgical Block",
-    "type": "customSql",
-    "readerSql": "SELECT sb.surgical_block_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS primary_provider_name, concat_ws(' ', ifnull(pn2.given_name, ''), ifnull(pn2.family_name, '')) AS creator_name, l.name AS location_name, sb.start_datetime AS block_starttime, sb.end_datetime AS block_endtime, sb.date_created AS date_created, sb.date_changed AS date_changed, cb.changed_by AS changed_by FROM surgical_block sb INNER JOIN location l ON l.location_id = sb.location_id AND l.retired = 0 AND sb.voided = 0 INNER JOIN provider p ON p.provider_id = sb.primary_provider_id AND p.retired = 0 INNER JOIN person_name pn ON pn.person_id = p.person_id AND pn.voided = 0 INNER JOIN provider p2 ON p2.provider_id = sb.creator AND p2.retired = 0 INNER JOIN person_name pn2 ON pn2.person_id = p2.person_id AND pn2.voided = 0 LEFT OUTER JOIN (SELECT surgical_block_id, concat_ws(' ', ifnull(pn4.given_name, ''), ifnull(pn4.family_name, '')) AS changed_by FROM surgical_block sb1 INNER JOIN provider p3 ON p3.provider_id = sb1.changed_by AND sb1.voided = 0 INNER JOIN person_name pn4 ON pn4.person_id = p3.person_id) cb ON cb.surgical_block_id = sb.surgical_block_id",
-    "chunkSizeToRead": "500",
-    "tableName": "surgical_block"
-  },
-  {
-    "name": "Surgical Appointment",
-    "type": "customSql",
-    "readerSql": "SELECT sa.surgical_appointment_id, sa.surgical_block_id, sa.patient_id, sa.sort_weight, sa.status, sa.actual_start_datetime, sa.actual_end_datetime, sa.notes, sa.date_created, sa.date_changed, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name, cb.changed_by AS change_by FROM surgical_appointment sa INNER JOIN provider pr ON pr.provider_id = sa.creator AND pr.retired = 0 AND sa.voided = 0 INNER JOIN person_name pn ON pn.person_id = pr.person_id LEFT OUTER JOIN (SELECT surgical_appointment_id, concat_ws(' ', ifnull(pn2.given_name, ''), ifnull(pn2.family_name, '')) AS changed_by FROM surgical_appointment sa1 INNER JOIN provider p2 ON p2.provider_id = sa1.changed_by AND sa1.voided = 0 INNER JOIN person_name pn2 ON pn2.person_id = p2.person_id) cb ON cb.surgical_appointment_id = sa.surgical_appointment_id",
-    "chunkSizeToRead": "500",
-    "tableName": "surgical_appointment"
-  },
-  {
-    "name": "Surgical Appointment Attribute Type Details",
-    "type": "customSql",
-    "readerSql": "SELECT name, description FROM surgical_appointment_attribute_type WHERE retired = 0",
-    "chunkSizeToRead": "500",
-    "tableName": "surgical_appointment_attribute_type_details"
-  },
-  {
-    "name": "Surgical Appointment Attributes",
-    "type": "eav",
-    "chunkSizeToRead": "500",
-    "tableName": "surgical_appointment_attributes",
-    "eavAttributes": {
-      "attributeTypeTableName": "surgical_appointment_attribute_type",
-      "attributeTableName": "surgical_appointment_attribute",
-      "valueTableJoiningId": "surgical_appointment_attribute_type_id",
-      "typeTableJoiningId": "surgical_appointment_attribute_type_id",
-      "valueColumnName": "value",
-      "primaryKey": "surgical_appointment_id"
-    }
-  },
-  {
-    "name": "Provider Attributes",
-    "type": "eav",
-    "chunkSizeToRead": "500",
-    "tableName": "provider_attributes",
-    "eavAttributes": {
-      "attributeTypeTableName": "provider_attribute_type",
-      "attributeTableName": "provider_attribute",
-      "valueTableJoiningId": "attribute_type_id",
-      "typeTableJoiningId": "provider_attribute_type_id",
-      "valueColumnName": "value_reference",
-      "primaryKey": "provider_id"
-    }
-  },
-  {
-    "name": "Patient identification",
-    "type": "eav",
-    "chunkSizeToRead": "500",
-    "tableName": "patient_identifier",
-    "eavAttributes": {
-      "attributeTypeTableName": "patient_identifier_type",
-      "attributeTableName": "patient_identifier",
-      "valueTableJoiningId": "identifier_type",
-      "typeTableJoiningId": "patient_identifier_type_id",
-      "valueColumnName": "identifier",
-      "primaryKey": "patient_id"
-    }
-  },
-  {
-    "name": "Program Attributes",
-    "type": "eav",
-    "chunkSizeToRead": "500",
-    "tableName": "program_attributes",
-    "eavAttributes": {
-      "attributeTypeTableName": "program_attribute_type",
-      "attributeTableName": "patient_program_attribute",
-      "valueTableJoiningId": "attribute_type_id",
-      "typeTableJoiningId": "program_attribute_type_id",
-      "valueColumnName": "value_reference",
-      "primaryKey": "patient_program_id"
-    }
-  },
-  {
-    "name": "Bacteriology Data",
-    "conceptReferenceSource": "MSF-INTERNAL",
-    "type": "bacteriology"
-  },
-  {
-    "name": "MetaData Dictionary",
-    "type": "metadata",
-    "conceptReferenceSource": "MSF-INTERNAL"
-  },
-  {
-    "name": "Obs Data",
-    "type": "obs",
-    "separateTables": [
-      "PA, Location of Assessment",
-      "SMH, Pain Assessment",
-      "FV, Outcomes FV"
-    ],
-    "conceptReferenceSource": "MSF-INTERNAL",
-    "ignoreAllFreeTextConcepts": true,
-    "columnsToIgnore": [
-      "Video",
-      "Image",
-      "Documents, Image Upload",
-      "Documents, Image",
-      "Radiology Documents",
-      "FSTG, Comments",
-      "CC, Additional comments, complications",
-      "FUP, Comments about dismissal",
-      "FUP, Comments about next follow-up",
-      "FSTG, Comments about refusal"
-    ]
-  },
+    {
+      "name": "Program outcomes",
+      "type": "customSql",
+      "readerSql": "SELECT p.program_id, p.name AS `program_name`, cv.concept_full_name AS `program_outcome` FROM program p INNER JOIN concept c ON c.concept_id = p.outcomes_concept_id AND c.retired IS FALSE AND p.retired IS FALSE INNER JOIN concept_set cs ON cs.concept_set = c.concept_id LEFT OUTER JOIN concept_view cv ON cv.concept_id = cs.concept_id AND cv.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "program_outcomes",
+      "columnsToIgnore": []
+    },
+    {
+      "name": "Patient program data",
+      "type": "customSql",
+      "readerSql": "SELECT pp.patient_id, ee.encounter_id, pp.program_id, epp.episode_id, pp.patient_program_id, pp.date_enrolled, pp.date_completed, pp.location_id, l.name AS location_name, cn_outcome.concept_full_name AS program_outcome, pp.creator, pp.date_created, pp.date_changed, pp.changed_by FROM patient_program pp INNER JOIN episode_patient_program epp ON epp.patient_program_id = pp.patient_program_id AND pp.voided IS FALSE LEFT JOIN episode_encounter ee ON ee.episode_id = epp.episode_id LEFT OUTER JOIN concept_view cn_outcome ON cn_outcome.concept_id = pp.outcome_concept_id AND cn_outcome.retired IS FALSE LEFT OUTER JOIN location l ON l.location_id = pp.location_id AND l.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_program_data"
+    },
+    {
+      "name": "Patient State",
+      "type": "customSql",
+      "readerSql": "SELECT ps.patient_state_id, ps.patient_program_id, p.patient_id, pp.program_id, pr.name AS program_name, ps.state, cv.concept_full_name AS state_name, ps.start_date, ps.end_date, ps.creator, ps.date_created, ps.date_changed, ps.changed_by FROM patient p INNER JOIN patient_program pp ON pp.patient_id = p.patient_id AND p.voided IS FALSE AND pp.voided IS FALSE INNER JOIN program pr ON pr.program_id = pp.program_id AND pr.retired IS FALSE INNER JOIN patient_state ps ON ps.patient_program_id = pp.patient_program_id AND ps.voided IS FALSE INNER JOIN program_workflow_state pws ON pws.program_workflow_state_id = ps.state AND ps.voided IS FALSE AND pws.retired IS FALSE LEFT OUTER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_state"
+    },
+    {
+      "name": "Program Workflow",
+      "type": "customSql",
+      "readerSql": "SELECT pw.program_id, pw.program_workflow_id, cv.concept_full_name AS program_workflow_name FROM program_workflow pw INNER JOIN concept_view cv ON cv.concept_id = pw.concept_id AND cv.retired IS FALSE AND pw.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "program_workflow"
+    },
+    {
+      "name": "Program Workflow States",
+      "type": "customSql",
+      "readerSql": "SELECT pws.program_workflow_state_id, pws.program_workflow_id, pwscv.concept_full_name AS state_name, pwcv.concept_full_name AS program_workflow_name, pws.initial, pws.terminal, pws.creator, pws.date_created, pws.date_changed, pws.changed_by FROM program_workflow_state pws INNER JOIN program_workflow pw ON pw.program_workflow_id = pws.program_workflow_id AND pws.retired IS FALSE AND pw.retired IS FALSE LEFT JOIN concept_view pwcv ON pwcv.concept_id = pw.concept_id AND pwcv.retired IS FALSE LEFT JOIN concept_view pwscv ON pwscv.concept_id = pws.concept_id AND pwscv.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "program_workflow_states"
+    },
+    {
+      "name": "Person details",
+      "type": "customSql",
+      "readerSql": "SELECT p.person_id, pn.person_name_id, pn.preferred, pn.prefix, pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name2, pn.family_name_suffix, p.gender, p.birthdate, p.birthtime, p.birthdate_estimated, p.dead, p.death_date, p.deathdate_estimated, p.cause_of_death FROM person p INNER JOIN person_name pn ON p.person_id = pn.person_id AND p.voided IS FALSE AND pn.voided IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "person_details",
+      "columnsToIgnore": [
+        "prefix",
+        "given_name",
+        "middle_name",
+        "family_name_prefix",
+        "family_name",
+        "family_name2",
+        "family_name_suffix"
+      ]
+    },
+    {
+      "name": "Person address",
+      "type": "customSql",
+      "readerSql": "SELECT person_id, preferred, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14, address15, city_village, state_province, postal_code, country, county_district, latitude, longitude, start_date, end_date FROM person_address WHERE voided IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "person_address"
+    },
+    {
+      "name": "Address hierarchy levels",
+      "type": "customSql",
+      "readerSql": "SELECT address_hierarchy_level_id, name, parent_level_id, address_field FROM address_hierarchy_level",
+      "chunkSizeToRead": "500",
+      "tableName": "address_hierarchy_level"
+    },
+    {
+      "name": "Person Attribute Info",
+      "type": "customSql",
+      "readerSql": "SELECT person_attribute_type_id, name, description FROM person_attribute_type",
+      "chunkSizeToRead": "500",
+      "tableName": "person_attribute_info"
+    },
+    {
+      "name": "Patient allergy status",
+      "type": "customSql",
+      "readerSql": "SELECT patient_id, allergy_status FROM patient WHERE voided IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_allergy_status"
+    },
+    {
+      "name": "Medication Data",
+      "type": "customSql",
+      "readerSqlFilePath": "classpath:readerSql/drugOrder.sql",
+      "chunkSizeToRead": "500",
+      "tableName": "medication_data",
+      "columnsToIgnore": [
+        "instructions",
+        "stop_notes"
+      ]
+    },
+    {
+      "name": "Appointment service",
+      "type": "customSql",
+      "readerSql": "SELECT appser.appointment_service_id, appser.name AS `service_name`, appser.description AS `service_description`, appser.start_time AS `service_start_time`, appser.end_time AS `service_end_time`, appser.max_appointments_limit AS `service_max_load`, appser.duration_mins AS `service_duration`, l.name AS `location_name`, ast.name AS `service_type`, ast.duration_mins AS `service_type_duration`, spec.name AS `speciality` FROM (SELECT appointment_service_id, name, description, start_time, end_time, max_appointments_limit, duration_mins, location_id, speciality_id, voided FROM appointment_service WHERE voided IS FALSE) appser LEFT OUTER JOIN appointment_service_type ast ON ast.appointment_service_id = appser.appointment_service_id AND ast.voided IS FALSE LEFT OUTER JOIN location l ON l.location_id = appser.location_id AND l.retired IS FALSE LEFT OUTER JOIN appointment_speciality spec ON spec.speciality_id = appser.speciality_id AND spec.voided IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "appointment_service",
+      "columnsToIgnore": [
+        "speciality"
+      ]
+    },
+    {
+      "name": "Appointment service availability",
+      "type": "customSql",
+      "readerSql": "SELECT appser.appointment_service_id, appser.name AS `service_name`, l.name AS `service_location`, aswa.day_of_week AS `availability_day_of_week`, aswa.start_time AS `availability_start_time`, aswa.end_time AS `availability_end_time`, aswa.max_appointments_limit AS `availability_max_load` FROM (SELECT appointment_service_id, name, location_id, voided FROM appointment_service WHERE voided IS FALSE) appser LEFT OUTER JOIN appointment_service_weekly_availability aswa ON aswa.service_id = appser.appointment_service_id AND aswa.voided IS FALSE LEFT OUTER JOIN location l ON l.location_id = appser.location_id AND l.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "service_availability"
+    },
+    {
+      "name": "Appointment speciality",
+      "type": "customSql",
+      "readerSql": "SELECT speciality_id, name AS `speciality` FROM appointment_speciality WHERE voided IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "appointment_speciality"
+    },
+    {
+      "name": "Patient appointment",
+      "type": "customSql",
+      "readerSql": "SELECT pa.patient_id, pa.patient_appointment_id AS `appointment_id`, prov.provider_name AS `appointment_provider`, pa.start_date_time AS `appointment_start_time`, pa.end_date_time AS `appointment_end_time`, aspec.name AS `appointment_speciality`, appser.name AS `appointment_service`, ast.name AS `appointment_service_type`, pa.status AS `appointment_status`, l.name AS `appointment_location`, pa.appointment_kind, pa.comments FROM patient_appointment pa INNER JOIN appointment_service appser ON appser.appointment_service_id = pa.appointment_service_id AND pa.voided IS FALSE AND appser.voided IS FALSE LEFT OUTER JOIN appointment_speciality aspec ON aspec.speciality_id = appser.speciality_id AND aspec.voided IS FALSE LEFT OUTER JOIN appointment_service_type ast ON ast.appointment_service_type_id = pa.appointment_service_type_id AND ast.voided IS FALSE LEFT OUTER JOIN location l ON l.location_id = pa.location_id AND l.retired IS FALSE LEFT OUTER JOIN (SELECT p.provider_id, CONCAT_WS(' ', pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name_suffix) AS `provider_name` from provider p INNER JOIN person_name pn ON pn.person_id = p.person_id AND pn.voided IS FALSE AND p.retired IS FALSE) AS prov ON prov.provider_id = pa.provider_id",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_appointment"
+    },
+    {
+      "name": "Patient Visit Details",
+      "type": "customSql",
+      "readerSql": "SELECT visit_id, patient.patient_id AS patient_id, visit.visit_type_id AS visit_type_id, vt.name AS visit_type_name, vt.description AS visit_type_description, date_started AS visit_start_date, date_stopped AS visit_end_date, indication_concept_id, visit.location_id AS location_id, location.name AS location_name FROM patient INNER JOIN visit ON patient.patient_id = visit.patient_id AND patient.voided IS FALSE AND visit.voided IS FALSE INNER JOIN visit_type vt ON visit.visit_type_id = vt.visit_type_id AND vt.retired IS FALSE LEFT OUTER JOIN location ON visit.location_id = location.location_id AND location.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_visit_details"
+    },
+    {
+      "name": "Patient Encounter Details",
+      "type": "customSql",
+      "readerSql": "SELECT patient.patient_id, visit_id, encounter_id, et.encounter_type_id AS encounter_type_id, et.name AS encounter_type_name, et.description AS encounter_type_description, et.edit_privilege AS edit_privilege, et.view_privilege AS view_privilege, location.name AS location_name, form_id, encounter_datetime FROM patient INNER JOIN encounter ON patient.patient_id = encounter.patient_id AND patient.voided IS FALSE AND encounter.voided IS FALSE INNER JOIN encounter_type et ON encounter.encounter_type = et.encounter_type_id AND et.retired IS FALSE LEFT OUTER JOIN location ON encounter.location_id = location.location_id AND location.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_encounter_details"
+    },
+    {
+      "name": "Encounter Provider and Role",
+      "type": "customSql",
+      "readerSql": "SELECT ep.encounter_provider_id as encounter_provider_id, ep.encounter_id as encounter_id, ep.provider_id as provider_id, er.encounter_role_id as encounter_role_id, er.name as encounter_role_name, er.description as encounter_role_description from encounter_provider ep INNER JOIN encounter_role er on ep.encounter_role_id = er.encounter_role_id AND ep.voided IS FALSE AND er.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "encounter_provider_and_role"
+    },
+    {
+      "name": "Provider",
+      "type": "customSql",
+      "readerSql": "SELECT provider_id, person_id, name, identifier, provider_role_id from provider WHERE provider.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "provider"
+    },
+    {
+      "name": "Location",
+      "type": "customSql",
+      "readerSql": "SELECT location_id, name, description, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14,  address15, city_village, state_province, postal_code, country, latitude, longitude, county_district, parent_location from location WHERE retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "location"
+    },
+    {
+      "name": "Location Tag Map",
+      "type": "customSql",
+      "readerSql": "SELECT ltm.location_id as location_id, lt.location_tag_id as location_tag_id, lt.name as location_tag_name, lt.description as location_tag_description from location_tag_map ltm INNER JOIN location_tag lt on ltm.location_tag_id = lt.location_tag_id AND lt.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "location_tag_map"
+    },
+    {
+      "name": "Location Attribute Details",
+      "type": "customSql",
+      "readerSql": "SELECT location_attribute_id, location_id, lat.location_attribute_type_id as attribute_type_id, la.value_reference as value_reference, lat.name as location_attribute_type_name, lat.description as location_attribute_type_description, lat.datatype as location_attribute_type_datatype, lat.datatype_config as location_attribute_type_datatype_config, lat.preferred_handler as location_attribute_type_preferred_handler, lat.handler_config as location_attribute_type_handler_config, lat.min_occurs as location_attribute_type_min_occurs, lat.max_occurs as location_attribute_type_max_occurs from location_attribute la INNER JOIN location_attribute_type lat on la.attribute_type_id = lat.location_attribute_type_id AND la.voided IS FALSE AND lat.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "location_attribute_details"
+    },
+    {
+      "name": "Visit Attribute Details",
+      "type": "customSql",
+      "readerSql": "SELECT va.visit_id AS visit_id, va.visit_attribute_id AS visit_attribute_id, va.value_reference AS value_reference, vat.visit_attribute_type_id AS visit_attribute_type_id, vat.name AS visit_attribute_type_name, vat.description AS visit_attribute_type_description, vat.datatype AS visit_attribute_type_datatype, vat.datatype_config AS visit_attribute_type_datatype_config, vat.preferred_handler AS visit_attribute_type_preferred_handler, vat.handler_config AS visit_attribute_type_handler_config, vat.min_occurs AS visit_attribute_type_min_occurs, vat.max_occurs AS visit_attribute_type_max_occurs FROM visit INNER JOIN visit_attribute va on visit.visit_id = va.visit_id AND visit.voided is FALSE INNER JOIN visit_attribute_type vat ON va.attribute_type_id = vat.visit_attribute_type_id AND va.voided IS FALSE AND vat.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "visit_attribute_details"
+    },
+    {
+      "name": "Provider Attribute Details",
+      "type": "customSql",
+      "readerSql": "SELECT pa.provider_attribute_id AS provider_attribute_id, pat.provider_attribute_type_id AS attribute_type_id, pa.provider_id AS provider_id, pa.value_reference AS value_reference, pat.name AS provider_attribute_type_name, pat.description AS provider_attribute_type_description, pat.datatype AS provider_attribute_datatype, pat.datatype_config AS provider_attribute_datatype_config, pat.preferred_handler AS provider_attribute_type_preferred_handler, pat.handler_config AS provider_attribute_type_handler_config, pat.min_occurs AS provider_attribute_type_min_occurs, pat.max_occurs AS provider_attribute_type_max_occurs FROM provider INNER JOIN provider_attribute pa on provider.provider_id = pa.provider_id AND provider.retired IS FALSE INNER JOIN provider_attribute_type pat ON pa.attribute_type_id = pat.provider_attribute_type_id AND pa.voided IS FALSE AND pat.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "provider_attribute_details"
+    },
+    {
+      "name": "Bed Patient Assignment",
+      "type": "customSql",
+      "readerSql": "SELECT bpam.patient_id, bpam.bed_id, b.bed_number, bpam.date_started, bpam.date_stopped, bpam.encounter_id, e.encounter_datetime, e.visit_id, vt.name AS visit_type FROM bed_patient_assignment_map bpam INNER JOIN bed b ON b.bed_id = bpam.bed_id AND b.voided IS FALSE AND bpam.voided IS FALSE INNER JOIN encounter e ON e.encounter_id = bpam.encounter_id AND e.voided IS FALSE INNER JOIN visit v ON v.visit_id = e.visit_id AND v.voided IS FALSE INNER JOIN visit_type vt ON vt.visit_type_id = v.visit_type_id AND vt.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "bed_patient_assignment"
+    },
+    {
+      "name": "Bed Tags",
+      "type": "customSql",
+      "readerSql": "SELECT b.bed_id, l.name AS bed_location, b.bed_number, b.status AS bed_status, bt.name AS bed_tag_name, btm.date_created, btm.date_changed, btm.date_voided AS date_stopped FROM bed b INNER JOIN bed_tag_map btm ON btm.bed_id = b.bed_id AND b.voided IS FALSE INNER JOIN bed_tag bt ON bt.bed_tag_id = btm.bed_tag_id AND bt.voided IS FALSE INNER JOIN bed_location_map blm ON blm.bed_id = b.bed_id INNER JOIN location l ON blm.location_id = l.location_id AND l.retired IS FALSE",
+      "chunkSizeToRead": "500",
+      "tableName": "bed_tags"
+    },
+    {
+      "name": "Current Bed Details",
+      "type": "customSql",
+      "readerSql": "SELECT b.bed_id, l.name AS bed_location, b.bed_number, bt.name AS bed_type, b.status AS bed_status FROM bed b INNER JOIN bed_location_map blm ON blm.bed_id = b.bed_id AND b.voided IS FALSE INNER JOIN location l ON blm.location_id = l.location_id AND l.retired IS FALSE INNER JOIN bed_type bt ON bt.bed_type_id = b.bed_type_id",
+      "chunkSizeToRead": "500",
+      "tableName": "current_bed_details"
+    },
+    {
+      "name": "Person Attributes",
+      "type": "eav",
+      "chunkSizeToRead": "500",
+      "tableName": "person_attributes",
+      "eavAttributes": {
+        "attributeTypeTableName": "person_attribute_type",
+        "attributeTableName": "person_attribute",
+        "valueTableJoiningId": "person_attribute_type_id",
+        "typeTableJoiningId": "person_attribute_type_id",
+        "valueColumnName": "value",
+        "primaryKey": "person_id"
+      },
+      "columnsToIgnore": [
+        "id3DateOfExpiry",
+        "id3DocNumber",
+        "familyNameLocal",
+        "givenNameLocal",
+        "id1DocNumber",
+        "id1Document",
+        "id1FullNameArabic",
+        "id1FullNameEnglish",
+        "id2FullNameArabic",
+        "id2FullNameEnglish",
+        "id3FullNameArabic",
+        "id3FullNameEnglish",
+        "middleNameLocal",
+        "legalRepFullNameEnglish",
+        "legalRepFullNameArabic"
+      ]
+    },
+    {
+      "name": "Visit Attributes",
+      "type": "eav",
+      "chunkSizeToRead": "500",
+      "tableName": "visit_attributes",
+      "eavAttributes": {
+        "attributeTypeTableName": "visit_attribute_type",
+        "attributeTableName": "visit_attribute",
+        "valueTableJoiningId": "attribute_type_id",
+        "typeTableJoiningId": "visit_attribute_type_id",
+        "valueColumnName": "value_reference",
+        "primaryKey": "visit_id"
+      }
+    },
+    {
+      "name": "Surgical Block",
+      "type": "customSql",
+      "readerSql": "SELECT sb.surgical_block_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS primary_provider_name, concat_ws(' ', ifnull(pn2.given_name, ''), ifnull(pn2.family_name, '')) AS creator_name, l.name AS location_name, sb.start_datetime AS block_starttime, sb.end_datetime AS block_endtime, sb.date_created AS date_created, sb.date_changed AS date_changed, cb.changed_by AS changed_by FROM surgical_block sb INNER JOIN location l ON l.location_id = sb.location_id AND l.retired = 0 AND sb.voided = 0 INNER JOIN provider p ON p.provider_id = sb.primary_provider_id AND p.retired = 0 INNER JOIN person_name pn ON pn.person_id = p.person_id AND pn.voided = 0 INNER JOIN provider p2 ON p2.provider_id = sb.creator AND p2.retired = 0 INNER JOIN person_name pn2 ON pn2.person_id = p2.person_id AND pn2.voided = 0 LEFT OUTER JOIN (SELECT surgical_block_id, concat_ws(' ', ifnull(pn4.given_name, ''), ifnull(pn4.family_name, '')) AS changed_by FROM surgical_block sb1 INNER JOIN provider p3 ON p3.provider_id = sb1.changed_by AND sb1.voided = 0 INNER JOIN person_name pn4 ON pn4.person_id = p3.person_id) cb ON cb.surgical_block_id = sb.surgical_block_id",
+      "chunkSizeToRead": "500",
+      "tableName": "surgical_block"
+    },
+    {
+      "name": "Surgical Appointment",
+      "type": "customSql",
+      "readerSql": "SELECT sa.surgical_appointment_id, sa.surgical_block_id, sa.patient_id, sa.sort_weight, sa.status, sa.actual_start_datetime, sa.actual_end_datetime, sa.notes, sa.date_created, sa.date_changed, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name, cb.changed_by AS change_by FROM surgical_appointment sa INNER JOIN provider pr ON pr.provider_id = sa.creator AND pr.retired = 0 AND sa.voided = 0 INNER JOIN person_name pn ON pn.person_id = pr.person_id LEFT OUTER JOIN (SELECT surgical_appointment_id, concat_ws(' ', ifnull(pn2.given_name, ''), ifnull(pn2.family_name, '')) AS changed_by FROM surgical_appointment sa1 INNER JOIN provider p2 ON p2.provider_id = sa1.changed_by AND sa1.voided = 0 INNER JOIN person_name pn2 ON pn2.person_id = p2.person_id) cb ON cb.surgical_appointment_id = sa.surgical_appointment_id",
+      "chunkSizeToRead": "500",
+      "tableName": "surgical_appointment"
+    },
+    {
+      "name": "Surgical Appointment Attribute Type Details",
+      "type": "customSql",
+      "readerSql": "SELECT name, description FROM surgical_appointment_attribute_type WHERE retired = 0",
+      "chunkSizeToRead": "500",
+      "tableName": "surgical_appointment_attribute_type_details"
+    },
+    {
+      "name": "Surgical Appointment Attributes",
+      "type": "eav",
+      "chunkSizeToRead": "500",
+      "tableName": "surgical_appointment_attributes",
+      "eavAttributes": {
+        "attributeTypeTableName": "surgical_appointment_attribute_type",
+        "attributeTableName": "surgical_appointment_attribute",
+        "valueTableJoiningId": "surgical_appointment_attribute_type_id",
+        "typeTableJoiningId": "surgical_appointment_attribute_type_id",
+        "valueColumnName": "value",
+        "primaryKey": "surgical_appointment_id"
+      }
+    },
+    {
+      "name": "Provider Attributes",
+      "type": "eav",
+      "chunkSizeToRead": "500",
+      "tableName": "provider_attributes",
+      "eavAttributes": {
+        "attributeTypeTableName": "provider_attribute_type",
+        "attributeTableName": "provider_attribute",
+        "valueTableJoiningId": "attribute_type_id",
+        "typeTableJoiningId": "provider_attribute_type_id",
+        "valueColumnName": "value_reference",
+        "primaryKey": "provider_id"
+      }
+    },
+    {
+      "name": "Patient identification",
+      "type": "eav",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_identifier",
+      "eavAttributes": {
+        "attributeTypeTableName": "patient_identifier_type",
+        "attributeTableName": "patient_identifier",
+        "valueTableJoiningId": "identifier_type",
+        "typeTableJoiningId": "patient_identifier_type_id",
+        "valueColumnName": "identifier",
+        "primaryKey": "patient_id"
+      }
+    },
+    {
+      "name": "Program Attributes",
+      "type": "eav",
+      "chunkSizeToRead": "500",
+      "tableName": "program_attributes",
+      "eavAttributes": {
+        "attributeTypeTableName": "program_attribute_type",
+        "attributeTableName": "patient_program_attribute",
+        "valueTableJoiningId": "attribute_type_id",
+        "typeTableJoiningId": "program_attribute_type_id",
+        "valueColumnName": "value_reference",
+        "primaryKey": "patient_program_id"
+      }
+    },
+    {
+      "name": "Bacteriology Data",
+      "conceptReferenceSource": "MSF-INTERNAL",
+      "type": "bacteriology"
+    },
+    {
+      "name": "MetaData Dictionary",
+      "type": "metadata",
+      "conceptReferenceSource": "MSF-INTERNAL"
+    },
+    {
+      "name": "Obs Data",
+      "type": "obs",
+      "separateTables": [
+        "PA, Location of Assessment",
+        "SMH, Pain Assessment",
+        "FV, Outcomes FV"
+      ],
+      "conceptReferenceSource": "MSF-INTERNAL",
+      "ignoreAllFreeTextConcepts": true,
+      "columnsToIgnore": [
+        "Video",
+        "Image",
+        "Documents, Image Upload",
+        "Documents, Image",
+        "Radiology Documents",
+        "FSTG, Comments",
+        "CC, Additional comments, complications",
+        "FUP, Comments about dismissal",
+        "FUP, Comments about next follow-up",
+        "FSTG, Comments about refusal"
+      ]
+    },
     {
       "name": "Orders Data",
       "type": "orders",
       "chunkSizeToRead": 500
     }
-],
-  "views" : [
+  ],
+  "views": [
     {
       "name": "patient_program_view",
       "sql": "SELECT pat.*, pa.address1, pa.address2, pa.address3, pa.address4, pa.address6, pa.state_province, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, program_id, patient_program_id, date_enrolled, date_completed, location_name, program_outcome FROM person_details pd LEFT OUTER JOIN person_address pa ON pa.person_id = pd.person_id LEFT OUTER JOIN person_attributes pat ON pat.person_id = pa.person_id LEFT OUTER JOIN patient_program_data ppd ON ppd.patient_id = pat.person_id"
