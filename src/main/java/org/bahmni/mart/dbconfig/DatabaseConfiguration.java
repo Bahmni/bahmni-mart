@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -34,6 +35,16 @@ public class DatabaseConfiguration {
     @Bean(name = "martJdbcTemplate")
     public JdbcTemplate martJdbcTemplate(@Qualifier("martDb") DataSource dsMart) {
         return new JdbcTemplate(dsMart);
+    }
+
+    @Bean(name = "martNamedJdbcTemplate")
+    public NamedParameterJdbcTemplate martNamedJdbcTemplate(@Qualifier("martDb") DataSource dsMart) {
+        return new NamedParameterJdbcTemplate(dsMart);
+    }
+
+    @Bean(name = "openmrsNamedJdbcTemplate")
+    public NamedParameterJdbcTemplate openmrsNamedJdbcTemplate(@Qualifier("openmrsDb") DataSource dsMart) {
+        return new NamedParameterJdbcTemplate(dsMart);
     }
 
 }

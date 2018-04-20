@@ -6,6 +6,7 @@ import org.bahmni.mart.exception.NoSamplesFoundException;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -26,6 +27,7 @@ public class OrderConceptUtil {
     private Resource resource;
 
     @Autowired
+    @Qualifier("openmrsNamedJdbcTemplate")
     private NamedParameterJdbcTemplate openMRSJDBCTemplate;
 
     public int getOrderTypeId(String conceptName) throws NoSamplesFoundException, InvalidOrderTypeException {

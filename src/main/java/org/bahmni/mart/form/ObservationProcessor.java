@@ -7,6 +7,7 @@ import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
@@ -51,6 +52,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
     private FormFieldTransformer formFieldTransformer;
 
     @Autowired
+    @Qualifier("openmrsNamedJdbcTemplate")
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override

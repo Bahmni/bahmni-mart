@@ -3,6 +3,7 @@ package org.bahmni.mart.form.service;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.form.domain.Concept;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -32,6 +33,7 @@ public class ObsService {
     private String freeTextConceptSql;
 
     @Autowired
+    @Qualifier("openmrsNamedJdbcTemplate")
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public List<Concept> getConceptsByNames(List<String> conceptNames) {
