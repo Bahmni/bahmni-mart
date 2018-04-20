@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
   om.order_type_id
 FROM concept_set cs
   INNER JOIN concept c ON c.concept_id = cs.concept_id AND cs.concept_set IN (:sampleConceptIds)

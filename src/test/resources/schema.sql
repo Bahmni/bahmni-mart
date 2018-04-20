@@ -528,6 +528,133 @@ CREATE VIEW concept_reference_term_map_view AS
       ON ((concept_reference_source.concept_source_id =
            concept_reference_term.concept_source_id)));
 
+DROP TABLE IF EXISTS order_type CASCADE;
+CREATE TABLE order_type
+(
+  order_type_id   INT AUTO_INCREMENT
+    PRIMARY KEY,
+  name            VARCHAR(255) DEFAULT '' NOT NULL,
+  description     TEXT                    NULL,
+  creator         INT DEFAULT '0'         NOT NULL,
+  date_created    DATETIME                NOT NULL,
+  retired         TINYINT(1) DEFAULT '0'  NOT NULL,
+  retired_by      INT                     NULL,
+  date_retired    DATETIME                NULL,
+  retire_reason   VARCHAR(255)            NULL,
+  uuid            CHAR(38)                NOT NULL,
+  java_class_name VARCHAR(255)            NOT NULL,
+  parent          INT                     NULL,
+  changed_by      INT                     NULL,
+  date_changed    DATETIME                NULL,
+  CONSTRAINT unique_name
+  UNIQUE (name),
+  CONSTRAINT unique_uuid
+  UNIQUE (uuid)
+);
+
+DROP TABLE IF EXISTS order_type_class_map CASCADE;
+CREATE TABLE order_type_class_map
+(
+  order_type_id    INT NOT NULL,
+  concept_class_id INT NOT NULL,
+  PRIMARY KEY (order_type_id, concept_class_id),
+  CONSTRAINT concept_class_id
+  UNIQUE (concept_class_id),
+  CONSTRAINT fk_order_type_order_type_id
+  FOREIGN KEY (order_type_id) REFERENCES order_type (order_type_id),
+  CONSTRAINT fk_order_type_class_map_concept_class_concept_class_id
+  FOREIGN KEY (concept_class_id) REFERENCES concept_class (concept_class_id)
+);
+
+DROP TABLE IF EXISTS visit_type CASCADE;
+CREATE TABLE visit_type
+(
+  visit_type_id INT
+    PRIMARY KEY,
+  name          VARCHAR(255)           NOT NULL,
+  description   VARCHAR(1024)          NULL,
+  creator       INT                    NOT NULL,
+  date_created  DATETIME               NOT NULL,
+  changed_by    INT                    NULL,
+  date_changed  DATETIME               NULL,
+  retired       TINYINT(1) DEFAULT '0' NOT NULL,
+  retired_by    INT                    NULL,
+  date_retired  DATETIME               NULL,
+  retire_reason VARCHAR(255)           NULL,
+  uuid          CHAR(38)               NOT NULL,
+  CONSTRAINT visit_type_uuid
+  UNIQUE (uuid)
+);
+
+DROP TABLE IF EXISTS visit CASCADE;
+CREATE TABLE visit
+(
+  visit_id              INT AUTO_INCREMENT
+    PRIMARY KEY,
+  patient_id            INT                    NOT NULL,
+  visit_type_id         INT                    NOT NULL,
+  date_started          DATETIME               NOT NULL,
+  date_stopped          DATETIME               NULL,
+  indication_concept_id INT                    NULL,
+  location_id           INT                    NULL,
+  creator               INT                    NOT NULL,
+  date_created          DATETIME               NOT NULL,
+  changed_by            INT                    NULL,
+  date_changed          DATETIME               NULL,
+  voided                TINYINT(1) DEFAULT '0' NOT NULL,
+  voided_by             INT                    NULL,
+  date_voided           DATETIME               NULL,
+  void_reason           VARCHAR(255)           NULL,
+  uuid                  CHAR(38)               NOT NULL,
+  CONSTRAINT visit_uuid
+  UNIQUE (uuid),
+  CONSTRAINT visit_patient_fk
+  FOREIGN KEY (patient_id) REFERENCES patient (patient_id),
+  CONSTRAINT visit_type_fk
+  FOREIGN KEY (visit_type_id) REFERENCES visit_type (visit_type_id)
+);
+
+DROP TABLE IF EXISTS orders CASCADE;
+CREATE TABLE orders
+(
+  order_id               INT AUTO_INCREMENT
+    PRIMARY KEY,
+  order_type_id          INT                           NULL,
+  concept_id             INT DEFAULT '0'               NOT NULL,
+  orderer                INT                           NOT NULL,
+  encounter_id           INT                           NOT NULL,
+  instructions           TEXT                          NULL,
+  date_activated         DATETIME                      NULL,
+  auto_expire_date       DATETIME                      NULL,
+  date_stopped           DATETIME                      NULL,
+  order_reason           INT                           NULL,
+  order_reason_non_coded VARCHAR(255)                  NULL,
+  creator                INT DEFAULT '0'               NOT NULL,
+  date_created           DATETIME                      NOT NULL,
+  voided                 TINYINT(1) DEFAULT '0'        NOT NULL,
+  voided_by              INT                           NULL,
+  date_voided            DATETIME                      NULL,
+  void_reason            VARCHAR(255)                  NULL,
+  patient_id             INT                           NOT NULL,
+  accession_number       VARCHAR(255)                  NULL,
+  uuid                   CHAR(38)                      NOT NULL,
+  urgency                VARCHAR(50) DEFAULT 'ROUTINE' NOT NULL,
+  order_number           VARCHAR(50)                   NOT NULL,
+  previous_order_id      INT                           NULL,
+  order_action           VARCHAR(50)                   NOT NULL,
+  comment_to_fulfiller   VARCHAR(1024)                 NULL,
+  care_setting           INT                           NOT NULL,
+  scheduled_date         DATETIME                      NULL,
+  order_group_id         INT                           NULL,
+  sort_weight            DOUBLE                        NULL,
+  CONSTRAINT orders_uuid_index
+  UNIQUE (uuid),
+  CONSTRAINT type_of_order
+  FOREIGN KEY (order_type_id) REFERENCES order_type (order_type_id),
+  CONSTRAINT order_for_patient
+  FOREIGN KEY (patient_id) REFERENCES patient (patient_id)
+    ON UPDATE CASCADE
+);
 
 SET FOREIGN_KEY_CHECKS=1;
 

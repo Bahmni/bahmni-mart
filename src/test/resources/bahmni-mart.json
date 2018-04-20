@@ -56,6 +56,12 @@
       "columnsToIgnore": [
         "Specimen Collection Date"
       ]
+    },
+    {
+      "name": "Orders Data",
+      "type": "orders",
+      "chunkSizeToRead": 500,
+      "columnsToIgnore": ["visit_id"]
     }
   ],
   "views": [

@@ -41,7 +41,7 @@ public class TableDataGeneratorTest {
     @Test
     public void shouldReturnTableData() {
         String sql = "some sql";
-        String expectedTableName = "Radiology";
+        String expectedTableName = "radiology";
         TableData tableData = new TableData();
         TableColumn tableColumn = new TableColumn("name", "varchar", false, null);
         tableData.setColumns(Collections.singletonList(tableColumn));

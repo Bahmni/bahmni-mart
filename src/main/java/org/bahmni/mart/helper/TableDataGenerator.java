@@ -1,5 +1,6 @@
 package org.bahmni.mart.helper;
 
+import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.TableDataExtractor;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class TableDataGenerator {
     public TableData getTableData(String tableName, String sql) {
         ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
         TableData tableData = openmrsJdbcTemplate.query(sql + LIMIT, resultSetExtractor);
-        tableData.setName(tableName);
+        tableData.setName(FormTableMetadataGenerator.getProcessedName(tableName));
         tableData.getColumns().forEach(tableColumn
             -> tableColumn.setType(Constants.getPostgresDataTypeFor(tableColumn.getType())));
 

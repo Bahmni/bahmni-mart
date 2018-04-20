@@ -3,8 +3,8 @@ package org.bahmni.mart;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,8 +40,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
-    @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void shouldCreateTablesAndViewsBasedOnConfiguration() {
 
         batchConfiguration.run();
@@ -67,8 +65,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
-    @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void shouldCreateTablesBasedOnJobConfigurationByIgnoringColumns() {
 
         batchConfiguration.run();
@@ -90,8 +86,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    @Sql(scripts = "classpath:testDataSet/insertPatientsData.sql")
-    @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void shouldCreateTablesBasedOnTheSqlFilePathConfiguration() {
         batchConfiguration.run();
 
@@ -105,6 +99,46 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(2, tableDataColumns.size());
         assertTrue(columnsName.containsAll(Arrays.asList("patient_id", "allergy_status")));
         verifyRecords(martJdbcTemplate.queryForList("SELECT * FROM \"patient_details\""));
+    }
+
+    @Test
+    public void shouldCreateOrderLabSamplesTableByIgnoringVisitId() {
+
+        batchConfiguration.run();
+
+        List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'lab_samples'" +
+                " AND TABLE_SCHEMA='public';")
+                .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
+
+        List<String> expectedColumns = Arrays.asList("patient_id", "date_created", "encounter_id",
+                "visit_name", "type_of_test", "panel_name", "test_name");
+
+        assertEquals(7, tableDataColumns.size());
+        assertTrue(tableDataColumns.containsAll(expectedColumns));
+        verifyOrderRecords(martJdbcTemplate.queryForList("SELECT * FROM \"lab_samples\""), expectedColumns);
+
+        System.out.println();
+    }
+
+    private void verifyOrderRecords(List<Map<String, Object>> actualOrders, List<String> expectedColumns) {
+        Map<String, List> expectedOrders = new HashMap();
+        expectedOrders.put("WBC (FBC)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "Clinic", "Hematology",
+                "FBC (Full Blood Count)", "WBC (FBC)"));
+        expectedOrders.put("RBC (FBC)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "Clinic", "Hematology",
+                "FBC (Full Blood Count)", "RBC (FBC)"));
+        expectedOrders.put("INR (HCS)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "Clinic", "INR (HCS)",
+                null, "INR (HCS)"));
+
+        for (Map<String, Object> row : actualOrders) {
+            List<String> actualOrder = new ArrayList<>();
+            for (String column : expectedColumns) {
+                actualOrder.add(row.get(column) != null ? row.get(column).toString() : null);
+            }
+            List<String> expectedOrder = expectedOrders.get(row.get("test_name"));
+            assertEquals(expectedOrder.size(), actualOrder.size());
+            assertTrue(expectedOrder.containsAll(actualOrder));
+        }
     }
 
     private void verifyViews() {
