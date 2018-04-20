@@ -189,10 +189,10 @@ INSERT INTO  order_type_class_map VALUES (1, 8);
 INSERT INTO  order_type_class_map VALUES (1, 26);
 
 --visit type
-INSERT INTO visit_type VALUES (1, 'Clinic', 'Visit for patients coming for OPD', 8, '2014-09-18 14:19:53', 8, '2017-07-09 20:40:06', 0, null, null, null, 'c22a5000-3f10-11e4-adec-0800271c1b75');
+INSERT INTO visit_type VALUES (4, 'Clinic', 'Visit for patients coming for OPD', 8, '2014-09-18 14:19:53', 8, '2017-07-09 20:40:06', 0, null, null, null, 'c22a5000-3f10-11e4-adec-0800271c1b75');
 
 --visit
-INSERT INTO visit VALUES (1, 125, 1, '2018-02-12 17:22:16', '2018-02-12 17:23:56', null, 15, 8, '2018-02-12 17:22:16', 8, '2018-02-13 05:23:59', 0, null, NULL, null, '24fb9597-c300-4c40-b41e-7c07c5e1ef23');
+INSERT INTO visit VALUES (1, 125, 4, '2018-02-12 17:22:16', '2018-02-12 17:23:56', null, 15, 8, '2018-02-12 17:22:16', 8, '2018-02-13 05:23:59', 0, null, NULL, null, '24fb9597-c300-4c40-b41e-7c07c5e1ef23');
 
 --orders
 INSERT INTO orders values (1, 1, 7092, 8, 100, null, '2018-04-11 06:54:41', '2018-04-11 07:54:41', null, null, null, 8, '2018-04-11 06:54:41', 0, null, null, null, 125, null, '01fa3dae-d5ce-4c82-925b-e31b40afe4e1', 'ROUTINE', 'ORD-784', null, 'NEW', null, 1, null, null, null);

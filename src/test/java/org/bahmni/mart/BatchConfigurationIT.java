@@ -41,9 +41,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    @Sql(scripts = {"classpath:testDataSet/insertPatientsData.sql",
-            "classpath:testDataSet/insertPatientDataWithDiagnoses.sql"})
-    @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(scripts = {"classpath:testDataSet/insertPatientDataWithDiagnoses.sql"})
+
     public void shouldCreateTablesAndViewsBasedOnConfiguration() {
 
         batchConfiguration.run();
