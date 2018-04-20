@@ -3,6 +3,7 @@ package org.bahmni.mart;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +41,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
+    @Sql(scripts = {"classpath:testDataSet/insertPatientsData.sql",
+            "classpath:testDataSet/insertPatientDataWithDiagnoses.sql"})
+    @Sql(statements = {"TRUNCATE TABLE patient;"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void shouldCreateTablesAndViewsBasedOnConfiguration() {
 
         batchConfiguration.run();
@@ -52,7 +56,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 .collect(Collectors.toList());
         List<String> expectedTableNames = Arrays.asList("patient_allergy_status_test", "first_stage_validation",
                 "fstg,_specialty_determined_by_mlo", "follow-up_validation", "stage",
-                "person_attributes", "bacteriology_concept_set");
+                "person_attributes", "bacteriology_concept_set", "visit_diagnoses");
         assertTrue(tableNames.containsAll(expectedTableNames));
         verifyTableColumns();
 
@@ -62,6 +66,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         verifyRecords(patientList);
         verifyViews();
+        verifyDiagnoses();
     }
 
     @Test
@@ -171,6 +176,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 "middlenamelocal", "viber", "phonenumber2"));
         tableMap.put("bacteriology_concept_set", Arrays.asList("id_bacteriology_concept_set", "patient_id",
                 "encounter_id", "specimen_sample_source", "specimen_id"));
+        tableMap.put("visit_diagnoses", Arrays.asList("id_visit_diagnoses", "patient_id", "encounter_id",
+                "non-coded_diagnosis", "coded_diagnosis", "diagnosis_certainty", "diagnosis_order",
+                "bahmni_initial_diagnosis", "bahmni_diagnosis_revised", "bahmni_diagnosis_status"));
 
         for (String tableName : tableMap.keySet()) {
             String sql = String.format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' " +
@@ -180,6 +188,124 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
             assertEquals(tableMap.get(tableName).size(), columnNames.size());
             assertTrue(tableMap.get(tableName).containsAll(columnNames));
+        }
+    }
+
+    private void verifyDiagnoses() {
+        HashMap<String, Object> row1 = new HashMap<String, Object>() {
+            {
+                put("id_visit_diagnoses", 13);
+                put("patient_id", 129);
+                put("encounter_id", 2);
+                put("non-coded_diagnosis", "test diagnoses");
+                put("coded_diagnosis", null);
+                put("diagnosis_certainty", "Confirmed");
+                put("diagnosis_order", "Primary");
+                put("bahmni_initial_diagnosis", "7e4a4370-c9b2-4cf2-8c29-84756cc67dd5");
+                put("bahmni_diagnosis_revised", "False");
+                put("bahmni_diagnosis_status", null);
+            }
+        };
+
+        HashMap<String, Object> row2 = new HashMap<String, Object>() {
+            {
+                put("id_visit_diagnoses", 96);
+                put("patient_id", 133);
+                put("encounter_id", 8);
+                put("non-coded_diagnosis", null);
+                put("coded_diagnosis", "Dyspareunia");
+                put("diagnosis_certainty", "Presumed");
+                put("diagnosis_order", "Secondary");
+                put("bahmni_initial_diagnosis", "16a07ae8-9c9f-4737-a1fa-f96261a5783b");
+                put("bahmni_diagnosis_revised", "True");
+                put("bahmni_diagnosis_status", null);
+            }
+        };
+
+        HashMap<String, Object> row3 = new HashMap<String, Object>() {
+            {
+                put("id_visit_diagnoses", 123);
+                put("patient_id", 133);
+                put("encounter_id", 10);
+                put("non-coded_diagnosis", null);
+                put("coded_diagnosis", "Dyspareunia");
+                put("diagnosis_certainty", "Confirmed");
+                put("diagnosis_order", "Secondary");
+                put("bahmni_initial_diagnosis", "16a07ae8-9c9f-4737-a1fa-f96261a5783b");
+                put("bahmni_diagnosis_revised", "True");
+                put("bahmni_diagnosis_status", null);
+            }
+        };
+
+        HashMap<String, Object> row4 = new HashMap<String, Object>() {
+            {
+                put("id_visit_diagnoses", 130);
+                put("patient_id", 125);
+                put("encounter_id", 11);
+                put("non-coded_diagnosis", null);
+                put("coded_diagnosis", "Dyspareunia");
+                put("diagnosis_certainty", "Confirmed");
+                put("diagnosis_order", "Primary");
+                put("bahmni_initial_diagnosis", "48114fe3-4464-41cf-9cc0-2a4ba2be0c1b");
+                put("bahmni_diagnosis_revised", "False");
+                put("bahmni_diagnosis_status", null);
+            }
+        };
+
+        HashMap<String, Object> row5 = new HashMap<String, Object>() {
+            {
+                put("id_visit_diagnoses", 136);
+                put("patient_id", 133);
+                put("encounter_id", 12);
+                put("non-coded_diagnosis", null);
+                put("coded_diagnosis", "Dyspareunia");
+                put("diagnosis_certainty", "Presumed");
+                put("diagnosis_order", "Primary");
+                put("bahmni_initial_diagnosis", "16a07ae8-9c9f-4737-a1fa-f96261a5783b");
+                put("bahmni_diagnosis_revised", "False");
+                put("bahmni_diagnosis_status", null);
+            }
+        };
+
+        HashMap<String, Object> row6 = new HashMap<String, Object>() {
+            {
+                put("id_visit_diagnoses", 143);
+                put("patient_id", 132);
+                put("encounter_id", 13);
+                put("non-coded_diagnosis", null);
+                put("coded_diagnosis", "Parkinson");
+                put("diagnosis_certainty", "Presumed");
+                put("diagnosis_order", "Secondary");
+                put("bahmni_initial_diagnosis", "7b1010dc-0f7d-4574-a1c9-77f82d9c2953");
+                put("bahmni_diagnosis_revised", "False");
+                put("bahmni_diagnosis_status", "Ruled Out Diagnosis");
+            }
+        };
+
+        HashMap<Integer, HashMap<String, Object>> ledger = new HashMap<Integer, HashMap<String, Object>>() {
+            {
+                put(13, row1);
+                put(96, row2);
+                put(123, row3);
+                put(130, row4);
+                put(136, row5);
+                put(143, row6);
+            }
+        };
+
+        Object totalRow = martJdbcTemplate
+                .queryForList("SELECT count(*) AS total_row FROM visit_diagnoses").get(0).get("total_row");
+
+        assertEquals((long) ledger.size(), totalRow);
+
+        for (Integer visitDiagnosesId : ledger.keySet()) {
+            Map<String, Object> actualRow = martJdbcTemplate.queryForList(String
+                    .format("SELECT * FROM visit_diagnoses WHERE id_visit_diagnoses = %d", visitDiagnosesId)).get(0);
+
+            HashMap<String, Object> expectedRow = ledger.get(visitDiagnosesId);
+
+            for (String columnName : expectedRow.keySet())
+                assertEquals(expectedRow.get(columnName), actualRow.get(columnName));
         }
     }
 }

@@ -373,6 +373,30 @@ CREATE TABLE person_attribute_type
   UNIQUE (uuid)
 );
 
+DROP TABLE IF EXISTS visit CASCADE;
+CREATE TABLE visit
+(
+  visit_id              INT AUTO_INCREMENT
+    PRIMARY KEY,
+  patient_id            INT                    NOT NULL,
+  visit_type_id         INT                    NOT NULL,
+  date_started          DATETIME               NOT NULL,
+  date_stopped          DATETIME               NULL,
+  indication_concept_id INT                    NULL,
+  location_id           INT                    NULL,
+  creator               INT                    NOT NULL,
+  date_created          DATETIME               NOT NULL,
+  changed_by            INT                    NULL,
+  date_changed          DATETIME               NULL,
+  voided                TINYINT(1) DEFAULT '0' NOT NULL,
+  voided_by             INT                    NULL,
+  date_voided           DATETIME               NULL,
+  void_reason           VARCHAR(255)           NULL,
+  uuid                  CHAR(38)               NOT NULL,
+  CONSTRAINT uuid
+  UNIQUE (uuid)
+);
+
 DROP TABLE IF EXISTS patient CASCADE;
 CREATE TABLE patient
 (

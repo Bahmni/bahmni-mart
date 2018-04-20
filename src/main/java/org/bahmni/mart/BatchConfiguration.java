@@ -1,6 +1,7 @@
 package org.bahmni.mart;
 
 import org.bahmni.mart.config.BacteriologyStepConfigurer;
+import org.bahmni.mart.config.DiagnosesStepConfigurer;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
@@ -80,6 +81,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private OrderStepConfigurer orderStepConfigurer;
 
+    @Autowired
+    private DiagnosesStepConfigurer diagnosesStepConfigurer;
+
     private Job buildObsJob(JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
         return getJob(completeDataExport, formStepConfigurer, jobDefinition);
@@ -88,6 +92,11 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private Job buildBacteriologyJob(JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
         return getJob(completeDataExport, bacteriologyStepConfigurer, jobDefinition);
+    }
+
+    private Job buildDiagnosesJob(JobDefinition jobDefinition) {
+        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
+        return getJob(completeDataExport, diagnosesStepConfigurer, jobDefinition);
     }
 
     private FlowBuilder<FlowJobBuilder> getFlowJobBuilderFlowBuilder(String jobName) {
@@ -144,6 +153,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
               return buildMetaDataJob(jobDefinition);
           case "orders":
               return buildOrdersJob(jobDefinition);
+          case "diagnoses":
+              return buildDiagnosesJob(jobDefinition);
           default:
               return simpleJobTemplate.buildJob(jobDefinition);
         }

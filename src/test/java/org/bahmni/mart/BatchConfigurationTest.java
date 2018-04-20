@@ -2,6 +2,7 @@ package org.bahmni.mart;
 
 import org.apache.commons.io.FileUtils;
 import org.bahmni.mart.config.BacteriologyStepConfigurer;
+import org.bahmni.mart.config.DiagnosesStepConfigurer;
 import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
@@ -97,6 +98,9 @@ public class BatchConfigurationTest {
     @Mock
     private OrderStepConfigurer orderStepConfigurer;
 
+    @Mock
+    private DiagnosesStepConfigurer diagnosesStepConfigurer;
+
     private JobFlowBuilder jobFlowBuilder;
 
     private BatchConfiguration batchConfiguration;
@@ -121,6 +125,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "martJSONReader", martJSONReader);
         setValuesForMemberFields(batchConfiguration, "viewExecutor", viewExecutor);
         setValuesForMemberFields(batchConfiguration, "orderStepConfigurer", orderStepConfigurer);
+        setValuesForMemberFields(batchConfiguration, "diagnosesStepConfigurer", diagnosesStepConfigurer);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(any())).thenReturn(jobBuilder);
@@ -256,6 +261,21 @@ public class BatchConfigurationTest {
         verify(jobBuilderFactory, times(1)).get("Order Data");
         verify(orderStepConfigurer, times(1)).createTables();
         verify(orderStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+    }
+
+    @Test
+    public void shouldRunDiagnosesJob() throws Exception {
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinition.getName()).thenReturn("Diagnoses Data");
+        when(jobDefinition.getType()).thenReturn("diagnoses");
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobBuilderFactory, times(1)).get("Diagnoses Data");
+        verify(diagnosesStepConfigurer, times(1)).createTables();
+        verify(diagnosesStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
     }
 }

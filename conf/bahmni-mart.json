@@ -373,6 +373,11 @@
       "name": "Orders Data",
       "type": "orders",
       "chunkSizeToRead": 500
+    },
+    {
+      "name": "Diagnoses Data",
+      "type": "diagnoses",
+      "columnsToIgnore": []
     }
   ],
   "views": [
