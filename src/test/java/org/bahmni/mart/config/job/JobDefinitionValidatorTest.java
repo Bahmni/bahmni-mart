@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 
@@ -200,5 +201,66 @@ public class JobDefinitionValidatorTest {
         jobDefinitions.add(jobDefinition1);
         jobDefinitions.add(jobDefinition);
         assertFalse(JobDefinitionValidator.validate(jobDefinitions));
+    }
+
+    @Test
+    public void shouldReturnFalseGivenEmptyCodeConfigsList() throws Exception {
+        List<CodeConfig> codeConfigs = new ArrayList<>();
+
+        assertFalse(JobDefinitionValidator.isValid(codeConfigs));
+    }
+
+    @Test
+    public void shouldReturnTrueGivenAllNonNullAndNonEmptyFieldsInCodeConfig() throws Exception {
+        CodeConfig codeConfig = mock(CodeConfig.class);
+        PowerMockito.when(codeConfig.getSource()).thenReturn("source");
+        PowerMockito.when(codeConfig.getType()).thenReturn("type");
+        List<String> fields = Arrays.asList("field");
+        PowerMockito.when(codeConfig.getColumnsToCode()).thenReturn(fields);
+
+        assertTrue(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
+    }
+
+    @Test
+    public void shouldReturnFalseGivenASourceAsNull() throws Exception {
+        CodeConfig codeConfig = mock(CodeConfig.class);
+        PowerMockito.when(codeConfig.getType()).thenReturn("type");
+        List<String> fields = Arrays.asList("field");
+        PowerMockito.when(codeConfig.getColumnsToCode()).thenReturn(fields);
+
+        assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
+    }
+
+    @Test
+    public void shouldReturnFalseGivenSourceTypeAsNull() throws Exception {
+        CodeConfig codeConfig = mock(CodeConfig.class);
+        PowerMockito.when(codeConfig.getSource()).thenReturn("source");
+        List<String> fields = Arrays.asList("field");
+        PowerMockito.when(codeConfig.getColumnsToCode()).thenReturn(fields);
+
+        assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
+    }
+
+    @Test
+    public void shouldReturnFalseGivenColumnsToCodeAsNull() throws Exception {
+        CodeConfig codeConfig = mock(CodeConfig.class);
+        PowerMockito.when(codeConfig.getSource()).thenReturn("source");
+        PowerMockito.when(codeConfig.getType()).thenReturn("type");
+
+        assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
+    }
+
+    @Test
+    public void shouldReturnFalseGivenEmptyFields() throws Exception {
+        CodeConfig codeConfig = null;
+
+        assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
+    }
+
+    @Test
+    public void shouldReturnFalseGivenEmptyConfigWithAllNullFeilds() throws Exception {
+        CodeConfig codeConfig = new CodeConfig();
+
+        assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
     }
 }

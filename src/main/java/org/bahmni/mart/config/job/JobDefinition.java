@@ -19,6 +19,7 @@ public class JobDefinition {
     private EavAttributes eavAttributes;
     private String readerSqlFilePath;
     private boolean ignoreAllFreeTextConcepts;
+    private List<CodeConfig> codeConfigs;
 
     public List<String> getSeparateTables() {
         return separateTables;
@@ -105,5 +106,9 @@ public class JobDefinition {
 
     public String getReaderSqlFilePath() {
         return readerSqlFilePath;
+    }
+
+    public List<CodeConfig> getCodeConfigs() {
+        return codeConfigs;
     }
 }

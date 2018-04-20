@@ -1,5 +1,6 @@
 package org.bahmni.mart.config.job;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,5 +55,18 @@ public class JobDefinitionValidator {
             return true;
         }
         return false;
+    }
+
+    public static boolean isValid(List<CodeConfig> codeConfigs) {
+        if (codeConfigs == null || codeConfigs.isEmpty()) {
+            return false;
+        }
+
+        boolean isValid = true;
+        for (CodeConfig codeConfig : codeConfigs) {
+            isValid &= codeConfig != null && !isEmpty(codeConfig.getSource()) && !isEmpty(codeConfig.getType()) &&
+                    !CollectionUtils.isEmpty(codeConfig.getColumnsToCode());
+        }
+        return isValid;
     }
 }
