@@ -222,6 +222,29 @@
       "tableName": "conditions"
     },
     {
+      "name": "Obs Data",
+      "type": "obs",
+      "separateTables": [
+        "PA, Location of Assessment",
+        "SMH, Pain Assessment",
+        "FV, Outcomes FV"
+      ],
+      "conceptReferenceSource": "MSF-INTERNAL",
+      "ignoreAllFreeTextConcepts": true,
+      "columnsToIgnore": [
+        "Video",
+        "Image",
+        "Documents, Image Upload",
+        "Documents, Image",
+        "Radiology Documents",
+        "FSTG, Comments",
+        "CC, Additional comments, complications",
+        "FUP, Comments about dismissal",
+        "FUP, Comments about next follow-up",
+        "FSTG, Comments about refusal"
+      ]
+    },
+    {
       "name": "Person Attributes",
       "type": "eav",
       "chunkSizeToRead": "500",
