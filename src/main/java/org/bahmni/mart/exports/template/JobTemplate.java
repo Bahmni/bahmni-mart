@@ -1,6 +1,7 @@
 package org.bahmni.mart.exports.template;
 
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.table.PreProcessor;
 import org.bahmni.mart.table.TableDataProcessor;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
@@ -36,6 +37,8 @@ public class JobTemplate {
 
     private TableData tableDataForMart;
 
+    private PreProcessor preProcessor;
+
     protected Job buildJob(JobDefinition jobConfiguration, AbstractJobListener listener, String readerSql) {
         return jobBuilderFactory.get(jobConfiguration.getName())
                 .incrementer(new RunIdIncrementer())
@@ -55,6 +58,9 @@ public class JobTemplate {
 
     private TableDataProcessor getProcessor(JobDefinition jobConfiguration, AbstractJobListener listener) {
         TableDataProcessor tableDataProcessor = new TableDataProcessor();
+        if (preProcessor != null) {
+            tableDataProcessor.setPreProcessor(preProcessor);
+        }
         tableDataForMart = listener.getTableDataForMart(jobConfiguration.getName());
         tableDataProcessor.setTableData(tableDataForMart);
         return tableDataProcessor;
@@ -72,5 +78,9 @@ public class JobTemplate {
         reader.setSql(readerSql);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
+    }
+
+    protected void setPreProcessor(PreProcessor preProcessor) {
+        this.preProcessor = preProcessor;
     }
 }

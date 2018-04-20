@@ -13,6 +13,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class TableDataProcessorTest {
 
@@ -64,4 +68,37 @@ public class TableDataProcessorTest {
         assertTrue(processedMap.keySet().contains("outcome_id"));
         assertThat(processedMap.get("outcome_id"), is(""));
     }
+
+    @Test
+    public void shouldReturnEmptyStringGivenItemValueIsEmpty() throws Exception {
+        items.put("outcome_id", "");
+        TableColumn tableColumn4 = new TableColumn("outcome_id", "integer", false, null);
+        tableData.addColumn(tableColumn4);
+
+        Map<String, Object> processedMap = tableDataProcessor.process(items);
+
+        assertNotNull(processedMap);
+        assertTrue(processedMap.keySet().contains("outcome_id"));
+        assertThat(processedMap.get("outcome_id"), is(""));
+    }
+
+    @Test
+    public void shouldSetPreProcessorGivenNonNullPreProcessor() throws Exception {
+        PreProcessor preProcessor = mock(PreProcessor.class);
+        tableDataProcessor.setPreProcessor(preProcessor);
+
+        tableDataProcessor.process(items);
+
+        verify(preProcessor,times(1)).process(items);
+    }
+
+    @Test
+    public void shouldNotSetPreProcessorWhenPreProcessorIsNull() throws Exception {
+        PreProcessor preProcessor = mock(PreProcessor.class);
+
+        tableDataProcessor.process(items);
+
+        verify(preProcessor,never()).process(items);
+    }
+
 }
