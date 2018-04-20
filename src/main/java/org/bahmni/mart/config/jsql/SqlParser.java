@@ -40,7 +40,8 @@ public class SqlParser {
         return readerSQL;
     }
 
-    private static String getUpdatedSql(List<String> columnsToIgnore, SetOperationList setOperationList) {
+    private static String getUpdatedSql(List<String> columnsToIgnore, SetOperationList setOperationList)
+            throws JSQLParserException {
 
         List<String> updatedSelectStatements = setOperationList.getSelects().stream().map(selectBody ->
                 getUpdatedReaderSqlFromPlainSelect(columnsToIgnore, (PlainSelect) selectBody))
@@ -49,19 +50,27 @@ public class SqlParser {
         return getReaderSql(setOperationList, updatedSelectStatements);
     }
 
-    private static String getReaderSql(SetOperationList setOperationList, List<String> updatedSelectStatements) {
+    private static String getReaderSql(SetOperationList setOperationList, List<String> updatedSelectStatements)
+            throws JSQLParserException {
         List<SetOperation> setOperations = setOperationList.getOperations();
         Iterator<String> iterator = updatedSelectStatements.iterator();
         StringBuilder finalReaderSqlBuilder = new StringBuilder();
 
         for (SetOperation setOperation : setOperations) {
+            assertSelectStatementExist(iterator);
             finalReaderSqlBuilder.append(iterator.next());
             finalReaderSqlBuilder.append(" " + setOperation.toString() + " ");
         }
-
+        assertSelectStatementExist(iterator);
         finalReaderSqlBuilder.append(iterator.next());
 
         return finalReaderSqlBuilder.toString();
+    }
+
+    private static void assertSelectStatementExist(Iterator<String> iterator) throws JSQLParserException {
+        if (!iterator.hasNext()) {
+            throw new JSQLParserException();
+        }
     }
 
     private static String getUpdatedReaderSqlFromPlainSelect(List<String> columnsToIgnore, PlainSelect selectBody) {

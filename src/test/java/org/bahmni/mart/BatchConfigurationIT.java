@@ -117,8 +117,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(7, tableDataColumns.size());
         assertTrue(tableDataColumns.containsAll(expectedColumns));
         verifyOrderRecords(martJdbcTemplate.queryForList("SELECT * FROM \"lab_samples\""), expectedColumns);
-
-        System.out.println();
     }
 
     private void verifyOrderRecords(List<Map<String, Object>> actualOrders, List<String> expectedColumns) {

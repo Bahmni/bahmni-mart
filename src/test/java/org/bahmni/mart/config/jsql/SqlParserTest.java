@@ -186,7 +186,7 @@ public class SqlParserTest {
     }
 
     @Test
-    public void shouldReturnUpdatedSqlWhenGivenSqlHasSetOperations12() throws Exception {
+    public void shouldReturnUpdatedSqlWhenGivenSqlHasSetOperations() throws Exception {
         List<String> columnsToIgnore = Collections.singletonList("id");
         String readerSql = "SELECT id, name FROM patient UNION SELECT id, name FROM visitor";
         String expectedSql = "SELECT name FROM patient UNION SELECT name FROM visitor";
@@ -245,5 +245,46 @@ public class SqlParserTest {
         verify(logger, times(1)).error(eq("Unable to parse the reader sql: null"),
                 any(JSQLParserException.class));
         verify(ccjSqlParserManager, times(1)).parse(stringReader);
+    }
+
+    @Test
+    public void shouldThrowExceptionIfUnionOperationHasNoRightHandSql() throws Exception {
+        List<String> columnsToIgnore = Collections.singletonList("id");
+        String readerSql = "SELECT id, name FROM patient UNION";
+
+        mockStatic(StringUtils.class);
+
+        whenNew(CCJSqlParserManager.class).withNoArguments().thenReturn(ccjSqlParserManager);
+        whenNew(StringReader.class).withArguments(readerSql).thenReturn(stringReader);
+        when(ccjSqlParserManager.parse(stringReader)).thenReturn(select);
+        when(select.getSelectBody()).thenReturn(setOperationList);
+        when(setOperationList.getSelects()).thenReturn(Arrays.asList(plainSelect));
+        when(plainSelect.getSelectItems()).thenReturn(Arrays.asList(selectItem1, selectItem2));
+        whenNew(SelectItemVisitorImpl.class).withNoArguments().thenReturn(selectItemVisitor);
+        when(selectItemVisitor.getAlias()).thenReturn(null);
+        when(selectItem1.toString()).thenReturn("id");
+        when(selectItemVisitor.getExpressionVisitor()).thenReturn(expressionVisitor);
+        when(expressionVisitor.getColumnName()).thenReturn("id").thenReturn("name");
+        when(StringUtils.join(Arrays.asList("id", "name"), ", ")).thenReturn("id, name");
+        when(plainSelect.toString()).thenReturn("SELECT id, name FROM patient");
+        when(StringUtils.join(Arrays.asList("name"), ", ")).thenReturn("name");
+
+        when(setOperationList.getOperations()).thenReturn(Collections.singletonList(setOperation));
+        when(setOperation.toString()).thenReturn("UNION");
+        Logger logger = mock(Logger.class);
+        setValueForFinalStaticField(SqlParser.class, "logger", logger);
+
+        SqlParser.getUpdatedReaderSql(columnsToIgnore, readerSql);
+        verify(logger, times(1)).error(eq("Unable to parse the reader sql: null"),
+                any(JSQLParserException.class));
+
+        verify(ccjSqlParserManager, times(1)).parse(stringReader);
+        verify(select, times(1)).getSelectBody();
+        verify(setOperationList, times(1)).getSelects();
+        verify(plainSelect, times(1)).getSelectItems();
+        verify(selectItemVisitor, times(2)).getAlias();
+        verify(selectItemVisitor, times(2)).getExpressionVisitor();
+        verify(expressionVisitor, times(2)).getColumnName();
+        verify(setOperationList, times(1)).getOperations();
     }
 }
