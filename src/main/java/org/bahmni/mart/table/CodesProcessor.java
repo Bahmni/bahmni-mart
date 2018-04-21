@@ -30,7 +30,7 @@ public class CodesProcessor implements PreProcessor {
     private Map<String, String> columnsToCode;
 
     @Autowired
-    CodesProcessor() {
+    public CodesProcessor() {
         codes = new ArrayList<>();
         columnsToCode = new HashMap<>();
     }

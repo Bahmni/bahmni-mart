@@ -21,8 +21,8 @@ public class CodesExtractor implements ResultSetExtractor<List<Map<String, Strin
     private List<String> getColumns(ResultSetMetaData resultSetMetaData) throws SQLException {
         int columnCount = resultSetMetaData.getColumnCount();
         List<String> columns = new ArrayList<>(columnCount);
-        for (int i = 1; i <= columnCount; i++) {
-            columns.add(resultSetMetaData.getColumnName(i));
+        for (int index = 1; index <= columnCount; index++) {
+            columns.add(resultSetMetaData.getColumnName(index));
         }
         return columns;
     }

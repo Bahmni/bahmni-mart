@@ -47,21 +47,19 @@ public class SimpleJobTemplateTest {
     @Mock
     private JobDefinition jobDefinition;
 
-    private SimpleJobTemplate simpleJobTemplate;
     private SimpleJobTemplate spyJobTemplate;
-    private String jobName;
     private String readerSql;
     private List<CodeConfig> codeConfigs;
 
     @Before
     public void setUp() throws Exception {
-        simpleJobTemplate = new SimpleJobTemplate();
+        SimpleJobTemplate simpleJobTemplate = new SimpleJobTemplate();
         setValuesForMemberFields(simpleJobTemplate, "codesProcessor", codesProcessor);
         setValuesForMemberFields(simpleJobTemplate, "tableGeneratorJobListener", listener);
 
         spyJobTemplate = spy(simpleJobTemplate);
 
-        jobName = "testJob";
+        String jobName = "testJob";
         readerSql = "select * from table";
         CodeConfig codeConfig = mock(CodeConfig.class);
         codeConfigs = Arrays.asList(codeConfig);
