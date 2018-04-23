@@ -1,5 +1,6 @@
 package org.bahmni.mart.table;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.helper.Constants;
@@ -96,6 +97,10 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
 
     public boolean hasMetadataFor(BahmniForm form) {
         return tableDataMap.containsKey(getProcessedName(form.getFormName().getName()));
+    }
+
+    public static String addPrefixToName(String name, String prefix) {
+        return StringUtils.isEmpty(prefix) ? name : String.format("%s %s", prefix, name);
     }
 
     public static String getProcessedName(String formName) {

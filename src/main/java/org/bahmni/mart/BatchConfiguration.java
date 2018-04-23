@@ -6,6 +6,7 @@ import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.OrderStepConfigurer;
+import org.bahmni.mart.config.RspStepConfigurer;
 import org.bahmni.mart.config.StepConfigurerContract;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
@@ -79,6 +80,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private ViewExecutor viewExecutor;
 
     @Autowired
+    private RspStepConfigurer rspStepConfigurer;
+
+    @Autowired
     private OrderStepConfigurer orderStepConfigurer;
 
     @Autowired
@@ -125,9 +129,15 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
               return buildOrdersJob(jobDefinition);
           case "diagnoses":
               return buildDiagnosesJob(jobDefinition);
+          case "rsp":
+              return buildRspJob(jobDefinition);
           default:
               return simpleJobTemplate.buildJob(jobDefinition);
         }
+    }
+
+    private Job buildRspJob(JobDefinition jobDefinition) {
+        return getJob(getFlowBuilder(jobDefinition.getName()), rspStepConfigurer, jobDefinition);
     }
 
     private Job buildObsJob(JobDefinition jobDefinition) {

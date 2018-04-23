@@ -382,6 +382,12 @@
       "chunkSizeToRead": 500
     },
     {
+      "name": "Registration Second Page",
+      "type": "rsp",
+      "columnsToIgnore": [],
+      "separateTables": []
+    },
+    {
       "name": "Diagnoses Data",
       "type": "diagnoses",
       "columnsToIgnore": []

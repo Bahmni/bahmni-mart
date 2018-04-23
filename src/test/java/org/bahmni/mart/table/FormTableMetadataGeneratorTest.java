@@ -98,4 +98,19 @@ public class FormTableMetadataGeneratorTest {
     public void shouldGiveProcessedName() {
         assertEquals("temp_ab_c", FormTableMetadataGenerator.getProcessedName("  Temp  ab c "));
     }
+
+    @Test
+    public void shouldAddPrefixToGivenName() {
+        assertEquals("rsp test_name", FormTableMetadataGenerator.addPrefixToName("test_name", "rsp"));
+    }
+
+    @Test
+    public void shouldReturnGivenNameAsItIsIfPrefixIsNull() {
+        assertEquals("test_name", FormTableMetadataGenerator.addPrefixToName("test_name", null));
+    }
+
+    @Test
+    public void shouldReturnGivenNameAsItIsIfPrefixIsEmpty() {
+        assertEquals("test_name", FormTableMetadataGenerator.addPrefixToName("test_name", null));
+    }
 }

@@ -7,6 +7,7 @@ import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.OrderStepConfigurer;
+import org.bahmni.mart.config.RspStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
@@ -96,6 +97,9 @@ public class BatchConfigurationTest {
     @Mock
     private DiagnosesStepConfigurer diagnosesStepConfigurer;
 
+    @Mock
+    private RspStepConfigurer rspStepConfigurer;
+
     private JobFlowBuilder jobFlowBuilder;
 
     private BatchConfiguration batchConfiguration;
@@ -121,6 +125,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "viewExecutor", viewExecutor);
         setValuesForMemberFields(batchConfiguration, "orderStepConfigurer", orderStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "diagnosesStepConfigurer", diagnosesStepConfigurer);
+        setValuesForMemberFields(batchConfiguration, "rspStepConfigurer", rspStepConfigurer);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(any())).thenReturn(jobBuilder);
@@ -271,6 +276,22 @@ public class BatchConfigurationTest {
         verify(jobBuilderFactory, times(1)).get("Diagnoses Data");
         verify(diagnosesStepConfigurer, times(1)).createTables();
         verify(diagnosesStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+    }
+
+    @Test
+    public void shouldRunRspJob() throws Exception {
+        String jobName = "Registration Second Page";
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinition.getName()).thenReturn(jobName);
+        when(jobDefinition.getType()).thenReturn("rsp");
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobBuilderFactory, times(1)).get(jobName);
+        verify(rspStepConfigurer, times(1)).createTables();
+        verify(rspStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
     }
 }
