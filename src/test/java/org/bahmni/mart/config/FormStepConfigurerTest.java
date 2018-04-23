@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FormStepConfigurerTest {
 
-    private ObsStepConfigurer formStepConfigurer;
+    private StepConfigurer formStepConfigurer;
 
     @Mock
     private TableGeneratorStep tableGeneratorStep;

@@ -11,7 +11,7 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNames
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 
 @Configuration
-public class DiagnosesStepConfigurer extends ObsStepConfigurer {
+public class DiagnosesStepConfigurer extends StepConfigurer {
     private static final String VISIT_DIAGNOSES = "Visit Diagnoses";
     private static final String VISIT_DIAGNOSES_TYPE = "diagnoses";
 

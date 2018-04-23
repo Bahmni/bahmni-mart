@@ -40,7 +40,7 @@ import static org.bahmni.mart.BatchUtils.constructSqlWithParameter;
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
 
 @Component
-public class OrderStepConfigurer implements StepConfigurer {
+public class OrderStepConfigurer implements StepConfigurerContract {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderStepConfigurer.class);
 

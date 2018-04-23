@@ -6,7 +6,7 @@ import org.bahmni.mart.config.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.OrderStepConfigurer;
-import org.bahmni.mart.config.StepConfigurer;
+import org.bahmni.mart.config.StepConfigurerContract;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
@@ -107,9 +107,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     }
 
     private Job getJob(FlowBuilder<FlowJobBuilder> completeDataExport,
-                       StepConfigurer stepConfigurer, JobDefinition jobDefinition) {
-        stepConfigurer.registerSteps(completeDataExport, jobDefinition);
-        stepConfigurer.createTables();
+                       StepConfigurerContract stepConfigurerContract, JobDefinition jobDefinition) {
+        stepConfigurerContract.registerSteps(completeDataExport, jobDefinition);
+        stepConfigurerContract.createTables();
 
         return completeDataExport.end().build();
     }

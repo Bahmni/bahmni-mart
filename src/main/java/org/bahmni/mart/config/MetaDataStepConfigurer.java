@@ -22,7 +22,7 @@ import java.util.Arrays;
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
 
 @Component
-public class MetaDataStepConfigurer implements StepConfigurer {
+public class MetaDataStepConfigurer implements StepConfigurerContract {
 
     private static final String LIMIT = "LIMIT 1";
 

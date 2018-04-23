@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class FormStepConfigurer extends ObsStepConfigurer {
+public class FormStepConfigurer extends StepConfigurer {
 
     private static final String ALL_FORMS = "All Observation Templates";
 

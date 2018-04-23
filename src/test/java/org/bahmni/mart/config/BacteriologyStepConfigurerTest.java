@@ -40,7 +40,7 @@ public class BacteriologyStepConfigurerTest {
     @Mock
     private JobDefinitionReader jobDefinitionReader;
 
-    private ObsStepConfigurer bacteriologyStepConfigurer;
+    private StepConfigurer bacteriologyStepConfigurer;
 
     @Before
     public void setUp() throws Exception {

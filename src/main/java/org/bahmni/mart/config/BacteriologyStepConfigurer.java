@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class BacteriologyStepConfigurer extends ObsStepConfigurer {
+public class BacteriologyStepConfigurer extends StepConfigurer {
 
     private static final String BACTERIOLOGY_JOB_TYPE = "bacteriology";
     private static final String BACTERIOLOGY_CONCEPT_NAME = "Bacteriology Concept Set";
