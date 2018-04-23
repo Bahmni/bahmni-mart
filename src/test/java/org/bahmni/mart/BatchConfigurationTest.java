@@ -16,9 +16,7 @@ import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
 import org.bahmni.mart.exports.template.EAVJobTemplate;
 import org.bahmni.mart.exports.template.SimpleJobTemplate;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -52,9 +50,6 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 @PrepareForTest({FileUtils.class, JobDefinitionValidator.class})
 @RunWith(PowerMockRunner.class)
 public class BatchConfigurationTest {
-
-    @Rule
-    private ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private JobBuilderFactory jobBuilderFactory;

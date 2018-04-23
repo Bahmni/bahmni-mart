@@ -130,7 +130,6 @@ public class SeparateTableConfigHelperTest {
         List<String> ignoreConceptsSet = Arrays.asList("Test Concept", "Video");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        String ignoreConcepts = "Test Concept, Video";
         
         when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(ignoreConceptsSet);
         

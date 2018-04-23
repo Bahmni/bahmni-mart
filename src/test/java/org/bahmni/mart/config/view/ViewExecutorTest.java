@@ -1,9 +1,7 @@
 package org.bahmni.mart.config.view;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -27,8 +25,6 @@ public class ViewExecutorTest {
     @Mock
     private JdbcTemplate martJdbcTemplate;
 
-    @Rule
-    private ExpectedException expectedException = ExpectedException.none();
     private ViewExecutor viewExecutor;
 
     @Before

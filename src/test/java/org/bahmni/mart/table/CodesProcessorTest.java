@@ -12,7 +12,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,9 +34,6 @@ public class CodesProcessorTest {
 
     @Mock
     private Resource codesSqlResource;
-
-    @Mock
-    private DataSource martDataSource;
 
     @Mock
     private NamedParameterJdbcTemplate martJdbcTemplate;
