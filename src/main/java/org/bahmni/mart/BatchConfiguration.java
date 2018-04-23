@@ -84,36 +84,6 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private DiagnosesStepConfigurer diagnosesStepConfigurer;
 
-    private Job buildObsJob(JobDefinition jobDefinition) {
-        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, formStepConfigurer, jobDefinition);
-    }
-
-    private Job buildBacteriologyJob(JobDefinition jobDefinition) {
-        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, bacteriologyStepConfigurer, jobDefinition);
-    }
-
-    private Job buildDiagnosesJob(JobDefinition jobDefinition) {
-        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, diagnosesStepConfigurer, jobDefinition);
-    }
-
-    private FlowBuilder<FlowJobBuilder> getFlowJobBuilderFlowBuilder(String jobName) {
-        //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
-        return jobBuilderFactory.get(jobName)
-                .incrementer(new RunIdIncrementer()).preventRestart()
-                .flow(treatmentRegistrationBaseExportStep.getStep());
-    }
-
-    private Job getJob(FlowBuilder<FlowJobBuilder> completeDataExport,
-                       StepConfigurerContract stepConfigurerContract, JobDefinition jobDefinition) {
-        stepConfigurerContract.registerSteps(completeDataExport, jobDefinition);
-        stepConfigurerContract.createTables();
-
-        return completeDataExport.end().build();
-    }
-
     @Override
     public void run(String... args) {
         List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
@@ -160,13 +130,38 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         }
     }
 
+    private Job buildObsJob(JobDefinition jobDefinition) {
+        return getJob(getFlowBuilder(jobDefinition.getName()), formStepConfigurer, jobDefinition);
+    }
+
+    private Job buildBacteriologyJob(JobDefinition jobDefinition) {
+        return getJob(getFlowBuilder(jobDefinition.getName()), bacteriologyStepConfigurer, jobDefinition);
+    }
+
+    private Job buildDiagnosesJob(JobDefinition jobDefinition) {
+        return getJob(getFlowBuilder(jobDefinition.getName()), diagnosesStepConfigurer, jobDefinition);
+    }
+
     private Job buildOrdersJob(JobDefinition jobDefinition) {
-        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, orderStepConfigurer, jobDefinition);
+        return getJob(getFlowBuilder(jobDefinition.getName()), orderStepConfigurer, jobDefinition);
     }
 
     private Job buildMetaDataJob(JobDefinition jobDefinition) {
-        FlowBuilder<FlowJobBuilder> completeDataExport = getFlowJobBuilderFlowBuilder(jobDefinition.getName());
-        return getJob(completeDataExport, metaDataStepConfigurer, jobDefinition);
+        return getJob(getFlowBuilder(jobDefinition.getName()), metaDataStepConfigurer, jobDefinition);
+    }
+
+    private FlowBuilder<FlowJobBuilder> getFlowBuilder(String jobName) {
+        //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
+        return jobBuilderFactory.get(jobName)
+                .incrementer(new RunIdIncrementer()).preventRestart()
+                .flow(treatmentRegistrationBaseExportStep.getStep());
+    }
+
+    private Job getJob(FlowBuilder<FlowJobBuilder> completeDataExport,
+                       StepConfigurerContract stepConfigurerContract, JobDefinition jobDefinition) {
+        stepConfigurerContract.registerSteps(completeDataExport, jobDefinition);
+        stepConfigurerContract.createTables();
+
+        return completeDataExport.end().build();
     }
 }
