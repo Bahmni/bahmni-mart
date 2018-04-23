@@ -221,19 +221,9 @@ public class JobDefinitionValidatorTest {
     }
 
     @Test
-    public void shouldReturnFalseGivenASourceAsNull() throws Exception {
+    public void shouldReturnFalseGivenSourceAsNull() throws Exception {
         CodeConfig codeConfig = mock(CodeConfig.class);
         when(codeConfig.getType()).thenReturn("type");
-        List<String> fields = Arrays.asList("field");
-        when(codeConfig.getColumnsToCode()).thenReturn(fields);
-
-        assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
-    }
-
-    @Test
-    public void shouldReturnFalseGivenSourceTypeAsNull() throws Exception {
-        CodeConfig codeConfig = mock(CodeConfig.class);
-        when(codeConfig.getSource()).thenReturn("source");
         List<String> fields = Arrays.asList("field");
         when(codeConfig.getColumnsToCode()).thenReturn(fields);
 

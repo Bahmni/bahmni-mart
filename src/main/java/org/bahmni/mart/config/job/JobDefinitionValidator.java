@@ -64,7 +64,7 @@ public class JobDefinitionValidator {
 
         boolean isValid = true;
         for (CodeConfig codeConfig : codeConfigs) {
-            isValid &= codeConfig != null && !isEmpty(codeConfig.getSource()) && !isEmpty(codeConfig.getType()) &&
+            isValid &= codeConfig != null && !isEmpty(codeConfig.getSource()) &&
                     !CollectionUtils.isEmpty(codeConfig.getColumnsToCode());
         }
         return isValid;
