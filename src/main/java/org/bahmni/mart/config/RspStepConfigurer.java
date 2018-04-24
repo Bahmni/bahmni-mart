@@ -2,10 +2,12 @@ package org.bahmni.mart.config;
 
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
+import org.bahmni.mart.helper.RspConfigHelper;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,13 +18,19 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByTyp
 public class RspStepConfigurer extends StepConfigurer {
     private static final String TYPE = "rsp";
 
+    @Autowired
+    private RspConfigHelper rspConfigHelper;
+
     @Override
     protected List<BahmniForm> getAllForms() {
         List<String> ignoreConcepts = getIgnoreConceptNamesForJob(
                 getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE));
 
-        List<Concept> allFormConcepts = obsService.getConceptsByNames(
-                Arrays.asList("Nutritional Values", "Fee Information"));
+        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
+        if (rspConcepts.isEmpty())
+            return new ArrayList<>();
+
+        List<Concept> allFormConcepts = obsService.getConceptsByNames(rspConcepts);
         return addPrefixToFormsName(formListProcessor.retrieveAllForms(allFormConcepts, ignoreConcepts));
     }
 

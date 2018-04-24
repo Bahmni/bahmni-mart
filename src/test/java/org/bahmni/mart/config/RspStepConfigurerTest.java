@@ -4,6 +4,7 @@ import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
+import org.bahmni.mart.helper.RspConfigHelper;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +17,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.addPrefixToName;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -33,9 +39,13 @@ public class RspStepConfigurerTest extends StepConfigurerTestHelper {
     @Mock
     private Concept concept2;
 
+    @Mock
+    private RspConfigHelper rspConfigHelper;
+
     @Before
     public void setUp() throws Exception {
         rspStepConfigurer = new RspStepConfigurer();
+        setValuesForMemberFields(rspStepConfigurer, "rspConfigHelper", rspConfigHelper);
         setUp(rspStepConfigurer);
     }
 
@@ -56,8 +66,9 @@ public class RspStepConfigurerTest extends StepConfigurerTestHelper {
         mockStatic(FormTableMetadataGenerator.class);
 
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
-        when(JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, "rsp")).thenReturn(jobDefinition);
-        when(JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(Collections.emptyList());
+        when(getJobDefinitionByType(jobDefinitions, "rsp")).thenReturn(jobDefinition);
+        when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(Collections.emptyList());
+        when(rspConfigHelper.getRspConcepts()).thenReturn(conceptNames);
         when(obsService.getConceptsByNames(conceptNames))
                 .thenReturn(concepts);
         when(formListProcessor.retrieveAllForms(concepts, Collections.emptyList())).thenReturn(bahmniForms);
@@ -70,10 +81,11 @@ public class RspStepConfigurerTest extends StepConfigurerTestHelper {
 
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verifyStatic(times(1));
-        JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, "rsp");
+        getJobDefinitionByType(jobDefinitions, "rsp");
         verifyStatic(times(1));
-        JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition);
+        getIgnoreConceptNamesForJob(jobDefinition);
         verify(formListProcessor, times(1)).retrieveAllForms(concepts, Collections.emptyList());
+        verify(rspConfigHelper, times(1)).getRspConcepts();
         verify(obsService, times(1)).getConceptsByNames(conceptNames);
 
         assertEquals(2, actualForms.size());
@@ -85,5 +97,23 @@ public class RspStepConfigurerTest extends StepConfigurerTestHelper {
         verify(concept2, times(1)).getName();
         verify(concept, times(1)).setName("rsp Nutritional Values");
         verify(concept2, times(1)).setName("rsp Fee Information");
+    }
+
+    @Test
+    public void shouldGiveEmptyListAsAllFormsIfRspConceptsIsMissing() {
+        mockStatic(JobDefinitionUtil.class);
+
+        List<JobDefinition> jobDefinitions = Collections.singletonList(jobDefinition);
+
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
+        when(getJobDefinitionByType(jobDefinitions, "rsp")).thenReturn(jobDefinition);
+        when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(Collections.emptyList());
+        when(rspConfigHelper.getRspConcepts()).thenReturn(Collections.emptyList());
+
+        assertTrue(rspStepConfigurer.getAllForms().isEmpty());
+        verify(obsService, times(0)).getConceptsByNames(any());
+        verify(formListProcessor, times(0)).retrieveAllForms(any(), any());
+        verifyStatic(times(0));
+        addPrefixToName(any(), any());
     }
 }

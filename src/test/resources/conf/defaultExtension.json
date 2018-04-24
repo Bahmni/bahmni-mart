@@ -1,0 +1,23 @@
+{
+  "nutritionalValues": {
+    "extensionPointId": "org.bahmni.registration.conceptSetGroup.observations",
+    "type": "config",
+    "extensionParams": {
+      "conceptName": "Nutritional Values"
+    }
+  },
+  "feeInformation": {
+    "extensionPointId": "org.bahmni.registration.conceptSetGroup.observations",
+    "type": "config",
+    "extensionParams": {
+      "conceptName": "Fee Information"
+    }
+  },
+  "nutritionalValueTemp": {
+    "extensionPointId": "org.bahmni.registration.conceptSetGroup.observations",
+    "type": "config",
+    "extensionParams": {
+      "conceptName": "Nutritional Temp"
+    }
+  }
+}
