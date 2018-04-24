@@ -57,7 +57,6 @@ public class EAVJobTemplateTest {
     @Mock
     private JobDefinition jobDefinition;
 
-    private EAVJobTemplate eavJobTemplate;
     private EAVJobTemplate spyEAVJobTemplate;
     private String jobName;
     private String readerSql;
@@ -65,7 +64,7 @@ public class EAVJobTemplateTest {
 
     @Before
     public void setUp() throws Exception {
-        eavJobTemplate = new EAVJobTemplate();
+        EAVJobTemplate eavJobTemplate = new EAVJobTemplate();
         setValuesForMemberFields(eavJobTemplate, "codesProcessor", codesProcessor);
         setValuesForMemberFields(eavJobTemplate, "eavJobListener", listener);
         setValuesForMemberFields(eavJobTemplate, "freeMarkerEvaluator", freeMarkerEvaluator);

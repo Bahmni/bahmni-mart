@@ -2,21 +2,28 @@ package org.bahmni.mart.table;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.CodeConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
 public class CodesProcessor implements PreProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(CodesProcessor.class);
 
     @Value("classpath:sql/customCodes.sql")
     private Resource codesSqlResource;
@@ -30,7 +37,7 @@ public class CodesProcessor implements PreProcessor {
     private Map<String, String> columnsToCode;
 
     @Autowired
-    CodesProcessor() {
+    public CodesProcessor() {
         codes = new ArrayList<>();
         columnsToCode = new HashMap<>();
     }
@@ -60,12 +67,17 @@ public class CodesProcessor implements PreProcessor {
         params.put("source", codeConfig.getSource());
         params.put("type", codeConfig.getType());
         String sql = BatchUtils.convertResourceOutputToString(codesSqlResource);
-        return martNamedJdbcTemplate.query(sql, params, new CodesExtractor());
+        try {
+            return martNamedJdbcTemplate.query(sql, params, new CodesExtractor());
+        } catch (BadSqlGrammarException bsge) {
+            logger.error(bsge.getMessage());
+        }
+        return Collections.emptyList();
     }
 
     private String getCode(Object value, String type) {
         for (Map<String, String> rowMap : codes) {
-            if (value.equals(rowMap.get("name")) && type.equals(rowMap.get("type"))) {
+            if (value.equals(rowMap.get("name")) && Objects.equals(type,rowMap.get("type"))) {
                 return rowMap.get("code");
             }
         }

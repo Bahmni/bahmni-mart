@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 
@@ -213,30 +212,20 @@ public class JobDefinitionValidatorTest {
     @Test
     public void shouldReturnTrueGivenAllNonNullAndNonEmptyFieldsInCodeConfig() throws Exception {
         CodeConfig codeConfig = mock(CodeConfig.class);
-        PowerMockito.when(codeConfig.getSource()).thenReturn("source");
-        PowerMockito.when(codeConfig.getType()).thenReturn("type");
+        when(codeConfig.getSource()).thenReturn("source");
+        when(codeConfig.getType()).thenReturn("type");
         List<String> fields = Arrays.asList("field");
-        PowerMockito.when(codeConfig.getColumnsToCode()).thenReturn(fields);
+        when(codeConfig.getColumnsToCode()).thenReturn(fields);
 
         assertTrue(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
     }
 
     @Test
-    public void shouldReturnFalseGivenASourceAsNull() throws Exception {
+    public void shouldReturnFalseGivenSourceAsNull() throws Exception {
         CodeConfig codeConfig = mock(CodeConfig.class);
-        PowerMockito.when(codeConfig.getType()).thenReturn("type");
+        when(codeConfig.getType()).thenReturn("type");
         List<String> fields = Arrays.asList("field");
-        PowerMockito.when(codeConfig.getColumnsToCode()).thenReturn(fields);
-
-        assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
-    }
-
-    @Test
-    public void shouldReturnFalseGivenSourceTypeAsNull() throws Exception {
-        CodeConfig codeConfig = mock(CodeConfig.class);
-        PowerMockito.when(codeConfig.getSource()).thenReturn("source");
-        List<String> fields = Arrays.asList("field");
-        PowerMockito.when(codeConfig.getColumnsToCode()).thenReturn(fields);
+        when(codeConfig.getColumnsToCode()).thenReturn(fields);
 
         assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
     }
@@ -244,8 +233,8 @@ public class JobDefinitionValidatorTest {
     @Test
     public void shouldReturnFalseGivenColumnsToCodeAsNull() throws Exception {
         CodeConfig codeConfig = mock(CodeConfig.class);
-        PowerMockito.when(codeConfig.getSource()).thenReturn("source");
-        PowerMockito.when(codeConfig.getType()).thenReturn("type");
+        when(codeConfig.getSource()).thenReturn("source");
+        when(codeConfig.getType()).thenReturn("type");
 
         assertFalse(JobDefinitionValidator.isValid(Arrays.asList(codeConfig)));
     }

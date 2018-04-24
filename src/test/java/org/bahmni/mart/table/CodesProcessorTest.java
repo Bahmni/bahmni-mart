@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -97,6 +99,23 @@ public class CodesProcessorTest {
         assertEquals(3, spyCodesList.size());
         codesList1.addAll(this.codesList);
         assertTrue(Arrays.equals(spyCodesList.toArray(), codesList1.toArray()));
+    }
+
+    @Test
+    public void shouldReturnEmptyCodesListWhenThereIsProblemInFetchingCodes() throws Exception {
+        List<Map<String, String>> spyCodesList = spy(ArrayList.class);
+        setValuesForMemberFields(codesProcessor, "codes", spyCodesList);
+        List<CodeConfig> codeConfigs = setUpCodeConfigs();
+        String sql = "some sql";
+        mockStatic(BatchUtils.class);
+        when(BatchUtils.convertResourceOutputToString(codesSqlResource)).thenReturn(sql);
+        when(martJdbcTemplate.query(eq(sql), anyMap(),
+                any(CodesExtractor.class))).thenThrow(BadSqlGrammarException.class);
+
+        codesProcessor.setUpCodesData(codeConfigs);
+
+        assertNotNull(spyCodesList);
+        assertEquals(0, spyCodesList.size());
     }
 
     @Test
