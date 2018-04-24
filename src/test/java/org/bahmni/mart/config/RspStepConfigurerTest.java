@@ -36,7 +36,7 @@ public class RspStepConfigurerTest extends StepConfigurerTestHelper {
     @Before
     public void setUp() throws Exception {
         rspStepConfigurer = new RspStepConfigurer();
-        super.setUp(rspStepConfigurer);
+        setUp(rspStepConfigurer);
     }
 
     @Test

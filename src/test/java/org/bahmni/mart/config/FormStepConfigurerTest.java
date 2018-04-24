@@ -1,14 +1,9 @@
 package org.bahmni.mart.config;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exports.ObservationExportStep;
-import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
-import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,13 +13,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
-import org.springframework.beans.factory.ObjectFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -34,42 +27,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FormStepConfigurerTest {
-
-    private StepConfigurer formStepConfigurer;
-
-    @Mock
-    private TableGeneratorStep tableGeneratorStep;
-
-    @Mock
-    private FormTableMetadataGenerator formTableMetadataGenerator;
-
-    @Mock
-    private FormListProcessor formListProcessor;
-
-    @Mock
-    private ObjectFactory<ObservationExportStep> observationExportStepFactory;
-
+public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     @Mock
     private FlowBuilder<FlowJobBuilder> completeDataExport;
 
-    @Mock
-    private ObsService obsService;
-
-    @Mock
-    private JobDefinitionReader jobDefinitionReader;
+    private StepConfigurer formStepConfigurer;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         formStepConfigurer = new FormStepConfigurer();
-        setValuesForSuperClassMemberFields(formStepConfigurer, "tableGeneratorStep", tableGeneratorStep);
-        setValuesForSuperClassMemberFields(formStepConfigurer,
-                "formTableMetadataGenerator", formTableMetadataGenerator);
-        setValuesForSuperClassMemberFields(formStepConfigurer,
-                "observationExportStepFactory", observationExportStepFactory);
-        setValuesForSuperClassMemberFields(formStepConfigurer, "formListProcessor", formListProcessor);
-        setValuesForSuperClassMemberFields(formStepConfigurer, "jobDefinitionReader", jobDefinitionReader);
-        setValuesForSuperClassMemberFields(formStepConfigurer, "obsService", obsService);
+        setUp(formStepConfigurer);
     }
 
     @Test

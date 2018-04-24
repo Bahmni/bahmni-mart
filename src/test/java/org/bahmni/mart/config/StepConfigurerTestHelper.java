@@ -39,7 +39,7 @@ public class StepConfigurerTestHelper {
     @Mock
     protected Concept concept;
 
-    public void setUp(StepConfigurer classInstance) throws Exception {
+    protected void setUp(StepConfigurer classInstance) throws Exception {
         setValuesForSuperClassMemberFields(classInstance, "tableGeneratorStep", tableGeneratorStep);
         setValuesForSuperClassMemberFields(classInstance,
                 "formTableMetadataGenerator", formTableMetadataGenerator);
