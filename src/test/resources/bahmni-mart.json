@@ -18,7 +18,7 @@
     {
       "name": "Patient Details",
       "type": "generic",
-      "readerSqlFilePath": "classpath:readerSql/reader.sql",
+      "readerFilePath": "classpath:readerSql/reader.sql",
       "chunkSizeToRead": "500",
       "tableName": "patient_details",
       "columnsToIgnore": ["date_created"]

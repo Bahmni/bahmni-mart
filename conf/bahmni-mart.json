@@ -91,7 +91,7 @@
     {
       "name": "Medication Data",
       "type": "customSql",
-      "readerSqlFilePath": "classpath:readerSql/drugOrder.sql",
+      "readerFilePath": "classpath:readerSql/drugOrder.sql",
       "chunkSizeToRead": "500",
       "tableName": "medication_data",
       "columnsToIgnore": [

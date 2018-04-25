@@ -49,7 +49,7 @@ public class JobDefinitionValidator {
             return true;
         }
 
-        if (isEmpty(jobDefinition.getReaderSql()) && isEmpty(jobDefinition.getReaderSqlFilePath())) {
+        if (isEmpty(jobDefinition.getReaderSql()) && isEmpty(jobDefinition.getReaderFilePath())) {
             logger.error(String.format("Reader SQL(or Reader SQL file path) is empty for the job '%s'",
                     jobDefinition.getName()));
             return true;

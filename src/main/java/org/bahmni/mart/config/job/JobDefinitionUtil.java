@@ -49,7 +49,7 @@ public class JobDefinitionUtil {
         if (StringUtils.isNotEmpty(jobDefinition.getReaderSql())) {
             return jobDefinition.getReaderSql();
         }
-        Resource readerSqlResource = ReaderSQLFileLoader.loadResource(jobDefinition.getReaderSqlFilePath());
+        Resource readerSqlResource = ReaderSQLFileLoader.loadResource(jobDefinition.getReaderFilePath());
         return BatchUtils.convertResourceOutputToString(readerSqlResource);
     }
 
