@@ -409,6 +409,9 @@
     {
       "name": "patient_details_view",
       "sql": "select pi.*, gender, birthdate, birthtime, birthdate_estimated, dead, death_date, deathdate_estimated, cause_of_death, pat.* from patient_identifier pi LEFT OUTER JOIN person_details pd on pd.person_id = pi.patient_id LEFT OUTER JOIN person_attributes pat on pat.person_id = pi.patient_id"
-    }
+    },
+    {"name": "surgery_details",
+    "sql":"SELECT sa.surgical_appointment_id, sa.surgical_block_id, sb.primary_provider_name, sb.location_name, sb.block_starttime, sb.block_endtime, sb.date_created AS block_datecreated, sb.date_changed AS block_datechanged, patient_id, sort_weight, status, saa.*, actual_start_datetime, actual_end_datetime, sa.date_created AS surgery_date_created, sa.date_changed AS surgery_date_changed FROM surgical_block sb LEFT OUTER JOIN surgical_appointment sa ON sa.surgical_block_id = sb.surgical_block_id LEFT OUTER JOIN surgical_appointment_attributes saa ON saa.surgical_appointment_id = sa.surgical_appointment_id"}
+
   ]
 }
