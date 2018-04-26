@@ -4,6 +4,7 @@ import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
+import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.TableDataExtractor;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.domain.TableColumn;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
 import static org.junit.Assert.assertEquals;
@@ -33,6 +35,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -56,6 +59,9 @@ public class TableGeneratorJobListenerTest {
 
     @Mock
     private TableGeneratorStep tableGeneratorStep;
+
+    @Mock
+    private CodesProcessor codesProcessor;
 
     private TableGeneratorJobListener tableGeneratorJobListener;
 
@@ -142,5 +148,21 @@ public class TableGeneratorJobListenerTest {
         expectedException.expect(InvalidJobConfiguration.class);
         expectedException.expectMessage("Reader SQL is empty for the job definition 'testJob'");
         tableGeneratorJobListener.getTableDataForMart(jobName);
+    }
+
+    @Test
+    public void shouldSetUpCodesDataWhenCodeProcessorIsNotNull() throws Exception {
+        setValuesForMemberFields(tableGeneratorJobListener, "codesProcessor", codesProcessor);
+
+        tableGeneratorJobListener.setUpPreProcessorData();
+
+        verify(codesProcessor, times(1)).setUpCodesData();
+    }
+
+    @Test
+    public void shouldNotSetUpCodesDataGivenNullAsCodeProcessor() {
+        tableGeneratorJobListener.setUpPreProcessorData();
+
+        verify(codesProcessor, never()).setUpCodesData();
     }
 }

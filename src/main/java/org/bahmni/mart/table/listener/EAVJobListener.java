@@ -3,18 +3,29 @@ package org.bahmni.mart.table.listener;
 import org.apache.commons.collections.CollectionUtils;
 import org.bahmni.mart.config.job.EavAttributes;
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Scope(value = "prototype")
 public class EAVJobListener extends AbstractJobListener {
     private static final Logger log = LoggerFactory.getLogger(EAVJobListener.class);
+
+    private CodesProcessor codesProcessor;
+
+    @Override
+    protected void setUpPreProcessorData() {
+        if (codesProcessor != null)
+            codesProcessor.setUpCodesData();
+    }
 
     @Override
     public TableData getTableDataForMart(String jobName) {
@@ -66,5 +77,9 @@ public class EAVJobListener extends AbstractJobListener {
     private List<String> getPivotColumns(String tableName) {
         String sql = String.format("select name from %s;", tableName);
         return openMRSJdbcTemplate.queryForList(sql, String.class);
+    }
+
+    public void setCodesProcessor(CodesProcessor codesProcessor) {
+        this.codesProcessor = codesProcessor;
     }
 }

@@ -26,6 +26,7 @@ public abstract class AbstractJobListener extends JobExecutionListenerSupport {
     public void beforeJob(JobExecution jobExecution) {
         try {
             createTable(jobExecution.getJobInstance().getJobName());
+            setUpPreProcessorData();
         } catch (Exception e) {
             logError(e);
             jobExecution.stop();
@@ -39,4 +40,6 @@ public abstract class AbstractJobListener extends JobExecutionListenerSupport {
     public abstract TableData getTableDataForMart(String jobName);
 
     protected abstract void logError(Exception e);
+
+    protected abstract void setUpPreProcessorData();
 }

@@ -85,8 +85,9 @@ public class CodesProcessorTest {
         setValuesForMemberFields(codesProcessor, "columnsToCode", spyColumnsToCode);
         List<Map<String, String>> spyCodesList = spy(ArrayList.class);
         setValuesForMemberFields(codesProcessor, "codes", spyCodesList);
+        codesProcessor.setCodeConfigs(codeConfigs);
 
-        codesProcessor.setUpCodesData(codeConfigs);
+        codesProcessor.setUpCodesData();
 
         assertNotNull(spyColumnsToCode);
         assertEquals(2, spyColumnsToCode.size());
@@ -111,8 +112,9 @@ public class CodesProcessorTest {
         when(BatchUtils.convertResourceOutputToString(codesSqlResource)).thenReturn(sql);
         when(martJdbcTemplate.query(eq(sql), anyMap(),
                 any(CodesExtractor.class))).thenThrow(BadSqlGrammarException.class);
+        codesProcessor.setCodeConfigs(codeConfigs);
 
-        codesProcessor.setUpCodesData(codeConfigs);
+        codesProcessor.setUpCodesData();
 
         assertNotNull(spyCodesList);
         assertEquals(0, spyCodesList.size());

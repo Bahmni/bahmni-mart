@@ -6,6 +6,7 @@ import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.listener.TableGeneratorJobListener;
 import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnorin
 import static org.bahmni.mart.config.job.JobDefinitionValidator.isValid;
 
 @Component
+@Scope(value = "prototype")
 public class SimpleJobTemplate extends JobTemplate {
 
     @Autowired
@@ -29,7 +31,8 @@ public class SimpleJobTemplate extends JobTemplate {
         String readerSQLWithOutIgnoreColumns = getReaderSQLByIgnoringColumns(columnsToIgnore, readerSQL);
         List<CodeConfig> codeConfigs = jobConfiguration.getCodeConfigs();
         if (isValid(codeConfigs)) {
-            codesProcessor.setUpCodesData(codeConfigs);
+            codesProcessor.setCodeConfigs(codeConfigs);
+            tableGeneratorJobListener.setCodesProcessor(codesProcessor);
             setPreProcessor(codesProcessor);
         }
         return buildJob(jobConfiguration, tableGeneratorJobListener, readerSQLWithOutIgnoreColumns);

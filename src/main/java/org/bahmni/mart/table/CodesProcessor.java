@@ -36,6 +36,8 @@ public class CodesProcessor implements PreProcessor {
 
     private Map<String, String> columnsToCode;
 
+    private List<CodeConfig> codeConfigs;
+
     @Autowired
     public CodesProcessor() {
         codes = new ArrayList<>();
@@ -48,7 +50,7 @@ public class CodesProcessor implements PreProcessor {
                 Collectors.toMap(Map.Entry::getKey, p -> getProcessedValue(p.getKey(), p.getValue())));
     }
 
-    public void setUpCodesData(List<CodeConfig> codeConfigs) {
+    public void setUpCodesData() {
         codeConfigs.forEach(codeConfig -> {
             setColumnsToCode(codeConfig.getColumnsToCode(), codeConfig.getType());
             setCodes(fetchCodes(codeConfig));
@@ -91,5 +93,9 @@ public class CodesProcessor implements PreProcessor {
 
     private void setColumnsToCode(List<String> columnsToCode, String type) {
         columnsToCode.forEach(column -> this.columnsToCode.put(column, type));
+    }
+
+    public void setCodeConfigs(List<CodeConfig> codeConfigs) {
+        this.codeConfigs = codeConfigs;
     }
 }

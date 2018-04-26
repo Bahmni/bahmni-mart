@@ -33,6 +33,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.builder.JobFlowBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.beans.factory.ObjectFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,6 +76,12 @@ public class BatchConfigurationTest {
 
     @Mock
     private ViewExecutor viewExecutor;
+
+    @Mock
+    private ObjectFactory simpleJobTemplateFactory;
+
+    @Mock
+    private ObjectFactory eavJobTemplateFactory;
 
     @Mock
     private SimpleJobTemplate simpleJobTemplate;
@@ -120,13 +127,13 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "formStepConfigurer", formStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "bacteriologyStepConfigurer", bacteriologyStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "jobDefinitionReader", jobDefinitionReader);
-        setValuesForMemberFields(batchConfiguration, "simpleJobTemplate", simpleJobTemplate);
+        setValuesForMemberFields(batchConfiguration, "simpleJobTemplateFactory", simpleJobTemplateFactory);
         setValuesForMemberFields(batchConfiguration, "jobLauncher", jobLauncher);
         setValuesForMemberFields(batchConfiguration, "jobBuilderFactory", jobBuilderFactory);
         setValuesForMemberFields(batchConfiguration, "metaDataStepConfigurer", metaDataStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "treatmentRegistrationBaseExportStep",
                 treatmentRegistrationBaseExportStep);
-        setValuesForMemberFields(batchConfiguration, "eavJobTemplate", eavJobTemplate);
+        setValuesForMemberFields(batchConfiguration, "eavJobTemplateFactory", eavJobTemplateFactory);
         setValuesForMemberFields(batchConfiguration, "martJSONReader", martJSONReader);
         setValuesForMemberFields(batchConfiguration, "viewExecutor", viewExecutor);
         setValuesForMemberFields(batchConfiguration, "orderStepConfigurer", orderStepConfigurer);
@@ -148,6 +155,8 @@ public class BatchConfigurationTest {
         when(flowJobBuilder.build()).thenReturn(job);
         when(martJSONReader.getViewDefinitions()).thenReturn(new ArrayList<>());
         when(JobDefinitionValidator.validate(anyListOf(JobDefinition.class))).thenReturn(true);
+        when(eavJobTemplateFactory.getObject()).thenReturn(eavJobTemplate);
+        when(simpleJobTemplateFactory.getObject()).thenReturn(simpleJobTemplate);
         when(jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE)).thenReturn(jobDefinition);
         when(jobDefinition.isEmpty()).thenReturn(true);
     }
@@ -183,6 +192,7 @@ public class BatchConfigurationTest {
         verify(jobDefinition, times(2)).getType();
         verify(job, times(2)).getName();
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(simpleJobTemplateFactory,times(2)).getObject();
         verify(simpleJobTemplate, times(2)).buildJob(jobDefinition);
         verify(jobLauncher, times(2)).run(any(Job.class), any(JobParameters.class));
         verify(viewExecutor, times(1)).execute(any());
@@ -224,6 +234,7 @@ public class BatchConfigurationTest {
 
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+        verify(eavJobTemplateFactory,times(1)).getObject();
         verify(eavJobTemplate, times(1)).buildJob(jobDefinition);
         verify(jobDefinition, times(1)).getType();
     }

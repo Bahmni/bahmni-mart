@@ -88,7 +88,8 @@ public class SimpleJobTemplateTest {
 
         spyJobTemplate.buildJob(jobDefinition);
 
-        verify(codesProcessor, times(1)).setUpCodesData(codeConfigs);
+        verify(codesProcessor, times(1)).setCodeConfigs(codeConfigs);
+        verify(listener, times(1)).setCodesProcessor(codesProcessor);
         verify(spyJobTemplate,times(1)).setPreProcessor(codesProcessor);
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
@@ -100,7 +101,7 @@ public class SimpleJobTemplateTest {
 
         spyJobTemplate.buildJob(jobDefinition);
 
-        verify(codesProcessor, never()).setUpCodesData(codeConfigs);
+        verify(codesProcessor, never()).setUpCodesData();
         verify(spyJobTemplate,never()).setPreProcessor(codesProcessor);
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);

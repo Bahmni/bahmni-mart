@@ -104,7 +104,8 @@ public class EAVJobTemplateTest {
 
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
-        verify(codesProcessor, times(1)).setUpCodesData(codeConfigs);
+        verify(codesProcessor, times(1)).setCodeConfigs(codeConfigs);
+        verify(listener, times(1)).setCodesProcessor(codesProcessor);
         verify(spyEAVJobTemplate, times(1)).setPreProcessor(codesProcessor);
     }
 
@@ -117,6 +118,7 @@ public class EAVJobTemplateTest {
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
         verify(spyEAVJobTemplate, never()).setPreProcessor(codesProcessor);
-        verify(codesProcessor, never()).setUpCodesData(codeConfigs);
+        verify(listener, never()).setCodesProcessor(codesProcessor);
+        verify(codesProcessor, never()).setUpCodesData();
     }
 }

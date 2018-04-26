@@ -3,6 +3,7 @@ package org.bahmni.mart.table.listener;
 import org.bahmni.mart.config.job.EavAttributes;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,6 +33,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -58,6 +61,9 @@ public class EAVJobListenerTest {
 
     @Mock
     private TableColumn tableColumn;
+
+    @Mock
+    private CodesProcessor codesProcessor;
 
     private EAVJobListener eavJobListener;
 
@@ -179,4 +185,19 @@ public class EAVJobListenerTest {
         verify(jobExecution, times(1)).stop();
     }
 
+    @Test
+    public void shouldSetUpCodesDataWhenCodeProcessorIsNotNull() throws Exception {
+        setValuesForMemberFields(eavJobListener, "codesProcessor", codesProcessor);
+
+        eavJobListener.setUpPreProcessorData();
+
+        verify(codesProcessor, times(1)).setUpCodesData();
+    }
+
+    @Test
+    public void shouldNotSetUpCodesDataGivenNullAsCodeProcessor() {
+        eavJobListener.setUpPreProcessorData();
+
+        verify(codesProcessor, never()).setUpCodesData();
+    }
 }

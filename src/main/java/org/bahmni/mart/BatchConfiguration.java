@@ -34,6 +34,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -63,7 +64,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private BacteriologyStepConfigurer bacteriologyStepConfigurer;
 
     @Autowired
-    private SimpleJobTemplate simpleJobTemplate;
+    private ObjectFactory<SimpleJobTemplate> simpleJobTemplateFactory;
 
     @Autowired
     private JobDefinitionReader jobDefinitionReader;
@@ -78,7 +79,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private MetaDataStepConfigurer metaDataStepConfigurer;
 
     @Autowired
-    private EAVJobTemplate eavJobTemplate;
+    private ObjectFactory<EAVJobTemplate> eavJobTemplateFactory;
 
     @Autowired
     private ViewExecutor viewExecutor;
@@ -136,7 +137,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
           case "obs":
               return buildObsJob(jobDefinition);
           case "eav":
-              return eavJobTemplate.buildJob(jobDefinition);
+              return eavJobTemplateFactory.getObject().buildJob(jobDefinition);
           case "bacteriology":
               return buildBacteriologyJob(jobDefinition);
           case "metadata":
@@ -150,7 +151,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
           case "rsp":
               return buildRspJob(jobDefinition);
           default:
-              return simpleJobTemplate.buildJob(jobDefinition);
+              return simpleJobTemplateFactory.getObject().buildJob(jobDefinition);
         }
     }
 

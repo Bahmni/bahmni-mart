@@ -4,11 +4,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.helper.Constants;
+import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.TableDataExtractor;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
@@ -16,14 +18,23 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQL;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
 
 @Component
+@Scope(value = "prototype")
 public class TableGeneratorJobListener extends AbstractJobListener {
 
     private static final Logger logger = LoggerFactory.getLogger(TableGeneratorJobListener.class);
 
     private static final String LIMIT = " LIMIT 1";
 
+    private CodesProcessor codesProcessor;
+
     private static void setTableColumnType(TableColumn tableColumn) {
         tableColumn.setType(Constants.getPostgresDataTypeFor(tableColumn.getType()));
+    }
+
+    @Override
+    protected void setUpPreProcessorData() {
+        if (codesProcessor != null)
+            codesProcessor.setUpCodesData();
     }
 
     @Override
@@ -56,5 +67,9 @@ public class TableGeneratorJobListener extends AbstractJobListener {
     @Override
     protected void logError(Exception e) {
         logger.error(e.getMessage(), e);
+    }
+
+    public void setCodesProcessor(CodesProcessor codesProcessor) {
+        this.codesProcessor = codesProcessor;
     }
 }
