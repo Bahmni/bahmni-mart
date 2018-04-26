@@ -67,6 +67,10 @@
       "type": "orders",
       "chunkSizeToRead": 500,
       "columnsToIgnore": ["visit_id"]
+    },
+    {
+      "name": "Registration Second Page",
+      "type": "rsp"
     }
   ],
   "views": [
