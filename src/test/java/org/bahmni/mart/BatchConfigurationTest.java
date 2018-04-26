@@ -11,6 +11,8 @@ import org.bahmni.mart.config.RspStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.config.view.RspViewDefinition;
+import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
@@ -37,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.bahmni.mart.BatchConfiguration.REGISTRATION_SECOND_PAGE;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -100,6 +103,9 @@ public class BatchConfigurationTest {
     @Mock
     private RspStepConfigurer rspStepConfigurer;
 
+    @Mock
+    private RspViewDefinition rspViewDefinition;
+
     private JobFlowBuilder jobFlowBuilder;
 
     private BatchConfiguration batchConfiguration;
@@ -126,6 +132,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "orderStepConfigurer", orderStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "diagnosesStepConfigurer", diagnosesStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "rspStepConfigurer", rspStepConfigurer);
+        setValuesForMemberFields(batchConfiguration, "rspViewDefinition", rspViewDefinition);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(any())).thenReturn(jobBuilder);
@@ -141,6 +148,8 @@ public class BatchConfigurationTest {
         when(flowJobBuilder.build()).thenReturn(job);
         when(martJSONReader.getViewDefinitions()).thenReturn(new ArrayList<>());
         when(JobDefinitionValidator.validate(anyListOf(JobDefinition.class))).thenReturn(true);
+        when(jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE)).thenReturn(jobDefinition);
+        when(jobDefinition.isEmpty()).thenReturn(true);
     }
 
     @Test
@@ -282,9 +291,16 @@ public class BatchConfigurationTest {
     @Test
     public void shouldRunRspJob() throws Exception {
         String jobName = "Registration Second Page";
+        ViewDefinition viewDefinition = mock(ViewDefinition.class);
+        List<ViewDefinition> viewDefinitions = new ArrayList<>();
+
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
         when(jobDefinition.getName()).thenReturn(jobName);
         when(jobDefinition.getType()).thenReturn("rsp");
+        when(jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE)).thenReturn(jobDefinition);
+        when(jobDefinition.isEmpty()).thenReturn(false);
+        when(rspViewDefinition.getDefinition()).thenReturn(viewDefinition);
+        when(martJSONReader.getViewDefinitions()).thenReturn(viewDefinitions);
 
         batchConfiguration.run();
 
@@ -293,5 +309,10 @@ public class BatchConfigurationTest {
         verify(rspStepConfigurer, times(1)).createTables();
         verify(rspStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+        verify(jobDefinitionReader, times(1)).getJobDefinitionByName(REGISTRATION_SECOND_PAGE);
+        verify(jobDefinition, times(1)).isEmpty();
+        verify(rspViewDefinition, times(1)).getDefinition();
+        verify(martJSONReader, times(1)).getViewDefinitions();
+        verify(viewExecutor, times(1)).execute(Collections.singletonList(viewDefinition));
     }
 }

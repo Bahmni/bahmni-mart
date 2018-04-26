@@ -11,6 +11,8 @@ import org.bahmni.mart.config.StepConfigurerContract;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.config.view.RspViewDefinition;
+import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
@@ -45,6 +47,7 @@ import java.util.stream.Collectors;
 public class BatchConfiguration extends DefaultBatchConfigurer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(BatchConfiguration.class);
+    public static final String REGISTRATION_SECOND_PAGE = "Registration Second Page";
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -88,13 +91,22 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private DiagnosesStepConfigurer diagnosesStepConfigurer;
 
+    @Autowired
+    private RspViewDefinition rspViewDefinition;
+
     @Override
     public void run(String... args) {
         List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
         if (!JobDefinitionValidator.validate(jobDefinitions))
             throw new InvalidJobConfiguration();
         launchJobs(getJobs(jobDefinitions));
-        viewExecutor.execute(martJSONReader.getViewDefinitions());
+        List<ViewDefinition> viewDefinitions = martJSONReader.getViewDefinitions();
+
+        if (!jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE).isEmpty()) {
+            viewDefinitions.add(rspViewDefinition.getDefinition());
+        }
+
+        viewExecutor.execute(viewDefinitions);
     }
 
     private void launchJobs(List<Job> jobs) {
