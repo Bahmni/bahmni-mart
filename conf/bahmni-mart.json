@@ -1,6 +1,11 @@
 {
   "jobs": [
     {
+      "name": "Custom Codes Export",
+      "type": "csvupload",
+      "readerFilePath": "conf/customCodes.csv"
+    },
+    {
       "name": "Program data",
       "type": "customSql",
       "readerSql": "SELECT program_id, name AS program_name, description AS program_description, creator, date_created, date_changed, changed_by FROM program WHERE retired = FALSE",
@@ -391,11 +396,6 @@
       "name": "Diagnoses Data",
       "type": "diagnoses",
       "columnsToIgnore": []
-    },
-    {
-      "name": "Custom Codes Export",
-      "type": "csvupload",
-      "readerFilePath": "conf/customCodes.csv"
     }
   ],
   "views": [

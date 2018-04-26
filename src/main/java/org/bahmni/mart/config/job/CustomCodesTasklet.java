@@ -1,5 +1,6 @@
 package org.bahmni.mart.config.job;
 
+import org.apache.commons.lang3.StringUtils;
 import org.postgresql.copy.CopyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +16,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 @Component
 public class CustomCodesTasklet implements Tasklet {
@@ -42,12 +47,28 @@ public class CustomCodesTasklet implements Tasklet {
 
     private void importData() {
         try {
-            copyManager.copyIn("COPY custom_codes FROM STDIN DELIMITER ',' HEADER CSV",
-                    new FileInputStream(readerFilePath));
+            List<String> headers = getHeaders(readerFilePath);
+            if (isValid(headers)) {
+                copyManager.copyIn(String.format("COPY custom_codes (%s) FROM STDIN DELIMITER ',' CSV HEADER",
+                        StringUtils.join(headers, ",")), new FileInputStream(readerFilePath));
+            }
         } catch (DataAccessResourceFailureException | DataIntegrityViolationException |
                 SQLException | IOException exception) {
             logger.error(exception.getMessage(), exception);
         }
+    }
+
+    private List<String> getHeaders(String readerFilePath) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new FileInputStream(readerFilePath));
+        String[] headers = scanner.nextLine().split(",");
+        scanner.close();
+        return Arrays.asList(headers);
+    }
+
+    private boolean isValid(List<String> headers) {
+        List<String> columnsList = Arrays.asList("name", "source", "type", "code");
+
+        return columnsList.containsAll(headers);
     }
 
     private void createTable() {

@@ -1,2 +1,3 @@
-name,source,type,code
-bed,bahmni,ot,bed101
+name,source,code,type
+Male,MSF-INTERNAL,male101,
+Iraqi,MSF-INTERNAL,irq101,Registration
