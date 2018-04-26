@@ -1,5 +1,8 @@
 package org.bahmni.mart.dbconfig;
 
+import org.postgresql.PGConnection;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.core.BaseConnection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 @Configuration
 public class DatabaseConfiguration {
@@ -47,6 +51,10 @@ public class DatabaseConfiguration {
         return new NamedParameterJdbcTemplate(dsMart);
     }
 
+    @Bean(name = "martCopyManager")
+    public CopyManager martCopyManager(@Qualifier("martDb") DataSource dataSource) throws SQLException {
+        return new CopyManager((BaseConnection) dataSource.getConnection().unwrap(PGConnection.class));
+    }
     @Bean(name = "scdfDb")
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource dataSource() {

@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -71,7 +73,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldCreateTablesBasedOnJobConfigurationByIgnoringColumns() {
-
         batchConfiguration.run();
 
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
@@ -122,6 +123,41 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(7, tableDataColumns.size());
         assertTrue(tableDataColumns.containsAll(expectedColumns));
         verifyOrderRecords(martJdbcTemplate.queryForList("SELECT * FROM \"lab_samples\""), expectedColumns);
+    }
+
+    @Test
+    public void shouldCreateCustomCodesTableWithDataFromCSV() throws Exception {
+        batchConfiguration.run();
+
+        List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'custom_codes'" +
+                " AND TABLE_SCHEMA='public';")
+                .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
+
+        List<String> expectedColumns = Arrays.asList("name", "source", "type", "code");
+
+        assertEquals(4, tableDataColumns.size());
+        assertTrue(tableDataColumns.containsAll(expectedColumns));
+        List<Map<String, Object>> records = martJdbcTemplate.queryForList("SELECT * FROM \"custom_codes\"");
+        assertNotNull(records);
+        assertFalse(records.isEmpty());
+        verifyCustomCodesRecords(records, expectedColumns);
+    }
+
+    private void verifyCustomCodesRecords(List<Map<String, Object>> records, List<String> expectedColumns) {
+        List<Map<String, Object>> expectedRecords = new ArrayList<>();
+        Map<String, Object> firstRecord = new HashMap<>();
+        firstRecord.put(expectedColumns.get(0), "bed");
+        firstRecord.put(expectedColumns.get(1), "bahmni");
+        firstRecord.put(expectedColumns.get(2), "ot");
+        firstRecord.put(expectedColumns.get(3), "bed101");
+        expectedRecords.add(firstRecord);
+        for (int index = 0; index < records.size(); index++) {
+            int finalIndex = index;
+            expectedColumns.forEach(column ->
+                    assertEquals(expectedRecords.get(finalIndex).get(column), records.get(finalIndex).get(column))
+            );
+        }
     }
 
     private void verifyOrderRecords(List<Map<String, Object>> actualOrders, List<String> expectedColumns) {

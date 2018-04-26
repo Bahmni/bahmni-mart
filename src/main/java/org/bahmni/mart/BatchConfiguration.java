@@ -8,6 +8,7 @@ import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.OrderStepConfigurer;
 import org.bahmni.mart.config.RspStepConfigurer;
 import org.bahmni.mart.config.StepConfigurerContract;
+import org.bahmni.mart.config.job.CustomCodesUploader;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
@@ -92,6 +93,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private DiagnosesStepConfigurer diagnosesStepConfigurer;
 
     @Autowired
+    private CustomCodesUploader customCodesUploader;
+
+    @Autowired
     private RspViewDefinition rspViewDefinition;
 
     @Override
@@ -141,6 +145,8 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
               return buildOrdersJob(jobDefinition);
           case "diagnoses":
               return buildDiagnosesJob(jobDefinition);
+          case "csvupload":
+              return customCodesUploader.buildJob(jobDefinition);
           case "rsp":
               return buildRspJob(jobDefinition);
           default:

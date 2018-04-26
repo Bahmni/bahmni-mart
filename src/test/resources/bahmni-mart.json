@@ -71,7 +71,12 @@
     {
       "name": "Registration Second Page",
       "type": "rsp"
-    }
+    },
+    {
+      "name" : "Custom Codes Export",
+      "type" : "csvupload",
+      "readerFilePath" : "src/test/resources/customCodes.csv"
+     }
   ],
   "views": [
     {

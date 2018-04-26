@@ -391,6 +391,11 @@
       "name": "Diagnoses Data",
       "type": "diagnoses",
       "columnsToIgnore": []
+    },
+    {
+      "name": "Custom Codes Export",
+      "type": "csvupload",
+      "readerFilePath": "conf/customCodes.csv"
     }
   ],
   "views": [
