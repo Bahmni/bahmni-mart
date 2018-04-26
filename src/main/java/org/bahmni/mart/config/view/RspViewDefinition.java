@@ -47,7 +47,7 @@ public class RspViewDefinition {
 
     private String createSql(List<String> tableNames) {
         String selectClause = getSelectClause(getTablesMetaData(tableNames));
-        String sql = String.format("SELECT %s FROM %s", selectClause, tableNames.get(0));
+        String sql = format("SELECT %s FROM %s", selectClause, tableNames.get(0));
 
         for (int index = 1; index < tableNames.size(); index++) {
             sql = sql.concat(format(" INNER JOIN %s ON %s", tableNames.get(index),
