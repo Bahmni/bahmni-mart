@@ -1,6 +1,7 @@
 package org.bahmni.mart;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -40,9 +41,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         expectedPatientList.put("133", "Unknown");
     }
 
+    @Ignore
     @Test
     @Sql(scripts = {"classpath:testDataSet/insertPatientDataWithDiagnoses.sql"})
-
     public void shouldCreateTablesAndViewsBasedOnConfiguration() {
 
         batchConfiguration.run();

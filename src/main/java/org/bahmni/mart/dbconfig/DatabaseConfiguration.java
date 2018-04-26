@@ -47,4 +47,10 @@ public class DatabaseConfiguration {
         return new NamedParameterJdbcTemplate(dsMart);
     }
 
+    @Bean(name = "scdfDb")
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
 }
