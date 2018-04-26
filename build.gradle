@@ -72,7 +72,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-batch")
     compile("org.springframework.batch:spring-batch-test")
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.35'
-    compile group: 'postgresql', name: 'postgresql', version: '9.1-901-1.jdbc4'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
     compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
