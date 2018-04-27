@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -82,20 +83,30 @@ public class BahmniFormFactory {
 
     @PostConstruct
     public void postConstruct() {
-        List<String> allSeparateTableConceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
-        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
+        this.allSeparateTableConcepts = getSeparateTableConcepts();
+        this.ignoreConcepts = getAllIgnoreConcepts(jobDefinitionReader.getJobDefinitions());
+    }
+
+    private List<Concept> getSeparateTableConcepts() {
+        List<String> conceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
+        return conceptNames.isEmpty() ? EMPTY_LIST : obsService.getConceptsByNames(conceptNames);
+    }
+
+    private List<Concept> getAllIgnoreConcepts(List<JobDefinition> jobDefinitions) {
         JobDefinition obsJobDefinition = getJobDefinitionByType(jobDefinitions, OBS_JOB_TYPE);
         JobDefinition bacteriologyJobDefinition = getJobDefinitionByType(jobDefinitions, BACTERIOLOGY_JOB_TYPE);
 
-        this.allSeparateTableConcepts = allSeparateTableConceptNames.isEmpty() ? EMPTY_LIST :
-                obsService.getConceptsByNames(allSeparateTableConceptNames);
-        this.ignoreConcepts = isJobWithOutIgnoreColumns(obsJobDefinition) ? EMPTY_LIST :
-                obsService.getConceptsByNames(getIgnoreConceptNamesForJob(obsJobDefinition));
-        List<Concept> bacteriologyIgnoreConcepts = isJobWithOutIgnoreColumns(bacteriologyJobDefinition) ?
-                EMPTY_LIST : obsService.getConceptsByNames(getIgnoreConceptNamesForJob(bacteriologyJobDefinition));
-        ignoreConcepts.addAll(bacteriologyIgnoreConcepts);
+        ArrayList<Concept> ignoreConcepts = new ArrayList<>(getIgnoreConceptsForJobDefinition(obsJobDefinition));
+        ignoreConcepts.addAll(getIgnoreConceptsForJobDefinition(bacteriologyJobDefinition));
+
         if (obsJobDefinition.getIgnoreAllFreeTextConcepts())
             ignoreConcepts.addAll(obsService.getFreeTextConcepts());
+        return ignoreConcepts;
+    }
+
+    private List<Concept> getIgnoreConceptsForJobDefinition(JobDefinition jobDefinition) {
+        return isJobWithOutIgnoreColumns(jobDefinition) ? EMPTY_LIST :
+                obsService.getConceptsByNames(getIgnoreConceptNamesForJob(jobDefinition));
     }
 
     private Boolean isJobWithOutIgnoreColumns(JobDefinition jobDefinition) {

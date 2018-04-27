@@ -19,8 +19,10 @@ public class TableDataProcessor implements ItemProcessor<Map<String, Object>, Ma
 
     @Override
     public Map<String, Object> process(Map<String, Object> item) throws Exception {
-        if (preProcessor != null)
-            item = preProcessor.process(item);
+        return mapProcessedValue(preProcessor != null ? preProcessor.process(item) : item);
+    }
+
+    private Map<String, Object> mapProcessedValue(Map<String, Object> item) {
         return item.entrySet().stream().collect(
                 Collectors.toMap(Map.Entry::getKey, p -> getProcessedValue(p.getKey(), p.getValue())));
     }

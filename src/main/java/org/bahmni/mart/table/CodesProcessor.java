@@ -30,7 +30,7 @@ public class CodesProcessor implements PreProcessor {
 
     @Autowired
     @Qualifier("martNamedJdbcTemplate")
-    NamedParameterJdbcTemplate martNamedJdbcTemplate;
+    private NamedParameterJdbcTemplate martNamedJdbcTemplate;
 
     private List<Map<String, String>> codes;
 

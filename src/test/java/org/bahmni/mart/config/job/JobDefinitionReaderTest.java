@@ -25,12 +25,10 @@ public class JobDefinitionReaderTest {
 
     private JobDefinitionReader jobDefinitionReader;
 
-    private String json;
-
     @Before
     public void setUp() {
         PowerMockito.mockStatic(BatchUtils.class);
-        json = "{\"jobs\": [\n" +
+        String json = "{\"jobs\": [\n" +
                 "  {\n" +
                 "    \"name\": \"Program Data\",\n" +
                 "    \"type\": \"customSql\",\n" +

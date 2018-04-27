@@ -35,7 +35,7 @@ public class FreeMarkerEvaluatorTest {
     private Configuration configuration;
 
     @Rule
-    ExpectedException expectedException = ExpectedException.none();
+    private ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {

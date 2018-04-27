@@ -189,7 +189,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     private void verifyOrderRecords(List<Map<String, Object>> actualOrders, List<String> expectedColumns) {
-        Map<String, List> expectedOrders = new HashMap();
+        Map<String, List> expectedOrders = new HashMap<>();
         expectedOrders.put("WBC (FBC)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "Clinic", "Hematology",
                 "FBC (Full Blood Count)", "WBC (FBC)"));
         expectedOrders.put("RBC (FBC)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "Clinic", "Hematology",

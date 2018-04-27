@@ -23,12 +23,10 @@ public class SelectItemVisitorImpl implements SelectItemVisitor {
 
     @Override
     public void visit(AllColumns allColumns) {
-
     }
 
     @Override
     public void visit(AllTableColumns allTableColumns) {
-
     }
 
     @Override
