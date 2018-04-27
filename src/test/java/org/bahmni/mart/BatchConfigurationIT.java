@@ -214,17 +214,13 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         List<Map<String, Object>> rspView = martJdbcTemplate.queryForList(rspViewSql);
         Set<String> columnNames = view.get(0).keySet();
         Set<String> rspViewColumns = rspView.get(0).keySet();
-        List<String> rspViewExpectedCoulumns = Arrays.asList("rsp_fee_information_id_rsp_fee_information",
-                "rsp_fee_information_patient_id", "rsp_fee_information_encounter_id",
-                "rsp_fee_information_registration_fee", "rsp_nutritional_temp_id_rsp_nutritional_temp",
-                "rsp_nutritional_temp_patient_id", "rsp_nutritional_temp_encounter_id", "rsp_nutritional_temp_height",
-                "rsp_nutritional_id_rsp_nutritional", "rsp_nutritional_patient_id", "rsp_nutritional_encounter_id",
-                "rsp_nutritional_weight");
+        List<String> rspViewExpectedCoulumns = Arrays.asList("rsp_fee_information_registration_fee",
+                "rsp_nutritional_temp_height", "rsp_nutritional_weight", "patient_id", "encounter_id");
 
         assertEquals(2, columnNames.size());
         assertThat(Arrays.asList("patient_id", "allergy_status"), containsInAnyOrder(columnNames.toArray()));
         assertEquals(10, view.size());
-        assertEquals(12, rspViewColumns.size());
+        assertEquals(5, rspViewColumns.size());
         assertThat(rspViewExpectedCoulumns, containsInAnyOrder(rspViewColumns.toArray()));
         assertEquals(1, rspView.size());
         verifyRecords(view);

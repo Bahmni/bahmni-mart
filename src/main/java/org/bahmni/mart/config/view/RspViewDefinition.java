@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
 @Component
 public class RspViewDefinition {
+    //TODO: Refactor This Class Suman
 
     private static final String RSP = "Rsp";
 
@@ -46,22 +48,39 @@ public class RspViewDefinition {
     }
 
     private String createSql(List<String> tableNames) {
-        String selectClause = getSelectClause(getTablesMetaData(tableNames));
-        String sql = format("SELECT %s FROM %s", selectClause, tableNames.get(0));
+        List<String> excludedColumns = Arrays.asList("patient_id", "encounter_id");
+        String coalescePatientIdQuery = getCoalesceQuery(tableNames, "patient_id");
+        String coalesceEncounterIdQuery = getCoalesceQuery(tableNames, "encounter_id");
+        String selectClause = getSelectClause(getTablesMetaData(tableNames), excludedColumns);
+
+        String sql = format("SELECT %s, %s, %s FROM %s", coalescePatientIdQuery, coalesceEncounterIdQuery,
+                selectClause, tableNames.get(0));
 
         for (int index = 1; index < tableNames.size(); index++) {
-            sql = sql.concat(format(" INNER JOIN %s ON %s", tableNames.get(index),
+            sql = sql.concat(format(" FULL OUTER JOIN %s ON %s", tableNames.get(index),
                     getJoining(tableNames.get(index - 1), tableNames.get(index))));
         }
 
         return sql;
     }
 
-    private String getSelectClause(List<Map<String, Object>> tablesData) {
-        List<String> columns = tablesData.stream().map(tableData ->
-                format("%s.%s AS %s_%s", tableData.get("table_name"), tableData.get("column_name"),
-                        tableData.get("table_name"), tableData.get("column_name"))
-        ).collect(Collectors.toList());
+    private String getCoalesceQuery(List<String> tableNames, String columnName) {
+        List<String> columnNames = tableNames.stream()
+                .map(tableName -> String.format("%s.%s", tableName, columnName)).collect(Collectors.toList());
+        return String.format("COALESCE(%s) AS %s", StringUtils.join(columnNames, ","), columnName);
+    }
+
+    private String getSelectClause(List<Map<String, Object>> tablesData, List<String> excludedColumns) {
+        List<String> columns = tablesData.stream()
+                .filter(tableData -> {
+                    String columnName = tableData.get("column_name").toString();
+                    String tableName = tableData.get("table_name").toString();
+                    return !excludedColumns.contains(columnName) &&
+                            !String.format("id_%s", tableName).equals(columnName);
+                }).map(tableData ->
+                        format("%s.%s AS %s_%s", tableData.get("table_name"), tableData.get("column_name"),
+                                tableData.get("table_name"), tableData.get("column_name"))
+                ).collect(Collectors.toList());
 
         return StringUtils.join(columns, ",");
     }
@@ -77,7 +96,7 @@ public class RspViewDefinition {
     }
 
     private String getJoining(String firstTable, String secondTable) {
-        return format("%s.patient_id = %s.patient_id AND %s.encounter_id = %s.encounter_id",
-                secondTable, firstTable, secondTable, firstTable);
+        return format("%s.encounter_id = %s.encounter_id",
+                secondTable, firstTable);
     }
 }

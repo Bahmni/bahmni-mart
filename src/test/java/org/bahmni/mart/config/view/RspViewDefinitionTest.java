@@ -49,12 +49,10 @@ public class RspViewDefinitionTest {
 
     @Test
     public void shouldReturnViewDefinitionWithSql() {
-        String sql = "SELECT rsp_nutritional_values.id_rsp_nutritional_values " +
-                "AS rsp_nutritional_values_id_rsp_nutritional_values,rsp_fee_information.id_rsp_fee_information " +
-                "AS rsp_fee_information_id_rsp_fee_information FROM rsp_nutritional_values " +
-                "INNER JOIN rsp_fee_information ON " +
-                "rsp_fee_information.patient_id = rsp_nutritional_values.patient_id " +
-                "AND rsp_fee_information.encounter_id = rsp_nutritional_values.encounter_id";
+        String sql = "SELECT COALESCE(rsp_nutritional_values.patient_id,rsp_fee_information.patient_id) AS" +
+                " patient_id, COALESCE(rsp_nutritional_values.encounter_id,rsp_fee_information.encounter_id) AS" +
+                " encounter_id,  FROM rsp_nutritional_values FULL OUTER JOIN rsp_fee_information " +
+                "ON rsp_fee_information.encounter_id = rsp_nutritional_values.encounter_id";
         String viewName = "registration_second_page_view";
 
         Map<String, Object> nutritionalValue = new HashMap<>();
