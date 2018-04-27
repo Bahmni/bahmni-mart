@@ -67,8 +67,10 @@ public class CustomCodesTasklet implements Tasklet {
 
     private boolean isValid(List<String> headers) {
         List<String> columnsList = Arrays.asList("name", "source", "type", "code");
-
-        return columnsList.containsAll(headers);
+        if (columnsList.containsAll(headers)) {
+            return true;
+        }
+        throw new DataIntegrityViolationException("Invalid headers");
     }
 
     private void createTable() {
