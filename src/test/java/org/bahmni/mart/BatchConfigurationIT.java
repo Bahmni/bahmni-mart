@@ -160,10 +160,10 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 "SELECT * FROM \"patient_allergy_status_test_coded\"");
         assertNotNull(records);
         assertFalse(records.isEmpty());
-        verifyCodedPatientRecords(records, expectedColumns);
+        verifyCodedPatientRecords(records);
     }
 
-    private void verifyCodedPatientRecords(List<Map<String, Object>> records, List<String> expectedColumns) {
+    private void verifyCodedPatientRecords(List<Map<String, Object>> records) {
         Set<String> expected = new HashSet<>(Arrays.asList("unknown101", "Test", "Test 1"));
         Set<String> actualCodes = new HashSet<>();
         for (Map<String, Object> record : records) {
