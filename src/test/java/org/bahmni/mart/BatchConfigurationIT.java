@@ -1,10 +1,10 @@
 package org.bahmni.mart;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,11 +44,10 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         expectedPatientList.put("133", "Unknown");
     }
 
-    @Ignore
     @Test
-    @Sql(scripts = {"classpath:testDataSet/insertPatientDataWithDiagnoses.sql"})
+    @Sql(scripts = {"classpath:testDataSet/insertPatientDataWithDiagnoses.sql"},
+            config = @SqlConfig(transactionManager = "customITContext"))
     public void shouldCreateTablesAndViewsBasedOnConfiguration() {
-
         batchConfiguration.run();
 
         List<Map<String, Object>> tables = martJdbcTemplate.queryForList("SELECT TABLE_NAME FROM " +

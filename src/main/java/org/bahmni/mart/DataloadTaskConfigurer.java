@@ -26,7 +26,6 @@ public class DataloadTaskConfigurer implements TaskConfigurer {
 
     @Autowired
     public DataloadTaskConfigurer(@Qualifier("scdfDb") DataSource dataSource) {
-
         this.dataSource = dataSource;
         TaskExecutionDaoFactoryBean taskExecutionDaoFactoryBean = new TaskExecutionDaoFactoryBean(this.dataSource);
         this.taskRepository = new SimpleTaskRepository(taskExecutionDaoFactoryBean);
