@@ -55,10 +55,10 @@ public class DatabaseConfiguration {
     public CopyManager martCopyManager(@Qualifier("martDb") DataSource dataSource) throws SQLException {
         return new CopyManager((BaseConnection) dataSource.getConnection().unwrap(PGConnection.class));
     }
+
     @Bean(name = "scdfDb")
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource dataSource() {
         return DataSourceBuilder.create().build();
     }
-
 }

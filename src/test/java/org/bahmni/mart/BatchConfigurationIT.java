@@ -9,6 +9,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -144,13 +145,41 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyCustomCodesRecords(records, expectedColumns);
     }
 
+    @Test
+    public void shouldAddCodesToNonConceptsGiveValidCodeConfigs() {
+        batchConfiguration.run();
+        List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_allergy_status_test_coded'" +
+                " AND TABLE_SCHEMA='public';")
+                .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
+
+        List<String> expectedColumns = Arrays.asList("patient_id", "allergy_status");
+
+        assertEquals(2, tableDataColumns.size());
+        assertTrue(tableDataColumns.containsAll(expectedColumns));
+        List<Map<String, Object>> records = martJdbcTemplate.queryForList(
+                "SELECT * FROM \"patient_allergy_status_test_coded\"");
+        assertNotNull(records);
+        assertFalse(records.isEmpty());
+        verifyCodedPatientRecords(records, expectedColumns);
+    }
+
+    private void verifyCodedPatientRecords(List<Map<String, Object>> records, List<String> expectedColumns) {
+        Set<String> expected = new HashSet<>(Arrays.asList("unknown101", "Test", "Test 1"));
+        Set<String> actualCodes = new HashSet<>();
+        for (Map<String, Object> record : records) {
+            actualCodes.add((String) record.get("allergy_status"));
+        }
+        assertTrue(expected.containsAll(actualCodes));
+    }
+
     private void verifyCustomCodesRecords(List<Map<String, Object>> records, List<String> expectedColumns) {
         List<Map<String, Object>> expectedRecords = new ArrayList<>();
         Map<String, Object> firstRecord = new HashMap<>();
-        firstRecord.put(expectedColumns.get(0), "bed");
+        firstRecord.put(expectedColumns.get(0), "Unknown");
         firstRecord.put(expectedColumns.get(1), "bahmni");
-        firstRecord.put(expectedColumns.get(2), "ot");
-        firstRecord.put(expectedColumns.get(3), "bed101");
+        firstRecord.put(expectedColumns.get(2), "patient_info");
+        firstRecord.put(expectedColumns.get(3), "unknown101");
         expectedRecords.add(firstRecord);
         for (int index = 0; index < records.size(); index++) {
             int finalIndex = index;

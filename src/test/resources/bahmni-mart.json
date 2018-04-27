@@ -1,11 +1,32 @@
 {
   "jobs": [
     {
+      "name": "Custom Codes Export",
+      "type": "csvupload",
+      "readerFilePath": "src/test/resources/customCodes.csv"
+    },
+    {
       "name": "Patient allergy status",
       "type": "customSql",
       "readerSql": "SELECT patient_id, allergy_status FROM patient",
       "chunkSizeToRead": "500",
       "tableName": "patient_allergy_status_test"
+    },
+    {
+      "name": "Patient allergy status Coded",
+      "type": "customSql",
+      "readerSql": "SELECT patient_id, allergy_status FROM patient",
+      "chunkSizeToRead": "500",
+      "tableName": "patient_allergy_status_test_coded",
+      "codeConfigs": [
+        {
+          "source": "bahmni",
+          "columnsToCode": [
+            "allergy_status"
+          ],
+          "type": "patient_info"
+        }
+      ]
     },
     {
       "name": "Patient allergy status1",
@@ -71,12 +92,7 @@
     {
       "name": "Registration Second Page",
       "type": "rsp"
-    },
-    {
-      "name" : "Custom Codes Export",
-      "type" : "csvupload",
-      "readerFilePath" : "src/test/resources/customCodes.csv"
-     }
+    }
   ],
   "views": [
     {
