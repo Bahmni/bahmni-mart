@@ -1,21 +1,26 @@
 package org.bahmni.mart.table;
 
+import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import org.bahmni.mart.table.domain.ForeignKey;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class SpecialCharacterResolver {
 
     private static final String ALPHA_NUMERIC_UNDERSCORE_REGEX = "[^a-zA-Z0-9_]+";
 
-    private static Map<String, Map<String, String>> tableToColumnsMap = new LinkedHashMap<>();
-    private static Map<String, String> updatedToActualTableNames = new LinkedHashMap<>();
+    private static Map<String, DualHashBidiMap> tableToColumnsMap = new HashMap<>();
+    private static DualHashBidiMap updatedToActualTableNames = new DualHashBidiMap();
 
     public static void resolveTableData(TableData tableData) {
 
-        Map<String, String> updatedToActualColumnNamesMap = getUpdatedToActualColumnNamesMap(tableData);
+        if (updatedToActualTableNames.containsKey(tableData.getName())) {
+            return;
+        }
+        DualHashBidiMap updatedToActualColumnNamesMap = getUpdatedToActualColumnNamesMap(tableData);
 
         String actualTableName = tableData.getName();
         String updatedTableName = getUpdatedStringName(updatedToActualTableNames, actualTableName);
@@ -23,17 +28,21 @@ public class SpecialCharacterResolver {
 
         updatedToActualTableNames.put(updatedTableName, actualTableName);
         tableToColumnsMap.put(actualTableName, updatedToActualColumnNamesMap);
+
     }
 
     public static String getActualColumnName(TableData tableData, TableColumn tableColumn) {
 
-        String actualTableName = updatedToActualTableNames.get(tableData.getName());
-        return tableToColumnsMap.get(actualTableName).get(tableColumn.getName());
+        String actualTableName = (String) updatedToActualTableNames.get(tableData.getName());
+        DualHashBidiMap updatedToActualColumns = tableToColumnsMap.get(actualTableName);
+        String actualColumnName = tableColumn.getName();
+        return updatedToActualColumns != null ?
+                (String) updatedToActualColumns.get(actualColumnName) : actualColumnName;
     }
 
-    private static Map<String, String> getUpdatedToActualColumnNamesMap(TableData tableData) {
+    private static DualHashBidiMap getUpdatedToActualColumnNamesMap(TableData tableData) {
 
-        Map<String, String> updatedToActualColumnNamesMap = new LinkedHashMap<>();
+        DualHashBidiMap updatedToActualColumnNamesMap = new DualHashBidiMap();
 
         for (TableColumn tableColumn : tableData.getColumns()) {
 
@@ -42,8 +51,27 @@ public class SpecialCharacterResolver {
 
             updatedToActualColumnNamesMap.put(updatedColumnName, actualColumnName);
             tableColumn.setName(updatedColumnName);
+
+            updateForeignKeyReferenceNames(tableColumn);
+
         }
         return updatedToActualColumnNamesMap;
+    }
+
+    private static void updateForeignKeyReferenceNames(TableColumn tableColumn) {
+        ForeignKey foreignKeyReference = tableColumn.getReference();
+        if (foreignKeyReference != null) {
+            String referenceTable = foreignKeyReference.getReferenceTable();
+            String referenceColumn = foreignKeyReference.getReferenceColumn();
+            if (updatedToActualTableNames.containsValue(referenceTable)) {
+                String str = (String) updatedToActualTableNames.getKey(referenceTable);
+                foreignKeyReference.setReferenceTable(str);
+            }
+            if (tableToColumnsMap.containsKey(referenceTable)) {
+                foreignKeyReference.setReferenceColumn((String) tableToColumnsMap.get(referenceTable)
+                        .getKey(referenceColumn));
+            }
+        }
     }
 
     private static String getUpdatedStringName(Map<String, String> updatedToActualStringMap, String actualString) {
@@ -67,5 +95,10 @@ public class SpecialCharacterResolver {
 
         return conceptName.replaceAll(ALPHA_NUMERIC_UNDERSCORE_REGEX, String.format("_%s", identifier))
                 .replaceAll(String.format("(_+%s)\\1+", identifier), String.format("_%s", identifier));
+    }
+
+    public static String getUpdatedTableNameIfExist(String actualTableName) {
+        String updatedTableName = (String) updatedToActualTableNames.getKey(actualTableName);
+        return updatedTableName != null ? updatedTableName : actualTableName;
     }
 }

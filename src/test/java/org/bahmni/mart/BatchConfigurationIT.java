@@ -57,7 +57,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         List<String> tableNames = tables.stream().map(table -> table.get("TABLE_NAME").toString())
                 .collect(Collectors.toList());
         List<String> expectedTableNames = Arrays.asList("patient_allergy_status_test", "first_stage_validation",
-                "fstg,_specialty_determined_by_mlo", "follow-up_validation", "stage",
+                "fstg_specialty_determined_by_mlo", "follow_up_validation", "stage",
                 "person_attributes", "bacteriology_concept_set", "visit_diagnoses");
         assertTrue(tableNames.containsAll(expectedTableNames));
         verifyTableColumns();
@@ -239,18 +239,18 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         tableMap.put("patient_allergy_status_test", Arrays.asList("patient_id", "allergy_status"));
         tableMap.put("first_stage_validation",
                 Arrays.asList("id_first_stage_validation", "patient_id", "encounter_id"));
-        tableMap.put("fstg,_specialty_determined_by_mlo",
-                Arrays.asList("id_fstg,_specialty_determined_by_mlo", "patient_id", "encounter_id",
-                        "id_first_stage_validation", "fstg,_specialty_determined_by_mlo"));
-        tableMap.put("follow-up_validation", Arrays.asList("id_follow-up_validation", "patient_id", "encounter_id"));
+        tableMap.put("fstg_specialty_determined_by_mlo",
+                Arrays.asList("id_fstg_specialty_determined_by_mlo", "patient_id", "encounter_id",
+                        "id_first_stage_validation", "fstg_specialty_determined_by_mlo"));
+        tableMap.put("follow_up_validation", Arrays.asList("id_follow_up_validation", "patient_id", "encounter_id"));
         tableMap.put("stage", Arrays.asList("id_stage", "patient_id", "encounter_id", "id_first_stage_validation",
-                "stage", "id_follow-up_validation"));
+                "stage", "id_follow_up_validation"));
         tableMap.put("person_attributes", Arrays.asList("person_id", "givennamelocal", "familynamelocal",
                 "middlenamelocal", "viber", "phonenumber2"));
         tableMap.put("bacteriology_concept_set", Arrays.asList("id_bacteriology_concept_set", "patient_id",
                 "encounter_id", "specimen_sample_source", "specimen_id"));
         tableMap.put("visit_diagnoses", Arrays.asList("id_visit_diagnoses", "patient_id", "encounter_id",
-                "non-coded_diagnosis", "coded_diagnosis", "diagnosis_certainty", "diagnosis_order",
+                "non_coded_diagnosis", "coded_diagnosis", "diagnosis_certainty", "diagnosis_order",
                 "bahmni_initial_diagnosis", "bahmni_diagnosis_revised", "bahmni_diagnosis_status"));
 
         for (String tableName : tableMap.keySet()) {
@@ -270,7 +270,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 put("id_visit_diagnoses", 13);
                 put("patient_id", 129);
                 put("encounter_id", 2);
-                put("non-coded_diagnosis", "test diagnoses");
+                put("non_coded_diagnosis", "test diagnoses");
                 put("coded_diagnosis", null);
                 put("diagnosis_certainty", "Confirmed");
                 put("diagnosis_order", "Primary");
@@ -285,7 +285,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 put("id_visit_diagnoses", 96);
                 put("patient_id", 133);
                 put("encounter_id", 8);
-                put("non-coded_diagnosis", null);
+                put("non_coded_diagnosis", null);
                 put("coded_diagnosis", "Dyspareunia");
                 put("diagnosis_certainty", "Presumed");
                 put("diagnosis_order", "Secondary");
@@ -300,7 +300,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 put("id_visit_diagnoses", 123);
                 put("patient_id", 133);
                 put("encounter_id", 10);
-                put("non-coded_diagnosis", null);
+                put("non_coded_diagnosis", null);
                 put("coded_diagnosis", "Dyspareunia");
                 put("diagnosis_certainty", "Confirmed");
                 put("diagnosis_order", "Secondary");
@@ -315,7 +315,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 put("id_visit_diagnoses", 130);
                 put("patient_id", 125);
                 put("encounter_id", 11);
-                put("non-coded_diagnosis", null);
+                put("non_coded_diagnosis", null);
                 put("coded_diagnosis", "Dyspareunia");
                 put("diagnosis_certainty", "Confirmed");
                 put("diagnosis_order", "Primary");
@@ -330,7 +330,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 put("id_visit_diagnoses", 136);
                 put("patient_id", 133);
                 put("encounter_id", 12);
-                put("non-coded_diagnosis", null);
+                put("non_coded_diagnosis", null);
                 put("coded_diagnosis", "Dyspareunia");
                 put("diagnosis_certainty", "Presumed");
                 put("diagnosis_order", "Primary");
@@ -345,7 +345,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 put("id_visit_diagnoses", 143);
                 put("patient_id", 132);
                 put("encounter_id", 13);
-                put("non-coded_diagnosis", null);
+                put("non_coded_diagnosis", null);
                 put("coded_diagnosis", "Parkinson");
                 put("diagnosis_certainty", "Presumed");
                 put("diagnosis_order", "Secondary");

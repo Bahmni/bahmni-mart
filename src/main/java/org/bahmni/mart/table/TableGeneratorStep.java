@@ -20,6 +20,7 @@ public class TableGeneratorStep {
 
     public void createTables(List<TableData> tables) {
         tables.forEach(tableData -> {
+            SpecialCharacterResolver.resolveTableData(tableData);
             String sql = freeMarkerEvaluatorForTables.evaluate("ddlForForm.ftl", tableData);
             martJdbcTemplate.execute(sql);
             }

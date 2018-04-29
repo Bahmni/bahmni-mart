@@ -3,12 +3,14 @@ package org.bahmni.mart.form;
 import org.bahmni.mart.exports.ObsRecordExtractorForTable;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
+import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.ForeignKey;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
@@ -21,8 +23,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(SpecialCharacterResolver.class)
 public class ObsRecordExtractorForTableTest {
 
     private ObsRecordExtractorForTable obsRecordExtractorForTable;
@@ -30,6 +35,7 @@ public class ObsRecordExtractorForTableTest {
     @Before
     public void setUp() throws Exception {
         obsRecordExtractorForTable = new ObsRecordExtractorForTable("tableName");
+        mockStatic(SpecialCharacterResolver.class);
     }
 
     @Test
@@ -55,6 +61,9 @@ public class ObsRecordExtractorForTableTest {
         obs2.setValue("value2");
         obs2.setField(new Concept(111, "second", 0));
         List<Obs> obsList = Arrays.asList(obs1, obs2);
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column1)).thenReturn("first");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column2)).thenReturn("second");
 
         obsRecordExtractorForTable.execute(Arrays.asList(obsList), tableData);
 
@@ -83,6 +92,9 @@ public class ObsRecordExtractorForTableTest {
         obs2.setParentId(123);
         obs2.setId(222);
         obs2.setParentName("second");
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column1)).thenReturn("id_tablename");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column2)).thenReturn("id_second");
 
         obsRecordExtractorForTable.execute(Arrays.asList(Arrays.asList(obs1), Arrays.asList(obs2)), tableData);
 
@@ -115,6 +127,10 @@ public class ObsRecordExtractorForTableTest {
         obs2.setParentId(123);
         obs2.setId(222);
         obs2.setParentName("second");
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column1)).thenReturn("id_first");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column2)).thenReturn("id_second");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column3)).thenReturn("id_test");
 
         obsRecordExtractorForTable.execute(Arrays.asList(Arrays.asList(obs1), Arrays.asList(obs2)), tableData);
 
@@ -150,6 +166,8 @@ public class ObsRecordExtractorForTableTest {
         obs2.setField(new Concept(222, "second", 0));
         obs2.setParentName("parent");
 
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column1)).thenReturn("id_parent");
+
         obsRecordExtractorForTable.execute(Arrays.asList(Arrays.asList(obs1, obs2)), tableData);
 
         assertNotNull(obsRecordExtractorForTable.getRecordList());
@@ -166,6 +184,8 @@ public class ObsRecordExtractorForTableTest {
         Obs obs1 = new Obs();
         obs1.setField(new Concept(123, "encounter", 1));
         obs1.setEncounterId("123");
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column)).thenReturn("encounter_id");
 
         obsRecordExtractorForTable.execute(Arrays.asList(Arrays.asList(obs1)), tableData);
 
@@ -184,6 +204,8 @@ public class ObsRecordExtractorForTableTest {
         Obs obs = new Obs();
         obs.setField(new Concept(123, "patient_identifier", 1));
         obs.setPatientId("123");
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column)).thenReturn("patient_id");
 
         obsRecordExtractorForTable.execute(Arrays.asList(Arrays.asList(obs)), tableData);
 

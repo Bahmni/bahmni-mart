@@ -2,6 +2,7 @@ package org.bahmni.mart.exports;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.form.domain.Obs;
+import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 
@@ -40,7 +41,8 @@ public class ObsRecordExtractorForTable {
     private void mapRecordsWithColumns(TableData tableData, List<Obs> record, Map<String, String> recordMap) {
         record.forEach(obs -> tableData.getColumns().forEach(tableColumn -> {
             String tableColumnName = tableColumn.getName();
-            if (tableColumnName.equals(getProcessedName(obs.getField().getName()))) {
+            String actualColumnName = SpecialCharacterResolver.getActualColumnName(tableData, tableColumn);
+            if (actualColumnName.equals(getProcessedName(obs.getField().getName()))) {
                 replace(recordMap, tableColumnName, obs.getValue(), tableColumn.getType());
             } else if (tableColumnName.contains("id_") && isNull(recordMap, tableColumnName)) {
                 mapConstraints(recordMap, obs, tableColumn);

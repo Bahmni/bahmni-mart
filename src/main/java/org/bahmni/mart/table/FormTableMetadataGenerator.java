@@ -69,6 +69,9 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
             Concept formParentConcept = form.getParent().getFormName();
             String formParentConceptName = formParentConcept.getName();
             String referenceTableName = getProcessedName(formParentConceptName);
+
+            referenceTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(referenceTableName);
+
             String referenceColumn = "id_" + referenceTableName;
             ForeignKey reference = new ForeignKey(referenceColumn, referenceTableName);
 
