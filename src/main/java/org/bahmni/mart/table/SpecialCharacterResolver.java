@@ -83,7 +83,11 @@ public class SpecialCharacterResolver {
         while (updatedToActualStringMap.containsKey(updatedString)) {
             updatedString = replaceWithUnderscore(actualString, Integer.toString(underscoreAppender++));
         }
-        return updatedString;
+        return removeEndingUnderscore(updatedString);
+    }
+
+    private static String removeEndingUnderscore(String updatedString) {
+        return updatedString.endsWith("_") ? updatedString.substring(0, updatedString.length() - 1) : updatedString;
     }
 
     private static String replaceWithUnderscore(String actualString) {
@@ -100,5 +104,12 @@ public class SpecialCharacterResolver {
     public static String getUpdatedTableNameIfExist(String actualTableName) {
         String updatedTableName = (String) updatedToActualTableNames.getKey(actualTableName);
         return updatedTableName != null ? updatedTableName : actualTableName;
+    }
+
+    public static String getUpdatedColumnName(TableData updatedTableData, String actualColumnName) {
+        String actualTableName = (String) updatedToActualTableNames.get(updatedTableData.getName());
+        DualHashBidiMap updatedToActualColumnsMap = tableToColumnsMap.get(actualTableName);
+        return updatedToActualColumnsMap == null ? actualColumnName
+                : (String) updatedToActualColumnsMap.getKey(actualColumnName);
     }
 }

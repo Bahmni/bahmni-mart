@@ -20,6 +20,7 @@ public class EAVJobListener extends AbstractJobListener {
     private static final Logger log = LoggerFactory.getLogger(EAVJobListener.class);
 
     private CodesProcessor codesProcessor;
+    private TableData tableData;
 
     @Override
     protected void setUpPreProcessorData() {
@@ -29,7 +30,11 @@ public class EAVJobListener extends AbstractJobListener {
 
     @Override
     public TableData getTableDataForMart(String jobName) {
-        TableData tableData = new TableData();
+
+        if (tableData != null) {
+            return tableData;
+        }
+        tableData = new TableData();
         JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         tableData.setName(jobDefinition.getTableName());
         tableData.addAllColumns(getColumns(jobDefinition));

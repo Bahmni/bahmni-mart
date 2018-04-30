@@ -26,6 +26,7 @@ public class TableGeneratorJobListener extends AbstractJobListener {
     private static final String LIMIT = " LIMIT 1";
 
     private CodesProcessor codesProcessor;
+    private TableData tableData;
 
     private static void setTableColumnType(TableColumn tableColumn) {
         tableColumn.setType(Constants.getPostgresDataTypeFor(tableColumn.getType()));
@@ -39,9 +40,15 @@ public class TableGeneratorJobListener extends AbstractJobListener {
 
     @Override
     public TableData getTableDataForMart(String jobName) {
+
+        if (tableData != null) {
+            return tableData;
+        }
         JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
 
-        return getTableData(jobDefinition, getSql(jobDefinition));
+        tableData = getTableData(jobDefinition, getSql(jobDefinition));
+
+        return tableData;
     }
 
     private String getSql(JobDefinition jobDefinition) {

@@ -23,8 +23,13 @@ public class TableDataProcessor implements ItemProcessor<Map<String, Object>, Ma
     }
 
     private Map<String, Object> mapProcessedValue(Map<String, Object> item) {
-        return item.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, p -> getProcessedValue(p.getKey(), p.getValue())));
+        return item.entrySet().stream().collect(Collectors.toMap(
+            currentColumn -> getUpdatedColumnName(currentColumn.getKey()),
+            currentColumn -> getProcessedValue(currentColumn.getKey(), currentColumn.getValue())));
+    }
+
+    private String getUpdatedColumnName(String actualColumnName) {
+        return SpecialCharacterResolver.getUpdatedColumnName(tableData, actualColumnName);
     }
 
     public TableData getTableData() {
@@ -40,7 +45,8 @@ public class TableDataProcessor implements ItemProcessor<Map<String, Object>, Ma
             return "";
         }
         Optional<TableColumn> tableColumn = tableData.getColumns().stream()
-                .filter(column -> column.getName().equals(key)).findFirst();
+                .filter(column -> SpecialCharacterResolver
+                        .getActualColumnName(tableData, column).equals(key)).findFirst();
         return BatchUtils.getPostgresCompatibleValue(value.toString(), tableColumn.get().getType());
     }
 
