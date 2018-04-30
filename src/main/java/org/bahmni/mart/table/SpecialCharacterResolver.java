@@ -83,7 +83,7 @@ public class SpecialCharacterResolver {
         while (updatedToActualStringMap.containsKey(updatedString)) {
             updatedString = replaceWithUnderscore(actualString, Integer.toString(underscoreAppender++));
         }
-        return removeEndingUnderscore(updatedString);
+        return updatedString;
     }
 
     private static String removeEndingUnderscore(String updatedString) {
@@ -97,8 +97,11 @@ public class SpecialCharacterResolver {
 
     private static String replaceWithUnderscore(String conceptName, String identifier) {
 
-        return conceptName.replaceAll(ALPHA_NUMERIC_UNDERSCORE_REGEX, String.format("_%s", identifier))
+        String updatedConceptName = conceptName
+                .replaceAll(ALPHA_NUMERIC_UNDERSCORE_REGEX, String.format("_%s", identifier))
                 .replaceAll(String.format("(_+%s)\\1+", identifier), String.format("_%s", identifier));
+
+        return removeEndingUnderscore(updatedConceptName);
     }
 
     public static String getUpdatedTableNameIfExist(String actualTableName) {

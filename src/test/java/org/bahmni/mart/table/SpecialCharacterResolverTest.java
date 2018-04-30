@@ -25,8 +25,8 @@ public class SpecialCharacterResolverTest {
         TableColumn tableColumn2 = new TableColumn("skin@have_you,had_a_skin_rash_recently???", "text", false, null);
         tableData.setColumns(Arrays.asList(tableColumn, tableColumn1, tableColumn2));
 
-        List<String> expectedColumnNames = Arrays.asList("do_you_have_any_skin_problems_",
-                "skin_have_you_had_a_skin_rash_recently_", "skin_1have_you_1had_a_skin_rash_recently_1");
+        List<String> expectedColumnNames = Arrays.asList("do_you_have_any_skin_problems",
+                "skin_have_you_had_a_skin_rash_recently", "skin_1have_you_1had_a_skin_rash_recently_1");
 
         SpecialCharacterResolver.resolveTableData(tableData);
 
@@ -66,7 +66,7 @@ public class SpecialCharacterResolverTest {
         assertThat(Arrays.asList("test_id"), containsInAnyOrder(actualColumnNames.toArray()));
         ForeignKey actualReference = tableData1.getColumns().get(0).getReference();
         assertEquals("skin1_form_template", actualReference.getReferenceTable());
-        assertEquals("do_you_have_any_skin_problems_", actualReference.getReferenceColumn());
+        assertEquals("do_you_have_any_skin_problems", actualReference.getReferenceColumn());
     }
 
     @Test
