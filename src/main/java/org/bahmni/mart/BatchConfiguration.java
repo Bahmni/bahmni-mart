@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -31,9 +30,6 @@ import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -120,19 +116,27 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
                 JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                 jobParametersBuilder.addDate(job.getName(), new Date());
                 jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-            } catch (JobExecutionAlreadyRunningException | JobRestartException |
-                    JobParametersInvalidException | JobInstanceAlreadyCompleteException e) {
-                log.warn(e.getMessage());
-                log.debug(e.getMessage(), e);
+            } catch (Exception e) {
+                log.warn(e.getMessage(), e);
             }
         });
     }
 
     private List<Job> getJobs(List<JobDefinition> jobDefinitions) {
-        return jobDefinitions.stream().map(this::getJobByType).filter(Objects::nonNull).collect(Collectors.toList());
+        return jobDefinitions.stream().map(this::getJobByDefinition)
+                .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private Job getJobByType(JobDefinition jobDefinition) {
+    private Job getJobByDefinition(JobDefinition jobDefinition) {
+        try {
+            return getJobByType(jobDefinition);
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private Job getJobByType(JobDefinition jobDefinition) throws Exception {
         switch (jobDefinition.getType()) {
           case "obs":
               return buildObsJob(jobDefinition);

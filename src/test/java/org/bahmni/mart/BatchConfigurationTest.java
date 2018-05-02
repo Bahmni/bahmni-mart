@@ -34,6 +34,7 @@ import org.springframework.batch.core.job.builder.JobFlowBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -174,8 +175,31 @@ public class BatchConfigurationTest {
         verify(formStepConfigurer, times(1)).createTables();
         verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
-
     }
+
+    @Test
+    public void shouldRunObsJobEvenIfThereIsAnyErrorWithPreviousJob() throws Exception {
+        JobDefinition jobDefinition1 = mock(JobDefinition.class);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(jobDefinition1, jobDefinition));
+        when(simpleJobTemplate.buildJob(jobDefinition1))
+                .thenThrow(new BadSqlGrammarException("task", "wrong sql", null));
+
+        when(jobDefinition1.getType()).thenReturn("customSql");
+
+        when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinition.getName()).thenReturn(OBS_DATA_FLATTENING_JOB_NAME);
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobDefinition1, times(1)).getType();
+        verify(simpleJobTemplateFactory,times(1)).getObject();
+        verify(jobBuilderFactory, times(1)).get(OBS_DATA_FLATTENING_JOB_NAME);
+        verify(formStepConfigurer, times(1)).createTables();
+        verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
+    }
+
 
     @Test
     public void shouldRunJobsForValidJobConfiguration() throws Exception {
