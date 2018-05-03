@@ -3,7 +3,7 @@ SELECT DISTINCT
   o.date_created,
   o.encounter_id,
   v.visit_id,
-  vt.name               AS visit_name,
+  vt.name               AS visit_type,
   cv2.concept_full_name AS type_of_test,
   cv1.concept_full_name AS panel_name,
   cv.concept_full_name  AS test_name
@@ -31,7 +31,7 @@ SELECT DISTINCT
   o1.date_created,
   o1.encounter_id,
   v.visit_id,
-  vt.name               AS visit_name,
+  vt.name               AS visit_type,
   cv1.concept_full_name AS type_of_test,
   NULL                  AS panel_name,
   cv.concept_full_name  AS test_name

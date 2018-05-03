@@ -118,7 +118,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 
         List<String> expectedColumns = Arrays.asList("patient_id", "date_created", "encounter_id",
-                "visit_name", "type_of_test", "panel_name", "test_name");
+                "visit_type", "type_of_test", "panel_name", "test_name");
 
         assertEquals(7, tableDataColumns.size());
         assertTrue(tableDataColumns.containsAll(expectedColumns));
