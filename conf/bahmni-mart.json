@@ -52,7 +52,7 @@
     {
       "name": "Person details",
       "type": "customSql",
-      "readerSql": "SELECT p.person_id, pn.person_name_id, pn.preferred, pn.prefix, pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name2, pn.family_name_suffix, p.gender, p.birthdate, p.birthtime, p.birthdate_estimated, p.dead, p.death_date, p.deathdate_estimated, p.cause_of_death FROM person p INNER JOIN person_name pn ON p.person_id = pn.person_id AND p.voided = FALSE AND pn.voided = FALSE",
+      "readerSql": "SELECT p.person_id, pn.person_name_id, pn.preferred, pn.prefix, pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name2, pn.family_name_suffix, p.gender, p.birthdate, p.birthtime, p.birthdate_estimated, FORMAT((DATEDIFF(CURRENT_DATE, p.birthdate) / 365), 0) AS age, p.dead, p.death_date, p.deathdate_estimated, p.cause_of_death FROM person p INNER JOIN person_name pn ON p.person_id = pn.person_id AND p.voided = FALSE AND pn.voided = FALSE",
       "chunkSizeToRead": "500",
       "tableName": "person_details",
       "columnsToIgnore": [
