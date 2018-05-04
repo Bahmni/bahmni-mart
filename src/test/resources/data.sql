@@ -188,30 +188,30 @@ INSERT INTO concept_set (concept_set_id, concept_id, concept_set, sort_weight, c
 INSERT INTO concept_set (concept_set_id, concept_id, concept_set, sort_weight, creator, date_created, uuid) VALUES (11998, 3, 1858, 5, 1, '2016-03-07 12:10:38', '2ab7981d-0df6-4eb5-a5e9-95ae36a6261c');
 
 
-INSERT INTO concept_name VALUES (10205, 7098, 'Hematology', 'en', 1, 8, '2018-02-12 14:30:50', 'FULLY_SPECIFIED', 0, null, null, null, 'ed7798fe-d7fe-4b26-8db1-1820ed92b8fe', '2018-02-12 14:30:50', 8);
-INSERT INTO concept_name VALUES (10143, 7092, 'FBC (Full Blood Count)', 'en', 1, 8, '2018-02-12 07:55:20', 'FULLY_SPECIFIED', 0, null, null, null, '1341270f-08df-4469-ab9d-c1810c2b9180', null, null);
-INSERT INTO concept_name VALUES (10144, 7004, 'WBC (FBC)', 'en', 1, 8, '2018-02-12 07:47:54', 'FULLY_SPECIFIED', 0, null, null, null, 'ffcd2095-0e5c-4772-9d1e-a8be15eab4a1', null, null);
-INSERT INTO concept_name VALUES (10155, 7005, 'RBC (FBC)', 'en', 1, 8, '2018-02-12 07:47:54', 'FULLY_SPECIFIED', 0, null, null, null, 'c2e22850-28f3-450d-a378-606ae94af79b', null, null);
-INSERT INTO concept_name VALUES (10166, 7019, 'INR (HCS)', 'en', 1, 8, '2018-02-12 07:47:55', 'FULLY_SPECIFIED', 0, null, null, null, '74a7d907-c6a1-43e8-a937-6d0acd8c806e', null, null);
-INSERT INTO concept_name VALUES (10167, 1858, 'All Orderables', 'en', 1, 8, '2018-02-12 07:47:55', 'FULLY_SPECIFIED', 0, null, null, null, '74a7d907-c6a1-43e8-a937-6d0acd8abc6e', null, null);
-INSERT INTO concept_name VALUES (10168, 3, 'Lab Samples', 'en', 1, 8, '2018-02-12 07:47:55', 'FULLY_SPECIFIED', 0, null, null, null, '74a7d907-ca61-4ae8-a937-6idacd8c806e', null, null);
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10205, 7098, 'Hematology', 'en', 1, 8, '2018-02-12 14:30:50', 'FULLY_SPECIFIED', 0, null, null, null, 'ed7798fe-d7fe-4b26-8db1-1820ed92b8fe', '2018-02-12 14:30:50', 8);
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10143, 7092, 'FBC (Full Blood Count)', 'en', 1, 8, '2018-02-12 07:55:20', 'FULLY_SPECIFIED', 0, null, null, null, '1341270f-08df-4469-ab9d-c1810c2b9180', null, null);
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10144, 7004, 'WBC (FBC)', 'en', 1, 8, '2018-02-12 07:47:54', 'FULLY_SPECIFIED', 0, null, null, null, 'ffcd2095-0e5c-4772-9d1e-a8be15eab4a1', null, null);
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10155, 7005, 'RBC (FBC)', 'en', 1, 8, '2018-02-12 07:47:54', 'FULLY_SPECIFIED', 0, null, null, null, 'c2e22850-28f3-450d-a378-606ae94af79b', null, null);
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10166, 7019, 'INR (HCS)', 'en', 1, 8, '2018-02-12 07:47:55', 'FULLY_SPECIFIED', 0, null, null, null, '74a7d907-c6a1-43e8-a937-6d0acd8c806e', null, null);
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10167, 1858, 'All Orderables', 'en', 1, 8, '2018-02-12 07:47:55', 'FULLY_SPECIFIED', 0, null, null, null, '74a7d907-c6a1-43e8-a937-6d0acd8abc6e', null, null);
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10168, 3, 'Lab Samples', 'en', 1, 8, '2018-02-12 07:47:55', 'FULLY_SPECIFIED', 0, null, null, null, '74a7d907-ca61-4ae8-a937-6idacd8c806e', null, null);
 
 --order type
-INSERT INTO order_type VALUES (1, 'Lab Order', 'An order for laboratory tests', 8, '2014-09-18 14:18:05', 0, null, null, null, '8189b409-3f10-11e4-adec-0800271c1b75', 'org.openmrs.Order', null, null, null);
+INSERT INTO order_type (order_type_id, name, description, creator, date_created, retired, retired_by, date_retired, retire_reason, uuid, java_class_name, parent, changed_by, date_changed) VALUES (1, 'Lab Order', 'An order for laboratory tests', 8, '2014-09-18 14:18:05', 0, null, null, null, '8189b409-3f10-11e4-adec-0800271c1b75', 'org.openmrs.Order', null, null, null);
 
 --order type class map
-INSERT INTO  order_type_class_map VALUES (1, 8);
-INSERT INTO  order_type_class_map VALUES (1, 26);
+INSERT INTO  order_type_class_map (order_type_id, concept_class_id) VALUES (1, 8);
+INSERT INTO  order_type_class_map (order_type_id, concept_class_id) VALUES (1, 26);
 
 --visit type
-INSERT INTO visit_type VALUES (4, 'Clinic', 'Visit for patients coming for OPD', 8, '2014-09-18 14:19:53', 8, '2017-07-09 20:40:06', 0, null, null, null, 'c22a5000-3f10-11e4-adec-0800271c1b75');
+INSERT INTO visit_type (visit_type_id, name, description, creator, date_created, changed_by, date_changed, retired, retired_by, date_retired, retire_reason, uuid) VALUES (4, 'Clinic', 'Visit for patients coming for OPD', 8, '2014-09-18 14:19:53', 8, '2017-07-09 20:40:06', 0, null, null, null, 'c22a5000-3f10-11e4-adec-0800271c1b75');
 
 --visit
-INSERT INTO visit VALUES (1, 125, 4, '2018-02-12 17:22:16', '2018-02-12 17:23:56', null, 15, 8, '2018-02-12 17:22:16', 8, '2018-02-13 05:23:59', 0, null, NULL, null, '24fb9597-c300-4c40-b41e-7c07c5e1ef23');
+INSERT INTO visit (visit_id, patient_id, visit_type_id, date_started, date_stopped, indication_concept_id, location_id, creator, date_created, changed_by, date_changed, voided, voided_by, date_voided, void_reason, uuid) VALUES (1, 125, 4, '2018-02-12 17:22:16', '2018-02-12 17:23:56', null, 15, 8, '2018-02-12 17:22:16', 8, '2018-02-13 05:23:59', 0, null, NULL, null, '24fb9597-c300-4c40-b41e-7c07c5e1ef23');
 
 --orders
-INSERT INTO orders values (1, 1, 7092, 8, 100, null, '2018-04-11 06:54:41', '2018-04-11 07:54:41', null, null, null, 8, '2018-04-11 06:54:41', 0, null, null, null, 125, null, '01fa3dae-d5ce-4c82-925b-e31b40afe4e1', 'ROUTINE', 'ORD-784', null, 'NEW', null, 1, null, null, null);
-INSERT INTO orders values (2, 1, 7019, 8, 100, null, '2018-04-11 06:54:41', '2018-04-11 07:54:41', null, null, null, 8, '2018-04-11 06:54:41', 0, null, null, null, 125, null, 'b35e7090-af5d-481f-9ae4-c89dfbbfee3c', 'ROUTINE', 'ORD-785', null, 'NEW', null, 1, null, null, null);
+INSERT INTO orders (order_id, order_type_id, concept_id, orderer, encounter_id, instructions, date_activated, auto_expire_date, date_stopped, order_reason, order_reason_non_coded, creator, date_created, voided, voided_by, date_voided, void_reason, patient_id, accession_number, uuid, urgency, order_number, previous_order_id, order_action, comment_to_fulfiller, care_setting, scheduled_date, order_group_id, sort_weight) values (1, 1, 7092, 8, 100, null, '2018-04-11 06:54:41', '2018-04-11 07:54:41', null, null, null, 8, '2018-04-11 06:54:41', 0, null, null, null, 125, null, '01fa3dae-d5ce-4c82-925b-e31b40afe4e1', 'ROUTINE', 'ORD-784', null, 'NEW', null, 1, null, null, null);
+INSERT INTO orders (order_id, order_type_id, concept_id, orderer, encounter_id, instructions, date_activated, auto_expire_date, date_stopped, order_reason, order_reason_non_coded, creator, date_created, voided, voided_by, date_voided, void_reason, patient_id, accession_number, uuid, urgency, order_number, previous_order_id, order_action, comment_to_fulfiller, care_setting, scheduled_date, order_group_id, sort_weight) values (2, 1, 7019, 8, 100, null, '2018-04-11 06:54:41', '2018-04-11 07:54:41', null, null, null, 8, '2018-04-11 06:54:41', 0, null, null, null, 125, null, 'b35e7090-af5d-481f-9ae4-c89dfbbfee3c', 'ROUTINE', 'ORD-785', null, 'NEW', null, 1, null, null, null);
 
 -- End of test data for BatchConfigurationIT.shouldCreateOrderLabSamplesTableByIgnoringVisitId()
 
