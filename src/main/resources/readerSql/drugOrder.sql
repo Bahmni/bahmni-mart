@@ -22,46 +22,52 @@ SELECT
   o.additional_instructions AS additional_instructions,
   o.dispense                AS dispense,
   o.encounterId             AS encounter_id,
-  o.orderer                 AS orderer,
+  o.orderer_id              AS orderer_id,
+  o.orderer_name            AS orderer_name,
   o.visit_id                AS visit_id,
-  o.visit_type              AS visit_type
+  o.visit_type              AS visit_type,
+  o.encounter_type_id,
+  o.encounter_type_name
 FROM
   (SELECT
-     pp.patient_program_id                AS `patientProgramId`,
-     program.name                         AS `programName`,
-     orders.encounter_id                  AS `encounterId`,
-     drug.name                            AS `codedDrugName`,
-     drug_order.drug_non_coded            AS `nonCodedDrugName`,
-     drug_order.dose                      AS `dose`,
-     drug_order.quantity                  AS `quantity`,
-     quantityUnitcn.name                  AS `quantityUnits`,
-     drug_order.duration                  AS `duration`,
-     durationUnitscn.name                 AS `durationUnits`,
-     dosecn.name                          AS `doseUnits`,
-     routecn.name                         AS `route`,
-     freqcn.name                          AS `frequency`,
+     pp.patient_program_id                                                                   AS `patientProgramId`,
+     program.name                                                                            AS `programName`,
+     orders.encounter_id                                                                     AS `encounterId`,
+     drug.name                                                                               AS `codedDrugName`,
+     drug_order.drug_non_coded                                                               AS `nonCodedDrugName`,
+     drug_order.dose                                                                         AS `dose`,
+     drug_order.quantity                                                                     AS `quantity`,
+     quantityUnitcn.name                                                                     AS `quantityUnits`,
+     drug_order.duration                                                                     AS `duration`,
+     durationUnitscn.name                                                                    AS `durationUnits`,
+     dosecn.name                                                                             AS `doseUnits`,
+     routecn.name                                                                            AS `route`,
+     freqcn.name                                                                             AS `frequency`,
      CASE WHEN Date(orders.scheduled_date) IS NULL
        THEN orders.date_activated
-     ELSE orders.scheduled_date END       AS `startDate`,
-     orders.auto_expire_date              AS `calculatedEndDate`,
-     orders.date_stopped                  AS `dateStopped`,
+     ELSE orders.scheduled_date END                                                          AS `startDate`,
+     orders.auto_expire_date                                                                 AS `calculatedEndDate`,
+     orders.date_stopped                                                                     AS `dateStopped`,
      p.patient_id,
      orders.order_id,
      CASE WHEN obs.value_coded
        THEN 'Yes'
-     ELSE 'No' END                        AS `dispense`,
-     orders.instructions                  AS `instructions`,
-     stopped_order_cn.name                AS `stopped_order_reason`,
-     stopped_order.order_reason_non_coded AS `order_reason_non_coded`,
+     ELSE 'No' END                                                                           AS `dispense`,
+     orders.instructions                                                                     AS `instructions`,
+     stopped_order_cn.name                                                                   AS `stopped_order_reason`,
+     stopped_order.order_reason_non_coded                                                    AS `order_reason_non_coded`,
      CASE
      WHEN LOCATE("additionalInstructions", drug_order.dosing_instructions)
        THEN LEFT(SUBSTRING_INDEX(drug_order.dosing_instructions, '"', -2),
                  LENGTH(SUBSTRING_INDEX(drug_order.dosing_instructions, '"', -2)) - 2)
      ELSE '' END
-                                          AS additional_instructions,
-     person_name.given_name               AS `orderer`,
-     e.visit_type                         AS `visit_type`,
-     e.visit_id                           AS `visit_id`
+                                                                                             AS additional_instructions,
+     orders.orderer                                                                          AS orderer_id,
+     concat_ws(' ', ifnull(person_name.given_name, ''), ifnull(person_name.family_name, '')) AS `orderer_name`,
+     e.visit_type                                                                            AS `visit_type`,
+     e.visit_id                                                                              AS `visit_id`,
+     e.encounter_type_id,
+     e.encounter_type_name
    FROM patient p
      LEFT JOIN patient_program pp ON pp.patient_id = p.patient_id AND pp.voided = FALSE
      LEFT JOIN program ON program.program_id = pp.program_id AND program.retired = FALSE
@@ -70,8 +76,11 @@ FROM
                    en.encounter_id,
                    en.patient_id,
                    v.visit_id,
-                   vt.name AS visit_type
+                   vt.name           AS visit_type,
+                   et.name           AS encounter_type_name,
+                   en.encounter_type AS encounter_type_id
                  FROM encounter en
+                   INNER JOIN encounter_type et ON en.encounter_type = et.encounter_type_id AND et.retired = FALSE
                    INNER JOIN visit v ON en.visit_id = v.visit_id AND v.voided = FALSE
                    INNER JOIN visit_type vt ON v.visit_type_id = vt.visit_type_id AND vt.retired = FALSE
                  WHERE en.voided = FALSE) e ON e.patient_id = p.patient_id
