@@ -33,7 +33,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
-@PrepareForTest({ReaderSQLFileLoader.class, BatchUtils.class, SqlParser.class})
+@PrepareForTest({SQLFileLoader.class, BatchUtils.class, SqlParser.class})
 @RunWith(PowerMockRunner.class)
 public class JobDefinitionUtilTest {
 
@@ -216,9 +216,9 @@ public class JobDefinitionUtilTest {
         when(jobDefinition.getReaderFilePath()).thenReturn(filePath);
         String expectedSql = "SELECT * FROM table";
         Resource resource = mock(Resource.class);
-        mockStatic(ReaderSQLFileLoader.class);
+        mockStatic(SQLFileLoader.class);
         mockStatic(BatchUtils.class);
-        when(ReaderSQLFileLoader.loadResource(filePath)).thenReturn(resource);
+        when(SQLFileLoader.loadResource(filePath)).thenReturn(resource);
         when(BatchUtils.convertResourceOutputToString(resource)).thenReturn(expectedSql);
 
         String actualSql = JobDefinitionUtil.getReaderSQL(jobDefinition);
@@ -227,7 +227,7 @@ public class JobDefinitionUtilTest {
         PowerMockito.verifyStatic(VerificationModeFactory.times(1));
         BatchUtils.convertResourceOutputToString(resource);
         PowerMockito.verifyStatic(VerificationModeFactory.times(1));
-        ReaderSQLFileLoader.loadResource(filePath);
+        SQLFileLoader.loadResource(filePath);
     }
 
     @Test

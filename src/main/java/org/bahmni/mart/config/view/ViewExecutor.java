@@ -4,10 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
+import static org.bahmni.mart.config.job.SQLFileLoader.loadResource;
 
 @Component
 public class ViewExecutor {
@@ -31,6 +36,21 @@ public class ViewExecutor {
 
     private String getUpdatedViewSQL(ViewDefinition viewDefinition) {
         return String.format("drop view if exists %s;create view %s as %s",
-                viewDefinition.getName(), viewDefinition.getName(), viewDefinition.getSql());
+                viewDefinition.getName(), viewDefinition.getName(), getSql(viewDefinition));
+    }
+
+    private String getSql(ViewDefinition viewDefinition) {
+        if (isNotEmpty(viewDefinition.getSql())) {
+            return viewDefinition.getSql();
+        }
+        return getSqlFromFile(viewDefinition);
+    }
+
+    private String getSqlFromFile(ViewDefinition viewDefinition) {
+        if (isNotEmpty(viewDefinition.getSqlFilePath())) {
+            Resource readerSqlResource = loadResource(viewDefinition.getSqlFilePath());
+            return convertResourceOutputToString(readerSqlResource);
+        }
+        return "";
     }
 }

@@ -4,6 +4,7 @@ public class ViewDefinition {
 
     private String name;
     private String sql;
+    private String sqlFilePath;
 
     public String getName() {
         return name;
@@ -19,5 +20,9 @@ public class ViewDefinition {
 
     public void setSql(String sql) {
         this.sql = sql;
+    }
+
+    public String getSqlFilePath() {
+        return sqlFilePath;
     }
 }

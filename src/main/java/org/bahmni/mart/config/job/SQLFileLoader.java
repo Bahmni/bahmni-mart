@@ -6,16 +6,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReaderSQLFileLoader {
+public class SQLFileLoader {
 
     private static ApplicationContext applicationContext;
 
     @Autowired
-    ReaderSQLFileLoader(ApplicationContext appContext) {
+    SQLFileLoader(ApplicationContext appContext) {
         applicationContext = appContext;
     }
 
-    static Resource loadResource(String filePath) {
+    public static Resource loadResource(String filePath) {
         return applicationContext.getResource(filePath);
     }
 }
