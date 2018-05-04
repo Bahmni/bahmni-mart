@@ -1,0 +1,1 @@
+select * from patient_allergy_status_test

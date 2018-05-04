@@ -98,6 +98,10 @@
     {
       "name": "test_view",
       "sql": "select * from \"patient_allergy_status_test\""
+    },
+    {
+      "name": "view_from_file",
+      "sqlFilePath": "classpath:viewSql/view.sql"
     }
   ]
 }

@@ -211,19 +211,26 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     private void verifyViews() {
         String rspViewSql = "SELECT * FROM registration_second_page_view";
         List<Map<String, Object>> view = martJdbcTemplate.queryForList("SELECT * from test_view");
+        List<Map<String, Object>> viewFromFile = martJdbcTemplate.queryForList("SELECT * FROM view_from_file");
         List<Map<String, Object>> rspView = martJdbcTemplate.queryForList(rspViewSql);
-        Set<String> columnNames = view.get(0).keySet();
+        Set<String> columnNamesView = view.get(0).keySet();
+        Set<String> columnNamesViewFromFile = viewFromFile.get(0).keySet();
         Set<String> rspViewColumns = rspView.get(0).keySet();
         List<String> rspViewExpectedCoulumns = Arrays.asList("rsp_fee_information_registration_fee",
                 "rsp_nutritional_temp_height", "rsp_nutritional_weight", "patient_id", "encounter_id");
 
-        assertEquals(2, columnNames.size());
-        assertThat(Arrays.asList("patient_id", "allergy_status"), containsInAnyOrder(columnNames.toArray()));
+        assertEquals(2, columnNamesView.size());
+        assertEquals(2, columnNamesViewFromFile.size());
+        assertThat(Arrays.asList("patient_id", "allergy_status"), containsInAnyOrder(columnNamesView.toArray()));
+        assertThat(Arrays.asList("patient_id", "allergy_status"),
+                containsInAnyOrder(columnNamesViewFromFile.toArray()));
         assertEquals(10, view.size());
+        assertEquals(10, viewFromFile.size());
         assertEquals(5, rspViewColumns.size());
         assertThat(rspViewExpectedCoulumns, containsInAnyOrder(rspViewColumns.toArray()));
         assertEquals(1, rspView.size());
         verifyRecords(view);
+        verifyRecords(viewFromFile);
     }
 
     private void verifyRecords(List<Map<String, Object>> patientList) {
