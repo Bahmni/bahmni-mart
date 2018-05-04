@@ -440,6 +440,22 @@
     {
       "name": "surgery_details",
       "sql": "SELECT sa.surgical_block_id, sb.primary_provider_name, sb.location_name, sb.block_starttime, sb.block_endtime, sb.date_created AS block_datecreated, sb.date_changed AS block_datechanged, patient_id, sort_weight, status, saa.*, actual_start_datetime, actual_end_datetime, sa.date_created AS surgery_date_created, sa.date_changed AS surgery_date_changed FROM surgical_block sb LEFT OUTER JOIN surgical_appointment sa ON sa.surgical_block_id = sb.surgical_block_id LEFT OUTER JOIN surgical_appointment_attributes saa ON saa.surgical_appointment_id = sa.surgical_appointment_id"
+    },
+    {
+      "name": "patient_Information_view",
+      "sql": "SELECT pa.*, pi.\"Patient_Identifier\", pd.gender, pd.birthtime, pd.birthdate_estimated, pd.death_date, pd.deathdate_estimated, pd.cause_of_death, pad.address1, pad.address2, pad.address3, pad.address4, pad.address5, pad.address6, pad.address7, pad.address8, pad.address9, pad.address10, pad.address11, pad.address12, pad.address13, pad.address14, pad.address15, pad.city_village, pad.state_province, pad.postal_code, pad.country, pad.county_district, pad.latitude, pad.longitude, pad.start_date, pad.end_date FROM patient_identifier pi LEFT JOIN person_details pd ON pi.patient_id = pd.person_id LEFT JOIN person_attributes pa ON pa.person_id = pi.patient_id LEFT JOIN person_address pad ON pad.person_id = pi.patient_id WHERE pad.preferred = 'true'"
+    },
+    {
+      "name": "patient_program_info_view",
+      "sql": "SELECT ppd.patient_id, p.program_id, p.program_name, ppd.patient_program_id, date_enrolled, date_completed, location_id, location_name, program_outcome, ppd.creator AS patient_program_creator, ppd.date_created AS patient_program_date_created, ppd.date_changed AS patient_program_date_changed, ppd.changed_by AS patient_program_changed_by, ps.state, ps.state_name, ps.start_date AS state_start_date, ps.end_date AS state_end_date, ps.creator_name AS state_creator, ps.date_created AS state_date_created, ps.date_changed AS state_date_changed, ps.changed_by_name AS state_changed_by FROM programs p INNER JOIN patient_program_data ppd ON ppd.program_id = p.program_id LEFT JOIN patient_state ps ON ps.patient_program_id = ppd.patient_program_id AND ps.program_id = p.program_id"
+    },
+    {
+      "name": "operation_theater_view",
+      "sql": "SELECT sa.patient_id, sb.surgical_block_id, primary_provider_name, sb.creator_name AS block_creator_name, location_name, block_starttime, block_endtime, sb.date_created, sb.date_changed, sb.changed_by, saa.*, sa.sort_weight AS surgery_sort_weight, sa.status AS surgery_status, sa.actual_start_datetime AS surgery_actual_startime, sa.actual_end_datetime AS surgery_actual_endtime, sa.notes AS surgery_notes, sa.date_created AS surgery_datecreated, sa.date_changed AS surgery_date_changed, sa.creator_name AS sugery_creator_name, sa.change_by AS surgery_changed_by FROM surgical_block sb LEFT JOIN surgical_appointment sa ON sa.surgical_block_id = sb.surgical_block_id LEFT JOIN surgical_appointment_attributes saa ON saa.surgical_appointment_id = sa.surgical_appointment_id"
+    },
+    {
+      "name":"bed_management_view",
+      "sql":"SELECT bpa.patient_id, bpa.bed_number, bpa.date_started, bpa.date_stopped, ped.encounter_type_name, bt.bed_location, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM bed_patient_assignment bpa INNER JOIN patient_encounter_details ped ON ped.encounter_id = bpa.encounter_id LEFT JOIN bed_tags bt ON bt.bed_id = bpa.bed_id UNION (SELECT dateStopped.patient_id, dateStopped.bed_number, NULL AS date_started, dateStopped.date_stopped, ped.encounter_type_name, bt.bed_location, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM (SELECT patient_id, date_stopped AS date_stopped, bed_number, bed_id FROM bed_patient_assignment) dateStopped INNER JOIN patient_encounter_details ped ON date(ped.encounter_datetime) = date(dateStopped.date_stopped) AND encounter_type_name = 'DISCHARGE' AND ped.patient_id = dateStopped.patient_id LEFT JOIN bed_tags bt ON bt.bed_id = dateStopped.bed_id) ORDER BY patient_id"
     }
   ]
 }
