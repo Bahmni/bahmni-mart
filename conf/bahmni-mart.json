@@ -201,7 +201,7 @@
     {
       "name": "Bed Patient Assignment",
       "type": "customSql",
-      "readerSql": "SELECT bpam.patient_id, bpam.bed_id, b.bed_number, bpam.date_started, bpam.date_stopped, bpam.encounter_id, e.encounter_datetime, e.visit_id, vt.name AS visit_type FROM bed_patient_assignment_map bpam INNER JOIN bed b ON b.bed_id = bpam.bed_id AND b.voided = FALSE AND bpam.voided = FALSE INNER JOIN encounter e ON e.encounter_id = bpam.encounter_id AND e.voided = FALSE INNER JOIN visit v ON v.visit_id = e.visit_id AND v.voided = FALSE INNER JOIN visit_type vt ON vt.visit_type_id = v.visit_type_id AND vt.retired = FALSE",
+      "readerSql": "SELECT bpam.patient_id, bpam.bed_id, b.bed_number, bpam.date_started, bpam.date_stopped, l.name AS location, bpam.encounter_id, e.encounter_datetime, e.visit_id, vt.name AS visit_type FROM bed_patient_assignment_map bpam INNER JOIN bed b ON b.bed_id = bpam.bed_id AND b.voided = FALSE AND bpam.voided = FALSE INNER JOIN bed_location_map blm ON blm.bed_id = bpam.bed_id INNER JOIN location l ON l.location_id = blm.location_id AND l.retired IS FALSE INNER JOIN encounter e ON e.encounter_id = bpam.encounter_id AND e.voided = FALSE INNER JOIN visit v ON v.visit_id = e.visit_id AND v.voided = FALSE INNER JOIN visit_type vt ON vt.visit_type_id = v.visit_type_id AND vt.retired = FALSE",
       "chunkSizeToRead": "500",
       "tableName": "bed_patient_assignment"
     },
@@ -455,7 +455,7 @@
     },
     {
       "name":"bed_management_view",
-      "sql":"SELECT bpa.patient_id, bpa.bed_number, bpa.date_started, bpa.date_stopped, ped.encounter_type_name, bt.bed_location, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM bed_patient_assignment bpa INNER JOIN patient_encounter_details ped ON ped.encounter_id = bpa.encounter_id LEFT JOIN bed_tags bt ON bt.bed_id = bpa.bed_id UNION (SELECT dateStopped.patient_id, dateStopped.bed_number, NULL AS date_started, dateStopped.date_stopped, ped.encounter_type_name, bt.bed_location, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM (SELECT patient_id, date_stopped AS date_stopped, bed_number, bed_id FROM bed_patient_assignment) dateStopped INNER JOIN patient_encounter_details ped ON date(ped.encounter_datetime) = date(dateStopped.date_stopped) AND encounter_type_name = 'DISCHARGE' AND ped.patient_id = dateStopped.patient_id LEFT JOIN bed_tags bt ON bt.bed_id = dateStopped.bed_id) ORDER BY patient_id"
+      "sql":"SELECT bpa.patient_id, bpa.bed_number, bpa.date_started, bpa.date_stopped, bpa.location, ped.encounter_type_name, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM bed_patient_assignment bpa INNER JOIN patient_encounter_details ped ON ped.encounter_id = bpa.encounter_id LEFT JOIN bed_tags bt ON bt.bed_id = bpa.bed_id UNION (SELECT dateStopped.patient_id, dateStopped.bed_number, NULL AS date_started, dateStopped.date_stopped, dateStopped.location, ped.encounter_type_name, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM (SELECT patient_id, date_stopped AS date_stopped, location, bed_number, bed_id FROM bed_patient_assignment) dateStopped INNER JOIN patient_encounter_details ped ON date(ped.encounter_datetime) = date(dateStopped.date_stopped) AND encounter_type_name = 'DISCHARGE' AND ped.patient_id = dateStopped.patient_id LEFT JOIN bed_tags bt ON bt.bed_id = dateStopped.bed_id) ORDER BY patient_id"
     }
   ]
 }
