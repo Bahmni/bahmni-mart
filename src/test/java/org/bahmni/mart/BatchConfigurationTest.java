@@ -11,6 +11,8 @@ import org.bahmni.mart.config.RspStepConfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.config.procedure.ProcedureDefinition;
+import org.bahmni.mart.config.procedure.ProcedureExecutor;
 import org.bahmni.mart.config.view.RspViewDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
@@ -114,6 +116,9 @@ public class BatchConfigurationTest {
     @Mock
     private RspViewDefinition rspViewDefinition;
 
+    @Mock
+    private ProcedureExecutor procedureExecutor;
+
     private JobFlowBuilder jobFlowBuilder;
 
     private BatchConfiguration batchConfiguration;
@@ -141,6 +146,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "diagnosesStepConfigurer", diagnosesStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "rspStepConfigurer", rspStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "rspViewDefinition", rspViewDefinition);
+        setValuesForMemberFields(batchConfiguration, "procedureExecutor", procedureExecutor);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(any())).thenReturn(jobBuilder);
@@ -349,5 +355,16 @@ public class BatchConfigurationTest {
         verify(rspViewDefinition, times(1)).getDefinition();
         verify(martJSONReader, times(1)).getViewDefinitions();
         verify(viewExecutor, times(1)).execute(Collections.singletonList(viewDefinition));
+    }
+
+    @Test
+    public void shouldExecuteProcedures() throws Exception {
+        ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
+        List<ProcedureDefinition> procedureDefinitions = Arrays.asList(procedureDefinition);
+        when(martJSONReader.getProcedureDefinitions()).thenReturn(procedureDefinitions);
+
+        batchConfiguration.run();
+
+        verify(procedureExecutor,times(1)).execute(procedureDefinitions);
     }
 }

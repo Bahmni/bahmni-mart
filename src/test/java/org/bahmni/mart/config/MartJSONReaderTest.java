@@ -2,6 +2,7 @@ package org.bahmni.mart.config;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.procedure.ProcedureDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +49,14 @@ public class MartJSONReaderTest {
         when(viewDefinition.getName()).thenReturn("patient_program_view");
         when(viewDefinition.getSql()).thenReturn("select * from patient_program");
 
+        ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
+        when(procedureDefinition.getName()).thenReturn("Test Procedure");
+        when(procedureDefinition.getSqlFilePath()).thenReturn("some path");
+
         bahmniMartJSON = mock(BahmniMartJSON.class);
         when(bahmniMartJSON.getJobs()).thenReturn(Arrays.asList(jobDefinition));
         when(bahmniMartJSON.getViews()).thenReturn(Arrays.asList(viewDefinition));
+        when(bahmniMartJSON.getProcedures()).thenReturn(Arrays.asList(procedureDefinition));
 
         martJSONReader = new MartJSONReader();
         setValuesForMemberFields(martJSONReader, "bahmniMartJSON", bahmniMartJSON);
@@ -84,6 +90,18 @@ public class MartJSONReaderTest {
     }
 
     @Test
+    public void shouldReturnProcedureDefinitions() throws Exception {
+        List<ProcedureDefinition> procedureDefinitions = martJSONReader.getProcedureDefinitions();
+
+        assertEquals(1, procedureDefinitions.size());
+        ProcedureDefinition procedureDefinition = procedureDefinitions.get(0);
+        assertEquals("Test Procedure", procedureDefinition.getName());
+        assertEquals("some path", procedureDefinition.getSqlFilePath());
+
+        verify(bahmniMartJSON, times(1)).getProcedures();
+    }
+
+    @Test
     public void shouldGiveEmptyListAsJobDefinitionsIfJobsAreNotPresent() throws Exception {
         BahmniMartJSON spyMartJson = spy(new BahmniMartJSON());
         setValuesForMemberFields(martJSONReader, "bahmniMartJSON", spyMartJson);
@@ -99,6 +117,15 @@ public class MartJSONReaderTest {
 
         assertTrue(martJSONReader.getViewDefinitions().isEmpty());
         verify(spyMartJson, times(1)).getViews();
+    }
+
+    @Test
+    public void shouldGiveEmptyListAsProceduresGivenNoProceduresInConfig() throws Exception {
+        BahmniMartJSON spyMartJson = spy(new BahmniMartJSON());
+        setValuesForMemberFields(martJSONReader, "bahmniMartJSON", spyMartJson);
+
+        assertTrue(martJSONReader.getProcedureDefinitions().isEmpty());
+        verify(spyMartJson, times(1)).getProcedures();
     }
 
     @Test

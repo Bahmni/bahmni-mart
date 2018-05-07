@@ -12,6 +12,8 @@ import org.bahmni.mart.config.job.CustomCodesUploader;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.config.procedure.ProcedureDefinition;
+import org.bahmni.mart.config.procedure.ProcedureExecutor;
 import org.bahmni.mart.config.view.RspViewDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
@@ -81,6 +83,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     private ViewExecutor viewExecutor;
 
     @Autowired
+    private ProcedureExecutor procedureExecutor;
+
+    @Autowired
     private RspStepConfigurer rspStepConfigurer;
 
     @Autowired
@@ -101,6 +106,11 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         if (!JobDefinitionValidator.validate(jobDefinitions))
             throw new InvalidJobConfiguration();
         launchJobs(getJobs(jobDefinitions));
+
+        List<ProcedureDefinition> procedures = martJSONReader.getProcedureDefinitions();
+
+        procedureExecutor.execute(procedures);
+
         List<ViewDefinition> viewDefinitions = martJSONReader.getViewDefinitions();
 
         if (!jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE).isEmpty()) {
