@@ -416,7 +416,7 @@
   "procedures":[
     {
       "name":"Discharge Date Procedure",
-      "sqlFilePath":"classpath:viewSql/dischargeDateProc.sql"
+      "sqlFilePath":"classpath:procedureSql/dischargeDateProc.sql"
     }
   ],
   "views": [
