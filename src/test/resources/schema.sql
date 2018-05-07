@@ -680,5 +680,25 @@ CREATE TABLE orders
     ON UPDATE CASCADE
 );
 
+DROP TABLE IF EXISTS encounter_type CASCADE;
+CREATE TABLE encounter_type
+(
+  encounter_type_id INT AUTO_INCREMENT
+    PRIMARY KEY,
+  name              VARCHAR(50) DEFAULT '' NOT NULL,
+  description       TEXT                   NULL,
+  creator           INT DEFAULT '0'        NOT NULL,
+  date_created      DATETIME               NOT NULL,
+  retired           TINYINT(1) DEFAULT '0' NOT NULL,
+  retired_by        INT                    NULL,
+  date_retired      DATETIME               NULL,
+  retire_reason     VARCHAR(255)           NULL,
+  uuid              CHAR(38)               NOT NULL,
+  edit_privilege    VARCHAR(255)           NULL,
+  view_privilege    VARCHAR(255)           NULL,
+  changed_by        INT                    NULL,
+  date_changed      DATETIME               NULL
+);
+
 SET FOREIGN_KEY_CHECKS=1;
 

@@ -117,10 +117,10 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 " AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 
-        List<String> expectedColumns = Arrays.asList("patient_id", "date_created", "encounter_id",
-                "visit_type", "type_of_test", "panel_name", "test_name");
+        List<String> expectedColumns = Arrays.asList("patient_id", "date_created", "encounter_id", "encounter_type_id",
+                "encounter_type_name", "visit_type_id", "visit_type", "type_of_test", "panel_name", "test_name");
 
-        assertEquals(7, tableDataColumns.size());
+        assertEquals(10, tableDataColumns.size());
         assertTrue(tableDataColumns.containsAll(expectedColumns));
         verifyOrderRecords(martJdbcTemplate.queryForList("SELECT * FROM \"lab_samples\""), expectedColumns);
     }
@@ -190,12 +190,12 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     private void verifyOrderRecords(List<Map<String, Object>> actualOrders, List<String> expectedColumns) {
         Map<String, List> expectedOrders = new HashMap<>();
-        expectedOrders.put("WBC (FBC)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "Clinic", "Hematology",
-                "FBC (Full Blood Count)", "WBC (FBC)"));
-        expectedOrders.put("RBC (FBC)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "Clinic", "Hematology",
-                "FBC (Full Blood Count)", "RBC (FBC)"));
-        expectedOrders.put("INR (HCS)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "Clinic", "INR (HCS)",
-                null, "INR (HCS)"));
+        expectedOrders.put("WBC (FBC)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "1", "Consultation", "4",
+                "Clinic", "Hematology", "FBC (Full Blood Count)", "WBC (FBC)"));
+        expectedOrders.put("RBC (FBC)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "1", "Consultation", "4",
+                "Clinic", "Hematology", "FBC (Full Blood Count)", "RBC (FBC)"));
+        expectedOrders.put("INR (HCS)", Arrays.asList("125", "2018-04-11 06:54:41.0", "100", "1", "Consultation", "4",
+                "Clinic", "INR (HCS)", null, "INR (HCS)"));
 
         for (Map<String, Object> row : actualOrders) {
             List<String> actualOrder = new ArrayList<>();
