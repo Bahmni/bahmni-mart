@@ -213,7 +213,7 @@ public class JobDefinitionUtilTest {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getReaderSql()).thenReturn("");
         String filePath = "some path";
-        when(jobDefinition.getReaderFilePath()).thenReturn(filePath);
+        when(jobDefinition.getSourceFilePath()).thenReturn(filePath);
         String expectedSql = "SELECT * FROM table";
         Resource resource = mock(Resource.class);
         mockStatic(SQLFileLoader.class);

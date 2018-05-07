@@ -36,12 +36,12 @@ public class JobDefinitionValidatorTest {
     }
 
     @Test
-    public void shouldThrowInvalidJobConfigurationExceptionIfReaderSQLAndReaderSQLFilePathAreEmpty() {
+    public void shouldThrowInvalidJobConfigurationExceptionIfReaderSQLAndSourceFilePathAreEmpty() {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getName()).thenReturn("test");
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition.getReaderSql()).thenReturn("");
-        when(jobDefinition.getReaderFilePath()).thenReturn("");
+        when(jobDefinition.getSourceFilePath()).thenReturn("");
         when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
 
         JobDefinitionValidator.validate(Arrays.asList(jobDefinition));
@@ -50,12 +50,12 @@ public class JobDefinitionValidatorTest {
     }
 
     @Test
-    public void shouldThrowInvalidJobConfigurationExceptionIfReaderSQLAndReaderSQLFilePathAreNull() {
+    public void shouldThrowInvalidJobConfigurationExceptionIfReaderSQLAndSourceFilePathAreNull() {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getName()).thenReturn("test");
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition.getReaderSql()).thenReturn(null);
-        when(jobDefinition.getReaderFilePath()).thenReturn(null);
+        when(jobDefinition.getSourceFilePath()).thenReturn(null);
         when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
 
         JobDefinitionValidator.validate(Arrays.asList(jobDefinition));
@@ -111,21 +111,21 @@ public class JobDefinitionValidatorTest {
         when(jobDefinition.getTableName()).thenReturn("table");
         when(jobDefinition.getReaderSql()).thenReturn("select * form program");
         when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
-        when(jobDefinition.getReaderFilePath()).thenReturn("some file path");
+        when(jobDefinition.getSourceFilePath()).thenReturn("some file path");
 
         JobDefinition jobDefinition1 = mock(JobDefinition.class);
         when(jobDefinition1.getName()).thenReturn("test1");
         when(jobDefinition1.getTableName()).thenReturn("table1");
         when(jobDefinition1.getReaderSql()).thenReturn("select * form program1");
         when(jobDefinition1.getType()).thenReturn(CUSTOM_SQL);
-        when(jobDefinition1.getReaderFilePath()).thenReturn("some file path1");
+        when(jobDefinition1.getSourceFilePath()).thenReturn("some file path1");
 
         JobDefinition jobDefinition2 = mock(JobDefinition.class);
         when(jobDefinition2.getName()).thenReturn("test2");
         when(jobDefinition2.getTableName()).thenReturn("table2");
         when(jobDefinition2.getReaderSql()).thenReturn("select * form program2");
         when(jobDefinition2.getType()).thenReturn(CUSTOM_SQL);
-        when(jobDefinition2.getReaderFilePath()).thenReturn("some file path2");
+        when(jobDefinition2.getSourceFilePath()).thenReturn("some file path2");
 
         jobDefinitions.add(jobDefinition);
         jobDefinitions.add(jobDefinition1);
@@ -135,12 +135,12 @@ public class JobDefinitionValidatorTest {
     }
 
     @Test
-    public void shouldGiveTrueForNonEmptyReaderSQLFilePathAndEmptyReaderSQL() throws Exception {
+    public void shouldGiveTrueForNonEmptySourceFilePathAndEmptyReaderSQL() throws Exception {
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getName()).thenReturn("test1");
         when(jobDefinition.getTableName()).thenReturn("table1");
         when(jobDefinition.getReaderSql()).thenReturn("");
-        when(jobDefinition.getReaderFilePath()).thenReturn("some path to sql file");
+        when(jobDefinition.getSourceFilePath()).thenReturn("some path to sql file");
         when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
 
         assertTrue(JobDefinitionValidator.validate(Arrays.asList(jobDefinition)));

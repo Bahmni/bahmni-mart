@@ -92,7 +92,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    public void shouldCreateTablesBasedOnTheSqlFilePathConfiguration() {
+    public void shouldCreateTablesBasedOnTheSourceFilePathConfiguration() {
         batchConfiguration.run();
 
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +

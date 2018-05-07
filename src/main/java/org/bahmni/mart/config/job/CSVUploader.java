@@ -25,9 +25,9 @@ public abstract class CSVUploader {
 
     private Step step(JobDefinition jobDefinition) {
         return stepBuilderFactory.get(jobDefinition.getName())
-                .tasklet(getCSVUploaderTasklet(jobDefinition.getReaderFilePath()))
+                .tasklet(getCSVUploaderTasklet(jobDefinition.getSourceFilePath()))
                 .build();
     }
 
-    public abstract Tasklet getCSVUploaderTasklet(String readerFilePath);
+    public abstract Tasklet getCSVUploaderTasklet(String sourceFilePath);
 }

@@ -3,7 +3,7 @@
     {
       "name": "Custom Codes Export",
       "type": "csvupload",
-      "readerFilePath": "src/test/resources/customCodes.csv"
+      "sourceFilePath": "src/test/resources/customCodes.csv"
     },
     {
       "name": "Patient allergy status",
@@ -39,7 +39,7 @@
     {
       "name": "Patient Details",
       "type": "generic",
-      "readerFilePath": "classpath:readerSql/reader.sql",
+      "sourceFilePath": "classpath:readerSql/reader.sql",
       "chunkSizeToRead": "500",
       "tableName": "patient_details",
       "columnsToIgnore": ["date_created"]
@@ -97,7 +97,7 @@
   "procedures":[
     {
       "name":"Test Procedure",
-      "sqlFilePath":"classpath:procedureSql/testProc.sql"
+      "sourceFilePath":"classpath:procedureSql/testProc.sql"
     }
   ],
   "views": [
@@ -107,7 +107,7 @@
     },
     {
       "name": "view_from_file",
-      "sqlFilePath": "classpath:viewSql/view.sql"
+      "sourceFilePath": "classpath:viewSql/view.sql"
     }
   ]
 }

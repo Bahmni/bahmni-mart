@@ -95,20 +95,20 @@ public class ViewExecutorTest {
         ViewDefinition viewDefinition = mock(ViewDefinition.class);
         when(viewDefinition.getSql()).thenReturn(null);
         when(viewDefinition.getName()).thenReturn("view_from_file");
-        String sqlFilePath = "some path";
-        when(viewDefinition.getSqlFilePath()).thenReturn(sqlFilePath);
+        String sourceFilePath = "some path";
+        when(viewDefinition.getSourceFilePath()).thenReturn(sourceFilePath);
         mockStatic(SQLFileLoader.class);
         Resource resource = mock(Resource.class);
-        when(loadResource(sqlFilePath)).thenReturn(resource);
+        when(loadResource(sourceFilePath)).thenReturn(resource);
         mockStatic(BatchUtils.class);
         String sqlFromFile = "sql from file";
         when(BatchUtils.convertResourceOutputToString(resource)).thenReturn(sqlFromFile);
 
         viewExecutor.execute(Arrays.asList(viewDefinition));
 
-        verify(viewDefinition, times(2)).getSqlFilePath();
+        verify(viewDefinition, times(2)).getSourceFilePath();
         verifyStatic(times(1));
-        loadResource(sqlFilePath);
+        loadResource(sourceFilePath);
         verifyStatic(times(1));
         BatchUtils.convertResourceOutputToString(resource);
         verify(martJdbcTemplate, times(1)).execute("drop view if exists view_from_file;" +
@@ -116,7 +116,7 @@ public class ViewExecutorTest {
     }
 
     @Test
-    public void shouldExecuteEmptySqlAsViewWhenSqlAndSqlFilePathAreEmpty() throws Exception {
+    public void shouldExecuteEmptySqlAsViewWhenSqlAndSourceFilePathAreEmpty() throws Exception {
         ViewDefinition viewDefinition = mock(ViewDefinition.class);
         when(viewDefinition.getName()).thenReturn("invalid_view");
 

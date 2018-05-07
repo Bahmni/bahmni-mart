@@ -12,9 +12,9 @@ public class CustomCodesUploader extends CSVUploader {
     private ObjectFactory<CustomCodesTasklet> objectFactory;
 
     @Override
-    public Tasklet getCSVUploaderTasklet(String readerFilePath) {
+    public Tasklet getCSVUploaderTasklet(String sourceFilePath) {
         CustomCodesTasklet customCodesTasklet = objectFactory.getObject();
-        customCodesTasklet.setReaderFilePath(readerFilePath);
+        customCodesTasklet.setSourceFilePath(sourceFilePath);
         return customCodesTasklet;
     }
 }

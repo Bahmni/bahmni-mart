@@ -4,7 +4,7 @@ public class ViewDefinition {
 
     private String name;
     private String sql;
-    private String sqlFilePath;
+    private String sourceFilePath;
 
     public String getName() {
         return name;
@@ -22,7 +22,7 @@ public class ViewDefinition {
         this.sql = sql;
     }
 
-    public String getSqlFilePath() {
-        return sqlFilePath;
+    public String getSourceFilePath() {
+        return sourceFilePath;
     }
 }

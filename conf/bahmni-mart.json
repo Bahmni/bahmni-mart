@@ -3,7 +3,7 @@
     {
       "name": "Custom Codes Export",
       "type": "csvupload",
-      "readerFilePath": "conf/customCodes.csv"
+      "sourceFilePath": "conf/customCodes.csv"
     },
     {
       "name": "Program data",
@@ -96,7 +96,7 @@
     {
       "name": "Medication Data",
       "type": "customSql",
-      "readerFilePath": "classpath:readerSql/drugOrder.sql",
+      "sourceFilePath": "classpath:readerSql/drugOrder.sql",
       "chunkSizeToRead": "500",
       "tableName": "medication_data",
       "columnsToIgnore": [
@@ -416,7 +416,7 @@
   "procedures":[
     {
       "name":"Discharge Date Procedure",
-      "sqlFilePath":"classpath:procedureSql/dischargeDateProc.sql"
+      "sourceFilePath":"classpath:procedureSql/dischargeDateProc.sql"
     }
   ],
   "views": [
@@ -458,7 +458,7 @@
     },
     {
       "name":"bed_management_locations_view",
-      "sqlFilePath":"classpath:viewSql/locationWiseDischarge.sql"
+      "sourceFilePath":"classpath:viewSql/locationWiseDischarge.sql"
     }
   ]
 }

@@ -57,20 +57,20 @@ public class CustomCodesTaskletTest {
     @Mock
     private Scanner scanner;
 
-    private String readerFilePath;
+    private String sourceFilePath;
     private CustomCodesTasklet customCodesTasklet;
 
     @Before
     public void setUp() throws Exception {
         customCodesTasklet = new CustomCodesTasklet();
-        readerFilePath = "path of reader file";
+        sourceFilePath = "path of reader file";
         String headers = "name,source,type,code";
         setValuesForMemberFields(customCodesTasklet, "martJdbcTemplate", martJdbcTemplate);
-        setValuesForMemberFields(customCodesTasklet, "readerFilePath", readerFilePath);
+        setValuesForMemberFields(customCodesTasklet, "sourceFilePath", sourceFilePath);
         setValuesForMemberFields(customCodesTasklet, "copyManager", copyManager);
         setValueForFinalStaticField(CustomCodesTasklet.class, "logger", logger);
 
-        whenNew(FileInputStream.class).withArguments(readerFilePath).thenReturn(fileInputStream);
+        whenNew(FileInputStream.class).withArguments(sourceFilePath).thenReturn(fileInputStream);
         whenNew(Scanner.class).withArguments(fileInputStream).thenReturn(scanner);
         when(scanner.nextLine()).thenReturn(headers);
     }
@@ -118,7 +118,7 @@ public class CustomCodesTaskletTest {
 
     @Test
     public void shouldLogErrorForWrongCSVFilePath() throws Exception {
-        whenNew(FileInputStream.class).withArguments(readerFilePath).thenThrow(new IOException());
+        whenNew(FileInputStream.class).withArguments(sourceFilePath).thenThrow(new IOException());
 
         customCodesTasklet.execute(stepContribution, chunkContext);
 

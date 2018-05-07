@@ -3,13 +3,13 @@ package org.bahmni.mart.config.procedure;
 public class ProcedureDefinition {
 
     private String name;
-    private String sqlFilePath;
+    private String sourceFilePath;
 
     public String getName() {
         return name;
     }
 
-    public String getSqlFilePath() {
-        return sqlFilePath;
+    public String getSourceFilePath() {
+        return sourceFilePath;
     }
 }

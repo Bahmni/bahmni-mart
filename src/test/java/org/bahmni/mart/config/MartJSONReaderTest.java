@@ -51,7 +51,7 @@ public class MartJSONReaderTest {
 
         ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
         when(procedureDefinition.getName()).thenReturn("Test Procedure");
-        when(procedureDefinition.getSqlFilePath()).thenReturn("some path");
+        when(procedureDefinition.getSourceFilePath()).thenReturn("some path");
 
         bahmniMartJSON = mock(BahmniMartJSON.class);
         when(bahmniMartJSON.getJobs()).thenReturn(Arrays.asList(jobDefinition));
@@ -96,7 +96,7 @@ public class MartJSONReaderTest {
         assertEquals(1, procedureDefinitions.size());
         ProcedureDefinition procedureDefinition = procedureDefinitions.get(0);
         assertEquals("Test Procedure", procedureDefinition.getName());
-        assertEquals("some path", procedureDefinition.getSqlFilePath());
+        assertEquals("some path", procedureDefinition.getSourceFilePath());
 
         verify(bahmniMartJSON, times(1)).getProcedures();
     }

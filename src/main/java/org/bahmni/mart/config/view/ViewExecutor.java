@@ -47,8 +47,8 @@ public class ViewExecutor {
     }
 
     private String getSqlFromFile(ViewDefinition viewDefinition) {
-        if (isNotEmpty(viewDefinition.getSqlFilePath())) {
-            Resource readerSqlResource = loadResource(viewDefinition.getSqlFilePath());
+        if (isNotEmpty(viewDefinition.getSourceFilePath())) {
+            Resource readerSqlResource = loadResource(viewDefinition.getSourceFilePath());
             return convertResourceOutputToString(readerSqlResource);
         }
         return "";

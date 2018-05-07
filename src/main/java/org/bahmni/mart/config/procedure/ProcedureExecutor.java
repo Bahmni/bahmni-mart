@@ -30,15 +30,15 @@ public class ProcedureExecutor {
         procedureDefinitions.forEach(procedureDefinition -> {
             try {
                 logger.info(String.format("Executing the procedure '%s'.", procedureDefinition.getName()));
-                martJdbcTemplate.execute(getUpdatedProcedureSQL(procedureDefinition.getSqlFilePath()));
+                martJdbcTemplate.execute(getUpdatedProcedureSQL(procedureDefinition.getSourceFilePath()));
             } catch (BatchResourceException | SQLException e) {
                 logger.error(String.format("Unable to execute the procedure %s", procedureDefinition.getName()), e);
             }
         });
     }
 
-    private String getUpdatedProcedureSQL(String sqlFilePath) throws SQLException {
-        String sqlFromFile = getSqlFromFile(sqlFilePath);
+    private String getUpdatedProcedureSQL(String sourceFilePath) throws SQLException {
+        String sqlFromFile = getSqlFromFile(sourceFilePath);
         if (isValid(sqlFromFile)) {
             return sqlFromFile;
         }
@@ -49,9 +49,9 @@ public class ProcedureExecutor {
         return !sql.toUpperCase().contains("DROP");
     }
 
-    private String getSqlFromFile(String sqlFilePath) {
-        if (isNotEmpty(sqlFilePath)) {
-            Resource readerSqlResource = loadResource(sqlFilePath);
+    private String getSqlFromFile(String sourceFilePath) {
+        if (isNotEmpty(sourceFilePath)) {
+            Resource readerSqlResource = loadResource(sourceFilePath);
             return convertResourceOutputToString(readerSqlResource);
         }
         return "";

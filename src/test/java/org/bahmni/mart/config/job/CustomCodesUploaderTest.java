@@ -64,7 +64,7 @@ public class CustomCodesUploaderTest {
         Job actualJob = customCodesUploader.buildJob(jobDefinition);
 
         assertEquals(job, actualJob);
-        verify(customCodesTasklet, times(1)).setReaderFilePath(jobDefinition.getReaderFilePath());
+        verify(customCodesTasklet, times(1)).setSourceFilePath(jobDefinition.getSourceFilePath());
     }
 
     private void setUpJobWithTasklet(String jobName) {

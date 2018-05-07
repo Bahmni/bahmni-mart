@@ -36,7 +36,7 @@ public class CustomCodesTasklet implements Tasklet {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomCodesTasklet.class);
 
-    private String readerFilePath;
+    private String sourceFilePath;
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
@@ -47,10 +47,10 @@ public class CustomCodesTasklet implements Tasklet {
 
     private void importData() {
         try {
-            List<String> headers = getHeaders(readerFilePath);
+            List<String> headers = getHeaders(sourceFilePath);
             if (isValid(headers)) {
                 copyManager.copyIn(String.format("COPY custom_codes (%s) FROM STDIN DELIMITER ',' CSV HEADER",
-                        StringUtils.join(headers, ",")), new FileInputStream(readerFilePath));
+                        StringUtils.join(headers, ",")), new FileInputStream(sourceFilePath));
             }
         } catch (DataAccessResourceFailureException | DataIntegrityViolationException |
                 SQLException | IOException exception) {
@@ -58,8 +58,8 @@ public class CustomCodesTasklet implements Tasklet {
         }
     }
 
-    private List<String> getHeaders(String readerFilePath) throws FileNotFoundException {
-        Scanner scanner = new Scanner(new FileInputStream(readerFilePath));
+    private List<String> getHeaders(String sourceFilePath) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new FileInputStream(sourceFilePath));
         String[] headers = scanner.nextLine().split(",");
         scanner.close();
         return Arrays.asList(headers);
@@ -80,7 +80,7 @@ public class CustomCodesTasklet implements Tasklet {
         martJdbcTemplate.execute(tableCreationSql);
     }
 
-    public void setReaderFilePath(String readerFilePath) {
-        this.readerFilePath = readerFilePath;
+    public void setSourceFilePath(String sourceFilePath) {
+        this.sourceFilePath = sourceFilePath;
     }
 }

@@ -52,11 +52,11 @@ public class ProcedureExecutorTest {
     }
 
     @Test
-    public void shouldExecuteProcedureFromGivenSqlFilePath() throws Exception {
+    public void shouldExecuteProcedureFromGivenSourceFilePath() throws Exception {
         ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
         when(procedureDefinition.getName()).thenReturn("Test Procedure");
         String path = "Some path";
-        when(procedureDefinition.getSqlFilePath()).thenReturn(path);
+        when(procedureDefinition.getSourceFilePath()).thenReturn(path);
         when(loadResource(path)).thenReturn(resource);
         String validSql = "valid sql";
         when(convertResourceOutputToString(resource)).thenReturn(validSql);
@@ -71,7 +71,7 @@ public class ProcedureExecutorTest {
         ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
         when(procedureDefinition.getName()).thenReturn("Test Procedure");
         String path = "invalid path";
-        when(procedureDefinition.getSqlFilePath()).thenReturn(path);
+        when(procedureDefinition.getSourceFilePath()).thenReturn(path);
         when(loadResource(path)).thenThrow(BatchResourceException.class);
 
         procedureExecutor.execute(Arrays.asList(procedureDefinition));
@@ -85,7 +85,7 @@ public class ProcedureExecutorTest {
         ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
         when(procedureDefinition.getName()).thenReturn("Test Procedure");
         String path = "invalid path";
-        when(procedureDefinition.getSqlFilePath()).thenReturn(path);
+        when(procedureDefinition.getSourceFilePath()).thenReturn(path);
         when(loadResource(path)).thenReturn(resource);
         when(convertResourceOutputToString(resource)).thenReturn("DROP sql");
 
@@ -96,7 +96,7 @@ public class ProcedureExecutorTest {
     }
 
     @Test
-    public void shouldExecuteEmptySqlGivenEmptyOrNullSqlFilePath() throws Exception {
+    public void shouldExecuteEmptySqlGivenEmptyOrNullSourceFilePath() throws Exception {
         ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
         when(procedureDefinition.getName()).thenReturn("Test Procedure");
 

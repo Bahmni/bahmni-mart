@@ -17,7 +17,7 @@ public class JobDefinition {
     private String conceptReferenceSource;
     private List<String> columnsToIgnore;
     private EavAttributes eavAttributes;
-    private String readerFilePath;
+    private String sourceFilePath;
     private boolean ignoreAllFreeTextConcepts;
     private List<CodeConfig> codeConfigs;
 
@@ -104,8 +104,8 @@ public class JobDefinition {
         return ignoreAllFreeTextConcepts;
     }
 
-    public String getReaderFilePath() {
-        return readerFilePath;
+    public String getSourceFilePath() {
+        return sourceFilePath;
     }
 
     public List<CodeConfig> getCodeConfigs() {
