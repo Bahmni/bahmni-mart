@@ -94,6 +94,12 @@
       "type": "rsp"
     }
   ],
+  "procedures":[
+    {
+      "name":"Test Procedure",
+      "sqlFilePath":"classpath:procedureSql/testProc.sql"
+    }
+  ],
   "views": [
     {
       "name": "test_view",

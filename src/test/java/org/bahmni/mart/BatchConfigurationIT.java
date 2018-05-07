@@ -163,6 +163,17 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyCodedPatientRecords(records);
     }
 
+    @Test
+    public void shouldCreateProcedureFromSourceFile() throws Exception {
+        batchConfiguration.run();
+
+        List<Map<String, Object>> procRecords = martJdbcTemplate.queryForList(
+                "SELECT patient_id,getAllergyStatus(patient_id) AS allergy_status FROM " +
+                "\"patient_allergy_status_test\"");
+
+        verifyRecords(procRecords);
+    }
+
     private void verifyCodedPatientRecords(List<Map<String, Object>> records) {
         Set<String> expected = new HashSet<>(Arrays.asList("unknown101", "Test", "Test 1"));
         Set<String> actualCodes = new HashSet<>();
