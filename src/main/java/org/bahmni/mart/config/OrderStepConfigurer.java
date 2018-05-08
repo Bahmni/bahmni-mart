@@ -21,7 +21,9 @@ import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.JdbcPagingItemReader;
+import org.springframework.batch.item.database.Order;
+import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -142,12 +145,31 @@ public class OrderStepConfigurer implements StepConfigurerContract {
 
     private ItemReader<? extends Map<String, Object>> ordersDataReader(String orderable)
             throws InvalidOrderTypeException, NoSamplesFoundException {
-        String orderReaderSQL = getOrderReaderSQL(orderable);
-        JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
+        JdbcPagingItemReader<Map<String, Object>> reader = new JdbcPagingItemReader<>();
+        reader.setQueryProvider(getMySqlPagingQueryProvider(orderable));
+        reader.setSaveState(true);
         reader.setDataSource(dataSource);
-        reader.setSql(orderReaderSQL);
+        reader.setPageSize(200000);
         reader.setRowMapper(new ColumnMapRowMapper());
+        try {
+            reader.afterPropertiesSet();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
         return reader;
+    }
+
+
+    private MySqlPagingQueryProvider getMySqlPagingQueryProvider(String orderable)
+            throws InvalidOrderTypeException, NoSamplesFoundException {
+        MySqlPagingQueryProvider mySqlPagingQueryProvider = new MySqlPagingQueryProvider();
+        mySqlPagingQueryProvider.setSelectClause("SELECT * ");
+        mySqlPagingQueryProvider.setFromClause("FROM (" + getOrderReaderSQL(orderable) + ") AS mergedOrders");
+        Map<String, Order> sortKey = new HashMap<>();
+        sortKey.put("patient_id", Order.DESCENDING);
+        mySqlPagingQueryProvider.setSortKeys(sortKey);
+        return mySqlPagingQueryProvider;
+
     }
 
     private TableDataProcessor orderDataProcessor(String orderable)
