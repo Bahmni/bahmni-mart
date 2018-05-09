@@ -7,6 +7,7 @@ import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.MetaDataStepConfigurer;
 import org.bahmni.mart.config.OrderStepConfigurer;
 import org.bahmni.mart.config.RspStepConfigurer;
+import org.bahmni.mart.config.StepConfigurer;
 import org.bahmni.mart.config.StepConfigurerContract;
 import org.bahmni.mart.config.job.CustomCodesUploader;
 import org.bahmni.mart.config.job.JobDefinition;
@@ -14,6 +15,7 @@ import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.config.procedure.ProcedureDefinition;
 import org.bahmni.mart.config.procedure.ProcedureExecutor;
+import org.bahmni.mart.config.DispositionStepConfigurer;
 import org.bahmni.mart.config.view.RspViewDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
@@ -100,6 +102,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private RspViewDefinition rspViewDefinition;
 
+    @Autowired
+    private DispositionStepConfigurer dispositionStepConfigurer;
+
     @Override
     public void run(String... args) {
         List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
@@ -164,9 +169,19 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
               return customCodesUploader.buildJob(jobDefinition);
           case "rsp":
               return buildRspJob(jobDefinition);
+          case "disposition":
+              return buildDispositionJob(jobDefinition);
           default:
               return simpleJobTemplateFactory.getObject().buildJob(jobDefinition);
         }
+    }
+
+    private Job buildDispositionJob(JobDefinition jobDefinition) {
+        return getFlowJob(jobDefinition, dispositionStepConfigurer);
+    }
+
+    private Job getFlowJob(JobDefinition jobDefinition, StepConfigurer stepConfigurer) {
+        return getJob(getFlowBuilder(jobDefinition.getName()), stepConfigurer, jobDefinition);
     }
 
     private Job buildRspJob(JobDefinition jobDefinition) {

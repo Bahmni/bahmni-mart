@@ -13,6 +13,7 @@ import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.config.procedure.ProcedureDefinition;
 import org.bahmni.mart.config.procedure.ProcedureExecutor;
+import org.bahmni.mart.config.DispositionStepConfigurer;
 import org.bahmni.mart.config.view.RspViewDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
@@ -114,6 +115,9 @@ public class BatchConfigurationTest {
     private RspStepConfigurer rspStepConfigurer;
 
     @Mock
+    private DispositionStepConfigurer dispositionStepConfigurer;
+
+    @Mock
     private RspViewDefinition rspViewDefinition;
 
     @Mock
@@ -147,6 +151,7 @@ public class BatchConfigurationTest {
         setValuesForMemberFields(batchConfiguration, "rspStepConfigurer", rspStepConfigurer);
         setValuesForMemberFields(batchConfiguration, "rspViewDefinition", rspViewDefinition);
         setValuesForMemberFields(batchConfiguration, "procedureExecutor", procedureExecutor);
+        setValuesForMemberFields(batchConfiguration, "dispositionStepConfigurer", dispositionStepConfigurer);
 
         JobBuilder jobBuilder = mock(JobBuilder.class);
         when(jobBuilderFactory.get(any())).thenReturn(jobBuilder);
@@ -355,6 +360,23 @@ public class BatchConfigurationTest {
         verify(rspViewDefinition, times(1)).getDefinition();
         verify(martJSONReader, times(1)).getViewDefinitions();
         verify(viewExecutor, times(1)).execute(Collections.singletonList(viewDefinition));
+    }
+
+    @Test
+    public void shouldRunDispositionJob() throws Exception {
+        String jobName = "Disposition Data";
+
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinition.getName()).thenReturn(jobName);
+        when(jobDefinition.getType()).thenReturn("disposition");
+
+        batchConfiguration.run();
+
+        verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verify(jobBuilderFactory, times(1)).get(jobName);
+        verify(dispositionStepConfigurer, times(1)).createTables();
+        verify(dispositionStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
     }
 
     @Test

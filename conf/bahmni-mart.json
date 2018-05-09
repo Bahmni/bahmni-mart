@@ -411,6 +411,11 @@
       "name": "Diagnoses Data",
       "type": "diagnoses",
       "columnsToIgnore": []
+    },
+    {
+      "name": "Disposition Data",
+      "type": "disposition",
+      "columnsToIgnore": []
     }
   ],
   "procedures":[

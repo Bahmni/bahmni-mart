@@ -80,7 +80,7 @@ public class OrderStepConfigurerTest {
     @Mock
     private JobDefinitionReader jobDefinitionReader;
 
-    private  OrderStepConfigurer orderStepConfigurer;
+    private OrderStepConfigurer orderStepConfigurer;
 
     private String orderables = "All Orderables";
 
