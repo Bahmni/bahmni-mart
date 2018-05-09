@@ -48,6 +48,7 @@ public class OrderStepConfigurer implements StepConfigurerContract {
     private static final Logger logger = LoggerFactory.getLogger(OrderStepConfigurer.class);
 
     private static final String ALL_ORDERABLES = "All Orderables";
+    private static final int PAGE_SIZE = 200000;
 
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
@@ -149,7 +150,7 @@ public class OrderStepConfigurer implements StepConfigurerContract {
         reader.setQueryProvider(getMySqlPagingQueryProvider(orderable));
         reader.setSaveState(true);
         reader.setDataSource(dataSource);
-        reader.setPageSize(200000);
+        reader.setPageSize(PAGE_SIZE);
         reader.setRowMapper(new ColumnMapRowMapper());
         try {
             reader.afterPropertiesSet();
@@ -164,7 +165,8 @@ public class OrderStepConfigurer implements StepConfigurerContract {
             throws InvalidOrderTypeException, NoSamplesFoundException {
         MySqlPagingQueryProvider mySqlPagingQueryProvider = new MySqlPagingQueryProvider();
         mySqlPagingQueryProvider.setSelectClause("SELECT * ");
-        mySqlPagingQueryProvider.setFromClause("FROM (" + getOrderReaderSQL(orderable) + ") AS mergedOrders");
+        mySqlPagingQueryProvider.setFromClause(String
+                .format("FROM (%s) AS mergedOrders", getOrderReaderSQL(orderable)));
         Map<String, Order> sortKey = new HashMap<>();
         sortKey.put("patient_id", Order.DESCENDING);
         mySqlPagingQueryProvider.setSortKeys(sortKey);
