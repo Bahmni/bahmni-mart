@@ -5,7 +5,6 @@ import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.table.domain.TableData;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -154,11 +153,11 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
 
         List<BahmniForm> allForms = formStepConfigurer.getAllForms();
 
-        Assert.assertEquals(1, allForms.size());
+        assertEquals(1, allForms.size());
         BahmniForm uniqueForm = allForms.get(0);
-        Assert.assertEquals(2, uniqueForm.getFields().size());
+        assertEquals(2, uniqueForm.getFields().size());
 
-        Assert.assertEquals(uniqueFormName, uniqueForm.getFormName().getName());
+        assertEquals(uniqueFormName, uniqueForm.getFormName().getName());
         containsInAnyOrder(Arrays.asList(concept1, concept3), uniqueForm.getFields());
         verify(logger, times(1))
                 .warn("Skipping the form 'Duplicate form name' since it has duplicate concepts 'concept1'");
