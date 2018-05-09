@@ -31,7 +31,7 @@ public class ObsRecordExtractorForTable {
                 tableData.getColumns().forEach(tableColumn -> recordMap.put(tableColumn.getName(), null));
 
                 mapRecordsWithColumns(tableData, record, recordMap);
-                mapPatientAndEncounterIds(tableData, record, recordMap);
+                mapAdditionalDetails(tableData, record, recordMap);
 
                 recordList.add(recordMap);
             }
@@ -75,7 +75,7 @@ public class ObsRecordExtractorForTable {
         return tableColumnName.equals("id_" + getProcessedName(conceptName));
     }
 
-    private void mapPatientAndEncounterIds(TableData tableData, List<Obs> record, Map<String, String> recordMap) {
+    private void mapAdditionalDetails(TableData tableData, List<Obs> record, Map<String, String> recordMap) {
         Obs obs = record.get(0);
         for (TableColumn tableColumn : tableData.getColumns()) {
             String tableColumnName = tableColumn.getName();
@@ -86,8 +86,24 @@ public class ObsRecordExtractorForTable {
     }
 
     private String getValue(String columnName, Obs obs) {
-        return "encounter_id".equals(columnName) ? obs.getEncounterId() :
-                "patient_id".equals(columnName) ? obs.getPatientId() : null;
+        switch (columnName) {
+          case "encounter_id":
+              return obs.getEncounterId();
+          case "patient_id":
+              return obs.getPatientId();
+          case "obs_datetime":
+              return obs.getObsDateTime();
+          case "location_id":
+              return obs.getLocationId();
+          case "location_name":
+              return obs.getLocationName();
+          case "program_id":
+              return obs.getProgramId();
+          case "program_name":
+              return obs.getProgramName();
+          default:
+              return null;
+        }
     }
 
     public List<Map<String, String>> getRecordList() {

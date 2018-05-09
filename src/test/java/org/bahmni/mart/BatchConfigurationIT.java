@@ -228,7 +228,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         Set<String> columnNamesViewFromFile = viewFromFile.get(0).keySet();
         Set<String> rspViewColumns = rspView.get(0).keySet();
         List<String> rspViewExpectedCoulumns = Arrays.asList("rsp_fee_information_registration_fee",
-                "rsp_nutritional_temp_height", "rsp_nutritional_weight", "patient_id", "encounter_id");
+                "rsp_nutritional_temp_height", "rsp_nutritional_weight", "patient_id", "encounter_id",
+                "obs_datetime", "location_id", "location_name", "program_id", "program_name"
+        );
 
         assertEquals(2, columnNamesView.size());
         assertEquals(2, columnNamesViewFromFile.size());
@@ -237,7 +239,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 containsInAnyOrder(columnNamesViewFromFile.toArray()));
         assertEquals(10, view.size());
         assertEquals(10, viewFromFile.size());
-        assertEquals(5, rspViewColumns.size());
+        assertEquals(10, rspViewColumns.size());
         assertThat(rspViewExpectedCoulumns, containsInAnyOrder(rspViewColumns.toArray()));
         assertEquals(1, rspView.size());
         verifyRecords(view);
@@ -255,21 +257,34 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     private void verifyTableColumns() {
         HashMap<String, List<String>> tableMap = new HashMap<>();
         tableMap.put("patient_allergy_status_test", Arrays.asList("patient_id", "allergy_status"));
+
         tableMap.put("first_stage_validation",
-                Arrays.asList("id_first_stage_validation", "patient_id", "encounter_id"));
+                Arrays.asList("id_first_stage_validation", "patient_id", "encounter_id",
+                        "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+
         tableMap.put("fstg_specialty_determined_by_mlo",
                 Arrays.asList("id_fstg_specialty_determined_by_mlo", "patient_id", "encounter_id",
-                        "id_first_stage_validation", "fstg_specialty_determined_by_mlo"));
-        tableMap.put("follow_up_validation", Arrays.asList("id_follow_up_validation", "patient_id", "encounter_id"));
+                        "id_first_stage_validation", "fstg_specialty_determined_by_mlo", "obs_datetime", "location_id",
+                        "location_name", "program_id", "program_name"));
+
+        tableMap.put("follow_up_validation", Arrays.asList("id_follow_up_validation", "patient_id", "encounter_id",
+                "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+
         tableMap.put("stage", Arrays.asList("id_stage", "patient_id", "encounter_id", "id_first_stage_validation",
-                "stage", "id_follow_up_validation"));
+                "stage", "id_follow_up_validation", "obs_datetime", "location_id", "location_name", "program_id",
+                "program_name"));
+
         tableMap.put("person_attributes", Arrays.asList("person_id", "givennamelocal", "familynamelocal",
                 "middlenamelocal", "viber", "phonenumber2"));
+
         tableMap.put("bacteriology_concept_set", Arrays.asList("id_bacteriology_concept_set", "patient_id",
-                "encounter_id", "specimen_sample_source", "specimen_id"));
+                "encounter_id", "specimen_sample_source", "specimen_id",
+                "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+
         tableMap.put("visit_diagnoses", Arrays.asList("id_visit_diagnoses", "patient_id", "encounter_id",
                 "non_coded_diagnosis", "coded_diagnosis", "diagnosis_certainty", "diagnosis_order",
-                "bahmni_initial_diagnosis", "bahmni_diagnosis_revised", "bahmni_diagnosis_status"));
+                "bahmni_initial_diagnosis", "bahmni_diagnosis_revised", "bahmni_diagnosis_status",
+                "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
 
         for (String tableName : tableMap.keySet()) {
             String sql = String.format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' " +

@@ -700,5 +700,80 @@ CREATE TABLE encounter_type
   date_changed      DATETIME               NULL
 );
 
+DROP TABLE IF EXISTS location CASCADE;
+CREATE TABLE location
+(
+  location_id     INT AUTO_INCREMENT
+    PRIMARY KEY,
+  name            VARCHAR(255) DEFAULT '' NOT NULL,
+  description     VARCHAR(255)            NULL,
+  address1        VARCHAR(255)            NULL,
+  address2        VARCHAR(255)            NULL,
+  city_village    VARCHAR(255)            NULL,
+  state_province  VARCHAR(255)            NULL,
+  postal_code     VARCHAR(50)             NULL,
+  country         VARCHAR(50)             NULL,
+  latitude        VARCHAR(50)             NULL,
+  longitude       VARCHAR(50)             NULL,
+  creator         INT DEFAULT '0'         NOT NULL,
+  date_created    DATETIME                NOT NULL,
+  county_district VARCHAR(255)            NULL,
+  address3        VARCHAR(255)            NULL,
+  address4        VARCHAR(255)            NULL,
+  address5        VARCHAR(255)            NULL,
+  address6        VARCHAR(255)            NULL,
+  retired         TINYINT(1) DEFAULT '0'  NOT NULL,
+  retired_by      INT                     NULL,
+  date_retired    DATETIME                NULL,
+  retire_reason   VARCHAR(255)            NULL,
+  parent_location INT                     NULL,
+  uuid            CHAR(38)                NOT NULL,
+  changed_by      INT                     NULL,
+  date_changed    DATETIME                NULL,
+  address7        VARCHAR(255)            NULL,
+  address8        VARCHAR(255)            NULL,
+  address9        VARCHAR(255)            NULL,
+  address10       VARCHAR(255)            NULL,
+  address11       VARCHAR(255)            NULL,
+  address12       VARCHAR(255)            NULL,
+  address13       VARCHAR(255)            NULL,
+  address14       VARCHAR(255)            NULL,
+  address15       VARCHAR(255)            NULL
+);
+
+DROP TABLE IF EXISTS episode_encounter CASCADE;
+CREATE TABLE episode_encounter
+(
+  episode_id   INT NOT NULL,
+  encounter_id INT NOT NULL
+);
+
+DROP TABLE IF EXISTS episode_patient_program CASCADE;
+CREATE TABLE episode_patient_program
+(
+  episode_id         INT NOT NULL,
+  patient_program_id INT NOT NULL
+);
+
+DROP TABLE IF EXISTS person_attribute CASCADE;
+CREATE TABLE person_attribute
+(
+  person_attribute_id      INT AUTO_INCREMENT
+    PRIMARY KEY,
+  person_id                INT DEFAULT '0'        NOT NULL,
+  value                    VARCHAR(50) DEFAULT '' NOT NULL,
+  person_attribute_type_id INT DEFAULT '0'        NOT NULL,
+  creator                  INT DEFAULT '0'        NOT NULL,
+  date_created             DATETIME               NOT NULL,
+  changed_by               INT                    NULL,
+  date_changed             DATETIME               NULL,
+  voided                   TINYINT(1) DEFAULT '0' NOT NULL,
+  voided_by                INT                    NULL,
+  date_voided              DATETIME               NULL,
+  void_reason              VARCHAR(255)           NULL,
+  uuid                     CHAR(38)               NOT NULL
+);
+
+
 SET FOREIGN_KEY_CHECKS=1;
 

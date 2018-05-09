@@ -8,6 +8,11 @@ public class Obs {
     private Concept field;
     private String value;
     private String parentName;
+    private String obsDateTime;
+    private String locationId;
+    private String locationName;
+    private String programId;
+    private String programName;
 
     public Obs() {
     }
@@ -74,5 +79,45 @@ public class Obs {
 
     public void setPatientId(String patientId) {
         this.patientId = patientId;
+    }
+
+    public String getLocationId() {
+        return locationId;
+    }
+
+    public String getObsDateTime() {
+        return obsDateTime;
+    }
+
+    public void setObsDateTime(String obsDateTime) {
+        this.obsDateTime = obsDateTime;
+    }
+
+    public void setLocationId(String locationId) {
+        this.locationId = locationId;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public String getProgramId() {
+        return programId;
+    }
+
+    public void setProgramId(String programId) {
+        this.programId = programId;
+    }
+
+    public String getProgramName() {
+        return programName;
+    }
+
+    public void setProgramName(String programName) {
+        this.programName = programName;
     }
 }

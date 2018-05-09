@@ -51,6 +51,12 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
         columns.add(getPrimaryColumn(form));
         columns.add(new TableColumn("patient_id", "integer", false, null));
         columns.add(new TableColumn("encounter_id", "integer", false, null));
+        columns.add(new TableColumn("obs_datetime", "text", false, null));
+        columns.add(new TableColumn("location_id", "integer", false, null));
+        columns.add(new TableColumn("location_name", "text", false, null));
+        columns.add(new TableColumn("program_id", "integer", false, null));
+        columns.add(new TableColumn("program_name", "text", false, null));
+
         TableColumn foreignKeyColumn = getForeignKeyColumn(form);
         if (foreignKeyColumn != null)
             columns.add(foreignKeyColumn);

@@ -49,9 +49,14 @@ public class RspViewDefinitionTest {
 
     @Test
     public void shouldReturnViewDefinitionWithSql() {
-        String sql = "SELECT COALESCE(rsp_nutritional_values.patient_id,rsp_fee_information.patient_id) AS" +
-                " patient_id, COALESCE(rsp_nutritional_values.encounter_id,rsp_fee_information.encounter_id) AS" +
-                " encounter_id,  FROM rsp_nutritional_values FULL OUTER JOIN rsp_fee_information " +
+        String sql = "SELECT COALESCE(rsp_nutritional_values.patient_id,rsp_fee_information.patient_id) AS patient_id" +
+                ", COALESCE(rsp_nutritional_values.encounter_id,rsp_fee_information.encounter_id) AS encounter_id," +
+                " COALESCE(rsp_nutritional_values.location_id,rsp_fee_information.location_id) AS location_id," +
+                " COALESCE(rsp_nutritional_values.location_name,rsp_fee_information.location_name) AS location_name," +
+                " COALESCE(rsp_nutritional_values.obs_datetime,rsp_fee_information.obs_datetime) AS obs_datetime," +
+                " COALESCE(rsp_nutritional_values.program_id,rsp_fee_information.program_id) AS program_id," +
+                " COALESCE(rsp_nutritional_values.program_name,rsp_fee_information.program_name) AS program_name," +
+                "   FROM rsp_nutritional_values FULL OUTER JOIN rsp_fee_information " +
                 "ON rsp_fee_information.encounter_id = rsp_nutritional_values.encounter_id";
         String viewName = "registration_second_page_view";
 

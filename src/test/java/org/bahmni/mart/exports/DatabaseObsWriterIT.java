@@ -47,9 +47,20 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         Obs obs1 = new Obs(1, 2, fieldOne, "4");
         obs1.setEncounterId("56");
         obs1.setPatientId("23");
+        obs1.setLocationId("1");
+        obs1.setLocationName("test location 1");
+        obs1.setObsDateTime("2018-12-2 09:07:32");
+        obs1.setProgramId("1");
+        obs1.setProgramName("test program 1");
+
         Obs obs2 = new Obs(2, 2, fieldTwo, "test IT");
         obs2.setEncounterId("56");
         obs2.setPatientId("23");
+        obs2.setLocationId("1");
+        obs2.setLocationName("test location 1");
+        obs2.setObsDateTime("2018-12-2 09:07:32");
+        obs2.setProgramId("1");
+        obs2.setProgramName("test program 1");
 
         obsList1.add(obs1);
         obsList1.add(obs2);
@@ -58,9 +69,20 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         Obs obs3 = new Obs(3, 2, fieldOne, "40");
         obs3.setEncounterId("560");
         obs3.setPatientId("3");
+        obs3.setLocationId("2");
+        obs3.setLocationName("test location 2");
+        obs3.setObsDateTime("2018-12-2 09:07:42");
+        obs3.setProgramId("2");
+        obs3.setProgramName("test program 2");
+
         Obs obs4 = new Obs(4, 2, fieldTwo, "test IT 2");
         obs4.setEncounterId("560");
         obs4.setPatientId("3");
+        obs4.setLocationId("2");
+        obs4.setLocationName("test location 2");
+        obs4.setObsDateTime("2018-12-2 09:07:42");
+        obs4.setProgramId("2");
+        obs4.setProgramName("test program 2");
 
         obsList2.add(obs3);
         obsList2.add(obs4);
@@ -78,19 +100,30 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals(2, maps.size());
 
         Map<String, Object> actualObs1 = maps.get(0);
-        assertEquals(5, actualObs1.size());
+        assertEquals(10, actualObs1.size());
         assertEquals(1, actualObs1.get("id_test"));
         assertEquals(23, actualObs1.get("patient_id"));
         assertEquals(56, actualObs1.get("encounter_id"));
         assertEquals(new BigDecimal(4), actualObs1.get("field_one"));
         assertEquals("test IT", actualObs1.get("field_two"));
+        assertEquals(1, actualObs1.get("location_id"));
+        assertEquals("test location 1", actualObs1.get("location_name"));
+        assertEquals("2018-12-2 09:07:32", actualObs1.get("obs_datetime"));
+        assertEquals(1, actualObs1.get("program_id"));
+        assertEquals("test program 1", actualObs1.get("program_name"));
 
         Map<String, Object> actualObs2 = maps.get(1);
-        assertEquals(5, actualObs2.size());
+        assertEquals(10, actualObs2.size());
         assertEquals(3, actualObs2.get("id_test"));
         assertEquals(3, actualObs2.get("patient_id"));
         assertEquals(560, actualObs2.get("encounter_id"));
         assertEquals(new BigDecimal(40), actualObs2.get("field_one"));
         assertEquals("test IT 2", actualObs2.get("field_two"));
+        assertEquals("test IT", actualObs1.get("field_two"));
+        assertEquals(2, actualObs2.get("location_id"));
+        assertEquals("test location 2", actualObs2.get("location_name"));
+        assertEquals("2018-12-2 09:07:42", actualObs2.get("obs_datetime"));
+        assertEquals(2, actualObs2.get("program_id"));
+        assertEquals("test program 2", actualObs2.get("program_name"));
     }
 }

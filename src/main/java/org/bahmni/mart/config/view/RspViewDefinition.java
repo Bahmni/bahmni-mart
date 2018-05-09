@@ -48,13 +48,11 @@ public class RspViewDefinition {
     }
 
     private String createSql(List<String> tableNames) {
-        List<String> excludedColumns = Arrays.asList("patient_id", "encounter_id");
-        String coalescePatientIdQuery = getCoalesceQuery(tableNames, "patient_id");
-        String coalesceEncounterIdQuery = getCoalesceQuery(tableNames, "encounter_id");
-        String selectClause = getSelectClause(getTablesMetaData(tableNames), excludedColumns);
+        List<String> excludedColumns = Arrays.asList("patient_id", "encounter_id", "location_id", "location_name",
+                "obs_datetime", "program_id", "program_name");
 
-        String sql = format("SELECT %s, %s, %s FROM %s", coalescePatientIdQuery, coalesceEncounterIdQuery,
-                selectClause, tableNames.get(0));
+        String sql = format("SELECT %s %s FROM %s", createCoalesceQueries(excludedColumns, tableNames),
+                getSelectClause(getTablesMetaData(tableNames), excludedColumns), tableNames.get(0));
 
         for (int index = 1; index < tableNames.size(); index++) {
             sql = sql.concat(format(" FULL OUTER JOIN %s ON %s", tableNames.get(index),
@@ -62,6 +60,12 @@ public class RspViewDefinition {
         }
 
         return sql;
+    }
+
+    private String createCoalesceQueries(List<String> columnNames, List<String> tableNames) {
+        return columnNames.stream()
+                .map(columnName -> String.format("%s, ", getCoalesceQuery(tableNames, columnName)))
+                .collect(Collectors.joining());
     }
 
     private String getCoalesceQuery(List<String> tableNames, String columnName) {
