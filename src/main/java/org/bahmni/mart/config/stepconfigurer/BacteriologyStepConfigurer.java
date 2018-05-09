@@ -1,4 +1,4 @@
-package org.bahmni.mart.config;
+package org.bahmni.mart.config.stepconfigurer;
 
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;

@@ -1,4 +1,4 @@
-package org.bahmni.mart.config;
+package org.bahmni.mart.config.stepconfigurer;
 
 import org.bahmni.mart.config.job.JobDefinition;
 import org.springframework.batch.core.job.builder.FlowBuilder;
