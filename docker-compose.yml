@@ -3,7 +3,8 @@ dataflow-server:
     container_name: dataflow-server
     volumes:
       - /opt/bahmni-mart:/opt/bahmni-mart:rw
-      - /var/www:/var/www:rw
+      - /var/www/bahmni_config:/var/www/bahmni_config:rw
+      - /var/www/implementation_config:/var/www/implementation_config:rw
       - /var/log:/var/log:rw
     ports:
       - "9393:9393"
