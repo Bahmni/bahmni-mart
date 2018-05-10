@@ -2,11 +2,11 @@ package org.bahmni.mart.form;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.helper.IgnoreColumnsConfigHelper;
 import org.bahmni.mart.helper.SeparateTableConfigHelper;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
@@ -29,7 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -58,7 +56,7 @@ public class BahmniFormFactoryTest {
     private SeparateTableConfigHelper separateTableConfigHelper;
 
     @Mock
-    private JobDefinitionReader jobDefinitionReader;
+    private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
 
     private List<String> separateTableConceptList;
     private List<String> obsIgnoreConceptsNames;
@@ -95,14 +93,13 @@ public class BahmniFormFactoryTest {
         bahmniFormFactory = new BahmniFormFactory();
         setValuesForMemberFields(bahmniFormFactory, "obsService", obsService);
         setValuesForMemberFields(bahmniFormFactory, "separateTableConfigHelper", separateTableConfigHelper);
-        setValuesForMemberFields(bahmniFormFactory, "jobDefinitionReader", jobDefinitionReader);
+        setValuesForMemberFields(bahmniFormFactory, "ignoreColumnsConfigHelper", ignoreColumnsConfigHelper);
         mockStatic(BatchUtils.class);
         mockStatic(JobDefinitionUtil.class);
         when(getIgnoreConceptNamesForJob(obsJobDefinition)).thenReturn(obsIgnoreConceptsNames);
         when(getIgnoreConceptNamesForJob(bacteriologyJobDefinition)).thenReturn(bacteriologyIgnoreConceptsNames);
 
         List<JobDefinition> jobDefinitions = Arrays.asList(obsJobDefinition, bacteriologyJobDefinition);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
         when(getJobDefinitionByType(jobDefinitions, "obs")).thenReturn(obsJobDefinition);
         when(obsJobDefinition.isEmpty()).thenReturn(false);
         when(getJobDefinitionByType(jobDefinitions, "bacteriology")).thenReturn(bacteriologyJobDefinition);
@@ -119,7 +116,7 @@ public class BahmniFormFactoryTest {
     public void shouldCreateFormWithNoFieldsAndChildren() {
         bahmniFormFactory.postConstruct();
         BahmniForm dischargeSummaryForm = bahmniFormFactory
-                .createForm(new Concept(1, "Discharge Summary, Surgeries and Procedures", 1), null);
+                .createForm(new Concept(1, "Discharge Summary, Surgeries and Procedures", 1), null, obsJobDefinition);
 
         assertNotNull(dischargeSummaryForm);
         assertEquals(0, dischargeSummaryForm.getChildren().size());
@@ -139,7 +136,7 @@ public class BahmniFormFactoryTest {
 
         BahmniForm historyAndExamination = bahmniFormFactory.createForm(
                 new Concept(1189, "History and Examination", 1),
-                null);
+                null, obsJobDefinition);
 
         List<BahmniForm> historyAndExaminationChildren = historyAndExamination.getChildren();
 
@@ -153,10 +150,8 @@ public class BahmniFormFactoryTest {
         assertEquals(1, historyAndExaminationChildren.size());
         assertEquals(2, historyAndExaminationChildren.get(0).getDepthToParent());
         assertEquals("BP", historyAndExaminationChildren.get(0).getFormName().getName());
+        verify(ignoreColumnsConfigHelper, times(1)).getIgnoreConceptsForJob(obsJobDefinition);
         verify(obsService, times(1)).getConceptsByNames(separateTableConceptList);
-        verify(obsService, times(1)).getConceptsByNames(obsIgnoreConceptsNames);
-        verify(obsService, times(1)).getConceptsByNames(bacteriologyIgnoreConceptsNames);
-        verify(obsService, times(1)).getFreeTextConcepts();
     }
 
     @Test
@@ -171,17 +166,17 @@ public class BahmniFormFactoryTest {
         videoConcept.setParent(healthEducation);
         when(obsService.getChildConcepts("Health Education"))
                 .thenReturn(Arrays.asList(hasTakenCourse, videoConcept));
+        when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(obsJobDefinition))
+                .thenReturn(Collections.singletonList(videoConcept));
 
-        BahmniForm bahmniForm = bahmniFormFactory.createForm(healthEducation, null);
+        BahmniForm bahmniForm = bahmniFormFactory.createForm(healthEducation, null, obsJobDefinition);
 
         assertNotNull(bahmniForm);
         assertEquals("Health Education", bahmniForm.getFormName().getName());
         assertEquals(1, bahmniForm.getFields().size());
         assertEquals(hasTakenCourse, bahmniForm.getFields().get(0));
         verify(obsService, times(1)).getConceptsByNames(separateTableConceptList);
-        verify(obsService, times(1)).getConceptsByNames(obsIgnoreConceptsNames);
-        verify(obsService, times(1)).getConceptsByNames(bacteriologyIgnoreConceptsNames);
-        verify(obsService, times(1)).getFreeTextConcepts();
+        verify(ignoreColumnsConfigHelper, times(1)).getIgnoreConceptsForJob(obsJobDefinition);
     }
 
     @Test
@@ -204,7 +199,7 @@ public class BahmniFormFactoryTest {
 
         BahmniForm historyAndExamination = bahmniFormFactory.createForm(
                 new Concept(1189, "History and Examination", 1),
-                null);
+                null, obsJobDefinition);
 
         assertEquals("History and Examination", historyAndExamination.getFormName().getName());
         assertEquals(3, historyAndExamination.getChildren().size());
@@ -217,7 +212,7 @@ public class BahmniFormFactoryTest {
         verify(obsService, times(1)).getChildConcepts("Chief Complaint Data");
         verify(obsService, times(1)).getChildConcepts("Operation Notes Template");
         verify(obsService, times(1)).getChildConcepts("BP");
-        verify(obsService, times(1)).getFreeTextConcepts();
+        verify(ignoreColumnsConfigHelper, times(1)).getIgnoreConceptsForJob(obsJobDefinition);
     }
 
     @Test
@@ -229,69 +224,5 @@ public class BahmniFormFactoryTest {
         bahmniFormFactory.postConstruct();
 
         assertTrue(((List<Concept>) allSeparateTableConcepts.get(bahmniFormFactory)).isEmpty());
-    }
-
-    @Test
-    public void shouldReturnEmptyIgnoreConceptsListWhenThereIsNoObsJob() throws Exception {
-        when(getIgnoreConceptNamesForJob(any(JobDefinition.class))).thenReturn(Collections.emptyList());
-        when(obsJobDefinition.isEmpty()).thenReturn(true);
-
-        Field ignoreConcepts = bahmniFormFactory.getClass().getDeclaredField("ignoreConcepts");
-        ignoreConcepts.setAccessible(true);
-
-        bahmniFormFactory.postConstruct();
-
-        assertTrue(((List<Concept>) ignoreConcepts.get(bahmniFormFactory)).isEmpty());
-    }
-
-
-    @Test
-    public void shouldAddAllFreeTextConceptsToIgnoreList() {
-        when(obsJobDefinition.isEmpty()).thenReturn(false);
-        historyAndExaminationConcepts.remove(0);
-        when(obsService.getChildConcepts("History and Examination"))
-                .thenReturn(historyAndExaminationConcepts);
-
-        Concept chiefComplaintNotes = new Concept(1194, "Chief Complaint Notes", 0);
-        Concept history = new Concept(1843, "History", 0);
-        when(obsService.getFreeTextConcepts()).thenReturn(Arrays.asList(chiefComplaintNotes, history));
-
-        bahmniFormFactory.postConstruct();
-        BahmniForm historyAndExamination = bahmniFormFactory.createForm(
-                new Concept(1189, "History and Examination", 1),
-                null);
-
-        verify(obsService, times(1)).getFreeTextConcepts();
-
-        List<Concept> historyAndExaminationFields = historyAndExamination.getFields();
-        List<String> fieldNames = historyAndExaminationFields.stream()
-                .map(Concept::getName).collect(Collectors.toList());
-
-        assertEquals(2, historyAndExaminationFields.size());
-        assertTrue(fieldNames.containsAll(Arrays.asList("Examination", "Image")));
-    }
-
-    @Test
-    public void shouldNotAddAnyFreeTextConceptsToIgnoreListIfConfigIsDisabled() {
-        when(obsJobDefinition.isEmpty()).thenReturn(false);
-        when(obsJobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(false);
-
-        historyAndExaminationConcepts.remove(0);
-        when(obsService.getChildConcepts("History and Examination"))
-                .thenReturn(historyAndExaminationConcepts);
-
-        bahmniFormFactory.postConstruct();
-        BahmniForm historyAndExamination = bahmniFormFactory.createForm(
-                new Concept(1189, "History and Examination", 1),
-                null);
-
-        verify(obsService, times(0)).getFreeTextConcepts();
-
-        List<Concept> historyAndExaminationFields = historyAndExamination.getFields();
-        List<String> fieldNames = historyAndExaminationFields.stream()
-                .map(Concept::getName).collect(Collectors.toList());
-
-        assertEquals(4, historyAndExaminationFields.size());
-        assertTrue(fieldNames.containsAll(Arrays.asList("Examination", "Image", "Chief Complaint Notes", "History")));
     }
 }

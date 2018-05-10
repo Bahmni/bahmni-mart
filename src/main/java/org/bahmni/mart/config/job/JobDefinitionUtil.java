@@ -13,8 +13,8 @@ import static java.util.Objects.isNull;
 
 public class JobDefinitionUtil {
 
-    public static final String OBS_JOB_TYPE = "obs";
-    public static final String BACTERIOLOGY_JOB_TYPE = "bacteriology";
+    private static final String OBS_JOB_TYPE = "obs";
+    private static final String BACTERIOLOGY_JOB_TYPE = "bacteriology";
 
     public static String getReaderSQLByIgnoringColumns(List<String> columnsToIgnore, String readerSQL) {
         if (StringUtils.isEmpty(readerSQL) || CollectionUtils.isEmpty(columnsToIgnore)) {

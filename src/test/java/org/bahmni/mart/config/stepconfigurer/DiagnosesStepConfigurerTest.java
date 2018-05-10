@@ -42,16 +42,14 @@ public class DiagnosesStepConfigurerTest extends StepConfigurerTestHelper {
         when(JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(Collections.emptyList());
         when(obsService.getConceptsByNames(Collections.singletonList("Visit Diagnoses")))
                 .thenReturn(concepts);
-        when(formListProcessor.retrieveAllForms(concepts, Collections.emptyList())).thenReturn(Collections.emptyList());
+        when(formListProcessor.retrieveAllForms(concepts, jobDefinition)).thenReturn(Collections.emptyList());
 
         diagnosesStepConfigurer.getAllForms();
 
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verifyStatic(times(1));
         JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, "diagnoses");
-        verifyStatic(times(1));
-        JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition);
-        verify(formListProcessor, times(1)).retrieveAllForms(concepts, Collections.emptyList());
+        verify(formListProcessor, times(1)).retrieveAllForms(concepts, jobDefinition);
         verify(obsService, times(1)).getConceptsByNames(Collections.singletonList("Visit Diagnoses"));
     }
 }

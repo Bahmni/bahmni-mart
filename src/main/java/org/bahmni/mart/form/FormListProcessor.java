@@ -1,5 +1,7 @@
 package org.bahmni.mart.form;
 
+import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,12 @@ public class FormListProcessor {
     @Autowired
     private BahmniFormFactory bahmniFormFactory;
 
-    public List<BahmniForm> retrieveAllForms(List<Concept> formConcepts, List<String> ignoreConceptNames) {
+    public List<BahmniForm> retrieveAllForms(List<Concept> formConcepts, JobDefinition jobDefinition) {
+        List<String> ignoreConceptNames = JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition);
         List<BahmniForm> forms = formConcepts.stream()
                 .filter(concept -> !ignoreConceptNames.contains(concept.getName()))
-                .map(concept -> bahmniFormFactory.createForm(concept, null)).collect(Collectors.toList());
+                .map(concept -> bahmniFormFactory.createForm(concept, null, jobDefinition))
+                .collect(Collectors.toList());
 
         List<BahmniForm> flattenedFormList = new ArrayList<>(forms);
         fetchExportFormsList(forms, flattenedFormList);

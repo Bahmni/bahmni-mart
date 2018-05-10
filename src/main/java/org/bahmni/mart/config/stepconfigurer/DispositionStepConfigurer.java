@@ -1,5 +1,6 @@
 package org.bahmni.mart.config.stepconfigurer;
 
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
@@ -16,10 +17,10 @@ public class DispositionStepConfigurer  extends StepConfigurer {
 
     @Override
     protected List<BahmniForm> getAllForms() {
-        List<String> ignoreConcepts = JobDefinitionUtil.getIgnoreConceptNamesForJob(JobDefinitionUtil
-                .getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), DISPOSITION_JOB_TYPE));
+        JobDefinition jobDefinition = JobDefinitionUtil
+                .getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), DISPOSITION_JOB_TYPE);
         List<Concept> allConcepts = obsService
                 .getConceptsByNames(Collections.singletonList(DISPOSITION_CONCEPT_NAME));
-        return formListProcessor.retrieveAllForms(allConcepts, ignoreConcepts);
+        return formListProcessor.retrieveAllForms(allConcepts, jobDefinition);
     }
 }

@@ -1,6 +1,7 @@
 package org.bahmni.mart.config.stepconfigurer;
 
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
@@ -9,7 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
@@ -17,9 +19,11 @@ import org.springframework.batch.core.job.builder.FlowJobBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -28,8 +32,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(JobDefinitionUtil.class)
 public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     @Mock
     private FlowBuilder<FlowJobBuilder> completeDataExport;
@@ -38,6 +45,8 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
 
     @Before
     public void setUp() throws Exception {
+        mockStatic(JobDefinitionUtil.class);
+
         formStepConfigurer = new FormStepConfigurer();
         setUp(formStepConfigurer);
     }
@@ -75,13 +84,13 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         formStepConfigurer.registerSteps(completeDataExport, new JobDefinition());
 
         verify(formListProcessor, times(1)).retrieveAllForms(any(), any());
-        verify(observationExportStepFactory,times(2)).getObject();
+        verify(observationExportStepFactory, times(2)).getObject();
         verify(medicalHistoryObservationExportStep, times(1)).setForm(medicalHistoryForm);
         verify(fstgObservationExportStep, times(1)).setForm(fstg);
         verify(medicalHistoryObservationExportStep, times(1)).getStep();
         verify(fstgObservationExportStep, times(1)).getStep();
-        verify(completeDataExport,times(1)).next(medicalHistoryStep);
-        verify(completeDataExport,times(1)).next(fstgStep);
+        verify(completeDataExport, times(1)).next(medicalHistoryStep);
+        verify(completeDataExport, times(1)).next(fstgStep);
         verify(formTableMetadataGenerator, times(1)).addMetadataForForm(medicalHistoryForm);
         verify(formTableMetadataGenerator, times(1)).addMetadataForForm(fstg);
     }
@@ -89,15 +98,17 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     @Test
     public void shouldGetAllFormsUnderAllObservationTemplates() throws Exception {
         List<String> ignoreConcepts = Arrays.asList("video", "image");
-        List<Concept> allConcepts = Arrays.asList(new Concept(1, "concept", 1));
-        List<BahmniForm> forms = Arrays.asList(new BahmniForm());
+        List<Concept> allConcepts = Collections.singletonList(new Concept(1, "concept", 1));
+        List<BahmniForm> forms = Collections.singletonList(new BahmniForm());
         String allObservationTemplates = "All Observation Templates";
         JobDefinition obsJobDefinition = mock(JobDefinition.class);
         when(obsJobDefinition.getType()).thenReturn("obs");
         when(obsJobDefinition.getColumnsToIgnore()).thenReturn(ignoreConcepts);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Arrays.asList(obsJobDefinition));
+        List<JobDefinition> jobDefinitions = Collections.singletonList(obsJobDefinition);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
+        when(getJobDefinitionByType(jobDefinitions, "obs")).thenReturn(obsJobDefinition);
         when(obsService.getChildConcepts(allObservationTemplates)).thenReturn(allConcepts);
-        when(formListProcessor.retrieveAllForms(allConcepts, ignoreConcepts)).thenReturn(forms);
+        when(formListProcessor.retrieveAllForms(allConcepts, obsJobDefinition)).thenReturn(forms);
 
         List<BahmniForm> actual = formStepConfigurer.getAllForms();
 
@@ -105,8 +116,10 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         assertEquals(1, actual.size());
         assertEquals(forms, actual);
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
+        verifyStatic(times(1));
+        getJobDefinitionByType(jobDefinitions, "obs");
         verify(obsService, times(1)).getChildConcepts(allObservationTemplates);
-        verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, ignoreConcepts);
+        verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, obsJobDefinition);
     }
 
     @Test
@@ -142,7 +155,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         List<Concept> formConcepts = Arrays.asList(duplicateFormConcept, uniqueFormConcept);
 
         when(obsService.getChildConcepts(allObservationTemplates)).thenReturn(formConcepts);
-        when(formListProcessor.retrieveAllForms(formConcepts, new ArrayList<>())).thenReturn(forms);
+        when(formListProcessor.retrieveAllForms(formConcepts, obsJobDefinition)).thenReturn(forms);
 
         when(bahmniFormWithDuplicateConcepts.getFields()).thenReturn(allConceptsUnderDuplicateConceptsForm);
         when(bahmniFormWithUniqueConcepts.getFields()).thenReturn(allConceptsUnderUniqueConceptsForm);
@@ -150,6 +163,9 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
 
         when(bahmniFormWithDuplicateConcepts.getFormName()).thenReturn(duplicateFormConcept);
         when(bahmniFormWithUniqueConcepts.getFormName()).thenReturn(uniqueFormConcept);
+        List<JobDefinition> jobDefinitions = Collections.singletonList(obsJobDefinition);
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
+        when(getJobDefinitionByType(jobDefinitions, "obs")).thenReturn(obsJobDefinition);
 
         List<BahmniForm> allForms = formStepConfigurer.getAllForms();
 
@@ -163,7 +179,8 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
                 .warn("Skipping the form 'Duplicate form name' since it has duplicate concepts 'concept1'");
 
         verify(obsService, times(1)).getChildConcepts(allObservationTemplates);
-        verify(formListProcessor, times(1)).retrieveAllForms(formConcepts, new ArrayList<>());
-
+        verify(formListProcessor, times(1)).retrieveAllForms(formConcepts, obsJobDefinition);
+        verifyStatic(times(1));
+        getJobDefinitionByType(jobDefinitions, "obs");
     }
 }

@@ -1,23 +1,17 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.helper.IgnoreColumnsConfigHelper;
 import org.bahmni.mart.helper.SeparateTableConfigHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.bahmni.mart.config.job.JobDefinitionUtil.BACTERIOLOGY_JOB_TYPE;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.OBS_JOB_TYPE;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 
 @Component
 public class BahmniFormFactory {
@@ -31,23 +25,22 @@ public class BahmniFormFactory {
     private SeparateTableConfigHelper separateTableConfigHelper;
 
     @Autowired
-    private JobDefinitionReader jobDefinitionReader;
+    private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
 
     private List<Concept> allSeparateTableConcepts;
-    private List<Concept> ignoreConcepts;
 
-    public BahmniForm createForm(Concept concept, BahmniForm parentForm) {
-        return createForm(concept, parentForm, 0);
+    public BahmniForm createForm(Concept concept, BahmniForm parentForm, JobDefinition jobDefinition) {
+        return createForm(concept, parentForm, 0, ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition));
     }
 
-    private BahmniForm createForm(Concept concept, BahmniForm parentForm, int depth) {
+    private BahmniForm createForm(Concept concept, BahmniForm parentForm, int depth, List<Concept> ignoreConcepts) {
         BahmniForm bahmniForm = new BahmniForm();
         bahmniForm.setFormName(concept);
         bahmniForm.setDepthToParent(depth);
         bahmniForm.setParent(parentForm);
         bahmniForm.setRootForm(getRootFormFor(parentForm));
 
-        constructFormFields(concept, bahmniForm, depth);
+        constructFormFields(concept, bahmniForm, depth, ignoreConcepts);
         return bahmniForm;
     }
 
@@ -60,7 +53,7 @@ public class BahmniFormFactory {
         return getRootFormFor(form.getParent());
     }
 
-    private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth) {
+    private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth, List<Concept> ignoreConcepts) {
         if (concept.getIsSet() == 0) {
             bahmniForm.addField(concept);
             return;
@@ -72,11 +65,11 @@ public class BahmniFormFactory {
             if (ignoreConcepts.contains(childConcept)) {
                 continue;
             } else if (allSeparateTableConcepts.contains(childConcept)) {
-                bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth));
+                bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth, ignoreConcepts));
             } else if (childConcept.getIsSet() == 0) {
                 bahmniForm.addField(childConcept);
             } else {
-                constructFormFields(childConcept, bahmniForm, childDepth);
+                constructFormFields(childConcept, bahmniForm, childDepth, ignoreConcepts);
             }
         }
     }
@@ -84,32 +77,10 @@ public class BahmniFormFactory {
     @PostConstruct
     public void postConstruct() {
         this.allSeparateTableConcepts = getSeparateTableConcepts();
-        this.ignoreConcepts = getAllIgnoreConcepts(jobDefinitionReader.getJobDefinitions());
     }
 
     private List<Concept> getSeparateTableConcepts() {
         List<String> conceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
         return conceptNames.isEmpty() ? EMPTY_LIST : obsService.getConceptsByNames(conceptNames);
-    }
-
-    private List<Concept> getAllIgnoreConcepts(List<JobDefinition> jobDefinitions) {
-        JobDefinition obsJobDefinition = getJobDefinitionByType(jobDefinitions, OBS_JOB_TYPE);
-        JobDefinition bacteriologyJobDefinition = getJobDefinitionByType(jobDefinitions, BACTERIOLOGY_JOB_TYPE);
-
-        ArrayList<Concept> ignoreConcepts = new ArrayList<>(getIgnoreConceptsForJobDefinition(obsJobDefinition));
-        ignoreConcepts.addAll(getIgnoreConceptsForJobDefinition(bacteriologyJobDefinition));
-
-        if (obsJobDefinition.getIgnoreAllFreeTextConcepts())
-            ignoreConcepts.addAll(obsService.getFreeTextConcepts());
-        return ignoreConcepts;
-    }
-
-    private List<Concept> getIgnoreConceptsForJobDefinition(JobDefinition jobDefinition) {
-        return isJobWithOutIgnoreColumns(jobDefinition) ? EMPTY_LIST :
-                obsService.getConceptsByNames(getIgnoreConceptNamesForJob(jobDefinition));
-    }
-
-    private Boolean isJobWithOutIgnoreColumns(JobDefinition jobDefinition) {
-        return getIgnoreConceptNamesForJob(jobDefinition).isEmpty();
     }
 }

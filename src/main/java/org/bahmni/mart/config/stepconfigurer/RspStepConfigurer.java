@@ -1,5 +1,6 @@
 package org.bahmni.mart.config.stepconfigurer;
 
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.helper.RspConfigHelper;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 
 @Component
@@ -23,15 +23,14 @@ public class RspStepConfigurer extends StepConfigurer {
 
     @Override
     protected List<BahmniForm> getAllForms() {
-        List<String> ignoreConcepts = getIgnoreConceptNamesForJob(
-                getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE));
+        JobDefinition jobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE);
 
         List<String> rspConcepts = rspConfigHelper.getRspConcepts();
         if (rspConcepts.isEmpty())
             return new ArrayList<>();
 
         List<Concept> allFormConcepts = obsService.getConceptsByNames(rspConcepts);
-        return addPrefixToFormsName(formListProcessor.retrieveAllForms(allFormConcepts, ignoreConcepts));
+        return addPrefixToFormsName(formListProcessor.retrieveAllForms(allFormConcepts, jobDefinition));
     }
 
     private List<BahmniForm> addPrefixToFormsName(List<BahmniForm> bahmniForms) {

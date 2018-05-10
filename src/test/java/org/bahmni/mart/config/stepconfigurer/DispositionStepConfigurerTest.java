@@ -67,7 +67,7 @@ public class DispositionStepConfigurerTest {
         when(JobDefinitionUtil.getIgnoreConceptNamesForJob(dispositionJob)).thenReturn(ignoreConcepts);
         when(JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, dispositionJobType)).thenReturn(dispositionJob);
         when(obsService.getConceptsByNames(conceptNames)).thenReturn(allConcepts);
-        when(formListProcessor.retrieveAllForms(allConcepts, ignoreConcepts)).thenReturn(forms);
+        when(formListProcessor.retrieveAllForms(allConcepts, dispositionJob)).thenReturn(forms);
 
         List<BahmniForm> actual = dispositionStepConfigure.getAllForms();
 
@@ -76,10 +76,8 @@ public class DispositionStepConfigurerTest {
         assertEquals(forms, actual);
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verify(obsService, times(1)).getConceptsByNames(conceptNames);
-        verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, ignoreConcepts);
+        verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, dispositionJob);
         verifyStatic(times(1));
         JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, dispositionJobType);
-        verifyStatic(times(1));
-        JobDefinitionUtil.getIgnoreConceptNamesForJob(dispositionJob);
     }
 }

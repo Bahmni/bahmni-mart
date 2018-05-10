@@ -1,6 +1,6 @@
 package org.bahmni.mart.config.stepconfigurer;
 
-import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.slf4j.Logger;
@@ -12,18 +12,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
+
 @Configuration
 public class FormStepConfigurer extends StepConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(FormStepConfigurer.class);
     private static final String ALL_FORMS = "All Observation Templates";
+    private static final String TYPE = "obs";
 
     @Override
     protected List<BahmniForm> getAllForms() {
-        List<String> ignoreConcepts = JobDefinitionUtil
-                .getIgnoreConceptNamesForObsJob(jobDefinitionReader.getJobDefinitions());
+        JobDefinition jobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE);
         List<Concept> allFormConcepts = obsService.getChildConcepts(ALL_FORMS);
-        List<BahmniForm> bahmniForms = formListProcessor.retrieveAllForms(allFormConcepts, ignoreConcepts);
+        List<BahmniForm> bahmniForms = formListProcessor.retrieveAllForms(allFormConcepts, jobDefinition);
         return filterFormsWithOutDuplicateConcepts(bahmniForms);
     }
 

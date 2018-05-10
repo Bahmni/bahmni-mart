@@ -64,10 +64,9 @@ public class BacteriologyStepConfigurerTest {
         when(bacteriologyJob.getColumnsToIgnore()).thenReturn(ignoreConcepts);
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
         mockStatic(JobDefinitionUtil.class);
-        when(JobDefinitionUtil.getIgnoreConceptNamesForJob(bacteriologyJob)).thenReturn(ignoreConcepts);
         when(JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, bacteriologyJobType)).thenReturn(bacteriologyJob);
         when(obsService.getConceptsByNames(conceptNames)).thenReturn(allConcepts);
-        when(formListProcessor.retrieveAllForms(allConcepts, ignoreConcepts)).thenReturn(forms);
+        when(formListProcessor.retrieveAllForms(allConcepts, bacteriologyJob)).thenReturn(forms);
 
         List<BahmniForm> actual = bacteriologyStepConfigurer.getAllForms();
 
@@ -76,10 +75,8 @@ public class BacteriologyStepConfigurerTest {
         assertEquals(forms, actual);
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verify(obsService, times(1)).getConceptsByNames(conceptNames);
-        verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, ignoreConcepts);
+        verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, bacteriologyJob);
         verifyStatic(times(1));
         JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, bacteriologyJobType);
-        verifyStatic(times(1));
-        JobDefinitionUtil.getIgnoreConceptNamesForJob(bacteriologyJob);
     }
 }
