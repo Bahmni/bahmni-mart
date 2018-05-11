@@ -13,6 +13,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
@@ -57,14 +58,15 @@ public class IgnoreColumnsConfigHelperTest {
     @Test
     public void shouldGetAllTheIgnoreColumnsConceptsForGivenJob() {
         List<String> ignoreConceptNames = Arrays.asList("Image", "Video");
-        List<Concept> expectedConcepts = Arrays.asList(concept, concept2);
+        List<Concept> conceptList = Arrays.asList(concept, concept2);
+        HashSet<Concept> expectedConcepts = new HashSet<>(conceptList);
 
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptNames);
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.FALSE);
         when(jobDefinition.getColumnsToIgnore()).thenReturn(ignoreConceptNames);
-        when(conceptService.getConceptsByNames(ignoreConceptNames)).thenReturn(expectedConcepts);
+        when(conceptService.getConceptsByNames(ignoreConceptNames)).thenReturn(conceptList);
 
-        List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
+        HashSet<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
 
         assertEquals(2, ignoreConcepts.size());
         assertEquals(expectedConcepts, ignoreConcepts);
@@ -80,7 +82,8 @@ public class IgnoreColumnsConfigHelperTest {
     @Test
     public void shouldAddAllFreeTextConceptsWithIgnoreConceptConfigAsIgnoreConceptsIfConfigIsTrue() {
         List<String> ignoreConceptNames = Collections.singletonList("Image");
-        List<Concept> expectedConcepts = Arrays.asList(concept, concept2, concept3);
+        List<Concept> conceptList = Arrays.asList(concept, concept2, concept3);
+        HashSet<Concept> expectedConcepts = new HashSet<>(conceptList);
 
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptNames);
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.TRUE);
@@ -88,7 +91,7 @@ public class IgnoreColumnsConfigHelperTest {
         when(conceptService.getConceptsByNames(ignoreConceptNames)).thenReturn(Collections.singletonList(concept));
         when(conceptService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
 
-        List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
+        HashSet<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
 
         assertEquals(3, ignoreConcepts.size());
         assertEquals(expectedConcepts, ignoreConcepts);
@@ -104,7 +107,8 @@ public class IgnoreColumnsConfigHelperTest {
     @Test
     public void shouldNotReEvaluateIgnoreConceptsIfItsDoneAlreadyForAParticularJob() {
         List<String> ignoreConceptNames = Collections.singletonList("Image");
-        List<Concept> expectedConcepts = Arrays.asList(concept, concept2, concept3);
+        List<Concept> conceptList = Arrays.asList(concept, concept2, concept3);
+        HashSet<Concept> expectedConcepts = new HashSet<>(conceptList);
 
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptNames);
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.TRUE);
@@ -112,12 +116,12 @@ public class IgnoreColumnsConfigHelperTest {
         when(conceptService.getConceptsByNames(ignoreConceptNames)).thenReturn(Collections.singletonList(concept));
         when(conceptService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
 
-        List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
+        HashSet<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
 
         assertEquals(3, ignoreConcepts.size());
         assertEquals(expectedConcepts, ignoreConcepts);
 
-        List<Concept> ignoreConceptsForJob = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
+        HashSet<Concept> ignoreConceptsForJob = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
         assertEquals(3, ignoreConceptsForJob.size());
         assertEquals(expectedConcepts, ignoreConceptsForJob);
 
@@ -132,13 +136,14 @@ public class IgnoreColumnsConfigHelperTest {
     @Test
     public void shouldAddAllFreeTextConceptsAsIgnoreConceptsIfFreeTextConfigIsTrueAndColumnsToIgnoreIsEmpty() {
         List<String> ignoreConceptNames = Collections.emptyList();
-        List<Concept> expectedConcepts = Arrays.asList(concept2, concept3);
+        List<Concept> conceptList = Arrays.asList(concept2, concept3);
+        HashSet<Concept> expectedConcepts = new HashSet<>(conceptList);
 
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptNames);
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.TRUE);
-        when(conceptService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
+        when(conceptService.getFreeTextConcepts()).thenReturn(conceptList);
 
-        List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
+        HashSet<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
 
         assertEquals(2, ignoreConcepts.size());
         assertEquals(expectedConcepts, ignoreConcepts);
@@ -156,7 +161,7 @@ public class IgnoreColumnsConfigHelperTest {
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(Collections.emptyList());
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.FALSE);
 
-        List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
+        HashSet<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
         assertTrue(ignoreConcepts.isEmpty());
 
         verify(jobDefinition, times(1)).getIgnoreAllFreeTextConcepts();

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 @Component
@@ -30,10 +31,11 @@ public class BahmniFormFactory {
     private List<Concept> allSeparateTableConcepts;
 
     public BahmniForm createForm(Concept concept, BahmniForm parentForm, JobDefinition jobDefinition) {
-        return createForm(concept, parentForm, 0, ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition));
+        return createForm(concept, parentForm, 0,
+                ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition));
     }
 
-    private BahmniForm createForm(Concept concept, BahmniForm parentForm, int depth, List<Concept> ignoreConcepts) {
+    private BahmniForm createForm(Concept concept, BahmniForm parentForm, int depth, HashSet<Concept> ignoreConcepts) {
         BahmniForm bahmniForm = new BahmniForm();
         bahmniForm.setFormName(concept);
         bahmniForm.setDepthToParent(depth);
@@ -53,7 +55,8 @@ public class BahmniFormFactory {
         return getRootFormFor(form.getParent());
     }
 
-    private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth, List<Concept> ignoreConcepts) {
+    private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth,
+                                     HashSet<Concept> ignoreConcepts) {
         if (concept.getIsSet() == 0) {
             bahmniForm.addField(concept);
             return;

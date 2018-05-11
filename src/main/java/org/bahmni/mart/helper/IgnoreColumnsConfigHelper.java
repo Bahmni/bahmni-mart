@@ -6,10 +6,8 @@ import org.bahmni.mart.form.service.ConceptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
 
@@ -19,9 +17,9 @@ public class IgnoreColumnsConfigHelper {
     @Autowired
     private ConceptService conceptService;
 
-    private Map<String, List<Concept>> ignoreConceptsMap = new HashMap<>();
+    private HashMap<String, HashSet<Concept>> ignoreConceptsMap = new HashMap<>();
 
-    public List<Concept> getIgnoreConceptsForJob(JobDefinition jobDefinition) {
+    public HashSet<Concept> getIgnoreConceptsForJob(JobDefinition jobDefinition) {
         String jobName = jobDefinition.getName();
         if (!ignoreConceptsMap.containsKey(jobName))
             ignoreConceptsMap.put(jobName, getIgnoreConcepts(jobDefinition));
@@ -29,8 +27,8 @@ public class IgnoreColumnsConfigHelper {
         return ignoreConceptsMap.get(jobName);
     }
 
-    private ArrayList<Concept> getIgnoreConcepts(JobDefinition jobDefinition) {
-        ArrayList<Concept> ignoreConcepts = new ArrayList<>();
+    private HashSet<Concept> getIgnoreConcepts(JobDefinition jobDefinition) {
+        HashSet<Concept> ignoreConcepts = new HashSet<>();
 
         if (!isJobWithOutIgnoreColumns(jobDefinition))
             ignoreConcepts.addAll(conceptService.getConceptsByNames(jobDefinition.getColumnsToIgnore()));

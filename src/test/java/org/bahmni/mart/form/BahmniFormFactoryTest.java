@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
@@ -166,8 +167,10 @@ public class BahmniFormFactoryTest {
         videoConcept.setParent(healthEducation);
         when(conceptService.getChildConcepts("Health Education"))
                 .thenReturn(Arrays.asList(hasTakenCourse, videoConcept));
+        HashSet<Concept> ignoreConcepts = new HashSet<>();
+        ignoreConcepts.add(videoConcept);
         when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(obsJobDefinition))
-                .thenReturn(Collections.singletonList(videoConcept));
+                .thenReturn(ignoreConcepts);
 
         BahmniForm bahmniForm = bahmniFormFactory.createForm(healthEducation, null, obsJobDefinition);
 
