@@ -4,7 +4,7 @@ import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,7 +43,7 @@ public class OrderConceptUtilTest {
     private ExpectedException expectedException = ExpectedException.none();
 
     @Mock
-    private ObsService obsService;
+    private ConceptService conceptService;
 
     @Mock
     private Concept concept;
@@ -54,7 +54,7 @@ public class OrderConceptUtilTest {
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         orderConceptUtil = new OrderConceptUtil();
-        setValuesForMemberFields(orderConceptUtil, "obsService", obsService);
+        setValuesForMemberFields(orderConceptUtil, "conceptService", conceptService);
         setValuesForMemberFields(orderConceptUtil, "openMRSJDBCTemplate", openMRSJDBCTemplate);
         mockStatic(BatchUtils.class);
         when(concept.getId()).thenReturn(1);
@@ -64,19 +64,19 @@ public class OrderConceptUtilTest {
     @Test
     public void shouldThrowNoOrderablesFoundExceptionWhenThereAreNoSamplesForAGivenConcept()
             throws InvalidOrderTypeException, NoSamplesFoundException {
-        when(obsService.getChildConcepts(conceptName)).thenReturn(Collections.emptyList());
+        when(conceptService.getChildConcepts(conceptName)).thenReturn(Collections.emptyList());
         expectedException.expect(NoSamplesFoundException.class);
         expectedException.expectMessage("No samples found for the orderable Lab Samples");
 
         orderConceptUtil.getOrderTypeId(conceptName);
 
-        verify(obsService, times(1)).getChildConcepts(conceptName);
+        verify(conceptService, times(1)).getChildConcepts(conceptName);
     }
 
     @Test
     public void shouldThrowInvalidOrderTypeExceptionWhenThereIsNoOrderTypeForAGivenConcept()
             throws InvalidOrderTypeException, NoSamplesFoundException {
-        when(obsService.getChildConcepts(conceptName)).thenReturn(Collections.singletonList(concept));
+        when(conceptService.getChildConcepts(conceptName)).thenReturn(Collections.singletonList(concept));
         when(openMRSJDBCTemplate
                 .query(eq("sql"), any(MapSqlParameterSource.class), any(BeanPropertyRowMapper.class)))
                 .thenReturn(Collections.emptyList());
@@ -86,7 +86,7 @@ public class OrderConceptUtilTest {
 
         orderConceptUtil.getOrderTypeId(conceptName);
 
-        verify(obsService, times(1)).getChildConcepts(conceptName);
+        verify(conceptService, times(1)).getChildConcepts(conceptName);
         verify(concept, times(1)).getId();
         verifyStatic();
         BatchUtils.convertResourceOutputToString(any(Resource.class));
@@ -97,7 +97,7 @@ public class OrderConceptUtilTest {
     @Test
     public void shouldReturnOrderTypeIdForAnOrderable() throws InvalidOrderTypeException, NoSamplesFoundException {
 
-        when(obsService.getChildConcepts(conceptName)).thenReturn(Collections.singletonList(concept));
+        when(conceptService.getChildConcepts(conceptName)).thenReturn(Collections.singletonList(concept));
         int expectedOrderTypeId = 50;
         when(openMRSJDBCTemplate
                 .query(eq("sql"), any(MapSqlParameterSource.class), any(BeanPropertyRowMapper.class)))
@@ -105,7 +105,7 @@ public class OrderConceptUtilTest {
 
         int actualOrderTypeId = orderConceptUtil.getOrderTypeId(conceptName);
 
-        verify(obsService, times(1)).getChildConcepts(conceptName);
+        verify(conceptService, times(1)).getChildConcepts(conceptName);
         verify(concept, times(1)).getId();
         verifyStatic();
         BatchUtils.convertResourceOutputToString(any(Resource.class));

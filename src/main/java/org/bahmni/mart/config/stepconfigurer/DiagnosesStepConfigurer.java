@@ -17,7 +17,7 @@ public class DiagnosesStepConfigurer extends StepConfigurer {
     @Override
     protected List<BahmniForm> getAllForms() {
 
-        List<Concept> allFormConcepts = obsService.getConceptsByNames(Collections.singletonList(VISIT_DIAGNOSES));
+        List<Concept> allFormConcepts = conceptService.getConceptsByNames(Collections.singletonList(VISIT_DIAGNOSES));
         return formListProcessor.retrieveAllForms(allFormConcepts,
                 getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), VISIT_DIAGNOSES_TYPE));
     }

@@ -17,7 +17,8 @@ public class BacteriologyStepConfigurer extends StepConfigurer {
 
     @Override
     protected List<BahmniForm> getAllForms() {
-        List<Concept> allConcepts = obsService.getConceptsByNames(Collections.singletonList(BACTERIOLOGY_CONCEPT_NAME));
+        List<Concept> allConcepts = conceptService
+                .getConceptsByNames(Collections.singletonList(BACTERIOLOGY_CONCEPT_NAME));
         return formListProcessor.retrieveAllForms(allConcepts,
                 getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), BACTERIOLOGY_JOB_TYPE));
     }

@@ -3,7 +3,7 @@ package org.bahmni.mart.form;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.bahmni.mart.helper.IgnoreColumnsConfigHelper;
 import org.bahmni.mart.helper.SeparateTableConfigHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class BahmniFormFactory {
     private static final List<Concept> EMPTY_LIST = Collections.emptyList();
 
     @Autowired
-    private ObsService obsService;
+    private ConceptService conceptService;
 
     @Autowired
     private SeparateTableConfigHelper separateTableConfigHelper;
@@ -59,7 +59,7 @@ public class BahmniFormFactory {
             return;
         }
 
-        List<Concept> childConcepts = obsService.getChildConcepts(concept.getName());
+        List<Concept> childConcepts = conceptService.getChildConcepts(concept.getName());
         int childDepth = depth + 1;
         for (Concept childConcept : childConcepts) {
             if (ignoreConcepts.contains(childConcept)) {
@@ -81,6 +81,6 @@ public class BahmniFormFactory {
 
     private List<Concept> getSeparateTableConcepts() {
         List<String> conceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
-        return conceptNames.isEmpty() ? EMPTY_LIST : obsService.getConceptsByNames(conceptNames);
+        return conceptNames.isEmpty() ? EMPTY_LIST : conceptService.getConceptsByNames(conceptNames);
     }
 }

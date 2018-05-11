@@ -40,7 +40,7 @@ public class DiagnosesStepConfigurerTest extends StepConfigurerTestHelper {
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
         when(JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, "diagnoses")).thenReturn(jobDefinition);
         when(JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(Collections.emptyList());
-        when(obsService.getConceptsByNames(Collections.singletonList("Visit Diagnoses")))
+        when(conceptService.getConceptsByNames(Collections.singletonList("Visit Diagnoses")))
                 .thenReturn(concepts);
         when(formListProcessor.retrieveAllForms(concepts, jobDefinition)).thenReturn(Collections.emptyList());
 
@@ -50,6 +50,6 @@ public class DiagnosesStepConfigurerTest extends StepConfigurerTestHelper {
         verifyStatic(times(1));
         JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, "diagnoses");
         verify(formListProcessor, times(1)).retrieveAllForms(concepts, jobDefinition);
-        verify(obsService, times(1)).getConceptsByNames(Collections.singletonList("Visit Diagnoses"));
+        verify(conceptService, times(1)).getConceptsByNames(Collections.singletonList("Visit Diagnoses"));
     }
 }

@@ -6,7 +6,7 @@ import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,7 +35,7 @@ public class BacteriologyStepConfigurerTest {
     private FormListProcessor formListProcessor;
 
     @Mock
-    private ObsService obsService;
+    private ConceptService conceptService;
 
     @Mock
     private JobDefinitionReader jobDefinitionReader;
@@ -47,7 +47,7 @@ public class BacteriologyStepConfigurerTest {
         bacteriologyStepConfigurer = new BacteriologyStepConfigurer();
         setValuesForSuperClassMemberFields(bacteriologyStepConfigurer, "jobDefinitionReader", jobDefinitionReader);
         setValuesForSuperClassMemberFields(bacteriologyStepConfigurer, "formListProcessor", formListProcessor);
-        setValuesForSuperClassMemberFields(bacteriologyStepConfigurer, "obsService", obsService);
+        setValuesForSuperClassMemberFields(bacteriologyStepConfigurer, "conceptService", conceptService);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class BacteriologyStepConfigurerTest {
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
         mockStatic(JobDefinitionUtil.class);
         when(JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, bacteriologyJobType)).thenReturn(bacteriologyJob);
-        when(obsService.getConceptsByNames(conceptNames)).thenReturn(allConcepts);
+        when(conceptService.getConceptsByNames(conceptNames)).thenReturn(allConcepts);
         when(formListProcessor.retrieveAllForms(allConcepts, bacteriologyJob)).thenReturn(forms);
 
         List<BahmniForm> actual = bacteriologyStepConfigurer.getAllForms();
@@ -74,7 +74,7 @@ public class BacteriologyStepConfigurerTest {
         assertEquals(1, actual.size());
         assertEquals(forms, actual);
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
-        verify(obsService, times(1)).getConceptsByNames(conceptNames);
+        verify(conceptService, times(1)).getConceptsByNames(conceptNames);
         verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, bacteriologyJob);
         verifyStatic(times(1));
         JobDefinitionUtil.getJobDefinitionByType(jobDefinitions, bacteriologyJobType);

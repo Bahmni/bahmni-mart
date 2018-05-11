@@ -27,11 +27,11 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 
-@PrepareForTest({BatchUtils.class, ObsService.class})
+@PrepareForTest({BatchUtils.class, ConceptService.class})
 @RunWith(PowerMockRunner.class)
-public class ObsServiceTest {
+public class ConceptServiceTest {
 
-    private ObsService obsService;
+    private ConceptService conceptService;
 
     @Mock
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -42,7 +42,7 @@ public class ObsServiceTest {
     @Before
     public void setUp() throws Exception {
         mockStatic(BatchUtils.class);
-        obsService = new ObsService();
+        conceptService = new ConceptService();
         ClassPathResource conceptDetailsResource = mock(ClassPathResource.class);
         ClassPathResource conceptListResource = mock(ClassPathResource.class);
         ClassPathResource freeTextConceptSqlResource = mock(ClassPathResource.class);
@@ -52,19 +52,19 @@ public class ObsServiceTest {
         when(convertResourceOutputToString(freeTextConceptSqlResource)).thenReturn("freeTextConceptSql");
         whenNew(MapSqlParameterSource.class).withNoArguments().thenReturn(mapSqlParameterSource);
 
-        setValuesForMemberFields(obsService, "jdbcTemplate", namedParameterJdbcTemplate);
-        setValuesForMemberFields(obsService, "conceptDetailsSqlResource", conceptDetailsResource);
-        setValuesForMemberFields(obsService, "conceptListSqlResource", conceptListResource);
-        setValuesForMemberFields(obsService, "freeTextConceptSqlResource", freeTextConceptSqlResource);
+        setValuesForMemberFields(conceptService, "jdbcTemplate", namedParameterJdbcTemplate);
+        setValuesForMemberFields(conceptService, "conceptDetailsSqlResource", conceptDetailsResource);
+        setValuesForMemberFields(conceptService, "conceptListSqlResource", conceptListResource);
+        setValuesForMemberFields(conceptService, "freeTextConceptSqlResource", freeTextConceptSqlResource);
 
-        obsService.postConstruct();
+        conceptService.postConstruct();
     }
 
     @Test
     public void shouldGetConceptsByNames() {
         List<String> conceptNamesList = Arrays.asList("Video", "Image", "Radiology Documents");
 
-        obsService.getConceptsByNames(conceptNamesList);
+        conceptService.getConceptsByNames(conceptNamesList);
 
         verify(mapSqlParameterSource, times(1)).addValue("conceptNames", conceptNamesList);
         verify(namedParameterJdbcTemplate, times(1))
@@ -75,7 +75,7 @@ public class ObsServiceTest {
     public void shouldGetChildConcepts() {
         String parentVideoConcept = "Patient Videos";
 
-        obsService.getChildConcepts(parentVideoConcept);
+        conceptService.getChildConcepts(parentVideoConcept);
 
         verify(mapSqlParameterSource, times(1)).addValue("parentConceptName", parentVideoConcept);
         verify(namedParameterJdbcTemplate, times(1))
@@ -84,7 +84,7 @@ public class ObsServiceTest {
 
     @Test
     public void shouldGetAllFreeTextConcepts() {
-        obsService.getFreeTextConcepts();
+        conceptService.getFreeTextConcepts();
 
         verify(namedParameterJdbcTemplate, times(1))
                 .query(eq("freeTextConceptSql"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));

@@ -4,7 +4,7 @@ import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class OrderConceptUtil {
 
     @Autowired
-    private ObsService obsService;
+    private ConceptService conceptService;
 
     @Value("classpath:sql/orderTypes.sql")
     private Resource resource;
@@ -31,7 +31,7 @@ public class OrderConceptUtil {
     private NamedParameterJdbcTemplate openMRSJDBCTemplate;
 
     public int getOrderTypeId(String conceptName) throws NoSamplesFoundException, InvalidOrderTypeException {
-        List<Integer> sampleConceptIds = obsService.getChildConcepts(conceptName).stream()
+        List<Integer> sampleConceptIds = conceptService.getChildConcepts(conceptName).stream()
                 .map(Concept::getId).collect(Collectors.toList());
         if (sampleConceptIds.isEmpty()) {
             throw new NoSamplesFoundException(String.format("No samples found for the orderable %s", conceptName));

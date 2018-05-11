@@ -3,7 +3,7 @@ package org.bahmni.mart.helper;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +30,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PrepareForTest(JobDefinitionUtil.class)
 public class IgnoreColumnsConfigHelperTest {
     @Mock
-    private ObsService obsService;
+    private ConceptService conceptService;
 
     @Mock
     private Concept concept;
@@ -51,7 +51,7 @@ public class IgnoreColumnsConfigHelperTest {
         mockStatic(JobDefinitionUtil.class);
 
         ignoreColumnsConfigHelper = new IgnoreColumnsConfigHelper();
-        setValuesForMemberFields(ignoreColumnsConfigHelper, "obsService", obsService);
+        setValuesForMemberFields(ignoreColumnsConfigHelper, "conceptService", conceptService);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class IgnoreColumnsConfigHelperTest {
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptNames);
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.FALSE);
         when(jobDefinition.getColumnsToIgnore()).thenReturn(ignoreConceptNames);
-        when(obsService.getConceptsByNames(ignoreConceptNames)).thenReturn(expectedConcepts);
+        when(conceptService.getConceptsByNames(ignoreConceptNames)).thenReturn(expectedConcepts);
 
         List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
 
@@ -71,8 +71,8 @@ public class IgnoreColumnsConfigHelperTest {
 
         verify(jobDefinition, times(1)).getColumnsToIgnore();
         verify(jobDefinition, times(1)).getIgnoreAllFreeTextConcepts();
-        verify(obsService, times(1)).getConceptsByNames(ignoreConceptNames);
-        verify(obsService, times(0)).getFreeTextConcepts();
+        verify(conceptService, times(1)).getConceptsByNames(ignoreConceptNames);
+        verify(conceptService, times(0)).getFreeTextConcepts();
         verifyStatic(times(1));
         getIgnoreConceptNamesForJob(jobDefinition);
     }
@@ -85,8 +85,8 @@ public class IgnoreColumnsConfigHelperTest {
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptNames);
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.TRUE);
         when(jobDefinition.getColumnsToIgnore()).thenReturn(ignoreConceptNames);
-        when(obsService.getConceptsByNames(ignoreConceptNames)).thenReturn(Collections.singletonList(concept));
-        when(obsService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
+        when(conceptService.getConceptsByNames(ignoreConceptNames)).thenReturn(Collections.singletonList(concept));
+        when(conceptService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
 
         List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
 
@@ -95,8 +95,8 @@ public class IgnoreColumnsConfigHelperTest {
 
         verify(jobDefinition, times(1)).getColumnsToIgnore();
         verify(jobDefinition, times(1)).getIgnoreAllFreeTextConcepts();
-        verify(obsService, times(1)).getConceptsByNames(ignoreConceptNames);
-        verify(obsService, times(1)).getFreeTextConcepts();
+        verify(conceptService, times(1)).getConceptsByNames(ignoreConceptNames);
+        verify(conceptService, times(1)).getFreeTextConcepts();
         verifyStatic(times(1));
         getIgnoreConceptNamesForJob(jobDefinition);
     }
@@ -109,8 +109,8 @@ public class IgnoreColumnsConfigHelperTest {
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptNames);
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.TRUE);
         when(jobDefinition.getColumnsToIgnore()).thenReturn(ignoreConceptNames);
-        when(obsService.getConceptsByNames(ignoreConceptNames)).thenReturn(Collections.singletonList(concept));
-        when(obsService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
+        when(conceptService.getConceptsByNames(ignoreConceptNames)).thenReturn(Collections.singletonList(concept));
+        when(conceptService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
 
         List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
 
@@ -123,8 +123,8 @@ public class IgnoreColumnsConfigHelperTest {
 
         verify(jobDefinition, times(1)).getColumnsToIgnore();
         verify(jobDefinition, times(1)).getIgnoreAllFreeTextConcepts();
-        verify(obsService, times(1)).getConceptsByNames(ignoreConceptNames);
-        verify(obsService, times(1)).getFreeTextConcepts();
+        verify(conceptService, times(1)).getConceptsByNames(ignoreConceptNames);
+        verify(conceptService, times(1)).getFreeTextConcepts();
         verifyStatic(times(1));
         getIgnoreConceptNamesForJob(jobDefinition);
     }
@@ -136,7 +136,7 @@ public class IgnoreColumnsConfigHelperTest {
 
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptNames);
         when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.TRUE);
-        when(obsService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
+        when(conceptService.getFreeTextConcepts()).thenReturn(Arrays.asList(concept2, concept3));
 
         List<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
 
@@ -145,8 +145,8 @@ public class IgnoreColumnsConfigHelperTest {
 
         verify(jobDefinition, times(0)).getColumnsToIgnore();
         verify(jobDefinition, times(1)).getIgnoreAllFreeTextConcepts();
-        verify(obsService, times(0)).getConceptsByNames(ignoreConceptNames);
-        verify(obsService, times(1)).getFreeTextConcepts();
+        verify(conceptService, times(0)).getConceptsByNames(ignoreConceptNames);
+        verify(conceptService, times(1)).getFreeTextConcepts();
         verifyStatic(times(1));
         getIgnoreConceptNamesForJob(jobDefinition);
     }
@@ -161,8 +161,8 @@ public class IgnoreColumnsConfigHelperTest {
 
         verify(jobDefinition, times(1)).getIgnoreAllFreeTextConcepts();
         verify(jobDefinition, times(0)).getColumnsToIgnore();
-        verify(obsService, times(0)).getConceptsByNames(any());
-        verify(obsService, times(0)).getFreeTextConcepts();
+        verify(conceptService, times(0)).getConceptsByNames(any());
+        verify(conceptService, times(0)).getFreeTextConcepts();
         verifyStatic(times(1));
         getIgnoreConceptNamesForJob(jobDefinition);
     }

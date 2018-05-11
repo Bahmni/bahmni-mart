@@ -69,7 +69,7 @@ public class RspStepConfigurerTest extends StepConfigurerTestHelper {
         when(getJobDefinitionByType(jobDefinitions, "rsp")).thenReturn(jobDefinition);
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(Collections.emptyList());
         when(rspConfigHelper.getRspConcepts()).thenReturn(conceptNames);
-        when(obsService.getConceptsByNames(conceptNames))
+        when(conceptService.getConceptsByNames(conceptNames))
                 .thenReturn(concepts);
         when(formListProcessor.retrieveAllForms(concepts, jobDefinition)).thenReturn(bahmniForms);
         when(concept.getName()).thenReturn("Nutritional Values");
@@ -84,7 +84,7 @@ public class RspStepConfigurerTest extends StepConfigurerTestHelper {
         getJobDefinitionByType(jobDefinitions, "rsp");
         verify(formListProcessor, times(1)).retrieveAllForms(concepts, jobDefinition);
         verify(rspConfigHelper, times(1)).getRspConcepts();
-        verify(obsService, times(1)).getConceptsByNames(conceptNames);
+        verify(conceptService, times(1)).getConceptsByNames(conceptNames);
 
         assertEquals(2, actualForms.size());
         verifyStatic(times(1));
@@ -109,7 +109,7 @@ public class RspStepConfigurerTest extends StepConfigurerTestHelper {
         when(rspConfigHelper.getRspConcepts()).thenReturn(Collections.emptyList());
 
         assertTrue(rspStepConfigurer.getAllForms().isEmpty());
-        verify(obsService, times(0)).getConceptsByNames(any());
+        verify(conceptService, times(0)).getConceptsByNames(any());
         verify(formListProcessor, times(0)).retrieveAllForms(any(), any());
         verifyStatic(times(0));
         addPrefixToName(any(), any());

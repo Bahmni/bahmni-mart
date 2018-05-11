@@ -2,7 +2,7 @@ package org.bahmni.mart.helper;
 
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNames
 public class IgnoreColumnsConfigHelper {
 
     @Autowired
-    private ObsService obsService;
+    private ConceptService conceptService;
 
     private Map<String, List<Concept>> ignoreConceptsMap = new HashMap<>();
 
@@ -33,10 +33,10 @@ public class IgnoreColumnsConfigHelper {
         ArrayList<Concept> ignoreConcepts = new ArrayList<>();
 
         if (!isJobWithOutIgnoreColumns(jobDefinition))
-            ignoreConcepts.addAll(obsService.getConceptsByNames(jobDefinition.getColumnsToIgnore()));
+            ignoreConcepts.addAll(conceptService.getConceptsByNames(jobDefinition.getColumnsToIgnore()));
 
         if (jobDefinition.getIgnoreAllFreeTextConcepts())
-            ignoreConcepts.addAll(obsService.getFreeTextConcepts());
+            ignoreConcepts.addAll(conceptService.getFreeTextConcepts());
         return ignoreConcepts;
     }
 

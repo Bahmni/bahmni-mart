@@ -5,7 +5,7 @@ import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.springframework.batch.core.job.builder.FlowBuilder;
@@ -34,7 +34,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     protected JobDefinitionReader jobDefinitionReader;
 
     @Autowired
-    protected ObsService obsService;
+    protected ConceptService conceptService;
 
     @Override
     public void createTables() {

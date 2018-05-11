@@ -5,7 +5,7 @@ import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.mockito.Mock;
@@ -28,7 +28,7 @@ public class StepConfigurerTestHelper {
     protected ObjectFactory<ObservationExportStep> observationExportStepFactory;
 
     @Mock
-    protected ObsService obsService;
+    protected ConceptService conceptService;
 
     @Mock
     protected JobDefinitionReader jobDefinitionReader;
@@ -47,6 +47,6 @@ public class StepConfigurerTestHelper {
                 "observationExportStepFactory", observationExportStepFactory);
         setValuesForSuperClassMemberFields(classInstance, "formListProcessor", formListProcessor);
         setValuesForSuperClassMemberFields(classInstance, "jobDefinitionReader", jobDefinitionReader);
-        setValuesForSuperClassMemberFields(classInstance, "obsService", obsService);
+        setValuesForSuperClassMemberFields(classInstance, "conceptService", conceptService);
     }
 }

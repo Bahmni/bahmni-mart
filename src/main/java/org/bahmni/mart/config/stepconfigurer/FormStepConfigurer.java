@@ -24,7 +24,7 @@ public class FormStepConfigurer extends StepConfigurer {
     @Override
     protected List<BahmniForm> getAllForms() {
         JobDefinition jobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE);
-        List<Concept> allFormConcepts = obsService.getChildConcepts(ALL_FORMS);
+        List<Concept> allFormConcepts = conceptService.getChildConcepts(ALL_FORMS);
         List<BahmniForm> bahmniForms = formListProcessor.retrieveAllForms(allFormConcepts, jobDefinition);
         return filterFormsWithOutDuplicateConcepts(bahmniForms);
     }

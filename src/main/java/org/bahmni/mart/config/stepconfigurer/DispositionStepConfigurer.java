@@ -19,7 +19,7 @@ public class DispositionStepConfigurer  extends StepConfigurer {
     protected List<BahmniForm> getAllForms() {
         JobDefinition jobDefinition = JobDefinitionUtil
                 .getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), DISPOSITION_JOB_TYPE);
-        List<Concept> allConcepts = obsService
+        List<Concept> allConcepts = conceptService
                 .getConceptsByNames(Collections.singletonList(DISPOSITION_CONCEPT_NAME));
         return formListProcessor.retrieveAllForms(allConcepts, jobDefinition);
     }

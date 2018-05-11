@@ -107,7 +107,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         List<JobDefinition> jobDefinitions = Collections.singletonList(obsJobDefinition);
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
         when(getJobDefinitionByType(jobDefinitions, "obs")).thenReturn(obsJobDefinition);
-        when(obsService.getChildConcepts(allObservationTemplates)).thenReturn(allConcepts);
+        when(conceptService.getChildConcepts(allObservationTemplates)).thenReturn(allConcepts);
         when(formListProcessor.retrieveAllForms(allConcepts, obsJobDefinition)).thenReturn(forms);
 
         List<BahmniForm> actual = formStepConfigurer.getAllForms();
@@ -118,7 +118,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verifyStatic(times(1));
         getJobDefinitionByType(jobDefinitions, "obs");
-        verify(obsService, times(1)).getChildConcepts(allObservationTemplates);
+        verify(conceptService, times(1)).getChildConcepts(allObservationTemplates);
         verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, obsJobDefinition);
     }
 
@@ -154,7 +154,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         String allObservationTemplates = "All Observation Templates";
         List<Concept> formConcepts = Arrays.asList(duplicateFormConcept, uniqueFormConcept);
 
-        when(obsService.getChildConcepts(allObservationTemplates)).thenReturn(formConcepts);
+        when(conceptService.getChildConcepts(allObservationTemplates)).thenReturn(formConcepts);
         when(formListProcessor.retrieveAllForms(formConcepts, obsJobDefinition)).thenReturn(forms);
 
         when(bahmniFormWithDuplicateConcepts.getFields()).thenReturn(allConceptsUnderDuplicateConceptsForm);
@@ -178,7 +178,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         verify(logger, times(1))
                 .warn("Skipping the form 'Duplicate form name' since it has duplicate concepts 'concept1'");
 
-        verify(obsService, times(1)).getChildConcepts(allObservationTemplates);
+        verify(conceptService, times(1)).getChildConcepts(allObservationTemplates);
         verify(formListProcessor, times(1)).retrieveAllForms(formConcepts, obsJobDefinition);
         verifyStatic(times(1));
         getJobDefinitionByType(jobDefinitions, "obs");

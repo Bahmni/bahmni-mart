@@ -6,7 +6,7 @@ import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.form.service.ObsService;
+import org.bahmni.mart.form.service.ConceptService;
 import org.bahmni.mart.helper.OrderConceptUtil;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.TableDataProcessor;
@@ -66,7 +66,7 @@ public class OrderStepConfigurer implements StepConfigurerContract {
     private TableDataGenerator tableDataGenerator;
 
     @Autowired
-    private ObsService obsService;
+    private ConceptService conceptService;
 
     @Autowired
     private OrderConceptUtil orderConceptUtil;
@@ -86,7 +86,7 @@ public class OrderStepConfigurer implements StepConfigurerContract {
 
     private List<String> getOrderables() {
         if (orderableConceptNames == null) {
-            orderableConceptNames = obsService.getChildConcepts(ALL_ORDERABLES).stream()
+            orderableConceptNames = conceptService.getChildConcepts(ALL_ORDERABLES).stream()
                     .map(Concept::getName).collect(Collectors.toList());
         }
         return orderableConceptNames;

@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component
-public class ObsService {
+public class ConceptService {
 
     @Value("classpath:sql/conceptDetails.sql")
     private Resource conceptDetailsSqlResource;

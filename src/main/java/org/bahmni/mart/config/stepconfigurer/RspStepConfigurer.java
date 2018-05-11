@@ -29,7 +29,7 @@ public class RspStepConfigurer extends StepConfigurer {
         if (rspConcepts.isEmpty())
             return new ArrayList<>();
 
-        List<Concept> allFormConcepts = obsService.getConceptsByNames(rspConcepts);
+        List<Concept> allFormConcepts = conceptService.getConceptsByNames(rspConcepts);
         return addPrefixToFormsName(formListProcessor.retrieveAllForms(allFormConcepts, jobDefinition));
     }
 
