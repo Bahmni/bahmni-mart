@@ -9,7 +9,7 @@ export MYSQL_PWD=${PASSWORD}
 
 CONNECTION_STRING="mysql -h ${MYSQL_HOST_NAME} -u${MYSQL_USER_NAME} ${OPENMRS_DB_NAME} -Bse"
 
-CONCEPT_IDS=`${CONNECTION_STRING} "select concept_id from concept_view where concept_full_name = 'All Observation Templates';"`
+CONCEPT_IDS=`${CONNECTION_STRING} "select concept_id from concept_view where concept_full_name = '$1';"`
 
 create_array(){
     CONCEPT_IDS_AS_ARRAY=( $( for CONCEPT_ID in ${CONCEPT_IDS} ; do echo ${CONCEPT_ID} ; done ) )
