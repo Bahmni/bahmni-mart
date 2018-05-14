@@ -113,10 +113,11 @@ ospackage {
     }
 
     from("${buildDir}/libs") {
-        include 'bahmni-mart*.jar'
+        include(String.format("%s-%s.jar", project.name, project.version))
         fileMode = 0755
         createDirectoryEntry = true
-        into "/opt/bahmni-mart/libs"
+        rename(String.format("%s-%s.jar", project.name, project.version), String.format("%s.jar", project.name))
+        into "/opt/bahmni-mart/lib"
     }
 
     from("${projectDir}/scripts/builds/config-variables.conf") {
