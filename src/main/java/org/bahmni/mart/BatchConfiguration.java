@@ -1,21 +1,20 @@
 package org.bahmni.mart;
 
-import org.bahmni.mart.config.stepconfigurer.BacteriologyStepConfigurer;
-import org.bahmni.mart.config.stepconfigurer.DiagnosesStepConfigurer;
-import org.bahmni.mart.config.stepconfigurer.FormStepConfigurer;
 import org.bahmni.mart.config.MartJSONReader;
-import org.bahmni.mart.config.stepconfigurer.MetaDataStepConfigurer;
-import org.bahmni.mart.config.stepconfigurer.OrderStepConfigurer;
-import org.bahmni.mart.config.stepconfigurer.RspStepConfigurer;
-import org.bahmni.mart.config.stepconfigurer.StepConfigurer;
-import org.bahmni.mart.config.stepconfigurer.StepConfigurerContract;
 import org.bahmni.mart.config.job.CustomCodesUploader;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.config.procedure.ProcedureDefinition;
 import org.bahmni.mart.config.procedure.ProcedureExecutor;
+import org.bahmni.mart.config.stepconfigurer.BacteriologyStepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.DiagnosesStepConfigurer;
 import org.bahmni.mart.config.stepconfigurer.DispositionStepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.FormStepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.MetaDataStepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.OrderStepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.RspStepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.StepConfigurerContract;
 import org.bahmni.mart.config.view.RspViewDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
@@ -180,32 +179,32 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
         return getFlowJob(jobDefinition, dispositionStepConfigurer);
     }
 
-    private Job getFlowJob(JobDefinition jobDefinition, StepConfigurer stepConfigurer) {
+    private Job getFlowJob(JobDefinition jobDefinition, StepConfigurerContract stepConfigurer) {
         return getJob(getFlowBuilder(jobDefinition.getName()), stepConfigurer, jobDefinition);
     }
 
     private Job buildRspJob(JobDefinition jobDefinition) {
-        return getJob(getFlowBuilder(jobDefinition.getName()), rspStepConfigurer, jobDefinition);
+        return getFlowJob(jobDefinition, rspStepConfigurer);
     }
 
     private Job buildObsJob(JobDefinition jobDefinition) {
-        return getJob(getFlowBuilder(jobDefinition.getName()), formStepConfigurer, jobDefinition);
+        return getFlowJob(jobDefinition, formStepConfigurer);
     }
 
     private Job buildBacteriologyJob(JobDefinition jobDefinition) {
-        return getJob(getFlowBuilder(jobDefinition.getName()), bacteriologyStepConfigurer, jobDefinition);
+        return getFlowJob(jobDefinition, bacteriologyStepConfigurer);
     }
 
     private Job buildDiagnosesJob(JobDefinition jobDefinition) {
-        return getJob(getFlowBuilder(jobDefinition.getName()), diagnosesStepConfigurer, jobDefinition);
+        return getFlowJob(jobDefinition, diagnosesStepConfigurer);
     }
 
     private Job buildOrdersJob(JobDefinition jobDefinition) {
-        return getJob(getFlowBuilder(jobDefinition.getName()), orderStepConfigurer, jobDefinition);
+        return getFlowJob(jobDefinition, orderStepConfigurer);
     }
 
     private Job buildMetaDataJob(JobDefinition jobDefinition) {
-        return getJob(getFlowBuilder(jobDefinition.getName()), metaDataStepConfigurer, jobDefinition);
+        return getFlowJob(jobDefinition, metaDataStepConfigurer);
     }
 
     private FlowBuilder<FlowJobBuilder> getFlowBuilder(String jobName) {
