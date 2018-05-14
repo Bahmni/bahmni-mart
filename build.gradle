@@ -106,20 +106,27 @@ ospackage {
 
     into '/opt/bahmni-mart'
 
-    from("${projectDir}/scripts/rpm/") {
+    from("${projectDir}/scripts/builds/rpm/") {
         fileMode = 0755
         createDirectoryEntry = true
         into '/opt/bahmni-mart/bin'
     }
 
     from("${buildDir}/libs") {
+        include 'bahmni-mart*.jar'
         fileMode = 0755
         createDirectoryEntry = true
         into "/opt/bahmni-mart/libs"
     }
 
-    from("${projectDir}/conf/") {
+    from("${projectDir}/scripts/builds/config-variables.conf") {
         fileMode = 0755
+        createDirectoryEntry = true
+        into "/opt/bahmni-mart/conf"
+    }
+
+    from("${projectDir}/conf/bahmni-mart.json") {
+        fileMode = 0777
         createDirectoryEntry = true
         into "/opt/bahmni-mart/conf"
     }
@@ -133,8 +140,8 @@ buildRpm {
     requires('postgresql92-server')
     requires('postgresql92-contrib')
 
-    postInstall file("${projectDir}/scripts/postinstall.sh")
-    postUninstall file("${projectDir}/scripts/postuninstall.sh")
+    postInstall file("${projectDir}/scripts/builds/postinstall.sh")
+    postUninstall file("${projectDir}/scripts/builds/postuninstall.sh")
 }
 
 task wrapper(type: Wrapper) {
