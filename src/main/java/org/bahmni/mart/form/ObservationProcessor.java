@@ -65,16 +65,17 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
             allChildObsIds.add((Integer) obsRow.get("obs_id"));
         }
 
-        List<Obs> obsRows = fetchAllLeafObs(allChildObsIds);
-        obsRows.addAll(formObs((Integer) obsRow.get("obs_id")));
+        List<Obs> obsRows = fetchAllLeafObs(allChildObsIds,(Integer) obsRow.get("parent_obs_id"));
+        obsRows.addAll(formObs((Integer) obsRow.get("obs_id"),(Integer) obsRow.get("parent_obs_id")));
         setObsIdAndParentObsId(obsRows, (Integer) obsRow.get("obs_id"), (Integer) obsRow.get("parent_obs_id"));
 
         return obsRows;
     }
 
-    private List<Obs> formObs(Integer obsId) {
+    private List<Obs> formObs(Integer obsId, Integer parentObsId) {
         Map<String, Object> params = new HashMap<>();
         params.put("obsId", obsId);
+        params.put("parentObsId", parentObsId);
         params.put("conceptReferenceSource", jobDefinition.getConceptReferenceSource());
         return getObs(params, formObsSql);
     }
@@ -92,13 +93,14 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
         });
     }
 
-    private List<Obs> fetchAllLeafObs(List<Integer> allChildObsGroupIds) {
+    private List<Obs> fetchAllLeafObs(List<Integer> allChildObsGroupIds, Integer parentObsId) {
         List<Integer> leafConcepts = formFieldTransformer.transformFormToFieldIds(form);
 
         if (allChildObsGroupIds.size() > 0 && leafConcepts.size() > 0) {
             Map<String, Object> params = new HashMap<>();
             params.put("childObsIds", allChildObsGroupIds);
             params.put("leafConceptIds", leafConcepts);
+            params.put("parentObsId", parentObsId);
             params.put("conceptReferenceSource", jobDefinition.getConceptReferenceSource());
             return getObs(params, leafObsSql);
         }

@@ -28,6 +28,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     private Map<String, String> expectedPatientList;
 
+    private Map<String, Object> expectedFormGenericData;
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -42,6 +44,15 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         expectedPatientList.put("131", "Unknown");
         expectedPatientList.put("132", "Unknown");
         expectedPatientList.put("133", "Unknown");
+
+        expectedFormGenericData = new HashMap<>();
+        expectedFormGenericData.put("patient_id", 124);
+        expectedFormGenericData.put("encounter_id", 22);
+        expectedFormGenericData.put("program_id", 1);
+        expectedFormGenericData.put("program_name", "Program Name");
+        expectedFormGenericData.put("location_id", 8);
+        expectedFormGenericData.put("location_name", null);
+        expectedFormGenericData.put("obs_datetime", "2015-01-22 00:00:00.0");
     }
 
     @Test
@@ -57,10 +68,11 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         List<String> tableNames = tables.stream().map(table -> table.get("TABLE_NAME").toString())
                 .collect(Collectors.toList());
         List<String> expectedTableNames = Arrays.asList("patient_allergy_status_test", "first_stage_validation",
-                "fstg_specialty_determined_by_mlo", "follow_up_validation", "stage",
+                "fstg_specialty_determined_by_mlo", "fstg_medical_files", "follow_up_validation", "stage",
                 "person_attributes", "bacteriology_concept_set", "visit_diagnoses");
         assertTrue(tableNames.containsAll(expectedTableNames));
         verifyTableColumns();
+        verifyObsRecords();
 
         List<Map<String, Object>> patientList = martJdbcTemplate
                 .queryForList("SELECT * FROM \"patient_allergy_status_test\"");
@@ -174,6 +186,44 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyRecords(procRecords);
     }
 
+    private void verifyObsRecords() {
+        List<Map<String, Object>> parentForm = martJdbcTemplate
+                .queryForList("SELECT * FROM first_stage_validation");
+        List<Map<String, Object>> childForm = martJdbcTemplate.queryForList("SELECT * FROM fstg_medical_files");
+        List<Map<String, Object>> grandChildForm = martJdbcTemplate
+                .queryForList("SELECT * FROM fstg_specialty_determined_by_mlo");
+
+        assertNotNull(parentForm);
+        assertEquals(1, parentForm.size());
+        Map<String, Object> parentFormData = parentForm.get(0);
+        assertEquals(26, parentFormData.get("id_first_stage_validation"));
+        verifyGenericFormData(parentFormData);
+
+        assertNotNull(childForm);
+        assertEquals(1, childForm.size());
+        Map<String, Object> childFormData = childForm.get(0);
+        assertEquals(27, childFormData.get("id_fstg_medical_files"));
+        assertEquals(26, childFormData.get("id_first_stage_validation"));
+        verifyGenericFormData(childFormData);
+
+        assertNotNull(grandChildForm);
+        assertEquals(1, grandChildForm.size());
+        Map<String, Object> grandChildData = grandChildForm.get(0);
+        assertEquals(28, grandChildData.get("id_fstg_specialty_determined_by_mlo"));
+        assertEquals(27, grandChildData.get("id_fstg_medical_files"));
+        verifyGenericFormData(grandChildData);
+    }
+
+    private void verifyGenericFormData(Map<String, Object> formDetails) {
+        assertEquals(expectedFormGenericData.get("patient_id"), formDetails.get("patient_id"));
+        assertEquals(expectedFormGenericData.get("encounter_id"), formDetails.get("encounter_id"));
+        assertEquals(expectedFormGenericData.get("program_id"), formDetails.get("program_id"));
+        assertEquals(expectedFormGenericData.get("program_name"), formDetails.get("program_name"));
+        assertEquals(expectedFormGenericData.get("location_id"), formDetails.get("location_id"));
+        assertEquals(expectedFormGenericData.get("location_name"), formDetails.get("location_name"));
+        assertEquals(expectedFormGenericData.get("obs_datetime"), formDetails.get("obs_datetime"));
+    }
+
     private void verifyCodedPatientRecords(List<Map<String, Object>> records) {
         Set<String> expected = new HashSet<>(Arrays.asList("unknown101", "Test", "Test 1"));
         Set<String> actualCodes = new HashSet<>();
@@ -262,15 +312,19 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 Arrays.asList("id_first_stage_validation", "patient_id", "encounter_id",
                         "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
 
+        tableMap.put("fstg_medical_files",
+                Arrays.asList("id_fstg_medical_files", "id_first_stage_validation", "patient_id", "encounter_id",
+                        "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+
         tableMap.put("fstg_specialty_determined_by_mlo",
                 Arrays.asList("id_fstg_specialty_determined_by_mlo", "patient_id", "encounter_id",
-                        "id_first_stage_validation", "fstg_specialty_determined_by_mlo", "obs_datetime", "location_id",
-                        "location_name", "program_id", "program_name"));
+                        "fstg_specialty_determined_by_mlo", "obs_datetime", "location_id",
+                        "location_name", "program_id", "program_name", "id_fstg_medical_files"));
 
         tableMap.put("follow_up_validation", Arrays.asList("id_follow_up_validation", "patient_id", "encounter_id",
                 "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
 
-        tableMap.put("stage", Arrays.asList("id_stage", "patient_id", "encounter_id", "id_first_stage_validation",
+        tableMap.put("stage", Arrays.asList("id_stage", "patient_id", "encounter_id", "id_fstg_medical_files",
                 "stage", "id_follow_up_validation", "obs_datetime", "location_id", "location_name", "program_id",
                 "program_name"));
 

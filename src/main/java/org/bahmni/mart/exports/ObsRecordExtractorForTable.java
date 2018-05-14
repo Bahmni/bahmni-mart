@@ -42,10 +42,10 @@ public class ObsRecordExtractorForTable {
         record.forEach(obs -> tableData.getColumns().forEach(tableColumn -> {
             String tableColumnName = tableColumn.getName();
             String actualColumnName = SpecialCharacterResolver.getActualColumnName(tableData, tableColumn);
-            if (actualColumnName.equals(getProcessedName(obs.getField().getName()))) {
+            if (getProcessedName(obs.getField().getName()).equals(actualColumnName)) {
                 replace(recordMap, tableColumnName, obs.getValue(), tableColumn.getType());
             } else if (tableColumnName.contains("id_") && isNull(recordMap, tableColumnName)) {
-                mapConstraints(recordMap, obs, tableColumn);
+                mapConstraints(recordMap, obs, tableColumn, actualColumnName);
             }
         }));
     }
@@ -54,17 +54,18 @@ public class ObsRecordExtractorForTable {
         return recordMap.get(tableColumnName) == null;
     }
 
-    private void mapConstraints(Map<String, String> recordMap, Obs obs, TableColumn tableColumn) {
-        if (isForeignKey(obs, tableColumn)) {
+    private void mapConstraints(Map<String, String> recordMap, Obs obs,
+                                TableColumn tableColumn, String actualColumnName) {
+        if (isForeignKey(obs,tableColumn, actualColumnName)) {
             replace(recordMap, tableColumn.getName(), obs.getParentId().toString(), tableColumn.getType());
         } else if (tableColumn.getReference() == null && isConstraintName(tableName, tableColumn.getName())) {
             replace(recordMap, tableColumn.getName(), obs.getId().toString(), tableColumn.getType());
         }
     }
 
-    private boolean isForeignKey(Obs obs, TableColumn tableColumn) {
+    private boolean isForeignKey(Obs obs, TableColumn tableColumn, String actualColumnName) {
         return tableColumn.getReference() != null && obs.getParentName() != null &&
-                isConstraintName(obs.getParentName(), tableColumn.getName());
+                isConstraintName(obs.getParentName(), actualColumnName);
     }
 
     private void replace(Map<String, String> recordMap, String key, String value, String type) {

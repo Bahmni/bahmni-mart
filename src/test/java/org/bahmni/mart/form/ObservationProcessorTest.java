@@ -170,13 +170,14 @@ public class ObservationProcessorTest {
     }
 
     @Test
-    public void shouldAddCodeFromJobDefinitionToParamsMap() throws Exception {
+    public void shouldAddCodeFromJobDefinitionAndParentObsIdToParamsMap() throws Exception {
         ArgumentCaptor<HashMap> captor = ArgumentCaptor.forClass(HashMap.class);
         Concept testConcept = new Concept(1, "test", 0);
         form.addField(testConcept);
         observationProcessor.setForm(form);
         Map<String, Object> obsRow = new HashMap<>();
         obsRow.put("obs_id", 1);
+        obsRow.put("parent_obs_id",2);
         List<Integer> fieldIds = new ArrayList<>();
         fieldIds.add(1);
         when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(fieldIds);
@@ -193,11 +194,15 @@ public class ObservationProcessorTest {
         assertEquals(conceptReferenceSource, childrenParams.get("conceptReferenceSource"));
         assertEquals("[1]", childrenParams.get("leafConceptIds").toString());
         assertEquals("[1]", childrenParams.get("childObsIds").toString());
+        assertEquals("2", childrenParams.get("parentObsId").toString());
+        assertEquals(conceptReferenceSource, childrenParams.get("conceptReferenceSource"));
+
 
         verify(namedParameterJdbcTemplate, times(1)).query(eq("get..some..child"),
                 captor.capture(), any(BeanPropertyRowMapper.class));
         HashMap childParams = captor.getAllValues().get(1);
         assertEquals(conceptReferenceSource, childParams.get("conceptReferenceSource"));
         assertEquals(1, childParams.get("obsId"));
+        assertEquals(2, childParams.get("parentObsId"));
     }
 }

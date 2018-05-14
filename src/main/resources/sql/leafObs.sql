@@ -15,7 +15,7 @@ SELECT
 FROM obs o
   JOIN concept_view obs_con ON o.concept_id = obs_con.concept_id
   LEFT OUTER JOIN obs AS form_obs ON form_obs.obs_id = o.obs_group_id AND form_obs.voided = 0
-  LEFT OUTER JOIN obs AS parent_obs ON parent_obs.obs_id = form_obs.obs_group_id AND form_obs.voided = 0
+  LEFT OUTER JOIN obs AS parent_obs ON parent_obs.obs_id = :parentObsId AND form_obs.voided = 0
   LEFT OUTER JOIN location l ON o.location_id = l.location_id
   LEFT OUTER JOIN concept_view parent_obs_con ON parent_obs.concept_id = parent_obs_con.concept_id
   LEFT OUTER JOIN episode_encounter ee ON ee.encounter_id = o.encounter_id

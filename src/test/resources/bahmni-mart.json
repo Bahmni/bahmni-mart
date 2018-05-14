@@ -62,7 +62,7 @@
       "name": "Obs Data",
       "type": "obs",
       "separateTables": [
-        "FSTG, Specialty determined by MLO",
+        "FSTG, Medical Files", "FSTG, Specialty determined by MLO",
         "Stage"
       ],
       "conceptReferenceSource": "",
