@@ -183,7 +183,7 @@ task createZip(type: Tar) {
         exclude("app.json")
     }
 
-    into("/") {
+    into("lib/") {
         from("build/libs")
         include(String.format("%s-%s.jar", baseName, project.version))
         rename(String.format("%s-%s.jar", baseName, project.version), String.format("%s.jar", baseName))

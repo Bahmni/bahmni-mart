@@ -26,7 +26,7 @@ jobs:
         - psql -c "CREATE DATABASE test_analytics WITH OWNER test_user;" -U postgres
         - sudo service postgresql restart
       script: ./scripts/travis/test.sh
-    - stage: deployToAWS
+    - stage: deploy_ZIP_to_AWS
       script: ./scripts/travis/createArtifacts.sh
       deploy:
         provider: s3
@@ -39,11 +39,25 @@ jobs:
         local-dir: ./build/artifacts
         upload-dir: travis-builds
         acl: public_read
+    - stage: deploy_RPM_to_AWS
+      script: ./scripts/travis/createArtifacts.sh
+      deploy:
+        provider: s3
+        access_key_id:
+          secure: $AWS_SECURE_ACCESS_KEY_ID
+        secret_access_key:
+          secure: $AWS_SECURE_ACCESS_KEY
+        bucket: bahmni-mart
+        skip_cleanup: true
+        local-dir: ./build/distributions
+        upload-dir: rpms
+        acl: public_read
     - stage : buildDocker
       script: ./scripts/travis/buildDocker.sh
 
 stages:
   - compile
   - test
-  - deployToAWS
+  - deploy_ZIP_to_AWS
+  - deploy_RPM_to_AWS
   - buildDocker
