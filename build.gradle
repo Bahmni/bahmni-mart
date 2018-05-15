@@ -180,7 +180,8 @@ task createZip(type: Tar) {
 
     into("conf") {
         from ("conf/")
-        exclude("app.json")
+        include 'application-*.properties'
+        include 'bahmni-mart.json'
     }
 
     into("lib/") {
