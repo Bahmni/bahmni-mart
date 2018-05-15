@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-. /opt/bahmni-mart/conf/config-variables.conf
-
-
 init_db() {
     echo "init postgresql database"
     service postgresql-${POSTGRESQL_VERSION} initdb  -D /var/lib/pgsql/data/postgresql.conf

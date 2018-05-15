@@ -120,12 +120,6 @@ ospackage {
         into "/opt/bahmni-mart/lib"
     }
 
-    from("${projectDir}/scripts/builds/config-variables.conf") {
-        fileMode = 0755
-        createDirectoryEntry = true
-        into "/opt/bahmni-mart/conf"
-    }
-
     from("${projectDir}/conf/") {
         include 'application-*.properties'
         fileMode = 0755
