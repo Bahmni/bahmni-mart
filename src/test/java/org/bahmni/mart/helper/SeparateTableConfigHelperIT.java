@@ -2,12 +2,15 @@ package org.bahmni.mart.helper;
 
 import org.apache.commons.io.FileUtils;
 import org.bahmni.mart.AbstractBaseBatchIT;
+import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.form.domain.Concept;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
@@ -35,8 +38,9 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
     @Test
     public void shouldReturnListOfMultiSelectAndAddMore() {
         List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
-        assertEquals(3, conceptNames.size());
-        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed", "Video");
+        assertEquals(4, conceptNames.size());
+        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed", "Video",
+                "MH, Name of MLO");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
     }
 
@@ -59,8 +63,8 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "/src/notPresent.json");
 
         List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
-        assertEquals(1, conceptNames.size());
-        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO");
+        assertEquals(2, conceptNames.size());
+        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "MH, Name of MLO");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
     }
 
@@ -72,5 +76,21 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", emptyImplConfPath);
 
         assertTrue(separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames().isEmpty());
+    }
+
+    @Test
+    public void shouldReturnEmptyHashSetWhenThereAreNoSeparateTablesAndDefaultAddMoreAndMultiSelects()
+            throws NoSuchFieldException, IllegalAccessException {
+
+        JobDefinition jobDefinition = new JobDefinition();
+        jobDefinition.setSeparateTables(Arrays.asList());
+
+        setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
+                Arrays.asList());
+
+        HashSet<Concept> separateTableConcepts = separateTableConfigHelper
+                .getSeparateTableConceptsForJob(jobDefinition);
+        assertEquals(0, separateTableConcepts.size());
+
     }
 }

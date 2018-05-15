@@ -3,8 +3,9 @@ package org.bahmni.mart.helper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.form.domain.Concept;
+import org.bahmni.mart.form.service.ConceptService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,22 +18,21 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForBacteriologyJob;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForObsJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForJob;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @PrepareForTest({SeparateTableConfigHelper.class, JsonParser.class, JobDefinitionUtil.class})
@@ -48,18 +48,13 @@ public class SeparateTableConfigHelperTest {
     @Mock
     private JsonParser jsonParser;
 
-    @Mock
-    private JobDefinitionReader jobDefinitionReader;
-
     private SeparateTableConfigHelper separateTableConfigHelper;
 
 
     @Before
     public void setUp() throws Exception {
         separateTableConfigHelper = new SeparateTableConfigHelper();
-        setValuesForMemberFields(separateTableConfigHelper, "jobDefinitionReader", jobDefinitionReader);
         mockStatic(JobDefinitionUtil.class);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.emptyList());
     }
 
     @Test
@@ -84,10 +79,8 @@ public class SeparateTableConfigHelperTest {
         List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed", "Video");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        setValuesForMemberFields(separateTableConfigHelper, "jobDefinitionReader", jobDefinitionReader);
-        
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
-        
+
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -95,56 +88,11 @@ public class SeparateTableConfigHelperTest {
 
         List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
                 .getAddMoreAndMultiSelectConceptNames();
+
         assertEquals(3, multiSelectAndAddMoreConceptNames.size());
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
     }
 
-    @Test
-    public void shouldReturnListOfMultiSelectAndAddMoreDiscardingIgnoreConcepts() throws Exception {
-        String jsonString = "{\n" +
-                "  \"config\": {\n" +
-                "    \"conceptSetUI\": {\n" +
-                "      \"All Observation Templates\": {\n" +
-                "        \"showPanelView\": false\n" +
-                "      },\n" +
-                "      \"Video\": {\n" +
-                "        \"allowAddMore\": true\n" +
-                "      },\n" +
-                "      \"FSTG, Specialty determined by MLO\":{\n" +
-                "        \"multiSelect\":true\n" +
-                "      },\n" +
-                "      \"Test Concept\":{\n" +
-                "        \"multiSelect\":true\n" +
-                "      },\n" +
-                "      \"OR, Operation performed\": {\n" +
-                "        \"allowAddMore\": true\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-        JsonElement jsonConfig = new JsonParser().parse(jsonString);
-
-        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed");
-        List<String> ignoreConceptsSet = Arrays.asList("Test Concept", "Video");
-        setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
-        setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(ignoreConceptsSet);
-        
-        whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
-        whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
-        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
-        when(jsonParser.parse(fileReader)).thenReturn(jsonConfig);
-
-        List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
-                .getAddMoreAndMultiSelectConceptNames();
-        assertEquals(2, multiSelectAndAddMoreConceptNames.size());
-        assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
-    }
 
     @Test
     public void shouldReturnEmptyListIfConfigDoesNotHoldAnyMultiSelectAndAddMoreConcept() throws Exception {
@@ -162,7 +110,6 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -171,8 +118,6 @@ public class SeparateTableConfigHelperTest {
         List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
                 .getAddMoreAndMultiSelectConceptNames();
         assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
     }
 
     @Test
@@ -181,13 +126,12 @@ public class SeparateTableConfigHelperTest {
         whenNew(FileReader.class).withArguments("test2.json").thenThrow(new FileNotFoundException());
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "test1.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "test2.json");
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
 
         assertTrue(separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames().isEmpty());
     }
 
     @Test
-    public void shouldReturnListOfMultiSelectAndAddMoreDiscardingIgnoreConceptsEvenIfDefaultConfigFileIsMissing()
+    public void shouldReturnListOfMultiSelectAndAddMoreConceptsEvenIfDefaultConfigFileIsMissing()
             throws Exception {
         String jsonString = "{\n" +
                 "  \"config\": {\n" +
@@ -213,13 +157,12 @@ public class SeparateTableConfigHelperTest {
 
         JsonElement jsonConfig = new JsonParser().parse(jsonString);
 
-        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed");
-        List<String> ignoreConceptsSet = Arrays.asList("Test Concept", "Video");
+        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed",
+                "Video", "Test Concept");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(ignoreConceptsSet);
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenThrow(new FileNotFoundException());
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -227,14 +170,13 @@ public class SeparateTableConfigHelperTest {
 
         List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
                 .getAddMoreAndMultiSelectConceptNames();
-        assertEquals(2, multiSelectAndAddMoreConceptNames.size());
+
+        assertEquals(4, multiSelectAndAddMoreConceptNames.size());
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
     }
 
     @Test
-    public void shouldReturnListOfMultiSelectAndAddMoreDiscardingIgnoreConceptsEvenIfImplementationConfigFileIsMissing()
+    public void shouldReturnListOfMultiSelectAndAddMoreConceptsEvenIfImplementationConfigFileIsMissing()
             throws Exception {
         String jsonString = "{\n" +
                 "  \"config\": {\n" +
@@ -259,12 +201,11 @@ public class SeparateTableConfigHelperTest {
                 "}";
         JsonElement jsonConfig = new JsonParser().parse(jsonString);
 
-        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed");
-        List<String> ignoreConceptsSet = Arrays.asList("Test Concept", "Video");
+        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed",
+                "Test Concept", "Video");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(ignoreConceptsSet);
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenThrow(new FileNotFoundException());
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -272,10 +213,9 @@ public class SeparateTableConfigHelperTest {
 
         List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
                 .getAddMoreAndMultiSelectConceptNames();
-        assertEquals(2, multiSelectAndAddMoreConceptNames.size());
+
+        assertEquals(4, multiSelectAndAddMoreConceptNames.size());
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
     }
 
     @Test
@@ -317,9 +257,8 @@ public class SeparateTableConfigHelperTest {
         JsonElement implementationConfig = new JsonParser().parse(implementationJsonString);
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
-        
-        
+
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(implementationFileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -332,8 +271,6 @@ public class SeparateTableConfigHelperTest {
                 .getAddMoreAndMultiSelectConceptNames();
 
         assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
     }
 
     @Test
@@ -344,8 +281,6 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class)))
-                .thenReturn(Collections.singletonList("Test Concept, Video"));
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -353,8 +288,6 @@ public class SeparateTableConfigHelperTest {
         List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
                 .getAddMoreAndMultiSelectConceptNames();
         assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
     }
 
     @Test
@@ -373,7 +306,6 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -381,8 +313,6 @@ public class SeparateTableConfigHelperTest {
         List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
                 .getAddMoreAndMultiSelectConceptNames();
         assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
     }
 
     @Test
@@ -401,7 +331,6 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
         
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -410,77 +339,6 @@ public class SeparateTableConfigHelperTest {
         List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
                 .getAddMoreAndMultiSelectConceptNames();
         assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
-    }
-
-    @Test
-    public void shouldReturnListOfSeparateTableNames() throws Exception {
-
-        String defaultJsonString = "{\n" +
-                "  \"config\": {\n" +
-                "    \"conceptSetUI\": {\n" +
-                "      \"All Observation Templates\": {\n" +
-                "        \"showPanelView\": false\n" +
-                "      },\n" +
-                "      \"Video\": {\n" +
-                "        \"allowAddMore\": true,\n" +
-                "        \"multiSelect\":true\n" +
-                "      },\n" +
-                "      \"Test Concept\":{\n" +
-                "        \"multiSelect\":true\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-
-        String implementationJsonString = "{\n" +
-                "  \"config\": {\n" +
-                "    \"conceptSetUI\": {\n" +
-                "      \"Demo Concept\": {\n" +
-                "        \"xyz\": true\n" +
-                "      },\n" +
-                "      \"Test Concept\":{\n" +
-                "        \"multiSelect\":true\n" +
-                "      },\n" +
-                "      \"OR, Operation performed\": {\n" +
-                "        \"allowAddMore\": true\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}\n";
-
-        JsonElement defaultConfig = new JsonParser().parse(defaultJsonString);
-        JsonElement implementationConfig = new JsonParser().parse(implementationJsonString);
-        setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
-        setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
-        
-        whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
-        whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(implementationFileReader);
-        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
-        when(jsonParser.parse(fileReader)).thenReturn(defaultConfig);
-        when(jsonParser.parse(implementationFileReader)).thenReturn(implementationConfig);
-
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.singletonList(""));
-        List<String> seprateTables = new ArrayList<>();
-        seprateTables.add("obs separate table");
-        when(getSeparateTableNamesForObsJob(any())).thenReturn(seprateTables);
-        when(getSeparateTableNamesForBacteriologyJob(any())).thenReturn(Arrays.asList("bacteriology seperate table"));
-        List<String> expectedSeparateTables = Arrays.asList("OR, Operation performed", "Video", "Test Concept",
-                "obs separate table", "bacteriology seperate table");
-
-        List<String> allSeparateConceptNames = separateTableConfigHelper
-                .getAllSeparateTableConceptNames();
-
-        assertEquals(5, allSeparateConceptNames.size());
-        assertThat(expectedSeparateTables, containsInAnyOrder(allSeparateConceptNames.toArray()));
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
-        verifyStatic(times(1));
-        getSeparateTableNamesForObsJob(any());
-        verifyStatic(times(1));
-        getSeparateTableNamesForBacteriologyJob(any());
     }
 
     @Test
@@ -522,7 +380,6 @@ public class SeparateTableConfigHelperTest {
         JsonElement implementationConfig = new JsonParser().parse(implementationJsonString);
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.emptyList());
 
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(implementationFileReader);
@@ -530,8 +387,7 @@ public class SeparateTableConfigHelperTest {
         when(jsonParser.parse(fileReader)).thenReturn(defaultConfig);
         when(jsonParser.parse(implementationFileReader)).thenReturn(implementationConfig);
 
-        when(getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class))).thenReturn(Collections.singletonList(""));
-        when(getSeparateTableNamesForObsJob(any()))
+        when(getSeparateTableNamesForJob(any()))
                 .thenReturn(Collections.singletonList("separate table"));
         List<String> expectedSeparateTables = Arrays.asList("OR, Operation performed", "Video");
 
@@ -540,7 +396,74 @@ public class SeparateTableConfigHelperTest {
 
         assertEquals(2, allSeparateConceptNames.size());
         assertThat(expectedSeparateTables, containsInAnyOrder(allSeparateConceptNames.toArray()));
-        verifyStatic(times(1));
-        getIgnoreConceptNamesForObsJob(anyListOf(JobDefinition.class));
+    }
+
+    @Test
+    public void shouldReturnListOfSeparateTableNames() throws Exception {
+
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        mockStatic(JobDefinitionUtil.class);
+        List<String> separateTableNames = new ArrayList<>();
+        separateTableNames.add("obs separate table");
+
+        when(JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition))
+                .thenReturn(separateTableNames);
+
+        Concept concept1 = new Concept(1, "OR, Operation performed", 0);
+        Concept concept2 = new Concept(2, "Video", 0);
+        Concept concept3 = new Concept(3, "Test Concept", 0);
+        Concept concept4 = new Concept(4, "obs separate table", 0);
+
+        ConceptService conceptService = mock(ConceptService.class);
+        setValuesForMemberFields(separateTableConfigHelper, "conceptService", conceptService);
+        when(conceptService.getConceptsByNames(separateTableNames))
+                .thenReturn(Arrays.asList(concept1, concept2, concept3, concept4));
+
+
+        setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
+                Arrays.asList("OR, Operation performed", "Video", "Test Concept"));
+
+        HashSet<Concept> expectedSeparateTables = new HashSet<>();
+        expectedSeparateTables.addAll(Arrays.asList(concept1, concept2, concept3, concept4));
+
+        HashSet<Concept> allSeparateConceptNames = separateTableConfigHelper
+                .getSeparateTableConceptsForJob(jobDefinition);
+
+        assertEquals(4, allSeparateConceptNames.size());
+        assertThat(expectedSeparateTables, containsInAnyOrder(allSeparateConceptNames.toArray()));
+
+        verify(JobDefinitionUtil.class, times(1));
+        JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition);
+
+        verify(conceptService, times(1)).getConceptsByNames(any());
+
+    }
+
+    @Test
+    public void shouldReturnEmptyHashSetWhenThereAreNoSeparateTablesAndDefaultAddMoreAndMultiSelects()
+            throws Exception {
+
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        mockStatic(JobDefinitionUtil.class);
+
+        List<String> separateTableNames = new ArrayList<>();
+        when(JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition))
+                .thenReturn(separateTableNames);
+
+        ConceptService conceptService = mock(ConceptService.class);
+        setValuesForMemberFields(separateTableConfigHelper, "conceptService", conceptService);
+        when(conceptService.getConceptsByNames(separateTableNames))
+                .thenReturn(Arrays.asList());
+
+        setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
+                Arrays.asList());
+
+        HashSet<Concept> allSeparateConceptNames = separateTableConfigHelper
+                .getSeparateTableConceptsForJob(jobDefinition);
+
+        assertEquals(0, allSeparateConceptNames.size());
+
+        verify(JobDefinitionUtil.class, times(1));
+        JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition);
     }
 }

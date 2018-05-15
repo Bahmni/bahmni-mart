@@ -13,9 +13,6 @@ import static java.util.Objects.isNull;
 
 public class JobDefinitionUtil {
 
-    private static final String OBS_JOB_TYPE = "obs";
-    private static final String BACTERIOLOGY_JOB_TYPE = "bacteriology";
-
     public static String getReaderSQLByIgnoringColumns(List<String> columnsToIgnore, String readerSQL) {
         if (StringUtils.isEmpty(readerSQL) || CollectionUtils.isEmpty(columnsToIgnore)) {
             return readerSQL;
@@ -23,16 +20,12 @@ public class JobDefinitionUtil {
         return SqlParser.getUpdatedReaderSql(columnsToIgnore, readerSQL);
     }
 
-    public static List<String> getIgnoreConceptNamesForObsJob(List<JobDefinition> jobDefinitions) {
-        return getDefaultIfNotPresent(getJobDefinitionByType(jobDefinitions, OBS_JOB_TYPE).getColumnsToIgnore());
-    }
-
     public static List<String> getIgnoreConceptNamesForJob(JobDefinition jobDefinition) {
         return getDefaultIfNotPresent(jobDefinition.getColumnsToIgnore());
     }
 
-    public static List<String> getSeparateTableNamesForObsJob(List<JobDefinition> jobDefinitions) {
-        return getDefaultIfNotPresent(getJobDefinitionByType(jobDefinitions, OBS_JOB_TYPE).getSeparateTables());
+    public static List<String> getSeparateTableNamesForJob(JobDefinition jobDefinition) {
+        return getDefaultIfNotPresent(jobDefinition.getSeparateTables());
     }
 
     private static List<String> getDefaultIfNotPresent(List<String> names) {
@@ -52,10 +45,4 @@ public class JobDefinitionUtil {
         Resource readerSqlResource = SQLFileLoader.loadResource(jobDefinition.getSourceFilePath());
         return BatchUtils.convertResourceOutputToString(readerSqlResource);
     }
-
-    public static List<String> getSeparateTableNamesForBacteriologyJob(List<JobDefinition> jobDefinitions) {
-        JobDefinition bacteriologyJob = getJobDefinitionByType(jobDefinitions, BACTERIOLOGY_JOB_TYPE);
-        return getDefaultIfNotPresent(bacteriologyJob.getSeparateTables());
-    }
-
 }

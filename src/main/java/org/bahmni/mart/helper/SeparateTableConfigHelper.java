@@ -4,17 +4,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.form.domain.Concept;
+import org.bahmni.mart.form.service.ConceptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,9 +27,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForObsJob;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForBacteriologyJob;
-import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForObsJob;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForJob;
 
 @Component
 public class SeparateTableConfigHelper {
@@ -44,19 +45,21 @@ public class SeparateTableConfigHelper {
     private String implementationConfigFile;
 
     @Autowired
-    private JobDefinitionReader jobDefinitionReader;
+    private ConceptService conceptService;
+
+    private List<String> defaultAddMoreAndMultiSelectConceptsNames;
+
+    @PostConstruct
+    private void separateTableConfigHelperPostConstruct() {
+        defaultAddMoreAndMultiSelectConceptsNames = getAddMoreAndMultiSelectConceptNames();
+    }
 
     public List<String> getAddMoreAndMultiSelectConceptNames() {
         List<String> multiSelectAndAddMore = new ArrayList<>();
-        List<String> ignoreConceptsList = getIgnoreConceptNamesForObsJob(
-                jobDefinitionReader.getJobDefinitions());
-
         for (Map.Entry<String, JsonElement> concept : getAllConceptSet()) {
             String conceptName = concept.getKey();
             JsonObject conceptConfig = concept.getValue().getAsJsonObject();
-
-            if (isAddMoreOrMultiSelect(conceptConfig.get(ALLOW_ADD_MORE_KEY), conceptConfig.get(MULTI_SELECT_KEY)) &&
-                    !ignoreConceptsList.contains(conceptName)) {
+            if (isAddMoreOrMultiSelect(conceptConfig.get(ALLOW_ADD_MORE_KEY), conceptConfig.get(MULTI_SELECT_KEY))) {
                 multiSelectAndAddMore.add(conceptName);
             }
         }
@@ -89,23 +92,18 @@ public class SeparateTableConfigHelper {
             return configKeyJson != null && configKeyJson.getAsJsonObject(CONCEPT_SET_UI_KEY) != null ?
                     configKeyJson.getAsJsonObject(CONCEPT_SET_UI_KEY).entrySet() : Collections.emptySet();
         } catch (FileNotFoundException | ClassCastException e) {
-            log.warn(e.getMessage(), e);
+            log.warn(e.getMessage());
             return Collections.emptySet();
         }
     }
 
-    public List<String> getAllSeparateTableConceptNames() {
-        List<String> multiSelectAndAddMoreConceptsNames = getAddMoreAndMultiSelectConceptNames();
-        List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
-        List<String> separateTableConceptsNames =
-                getSeparateTableNamesForObsJob(jobDefinitions);
-        separateTableConceptsNames.addAll(getSeparateTableNamesForBacteriologyJob(jobDefinitions));
-
-        for (String conceptName : multiSelectAndAddMoreConceptsNames) {
-            if (!separateTableConceptsNames.contains(conceptName)) {
-                separateTableConceptsNames.add(conceptName);
-            }
+    public HashSet<Concept> getSeparateTableConceptsForJob(JobDefinition jobDefinition) {
+        HashSet<Concept> separateTableConcepts = new HashSet<>();
+        List<String> separateTableConceptNames = getSeparateTableNamesForJob(jobDefinition);
+        separateTableConceptNames.addAll(defaultAddMoreAndMultiSelectConceptsNames);
+        if (!separateTableConceptNames.isEmpty()) {
+            separateTableConcepts.addAll(conceptService.getConceptsByNames(separateTableConceptNames));
         }
-        return separateTableConceptsNames;
+        return separateTableConcepts;
     }
 }

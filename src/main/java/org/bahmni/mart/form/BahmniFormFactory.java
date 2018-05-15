@@ -9,15 +9,11 @@ import org.bahmni.mart.helper.SeparateTableConfigHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 @Component
 public class BahmniFormFactory {
-
-    private static final List<Concept> EMPTY_LIST = Collections.emptyList();
 
     @Autowired
     private ConceptService conceptService;
@@ -28,21 +24,21 @@ public class BahmniFormFactory {
     @Autowired
     private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
 
-    private List<Concept> allSeparateTableConcepts;
-
     public BahmniForm createForm(Concept concept, BahmniForm parentForm, JobDefinition jobDefinition) {
         return createForm(concept, parentForm, 0,
-                ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition));
+                ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition),
+                separateTableConfigHelper.getSeparateTableConceptsForJob(jobDefinition));
     }
 
-    private BahmniForm createForm(Concept concept, BahmniForm parentForm, int depth, HashSet<Concept> ignoreConcepts) {
+    private BahmniForm createForm(Concept concept, BahmniForm parentForm, int depth, HashSet<Concept> ignoreConcepts,
+                                  HashSet<Concept> separateTableConcepts) {
         BahmniForm bahmniForm = new BahmniForm();
         bahmniForm.setFormName(concept);
         bahmniForm.setDepthToParent(depth);
         bahmniForm.setParent(parentForm);
         bahmniForm.setRootForm(getRootFormFor(parentForm));
 
-        constructFormFields(concept, bahmniForm, depth, ignoreConcepts);
+        constructFormFields(concept, bahmniForm, depth, ignoreConcepts, separateTableConcepts);
         return bahmniForm;
     }
 
@@ -56,7 +52,7 @@ public class BahmniFormFactory {
     }
 
     private void constructFormFields(Concept concept, BahmniForm bahmniForm, int depth,
-                                     HashSet<Concept> ignoreConcepts) {
+                                     HashSet<Concept> ignoreConcepts, HashSet<Concept> separateTableConcepts) {
         if (concept.getIsSet() == 0) {
             bahmniForm.addField(concept);
             return;
@@ -67,23 +63,14 @@ public class BahmniFormFactory {
         for (Concept childConcept : childConcepts) {
             if (ignoreConcepts.contains(childConcept)) {
                 continue;
-            } else if (allSeparateTableConcepts.contains(childConcept)) {
-                bahmniForm.addChild(createForm(childConcept, bahmniForm, childDepth, ignoreConcepts));
+            } else if (separateTableConcepts.contains(childConcept)) {
+                bahmniForm.addChild(
+                        createForm(childConcept, bahmniForm, childDepth, ignoreConcepts, separateTableConcepts));
             } else if (childConcept.getIsSet() == 0) {
                 bahmniForm.addField(childConcept);
             } else {
-                constructFormFields(childConcept, bahmniForm, childDepth, ignoreConcepts);
+                constructFormFields(childConcept, bahmniForm, childDepth, ignoreConcepts, separateTableConcepts);
             }
         }
-    }
-
-    @PostConstruct
-    public void postConstruct() {
-        this.allSeparateTableConcepts = getSeparateTableConcepts();
-    }
-
-    private List<Concept> getSeparateTableConcepts() {
-        List<String> conceptNames = separateTableConfigHelper.getAllSeparateTableConceptNames();
-        return conceptNames.isEmpty() ? EMPTY_LIST : conceptService.getConceptsByNames(conceptNames);
     }
 }
