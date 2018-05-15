@@ -10,16 +10,20 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
@@ -98,4 +102,48 @@ public class FormListProcessorTest {
         verifyStatic(times(1));
         getIgnoreConceptNamesForJob(jobDefinition);
     }
+
+    @Test
+    public void shouldRetrieveAllFormsByFilteringFormsWithDuplicateConcepts()
+            throws NoSuchFieldException, IllegalAccessException {
+
+        Logger logger = mock(Logger.class);
+        setValueForFinalStaticField(FormListProcessor.class, "logger", logger);
+
+        Concept allObservationConcept = new Concept(1, "All Observation Templates", 1);
+        List<Concept> conceptList = Collections.singletonList(allObservationConcept);
+
+        Concept concept1 = new Concept(1, "concept1", 0);
+        Concept duplicateConcept = new Concept(1, "concept1", 0);
+        Concept concept3 = new Concept(1, "concept3", 0);
+
+        BahmniForm uniqueForm = new BahmniFormBuilder().withName("Unique form name").build();
+        uniqueForm.addField(concept1);
+        uniqueForm.addField(concept3);
+
+        BahmniForm duplicateForm = new BahmniFormBuilder().withName("Duplicate form name").build();
+        duplicateForm.addField(concept1);
+        duplicateForm.addField(duplicateConcept);
+        duplicateForm.addField(concept3);
+
+        BahmniForm allObservationTemplatesForm = new BahmniFormBuilder().withName("All Observation Templates")
+                .withChild(uniqueForm).withChild(duplicateForm).build();
+
+        when(bahmniFormFactory.createForm(allObservationConcept, null, jobDefinition))
+                .thenReturn(allObservationTemplatesForm);
+        when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(Collections.emptyList());
+
+        List<BahmniForm> expected = Arrays.asList(allObservationTemplatesForm, uniqueForm);
+
+        List<BahmniForm> actual = formListProcessor.retrieveAllForms(conceptList, jobDefinition);
+
+        assertEquals(expected.size(), actual.size());
+        assertEquals(new HashSet(expected), new HashSet(actual));
+        verify(logger, times(1))
+                .warn("Skipping the form 'Duplicate form name' since it has duplicate concepts 'concept1'");
+        verifyStatic();
+        getIgnoreConceptNamesForJob(jobDefinition);
+
+    }
+
 }

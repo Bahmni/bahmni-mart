@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.Logger;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
@@ -22,9 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -120,67 +117,5 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         getJobDefinitionByType(jobDefinitions, "obs");
         verify(conceptService, times(1)).getChildConcepts(allObservationTemplates);
         verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, obsJobDefinition);
-    }
-
-    @Test
-    public void shouldGetAllFormsUnderAllObservationTemplatesByFilteringFormsWhichHaveDuplicateConcepts()
-            throws NoSuchFieldException, IllegalAccessException {
-
-        Logger logger = mock(Logger.class);
-        setValueForFinalStaticField(FormStepConfigurer.class, "logger", logger);
-
-        BahmniForm bahmniFormWithDuplicateConcepts = mock(BahmniForm.class);
-        BahmniForm bahmniFormWithUniqueConcepts = mock(BahmniForm.class);
-
-        List<BahmniForm> forms = Arrays.asList(bahmniFormWithDuplicateConcepts, bahmniFormWithUniqueConcepts);
-
-        String duplicateFormName = "Duplicate form name";
-        Concept duplicateFormConcept = new Concept(0, duplicateFormName, 1);
-
-        String uniqueFormName = "Unique form name";
-        Concept uniqueFormConcept = new Concept(0, uniqueFormName, 1);
-
-        Concept concept1 = new Concept(1, "concept1", 0);
-        Concept duplicateConcept = new Concept(1, "concept1", 0);
-        Concept concept3 = new Concept(1, "concept3", 0);
-
-        JobDefinition obsJobDefinition = mock(JobDefinition.class);
-        when(obsJobDefinition.getType()).thenReturn("obs");
-        when(obsJobDefinition.getColumnsToIgnore()).thenReturn(null);
-
-        List<Concept> allConceptsUnderDuplicateConceptsForm = Arrays.asList(concept1, duplicateConcept, concept3);
-        List<Concept> allConceptsUnderUniqueConceptsForm = Arrays.asList(concept1, concept3);
-
-        String allObservationTemplates = "All Observation Templates";
-        List<Concept> formConcepts = Arrays.asList(duplicateFormConcept, uniqueFormConcept);
-
-        when(conceptService.getChildConcepts(allObservationTemplates)).thenReturn(formConcepts);
-        when(formListProcessor.retrieveAllForms(formConcepts, obsJobDefinition)).thenReturn(forms);
-
-        when(bahmniFormWithDuplicateConcepts.getFields()).thenReturn(allConceptsUnderDuplicateConceptsForm);
-        when(bahmniFormWithUniqueConcepts.getFields()).thenReturn(allConceptsUnderUniqueConceptsForm);
-
-
-        when(bahmniFormWithDuplicateConcepts.getFormName()).thenReturn(duplicateFormConcept);
-        when(bahmniFormWithUniqueConcepts.getFormName()).thenReturn(uniqueFormConcept);
-        List<JobDefinition> jobDefinitions = Collections.singletonList(obsJobDefinition);
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
-        when(getJobDefinitionByType(jobDefinitions, "obs")).thenReturn(obsJobDefinition);
-
-        List<BahmniForm> allForms = formStepConfigurer.getAllForms();
-
-        assertEquals(1, allForms.size());
-        BahmniForm uniqueForm = allForms.get(0);
-        assertEquals(2, uniqueForm.getFields().size());
-
-        assertEquals(uniqueFormName, uniqueForm.getFormName().getName());
-        containsInAnyOrder(Arrays.asList(concept1, concept3), uniqueForm.getFields());
-        verify(logger, times(1))
-                .warn("Skipping the form 'Duplicate form name' since it has duplicate concepts 'concept1'");
-
-        verify(conceptService, times(1)).getChildConcepts(allObservationTemplates);
-        verify(formListProcessor, times(1)).retrieveAllForms(formConcepts, obsJobDefinition);
-        verifyStatic(times(1));
-        getJobDefinitionByType(jobDefinitions, "obs");
     }
 }
