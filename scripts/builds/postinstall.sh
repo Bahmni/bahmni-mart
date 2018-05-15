@@ -23,6 +23,7 @@ link_directories() {
     #create links
     ln -s /opt/bahmni-mart/bin/bahmni-mart.sh /usr/bin/bahmni-mart
     ln -s /opt/bahmni-mart/log /var/log/bahmni-mart
+    ln -s /opt/bahmni-mart/conf /var/www/bahmni_config/bahmni-mart
 }
 
 manage_permissions() {
