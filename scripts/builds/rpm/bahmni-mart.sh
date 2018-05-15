@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-. /opt/bahmni-mart/conf/config-variables.conf
-
-echo "Running bahmni-mart..."
-java -jar /opt/bahmni-mart/lib/bahmni-mart.jar >> /opt/bahmni-mart/log/bahmni-mart.log
+echo "Launching bahmni-mart..."
+java -jar /opt/bahmni-mart/lib/bahmni-mart.jar --spring.profiles.active="prod" --spring.config.location="/opt/bahmni-mart/conf/" >> /opt/bahmni-mart/log/bahmni-mart.log
 echo "Done"

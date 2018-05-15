@@ -126,8 +126,15 @@ ospackage {
         into "/opt/bahmni-mart/conf"
     }
 
+    from("${projectDir}/conf/") {
+        include 'application-*.properties'
+        fileMode = 0755
+        createDirectoryEntry = true
+        into "/opt/bahmni-mart/conf"
+    }
+
     from("${projectDir}/conf/bahmni-mart.json") {
-        fileMode = 0777
+        fileMode = 0755
         createDirectoryEntry = true
         into "/opt/bahmni-mart/conf"
     }
