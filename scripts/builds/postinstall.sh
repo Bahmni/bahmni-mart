@@ -22,7 +22,6 @@ create_mart_directories() {
 link_directories() {
     #create links
     ln -s /opt/bahmni-mart/bin/bahmni-mart.sh /usr/bin/bahmni-mart
-    ln -s /opt/bahmni-mart/bin/bahmni-mart-init.sh /usr/bin/bahmni-mart-init
     ln -s /opt/bahmni-mart/log /var/log/bahmni-mart
 }
 
