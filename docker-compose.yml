@@ -13,7 +13,7 @@ dataflow-server:
     environment:
       - spring.dataflow.embedded.database.enabled=false
       - spring.config.location=/opt/bahmni-mart/conf/
-      - spring.profiles.active=prod
+      - spring.profiles.active=docker
 
 postgres-server:
   image: anallytics/postgres

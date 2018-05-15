@@ -13,4 +13,4 @@ echo "Adding bahmni-mart app to SCDF server"
 psql -c "INSERT INTO bahmni_mart_scdf.uri_registry VALUES ('task.bahmni-mart', 'file:///opt/bahmni-mart/bahmni-mart.jar');" ${POSTGRES_DB_NAME}
 
 echo "Adding task definition for bahmni-mart app to SCDF server"
-psql -c "INSERT INTO bahmni_mart_scdf.task_definitions VALUES ('create-bahmni-mart', 'bahmni-mart --spring.profiles.active=\"prod\" --spring.config.location=\"/opt/bahmni-mart/conf/\"');" ${POSTGRES_DB_NAME}
+psql -c "INSERT INTO bahmni_mart_scdf.task_definitions VALUES ('create-bahmni-mart', 'bahmni-mart --spring.profiles.active=\"docker\" --spring.config.location=\"/opt/bahmni-mart/conf/\"');" ${POSTGRES_DB_NAME}

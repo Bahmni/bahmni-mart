@@ -58,7 +58,7 @@ To deploy/install bahmni-mart using docker follow the steps given below
 * download **bahmni-mart/scripts/install.sh** from github
 * run ```sh install.sh```
 * download **bahmni-mart/docker-compose.yml** from github
-* Change any config if needed. Bahmni-mart related config files will be present in **/opt/bahmni-mart/conf**. Change **application-prod.properties** if you want modify given parameters to bahmni-mart application or Spring cloud dataflow server
+* Change any config if needed. Bahmni-mart related config files will be present in **/opt/bahmni-mart/conf**. Change **application-docker.properties** if you want modify given parameters to bahmni-mart application or Spring cloud dataflow server
 * run ```docker-compose up -d```
 
 ---
