@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-read -p "Enter Bahmni-mart Database host name/IP: " ANALYTICS_DB_SERVER_INPUT
-read -p "Enter Bahmni-mart Database username: " ANALYTICS_DB_USERNAME_INPUT
-read -p "Enter Bahmni-mart Database name: " ANALYTICS_DB_NAME_INPUT
-read -p "Enter Postgres username: " ANALYTICS_DB_USER_POSTGRES_INPUT
-read -p "Enter Postgres database PORT: " POSTGRESQL_PORT_INPUT
+read -p "Enter Bahmni-mart Database host name/IP (Optional, default is 'localhost'): " ANALYTICS_DB_SERVER_INPUT
+read -p "Enter Bahmni-mart Database username (Optional, default is 'analytics'): " ANALYTICS_DB_USERNAME_INPUT
+read -p "Enter Bahmni-mart Database name (Optional, default is 'analytics'): " ANALYTICS_DB_NAME_INPUT
+read -p "Enter Postgres username (Optional, default is 'postgres'): " ANALYTICS_DB_USER_POSTGRES_INPUT
+read -p "Enter Postgres database PORT (Optional, default is '5432'): " POSTGRESQL_PORT_INPUT
 
 if [ -z "$ANALYTICS_DB_SERVER_INPUT" ]; then
     ANALYTICS_DB_SERVER_INPUT="localhost"
@@ -30,6 +30,7 @@ export ANALYTICS_DB_SERVER=${ANALYTICS_DB_SERVER_INPUT}
 export ANALYTICS_DB_USER=${ANALYTICS_DB_USERNAME_INPUT}
 export POSTGRES_DB_NAME=${ANALYTICS_DB_NAME_INPUT}
 export ANALYTICS_DB_USER_POSTGRES=${ANALYTICS_DB_USER_POSTGRES_INPUT}
+export POSTGRESQL_PORT=${POSTGRESQL_PORT_INPUT}
 export POSTGRESQL_VERSION="9.2"
 
 sh /opt/bahmni-mart/bin/bahmni-mart-setup.sh

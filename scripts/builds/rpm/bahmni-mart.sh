@@ -4,7 +4,6 @@
 initialize(){
     echo "Starting Bahmni Mart initialization..."
     sh /opt/bahmni-mart/bin/bahmni-mart-init.sh
-    echo "Done"
 }
 
 launch_bahmni_mart(){

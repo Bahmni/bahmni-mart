@@ -31,16 +31,19 @@ restart_postgres_service() {
 }
 
 create_postgres_users_and_db() {
-   RESULT_USER=`psql -U${ANALYTICS_DB_USER_POSTGRES} -h${ANALYTICS_DB_SERVER} -tAc "select count(*) from pg_roles where rolname='analytics'"`
-   RESULT_DB=`psql -U${ANALYTICS_DB_USER_POSTGRES} -h${ANALYTICS_DB_SERVER} -tAc "select count(*) from pg_catalog.pg_database where datname='analytics'"`
+   RESULT_USER=`psql -U${ANALYTICS_DB_USER_POSTGRES} -h${ANALYTICS_DB_SERVER} -tAc "select count(*) from pg_roles where rolname='${ANALYTICS_DB_USER}'"`
+   RESULT_DB=`psql -U${ANALYTICS_DB_USER_POSTGRES} -h${ANALYTICS_DB_SERVER} -tAc "select count(*) from pg_catalog.pg_database where datname='${POSTGRES_DB_NAME}'"`
    if [ "$RESULT_USER" == "0" ]; then
-            echo "creating postgres user - analytics with roles CREATEDB,NOCREATEROLE,SUPERUSER,REPLICATION"
-            createuser -U${ANALYTICS_DB_USER_POSTGRES}  -h${ANALYTICS_DB_SERVER} -d -R -s --replication analytics -P;
+            echo "creating postgres user - ${ANALYTICS_DB_USER} with roles CREATEDB,NOCREATEROLE,SUPERUSER,REPLICATION"
+            createuser -U${ANALYTICS_DB_USER_POSTGRES}  -h${ANALYTICS_DB_SERVER} -d -R -s --replication ${ANALYTICS_DB_USER} -P;
    fi
    if [ "$RESULT_DB" == "0" ]; then
-            echo "creating db - analytics "
-            createdb -U${ANALYTICS_DB_USER} -h${ANALYTICS_DB_SERVER} analytics;
-            psql -U${ANALYTICS_DB_USER_POSTGRES} -h${ANALYTICS_DB_SERVER} -tAc "revoke all privileges on  database analytics from public";
+            echo "creating db - ${POSTGRES_DB_NAME} "
+            createdb -U${ANALYTICS_DB_USER} -h${ANALYTICS_DB_SERVER} ${POSTGRES_DB_NAME};
+            psql -U${ANALYTICS_DB_USER_POSTGRES} -h${ANALYTICS_DB_SERVER} -tAc "revoke all privileges on  database ${POSTGRES_DB_NAME} from public";
+
+            echo "Creating the bahmni_mart_scdf schema"
+            psql -U${ANALYTICS_DB_USER_POSTGRES} -h${ANALYTICS_DB_SERVER} -tAc "CREATE SCHEMA bahmni_mart_scdf AUTHORIZATION ${ANALYTICS_DB_USER};" ${POSTGRES_DB_NAME}
    fi
 }
 
