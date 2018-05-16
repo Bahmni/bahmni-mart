@@ -170,7 +170,6 @@ public class BatchConfigurationTest {
         when(eavJobTemplateFactory.getObject()).thenReturn(eavJobTemplate);
         when(simpleJobTemplateFactory.getObject()).thenReturn(simpleJobTemplate);
         when(jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE)).thenReturn(jobDefinition);
-        when(jobDefinition.isEmpty()).thenReturn(true);
     }
 
     @Test
@@ -344,7 +343,6 @@ public class BatchConfigurationTest {
         when(jobDefinition.getName()).thenReturn(jobName);
         when(jobDefinition.getType()).thenReturn("rsp");
         when(jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE)).thenReturn(jobDefinition);
-        when(jobDefinition.isEmpty()).thenReturn(false);
         when(rspViewDefinition.getDefinition()).thenReturn(viewDefinition);
         when(martJSONReader.getViewDefinitions()).thenReturn(viewDefinitions);
 
@@ -356,7 +354,6 @@ public class BatchConfigurationTest {
         verify(rspStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
         verify(jobLauncher, times(1)).run(any(Job.class), any(JobParameters.class));
         verify(jobDefinitionReader, times(1)).getJobDefinitionByName(REGISTRATION_SECOND_PAGE);
-        verify(jobDefinition, times(1)).isEmpty();
         verify(rspViewDefinition, times(1)).getDefinition();
         verify(martJSONReader, times(1)).getViewDefinitions();
         verify(viewExecutor, times(1)).execute(Collections.singletonList(viewDefinition));

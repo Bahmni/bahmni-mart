@@ -1,5 +1,6 @@
 package org.bahmni.mart;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.job.CustomCodesUploader;
 import org.bahmni.mart.config.job.JobDefinition;
@@ -117,7 +118,7 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
         List<ViewDefinition> viewDefinitions = martJSONReader.getViewDefinitions();
 
-        if (!jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE).isEmpty()) {
+        if (!StringUtils.isEmpty(jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE).getName())) {
             viewDefinitions.add(rspViewDefinition.getDefinition());
         }
 
