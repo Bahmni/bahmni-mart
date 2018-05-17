@@ -120,15 +120,14 @@ ospackage {
         into "/opt/bahmni-mart/lib"
     }
 
-    from("${projectDir}/conf/") {
-        include 'application-*.properties'
+    from("${projectDir}/conf/bahmni-mart.json") {
         fileMode = 0755
         createDirectoryEntry = true
         into "/opt/bahmni-mart/conf"
     }
 
-    from("${projectDir}/conf/bahmni-mart.json") {
-        fileMode = 0755
+    from("${projectDir}/conf/liquibase.xml") {
+        fileMode = 0766
         createDirectoryEntry = true
         into "/opt/bahmni-mart/conf"
     }
@@ -170,26 +169,4 @@ checkstyle {
         checkstyle "com.puppycrawl.tools:checkstyle:${checkstyleVersion}"
         checkstyle "com.github.sevntu-checkstyle:sevntu-checks:${sevntuChecksVersion}"
     }
-}
-
-task createZip(type: Tar) {
-    extension = 'tar.gz'
-    baseName= project.name
-    archiveName = String.format("%s.%s", baseName, extension)
-    compression = Compression.GZIP
-
-    into("conf") {
-        from ("conf/")
-        include 'application-*.properties'
-        include 'bahmni-mart.json'
-    }
-
-    into("lib/") {
-        from("build/libs")
-        include(String.format("%s-%s.jar", baseName, project.version))
-        rename(String.format("%s-%s.jar", baseName, project.version), String.format("%s.jar", baseName))
-    }
-    destinationDir file('build/artifacts')
-
-    dependsOn("build")
 }

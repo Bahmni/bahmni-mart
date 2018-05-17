@@ -18,6 +18,10 @@ create_mart_directories() {
         mkdir -p /opt/bahmni-mart/log/
     fi
 
+    if [ ! -d /opt/bahmni-mart/properties/ ]; then
+        mkdir -p /opt/bahmni-mart/properties/
+    fi
+
     if [ ! -d /var/www/bahmni_config/ ]; then
         mkdir -p /var/www/bahmni_config/
     fi
@@ -27,7 +31,10 @@ link_directories() {
     #create links
     ln -s /opt/bahmni-mart/bin/bahmni-mart.sh /usr/bin/bahmni-mart
     ln -s /opt/bahmni-mart/log /var/log/bahmni-mart
-    ln -s /opt/bahmni-mart/conf /var/www/bahmni_config/bahmni-mart
+
+    if [ ! -d /var/www/bahmni_config/bahmni-mart/ ]; then
+        ln -s /opt/bahmni-mart/conf /var/www/bahmni_config/bahmni-mart
+    fi
 }
 
 manage_permissions() {
