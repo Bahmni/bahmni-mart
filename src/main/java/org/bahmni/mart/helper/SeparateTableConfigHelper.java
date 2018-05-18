@@ -16,21 +16,14 @@ import javax.annotation.PostConstruct;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toSet;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForJob;
 
 @Component
-public class SeparateTableConfigHelper {
+public class SeparateTableConfigHelper extends AbstractConfigParserHelper {
 
     private static final Logger log = LoggerFactory.getLogger(SeparateTableConfigHelper.class);
     private static final String ALLOW_ADD_MORE_KEY = "allowAddMore";
@@ -56,7 +49,7 @@ public class SeparateTableConfigHelper {
 
     public List<String> getAddMoreAndMultiSelectConceptNames() {
         List<String> multiSelectAndAddMore = new ArrayList<>();
-        for (Map.Entry<String, JsonElement> concept : getAllConceptSet()) {
+        for (Map.Entry<String, JsonElement> concept : getAllConcepts(implementationConfigFile, defaultConfigFile)) {
             String conceptName = concept.getKey();
             JsonObject conceptConfig = concept.getValue().getAsJsonObject();
             if (isAddMoreOrMultiSelect(conceptConfig.get(ALLOW_ADD_MORE_KEY), conceptConfig.get(MULTI_SELECT_KEY))) {
@@ -74,26 +67,16 @@ public class SeparateTableConfigHelper {
         return value != null && value.getAsBoolean();
     }
 
-    private Set<Map.Entry<String, JsonElement>> getAllConceptSet() {
-        return Stream
-                .concat(getConceptSet(implementationConfigFile).stream(), getConceptSet(defaultConfigFile).stream())
-                .filter(distinctByKey(Map.Entry::getKey)).collect(toSet());
-    }
-
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> keys = ConcurrentHashMap.newKeySet();
-        return key -> keys.add(keyExtractor.apply(key));
-    }
-
-    private Set<Map.Entry<String, JsonElement>> getConceptSet(String multiSelectAndAddMoreFile) {
+    @Override
+    protected JsonObject getConceptSet(String filePath) {
         try {
-            JsonObject jsonConfig = (JsonObject) new JsonParser().parse(new FileReader(multiSelectAndAddMoreFile));
+            JsonObject jsonConfig = (JsonObject) new JsonParser().parse(new FileReader(filePath));
             JsonObject configKeyJson = jsonConfig.getAsJsonObject(CONFIG_KEY);
             return configKeyJson != null && configKeyJson.getAsJsonObject(CONCEPT_SET_UI_KEY) != null ?
-                    configKeyJson.getAsJsonObject(CONCEPT_SET_UI_KEY).entrySet() : Collections.emptySet();
+                    configKeyJson.getAsJsonObject(CONCEPT_SET_UI_KEY) : new JsonObject();
         } catch (FileNotFoundException | ClassCastException e) {
             log.warn(e.getMessage());
-            return Collections.emptySet();
+            return new JsonObject();
         }
     }
 

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
@@ -42,6 +43,9 @@ public class RspConfigHelperTest {
     private Logger logger;
 
     private RspConfigHelper rspConfigHelper;
+
+    private String defaultExtFilePath = "default.json";
+    private String implExtFilePath = "implementation.json";
 
     private String jsonString = "{\n" +
             "  \"view\": {\n" +
@@ -130,9 +134,6 @@ public class RspConfigHelperTest {
                 "  }\n" +
                 "}";
 
-        String defaultExtFilePath = "default.json";
-        String implExtFilePath = "implementation.json";
-
         setValuesForMemberFields(rspConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
         setValuesForMemberFields(rspConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
 
@@ -166,8 +167,8 @@ public class RspConfigHelperTest {
 
     @Test
     public void shouldGiveEmptyListWhenBothFilesIsNotPresent() throws Exception {
-        whenNew(FileReader.class).withArguments("default.json").thenThrow(new FileNotFoundException());
-        whenNew(FileReader.class).withArguments("implementation.json").thenThrow(new FileNotFoundException());
+        whenNew(FileReader.class).withArguments(defaultExtFilePath).thenThrow(new FileNotFoundException());
+        whenNew(FileReader.class).withArguments(implExtFilePath).thenThrow(new FileNotFoundException());
         List<String> rspConcepts = rspConfigHelper.getRspConcepts();
         verify(logger, times(2)).warn(any(), any(FileNotFoundException.class));
         assertTrue(rspConcepts.isEmpty());
@@ -175,8 +176,8 @@ public class RspConfigHelperTest {
 
     @Test
     public void shouldGiveAllRspConceptNamesEvenIfImplementationJsonFileIsNotPresent() throws Exception {
-        whenNew(FileReader.class).withArguments("default.json").thenReturn(defaultFileReader);
-        whenNew(FileReader.class).withArguments("implementation.json").thenThrow(new FileNotFoundException());
+        whenNew(FileReader.class).withArguments(defaultExtFilePath).thenReturn(defaultFileReader);
+        whenNew(FileReader.class).withArguments(implExtFilePath).thenThrow(new FileNotFoundException());
         JsonElement jsonConfig = new JsonParser().parse(jsonString);
         List<String> expected = Arrays.asList("Nutritional Values", "Fee Information");
 
@@ -193,8 +194,8 @@ public class RspConfigHelperTest {
 
     @Test
     public void shouldGiveAllRspConceptNamesEvenIfDefaultJsonFileIsNotPresent() throws Exception {
-        whenNew(FileReader.class).withArguments("implementation.json").thenReturn(defaultFileReader);
-        whenNew(FileReader.class).withArguments("default.json").thenThrow(new FileNotFoundException());
+        whenNew(FileReader.class).withArguments(defaultExtFilePath).thenThrow(new FileNotFoundException());
+        whenNew(FileReader.class).withArguments(implExtFilePath).thenReturn(defaultFileReader);
         JsonElement jsonConfig = new JsonParser().parse(jsonString);
         List<String> expected = Arrays.asList("Nutritional Values", "Fee Information");
 
@@ -209,5 +210,76 @@ public class RspConfigHelperTest {
         verify(logger, times(1)).warn(any(), any(FileNotFoundException.class));
     }
 
+    @Test
+    public void shouldMergeImplementationAndDefaultConfigs() throws Exception {
+        String defaultJson = "{\n" +
+                "  \"nutritionalValues\": {\n" +
+                "    \"extensionPointId\": \"org.bahmni.registration.conceptSetGroup.observations\",\n" +
+                "    \"type\": \"config\",\n" +
+                "    \"extensionParams\": {\n" +
+                "      \"conceptName\": \"Nutritional Values\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
 
+        String implJson = "{\n" +
+                "  \"feeInformation\": {\n" +
+                "    \"extensionPointId\": \"org.bahmni.registration.conceptSetGroup.observations\",\n" +
+                "    \"type\": \"config\",\n" +
+                "    \"extensionParams\": {\n" +
+                "      \"conceptName\": \"Fee Information\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        List<String> expected = Arrays.asList("Fee Information", "Nutritional Values");
+
+        setValuesForMemberFields(rspConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
+        setValuesForMemberFields(rspConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
+
+
+        whenNew(FileReader.class).withArguments(defaultExtFilePath).thenReturn(defaultFileReader);
+        whenNew(FileReader.class).withArguments(implExtFilePath).thenReturn(implementationFileReader);
+        when(jsonParser.parse(defaultFileReader)).thenReturn(new JsonParser().parse(defaultJson));
+        when(jsonParser.parse(implementationFileReader)).thenReturn(new JsonParser().parse(implJson));
+
+        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
+
+        assertEquals(expected, rspConfigHelper.getRspConcepts());
+        verify(jsonParser, times(1)).parse(defaultFileReader);
+        verify(jsonParser, times(1)).parse(implementationFileReader);
+    }
+
+    @Test
+    public void shouldPrioritizeImplementationConfigOverDefaultConfigWhileMerging() throws Exception {
+        String defaultJson = "{\n" +
+                "  \"nutritionalValues\": {\n" +
+                "    \"extensionPointId\": \"org.bahmni.registration.conceptSetGroup.temp\",\n" +
+                "    \"extensionParams\": {\n" +
+                "      \"conceptName\": \"Nutritional Values\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+        String implJson = "{\n" +
+                "  \"nutritionalValues\": {\n" +
+                "    \"extensionPointId\": \"org.bahmni.registration.conceptSetGroup.observations\",\n" +
+                "    \"type\": \"config\"\n" +
+                "  }\n" +
+                "}";
+
+        setValuesForMemberFields(rspConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
+        setValuesForMemberFields(rspConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
+
+        List<String> expected = Collections.singletonList("Nutritional Values");
+
+        whenNew(FileReader.class).withArguments(defaultExtFilePath).thenReturn(defaultFileReader);
+        whenNew(FileReader.class).withArguments(implExtFilePath).thenReturn(implementationFileReader);
+        when(jsonParser.parse(defaultFileReader)).thenReturn(new JsonParser().parse(defaultJson));
+        when(jsonParser.parse(implementationFileReader)).thenReturn(new JsonParser().parse(implJson));
+
+        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
+
+        assertEquals(expected, rspConfigHelper.getRspConcepts());
+        verify(jsonParser, times(1)).parse(defaultFileReader);
+        verify(jsonParser, times(1)).parse(implementationFileReader);
+    }
 }

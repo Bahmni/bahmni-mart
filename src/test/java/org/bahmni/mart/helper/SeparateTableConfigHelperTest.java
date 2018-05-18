@@ -466,4 +466,58 @@ public class SeparateTableConfigHelperTest {
         verify(JobDefinitionUtil.class, times(1));
         JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition);
     }
+
+    @Test
+    public void shouldMergeBothConfigsAndGivePriorityToImplementationConfig() throws Exception {
+        String defaultJsonString = "{\n" +
+                "  \"config\": {\n" +
+                "    \"conceptSetUI\": {\n" +
+                "      \"All Observation Templates\": {\n" +
+                "        \"showPanelView\": false\n" +
+                "      },\n" +
+                "      \"Test Concept\":{\n" +
+                "        \"multiSelect\":true\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        String implementationJsonString = "{\n" +
+                "  \"config\": {\n" +
+                "    \"conceptSetUI\": {\n" +
+                "      \"Demo Concept\": {\n" +
+                "        \"xyz\": true\n" +
+                "      },\n" +
+                "      \"Test Concept\":{\n" +
+                "        \"multiSelect\":false\n" +
+                "      },\n" +
+                "      \"OR, Operation performed\": {\n" +
+                "        \"allowAddMore\": true\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}\n";
+
+        JsonElement defaultConfig = new JsonParser().parse(defaultJsonString);
+        JsonElement implementationConfig = new JsonParser().parse(implementationJsonString);
+        setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
+        setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
+
+
+        whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
+        whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(implementationFileReader);
+        whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
+        when(jsonParser.parse(fileReader)).thenReturn(defaultConfig);
+        when(jsonParser.parse(implementationFileReader)).thenReturn(implementationConfig);
+
+        when(getSeparateTableNamesForJob(any()))
+                .thenReturn(Collections.singletonList("separate table"));
+        List<String> expectedSeparateTables = Collections.singletonList("OR, Operation performed");
+
+        List<String> allSeparateConceptNames = separateTableConfigHelper
+                .getAddMoreAndMultiSelectConceptNames();
+
+        assertEquals(1, allSeparateConceptNames.size());
+        assertThat(expectedSeparateTables, containsInAnyOrder(allSeparateConceptNames.toArray()));
+    }
 }
