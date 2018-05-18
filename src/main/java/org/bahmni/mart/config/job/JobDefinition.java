@@ -8,21 +8,13 @@ public class JobDefinition {
     private String readerSql;
     private int chunkSizeToRead;
     private String tableName;
-    private List<String> separateTables;
+    private SeparateTableConfig separateTableConfig;
     private String conceptReferenceSource;
     private List<String> columnsToIgnore;
     private EavAttributes eavAttributes;
     private String sourceFilePath;
     private boolean ignoreAllFreeTextConcepts;
     private List<CodeConfig> codeConfigs;
-
-    public List<String> getSeparateTables() {
-        return separateTables;
-    }
-
-    public void setSeparateTables(List<String> separateTables) {
-        this.separateTables = separateTables;
-    }
 
     public int getChunkSizeToRead() {
         return chunkSizeToRead;
@@ -86,5 +78,9 @@ public class JobDefinition {
 
     public List<CodeConfig> getCodeConfigs() {
         return codeConfigs;
+    }
+
+    public SeparateTableConfig getSeparateTableConfig() {
+        return separateTableConfig;
     }
 }

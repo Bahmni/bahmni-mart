@@ -16,6 +16,7 @@ import java.util.List;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -42,6 +43,13 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
         List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed", "Video",
                 "MH, Name of MLO");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
+    }
+
+    @Test
+    public void shouldReturnTrueWhenAddMoreConceptsExistInAnyConfigFile() {
+        assertTrue(separateTableConfigHelper.isAddMore("OR, Operation performed"));
+        assertTrue(separateTableConfigHelper.isAddMore("Video"));
+        assertFalse(separateTableConfigHelper.isAddMore("FSTG, Specialty determined by MLO"));
     }
 
     @Test
@@ -83,7 +91,7 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
             throws NoSuchFieldException, IllegalAccessException {
 
         JobDefinition jobDefinition = new JobDefinition();
-        jobDefinition.setSeparateTables(Arrays.asList());
+
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
                 Arrays.asList());

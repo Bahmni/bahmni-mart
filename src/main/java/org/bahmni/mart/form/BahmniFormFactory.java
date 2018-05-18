@@ -73,4 +73,38 @@ public class BahmniFormFactory {
             }
         }
     }
+
+    public BahmniForm getFormWithAddMoreAndMultiSelectConceptsAlone(BahmniForm form) {
+
+        BahmniForm formWithAddMoreAndMultiSelectsAlone = new BahmniForm();
+
+        formWithAddMoreAndMultiSelectsAlone.setFormName(form.getFormName());
+        for (Concept concept : form.getFields()) {
+            if (separateTableConfigHelper.isAddMoreOrMultiSelect(concept)) {
+                setParentConcept(form, concept);
+                formWithAddMoreAndMultiSelectsAlone.addField(concept);
+            }
+        }
+        setAddMoreConceptSets(formWithAddMoreAndMultiSelectsAlone);
+
+        return formWithAddMoreAndMultiSelectsAlone;
+    }
+
+    private void setAddMoreConceptSets(BahmniForm formWithAddMoreAndMultiSelectsAlone) {
+        List<Concept> childConcepts = conceptService.getChildConcepts(formWithAddMoreAndMultiSelectsAlone
+                .getFormName().getName());
+        for (Concept concept : childConcepts) {
+            if (concept.getIsSet() == 1 && separateTableConfigHelper.isAddMore(concept.getName())) {
+                setParentConcept(formWithAddMoreAndMultiSelectsAlone, concept);
+                formWithAddMoreAndMultiSelectsAlone.addField(concept);
+            }
+        }
+    }
+
+    private void setParentConcept(BahmniForm form, Concept concept) {
+        Concept immediateParentOfChildFromRootConcept = conceptService
+                .getImmediateParentOfChildFromRootConcept(form.getFormName(), concept);
+        concept.setParent(immediateParentOfChildFromRootConcept);
+
+    }
 }

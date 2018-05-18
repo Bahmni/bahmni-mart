@@ -376,11 +376,14 @@
     {
       "name": "Obs Data",
       "type": "obs",
-      "separateTables": [
-        "PA, Location of Assessment",
-        "SMH, Pain Assessment",
-        "FV, Outcomes FV"
-      ],
+      "separateTableConfig": {
+        "enableForAddMoreAndMultiSelect": true,
+        "separateTables": [
+          "PA, Location of Assessment",
+          "SMH, Pain Assessment",
+          "FV, Outcomes FV"
+        ]
+      },
       "conceptReferenceSource": "MSF-INTERNAL",
       "ignoreAllFreeTextConcepts": true,
       "columnsToIgnore": [
@@ -405,7 +408,10 @@
       "name": "Registration Second Page",
       "type": "rsp",
       "columnsToIgnore": [],
-      "separateTables": []
+      "separateTableConfig": {
+        "enableForAddMoreAndMultiSelect": false,
+        "separateTables": []
+      }
     },
     {
       "name": "Diagnoses Data",
@@ -418,10 +424,10 @@
       "columnsToIgnore": []
     }
   ],
-  "procedures":[
+  "procedures": [
     {
-      "name":"Discharge Date Procedure",
-      "sourceFilePath":"classpath:procedureSql/dischargeDateProc.sql"
+      "name": "Discharge Date Procedure",
+      "sourceFilePath": "classpath:procedureSql/dischargeDateProc.sql"
     }
   ],
   "views": [
@@ -458,12 +464,12 @@
       "sql": "SELECT sa.patient_id, sb.surgical_block_id, primary_provider_name, sb.creator_name AS block_creator_name, location_name, block_starttime AS block_start_time, block_endtime AS block_end_time, sb.date_created AS block_date_created, sb.date_changed AS block_date_changed, sb.changed_by AS block_changed_by, saa.*, sa.sort_weight AS surgery_sort_weight, sa.status AS surgery_status, sa.actual_start_datetime AS surgery_actual_startime, sa.actual_end_datetime AS surgery_actual_endtime, sa.notes AS surgery_notes, sa.date_created AS surgery_datecreated, sa.date_changed AS surgery_date_changed, sa.creator_name AS sugery_creator_name, sa.changed_by AS surgery_changed_by FROM surgical_block sb LEFT JOIN surgical_appointment sa ON sa.surgical_block_id = sb.surgical_block_id LEFT JOIN surgical_appointment_attributes saa ON saa.surgical_appointment_id = sa.surgical_appointment_id"
     },
     {
-      "name":"bed_management_view",
-      "sql":"SELECT bpa.patient_id, bpa.bed_number, bpa.date_started, bpa.date_stopped, bpa.location, ped.encounter_type_name, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM bed_patient_assignment bpa INNER JOIN patient_encounter_details ped ON ped.encounter_id = bpa.encounter_id LEFT JOIN bed_tags bt ON bt.bed_id = bpa.bed_id UNION (SELECT dateStopped.patient_id, dateStopped.bed_number, NULL AS date_started, dateStopped.date_stopped, dateStopped.location, ped.encounter_type_name, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM (SELECT patient_id, date_stopped AS date_stopped, location, bed_number, bed_id FROM bed_patient_assignment) dateStopped INNER JOIN patient_encounter_details ped ON date(ped.encounter_datetime) = date(dateStopped.date_stopped) AND encounter_type_name = 'DISCHARGE' AND ped.patient_id = dateStopped.patient_id LEFT JOIN bed_tags bt ON bt.bed_id = dateStopped.bed_id) ORDER BY patient_id"
+      "name": "bed_management_view",
+      "sql": "SELECT bpa.patient_id, bpa.bed_number, bpa.date_started, bpa.date_stopped, bpa.location, ped.encounter_type_name, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM bed_patient_assignment bpa INNER JOIN patient_encounter_details ped ON ped.encounter_id = bpa.encounter_id LEFT JOIN bed_tags bt ON bt.bed_id = bpa.bed_id UNION (SELECT dateStopped.patient_id, dateStopped.bed_number, NULL AS date_started, dateStopped.date_stopped, dateStopped.location, ped.encounter_type_name, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM (SELECT patient_id, date_stopped AS date_stopped, location, bed_number, bed_id FROM bed_patient_assignment) dateStopped INNER JOIN patient_encounter_details ped ON date(ped.encounter_datetime) = date(dateStopped.date_stopped) AND encounter_type_name = 'DISCHARGE' AND ped.patient_id = dateStopped.patient_id LEFT JOIN bed_tags bt ON bt.bed_id = dateStopped.bed_id) ORDER BY patient_id"
     },
     {
-      "name":"bed_management_locations_view",
-      "sourceFilePath":"classpath:viewSql/locationWiseDischarge.sql"
+      "name": "bed_management_locations_view",
+      "sourceFilePath": "classpath:viewSql/locationWiseDischarge.sql"
     }
   ]
 }

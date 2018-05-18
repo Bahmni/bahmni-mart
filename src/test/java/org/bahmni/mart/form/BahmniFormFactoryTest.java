@@ -1,6 +1,7 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.SeparateTableConfig;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
@@ -16,13 +17,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForJob;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -41,6 +46,9 @@ public class BahmniFormFactoryTest {
 
     @Mock
     private JobDefinition jobDefinition;
+
+    @Mock
+    private SeparateTableConfig separateTableConfig;
 
     @Mock
     private SeparateTableConfigHelper separateTableConfigHelper;
@@ -83,6 +91,7 @@ public class BahmniFormFactoryTest {
         setValuesForMemberFields(bahmniFormFactory, "separateTableConfigHelper", separateTableConfigHelper);
         setValuesForMemberFields(bahmniFormFactory, "ignoreColumnsConfigHelper", ignoreColumnsConfigHelper);
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptsNames);
+        when(jobDefinition.getSeparateTableConfig()).thenReturn(separateTableConfig);
         when(getSeparateTableNamesForJob(jobDefinition)).thenReturn(separateTableNames);
 
         when(separateTableConfigHelper.getSeparateTableConceptsForJob(jobDefinition))
@@ -188,5 +197,58 @@ public class BahmniFormFactoryTest {
         verify(conceptService, times(1)).getChildConcepts("BP");
         verify(ignoreColumnsConfigHelper, times(1)).getIgnoreConceptsForJob(jobDefinition);
         verify(separateTableConfigHelper, times(1)).getSeparateTableConceptsForJob(jobDefinition);
+    }
+
+    @Test
+    public void shouldGetFormWithAddMoreAndMultiSelectConceptsAlone() {
+
+        Concept rootConcept = mock(Concept.class);
+        String rootConceptName = "Root concept";
+        when(rootConcept.getName()).thenReturn(rootConceptName);
+
+
+        Concept conceptSet = mock(Concept.class);
+        String conceptSetName = "Concept set as add more with normal concept";
+        when(conceptSet.getName()).thenReturn(conceptSetName);
+        when(conceptSet.getIsSet()).thenReturn(1);
+
+
+        Concept concept = mock(Concept.class);
+        when(concept.getName()).thenReturn("normal concept");
+        when(concept.getIsSet()).thenReturn(0);
+
+        Concept multiSelectConcept = mock(Concept.class);
+        String multiSelectConceptName = "multi-select concept";
+        when(multiSelectConcept.getName()).thenReturn(multiSelectConceptName);
+        when(multiSelectConcept.getIsSet()).thenReturn(1);
+
+        BahmniForm form = mock(BahmniForm.class);
+        when(form.getFormName()).thenReturn(rootConcept);
+        when(form.getFields()).thenReturn(Arrays.asList(concept, multiSelectConcept));
+
+        when(separateTableConfigHelper.isAddMoreOrMultiSelect(concept)).thenReturn(false);
+        when(separateTableConfigHelper.isAddMoreOrMultiSelect(multiSelectConcept)).thenReturn(true);
+
+        when(conceptService.getImmediateParentOfChildFromRootConcept(rootConcept, concept)).thenReturn(rootConcept);
+        when(conceptService.getImmediateParentOfChildFromRootConcept(rootConcept, multiSelectConcept))
+                .thenReturn(rootConcept);
+        when(conceptService.getImmediateParentOfChildFromRootConcept(rootConcept, conceptSet))
+                .thenReturn(rootConcept);
+
+        when(conceptService.getChildConcepts(rootConceptName))
+                .thenReturn(Arrays.asList(conceptSet, multiSelectConcept));
+
+        when(separateTableConfigHelper.isAddMore(conceptSetName)).thenReturn(true);
+        when(separateTableConfigHelper.isAddMore(multiSelectConceptName)).thenReturn(false);
+
+        BahmniForm formWithAddMoreAndMultiSelectConceptsAlone = bahmniFormFactory
+                .getFormWithAddMoreAndMultiSelectConceptsAlone(form);
+
+        assertEquals(2, formWithAddMoreAndMultiSelectConceptsAlone.getFields().size());
+        assertThat(Arrays.asList(multiSelectConceptName, conceptSetName),
+                containsInAnyOrder(formWithAddMoreAndMultiSelectConceptsAlone.getFields()
+                        .stream().map(Concept::getName).collect(Collectors.toList()).toArray()));
+
+
     }
 }

@@ -36,18 +36,21 @@ public class JobDefinitionReaderTest {
                 "    \"chunkSizeToRead\": \"1000\",\n" +
                 "    \"tableName\": \"MyProgram\"\n" +
                 "  },\n" +
-                "  {\n" +
-                "    \"name\": \"Obs Data\",\n" +
-                "    \"type\": \"obs\",\n" +
+                "{\n" +
+                "  \"name\": \"Obs Data\",\n" +
+                "  \"type\": \"obs\",\n" +
+                "  \"conceptReferenceSource\": \"MSF-INTERNAL\",\n" +
+                "  \"separateTableConfig\": {\n" +
+                "    \"enableForAddMoreAndMultiSelect\": false,\n" +
                 "    \"separateTables\": [\n" +
                 "      \"FSTG, Specialty determined by MLO\",\n" +
                 "      \"Stage\"\n" +
-                "    ],\n" +
-                "    \"conceptReferenceSource\": \"BAHMNI_INTERNAL\",\n" +
-                "    \"columnsToIgnore\": [\n" +
-                "      \"MH, Name of MLO\"\n" +
                 "    ]\n" +
-                "  }\n" +
+                "  },\n" +
+                "  \"columnsToIgnore\": [\n" +
+                "    \"MH, Name of MLO\"\n" +
+                "  ]\n" +
+                "}" +
                 "]}";
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(json);
 
@@ -73,7 +76,9 @@ public class JobDefinitionReaderTest {
         assertEquals("obs", obsJobDefinition.getType());
 
         List<String> expectedSeparateTables = Arrays.asList("FSTG, Specialty determined by MLO", "Stage");
-        List<String> actualSeparateTables = obsJobDefinition.getSeparateTables();
+        SeparateTableConfig separateTableConfig = obsJobDefinition.getSeparateTableConfig();
+        assertNotNull(separateTableConfig);
+        List<String> actualSeparateTables = separateTableConfig.getSeparateTables();
         assertEquals(2, actualSeparateTables.size());
         assertThat(expectedSeparateTables, containsInAnyOrder(actualSeparateTables.toArray()));
 

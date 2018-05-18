@@ -62,4 +62,28 @@ public class ConceptService {
     private List<Concept> getConcepts(String sql, MapSqlParameterSource parameters) {
         return jdbcTemplate.query(sql, parameters, new BeanPropertyRowMapper<>(Concept.class));
     }
+
+    /**
+     * Immediate parent concept of childConcept. If the rootConcept has more occurrences of
+     * childConcept(enclosed in a concept set) then it returns the parent which found first.
+     * It returns null if rootConcept doesn't have childConcept or rootConcept and childConcept concepts are same
+     * @param rootConcept root concept of the child concept
+     * @param childConcept concept for which immediate parent needs to be found
+     * @return @{@link Concept}, null
+     */
+    public Concept getImmediateParentOfChildFromRootConcept(Concept rootConcept, Concept childConcept) {
+        if (rootConcept == childConcept) {
+            return null;
+        }
+        List<Concept> childConcepts = getChildConcepts(rootConcept.getName());
+        for (Concept concept : childConcepts) {
+            if (concept.getName().equals(childConcept.getName()))
+                return rootConcept;
+            Concept immediateParentOfChildFromRoot = getImmediateParentOfChildFromRootConcept(concept, childConcept);
+            if (immediateParentOfChildFromRoot != null)
+                return immediateParentOfChildFromRoot;
+        }
+        return null;
+    }
+
 }

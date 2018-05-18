@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.SeparateTableConfig;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
 import org.junit.Before;
@@ -419,9 +420,13 @@ public class SeparateTableConfigHelperTest {
         when(conceptService.getConceptsByNames(separateTableNames))
                 .thenReturn(Arrays.asList(concept1, concept2, concept3, concept4));
 
-
+        List<String> defaultAddMoreAndMultiSelect = Arrays.asList("OR, Operation performed", "Video", "Test Concept");
         setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
-                Arrays.asList("OR, Operation performed", "Video", "Test Concept"));
+                defaultAddMoreAndMultiSelect);
+        SeparateTableConfig separateTableConfig = mock(SeparateTableConfig.class);
+        when(jobDefinition.getSeparateTableConfig()).thenReturn(separateTableConfig);
+        when(separateTableConfig.isEnableForAddMoreAndMultiSelect()).thenReturn(true);
+        when(separateTableConfig.getSeparateTables()).thenReturn(defaultAddMoreAndMultiSelect);
 
         HashSet<Concept> expectedSeparateTables = new HashSet<>();
         expectedSeparateTables.addAll(Arrays.asList(concept1, concept2, concept3, concept4));

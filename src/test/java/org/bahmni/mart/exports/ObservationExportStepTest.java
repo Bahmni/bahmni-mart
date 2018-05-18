@@ -1,7 +1,9 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.CommonTestHelper;
+import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.SeparateTableConfig;
+import org.bahmni.mart.form.BahmniFormFactory;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.ObjectFactory;
 
 import javax.sql.DataSource;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -48,24 +51,32 @@ public class ObservationExportStepTest {
     @Mock
     private ObjectFactory<DatabaseObsWriter> obsWriterObjectFactory;
 
+    @Mock
+    private JobDefinition jobDefinition;
+
+    @Mock
+    private BahmniFormFactory bahmniFormFactory;
+
     private ObservationExportStep observationExportStep = new ObservationExportStep();
 
     @Before
     public void setUp() throws Exception {
         PowerMockito.mockStatic(BatchUtils.class);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(observationExportStep,
                 "dataSource", dataSource);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep, "stepBuilderFactory", stepBuilderFactory);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep, "freeMarkerEvaluator", freeMarkerEvaluator);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(observationExportStep, "stepBuilderFactory", stepBuilderFactory);
+        setValuesForMemberFields(observationExportStep, "freeMarkerEvaluator", freeMarkerEvaluator);
+        setValuesForMemberFields(observationExportStep,
                 "observationProcessorFactory", observationProcessorFactory);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(observationExportStep,
                 "databaseObsWriterObjectFactory", obsWriterObjectFactory);
+        setValuesForMemberFields(observationExportStep, "jobDefinition", jobDefinition);
+        setValuesForMemberFields(observationExportStep, "bahmniFormFactory", bahmniFormFactory);
         BatchUtils.stepNumber = 0;
     }
 
     @Test
-    public void shouldSetTheForm() throws Exception {
+    public void shouldSetTheForm() {
         BahmniForm form = mock(BahmniForm.class);
         Concept formName = mock(Concept.class);
 
@@ -85,7 +96,7 @@ public class ObservationExportStepTest {
     }
 
     @Test
-    public void shouldGetTheBatchStepForBaseExport() throws Exception {
+    public void shouldGetTheBatchStepForBaseExportWhenSeparateTableConfigIsTrue() {
         StepBuilder stepBuilder = mock(StepBuilder.class);
         BahmniForm form = mock(BahmniForm.class);
         Concept formNameConcept = mock(Concept.class);
@@ -104,6 +115,44 @@ public class ObservationExportStepTest {
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
+        SeparateTableConfig separateTableConfig = mock(SeparateTableConfig.class);
+        when(jobDefinition.getSeparateTableConfig()).thenReturn(separateTableConfig);
+        when(separateTableConfig.isEnableForAddMoreAndMultiSelect()).thenReturn(true);
+
+        Step observationExportStepStep = observationExportStep.getStep();
+
+        assertNotNull(observationExportStepStep);
+        assertEquals(expectedBaseExportStep, observationExportStepStep);
+    }
+
+    @Test
+    public void shouldGetTheBatchStepForBaseExportWhenSeparateTableConfigIsFalse() throws Exception {
+        StepBuilder stepBuilder = mock(StepBuilder.class);
+        BahmniForm form = mock(BahmniForm.class);
+        Concept formNameConcept = mock(Concept.class);
+        String formName = "Form";
+        observationExportStep.setForm(form);
+        SimpleStepBuilder simpleStepBuilder = mock(SimpleStepBuilder.class);
+        TaskletStep expectedBaseExportStep = mock(TaskletStep.class);
+
+        when(form.getFormName()).thenReturn(formNameConcept);
+        when(formNameConcept.getName()).thenReturn(formName);
+        when(stepBuilderFactory.get("Step-1 " + formName)).thenReturn(stepBuilder);
+        when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
+        when(observationProcessorFactory.getObject()).thenReturn(new ObservationProcessor());
+        when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
+        when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
+        SeparateTableConfig separateTableConfig = mock(SeparateTableConfig.class);
+        when(jobDefinition.getSeparateTableConfig()).thenReturn(separateTableConfig);
+
+        when(separateTableConfig.isEnableForAddMoreAndMultiSelect()).thenReturn(false);
+
+        BahmniFormFactory bahmniFormFactory = mock(BahmniFormFactory.class);
+        setValuesForMemberFields(observationExportStep, "bahmniFormFactory", bahmniFormFactory);
+        when(bahmniFormFactory.getFormWithAddMoreAndMultiSelectConceptsAlone(form)).thenReturn(form);
 
         Step observationExportStepStep = observationExportStep.getStep();
 

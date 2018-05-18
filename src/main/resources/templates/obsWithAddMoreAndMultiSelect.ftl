@@ -1,5 +1,7 @@
 <@compress single_line=true>
+
     SELECT obs0.obs_id FROM obs obs0 WHERE obs0.concept_id = ${input.formName.id?c} AND obs0.voided = 0
+
     <#list input.fields as concept>
     UNION
     SELECT obs0.obs_id FROM obs obs0
