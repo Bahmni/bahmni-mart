@@ -68,7 +68,7 @@ public class SeparateTableConfigHelper extends AbstractConfigParserHelper {
     }
 
     private void setAddMoreConceptNames() {
-        for (Map.Entry<String, JsonElement> concept : getAllConceptSet()) {
+        for (Map.Entry<String, JsonElement> concept : getAllConcepts(implementationConfigFile, defaultConfigFile)) {
             JsonObject conceptConfig = concept.getValue().getAsJsonObject();
             if (getBoolean(conceptConfig.get(ALLOW_ADD_MORE_KEY))) {
                 defaultAddMoreConceptNames.add(concept.getKey());

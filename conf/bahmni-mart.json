@@ -409,7 +409,7 @@
       "type": "rsp",
       "columnsToIgnore": [],
       "separateTableConfig": {
-        "enableForAddMoreAndMultiSelect": false,
+        "enableForAddMoreAndMultiSelect": true,
         "separateTables": []
       }
     },
