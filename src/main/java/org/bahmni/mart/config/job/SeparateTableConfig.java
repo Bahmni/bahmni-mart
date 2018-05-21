@@ -4,11 +4,11 @@ import java.util.List;
 
 public class SeparateTableConfig {
 
-    private boolean enableForAddMoreAndMultiSelect;
+    private Boolean enableForAddMoreAndMultiSelect;
     private List<String> separateTables;
 
     public boolean isEnableForAddMoreAndMultiSelect() {
-        return enableForAddMoreAndMultiSelect;
+        return enableForAddMoreAndMultiSelect == null ? true : enableForAddMoreAndMultiSelect;
     }
 
     public List<String> getSeparateTables() {

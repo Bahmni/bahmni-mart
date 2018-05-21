@@ -67,10 +67,10 @@ public class ObservationExportStep {
 
     private String getReaderSql() {
         SeparateTableConfig separateTableConfig = jobDefinition.getSeparateTableConfig();
-        return separateTableConfig != null && separateTableConfig.isEnableForAddMoreAndMultiSelect() ?
-                freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form)
-                : freeMarkerEvaluator.evaluate("obsWithAddMoreAndMultiSelect.ftl", bahmniFormFactory
-                .getFormWithAddMoreAndMultiSelectConceptsAlone(form));
+        return separateTableConfig != null && !separateTableConfig.isEnableForAddMoreAndMultiSelect() ?
+                freeMarkerEvaluator.evaluate("obsWithAddMoreAndMultiSelect.ftl", bahmniFormFactory
+                        .getFormWithAddMoreAndMultiSelectConceptsAlone(form))
+                : freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form);
     }
 
     private ObservationProcessor observationProcessor() {
