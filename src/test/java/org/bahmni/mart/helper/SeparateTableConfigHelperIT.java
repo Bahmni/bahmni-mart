@@ -39,9 +39,9 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
     @Test
     public void shouldReturnListOfMultiSelectAndAddMore() {
         List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
-        assertEquals(4, conceptNames.size());
+        assertEquals(5, conceptNames.size());
         List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed", "Video",
-                "MH, Name of MLO");
+                "MH, Name of MLO", "Specimen Sample Source");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
     }
 
@@ -59,8 +59,8 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
                 "src/test/resources/conf/defaultApp.json");
 
         List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
-        assertEquals(2, conceptNames.size());
-        List<String> expected = Arrays.asList("OR, Operation performed", "Video");
+        assertEquals(3, conceptNames.size());
+        List<String> expected = Arrays.asList("OR, Operation performed", "Video", "Specimen Sample Source");
         assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
     }
 

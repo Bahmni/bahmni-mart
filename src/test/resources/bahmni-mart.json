@@ -79,7 +79,12 @@
       "type": "bacteriology",
       "columnsToIgnore": [
         "Specimen Collection Date"
-      ]
+      ],
+      "separateTableConfig": {
+        "enableForAddMoreAndMultiSelect": false,
+        "separateTables": [
+        ]
+      }
     },
     {
       "name": "Diagnoses Data",
