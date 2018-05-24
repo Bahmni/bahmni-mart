@@ -105,7 +105,7 @@ public class SeparateTableConfigHelper extends AbstractConfigParserHelper {
         HashSet<Concept> separateTableConcepts = new HashSet<>();
         List<String> separateTableConceptNames = getSeparateTableNamesForJob(jobDefinition);
         SeparateTableConfig separateTableConfig = jobDefinition.getSeparateTableConfig();
-        if (separateTableConfig != null && separateTableConfig.isEnableForAddMoreAndMultiSelect())
+        if (separateTableConfig == null || separateTableConfig.isEnableForAddMoreAndMultiSelect())
             separateTableConceptNames.addAll(defaultAddMoreAndMultiSelectConceptsNames);
         if (!separateTableConceptNames.isEmpty()) {
             separateTableConcepts.addAll(conceptService.getConceptsByNames(separateTableConceptNames));
