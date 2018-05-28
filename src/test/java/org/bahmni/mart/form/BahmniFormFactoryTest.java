@@ -1,6 +1,7 @@
 package org.bahmni.mart.form;
 
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.SeparateTableConfig;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
@@ -48,6 +49,9 @@ public class BahmniFormFactoryTest {
     @Mock
     private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
 
+    @Mock
+    private SeparateTableConfig separateTableConfig;
+
     private List<String> separateTableNames;
     private List<String> ignoreConceptsNames;
 
@@ -83,6 +87,7 @@ public class BahmniFormFactoryTest {
         setValuesForMemberFields(bahmniFormFactory, "separateTableConfigHelper", separateTableConfigHelper);
         setValuesForMemberFields(bahmniFormFactory, "ignoreColumnsConfigHelper", ignoreColumnsConfigHelper);
         when(getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(ignoreConceptsNames);
+        when(jobDefinition.getSeparateTableConfig()).thenReturn(separateTableConfig);
         when(getSeparateTableNamesForJob(jobDefinition)).thenReturn(separateTableNames);
 
         when(separateTableConfigHelper.getSeparateTableConceptsForJob(jobDefinition))

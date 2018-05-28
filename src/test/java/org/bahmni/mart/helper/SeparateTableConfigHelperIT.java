@@ -83,7 +83,6 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
             throws NoSuchFieldException, IllegalAccessException {
 
         JobDefinition jobDefinition = new JobDefinition();
-        jobDefinition.setSeparateTables(Arrays.asList());
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
                 Arrays.asList());

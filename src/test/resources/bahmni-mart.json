@@ -61,10 +61,12 @@
     {
       "name": "Obs Data",
       "type": "obs",
+      "separateTableConfig": {
+        "enableForAddMoreAndMultiSelect": true,
       "separateTables": [
         "FSTG, Medical Files", "FSTG, Specialty determined by MLO",
         "Stage"
-      ],
+      ]},
       "conceptReferenceSource": "",
       "columnsToIgnore": [
         "MH, Name of MLO"

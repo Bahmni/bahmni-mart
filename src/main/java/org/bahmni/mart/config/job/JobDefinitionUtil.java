@@ -25,7 +25,9 @@ public class JobDefinitionUtil {
     }
 
     public static List<String> getSeparateTableNamesForJob(JobDefinition jobDefinition) {
-        return getDefaultIfNotPresent(jobDefinition.getSeparateTables());
+        SeparateTableConfig separateTableConfig = jobDefinition.getSeparateTableConfig();
+        return getDefaultIfNotPresent(separateTableConfig != null ?
+                    separateTableConfig.getSeparateTables() : new ArrayList<>());
     }
 
     private static List<String> getDefaultIfNotPresent(List<String> names) {

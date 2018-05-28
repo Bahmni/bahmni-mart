@@ -376,11 +376,14 @@
     {
       "name": "Obs Data",
       "type": "obs",
-      "separateTables": [
-        "PA, Location of Assessment",
-        "SMH, Pain Assessment",
-        "FV, Outcomes FV"
-      ],
+     "separateTableConfig": {
+       "enableForAddMoreAndMultiSelect": true,
+       "separateTables": [
+         "PA, Location of Assessment",
+         "SMH, Pain Assessment",
+         "FV, Outcomes FV"
+       ]
+     },
       "conceptReferenceSource": "MSF-INTERNAL",
       "ignoreAllFreeTextConcepts": true,
       "columnsToIgnore": [
@@ -405,7 +408,10 @@
       "name": "Registration Second Page",
       "type": "rsp",
       "columnsToIgnore": [],
-      "separateTables": []
+      "separateTableConfig": {
+        "enableForAddMoreAndMultiSelect": true,
+        "separateTables": []
+      }
     },
     {
       "name": "Diagnoses Data",
