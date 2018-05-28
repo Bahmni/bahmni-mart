@@ -21,9 +21,6 @@
         "codedConceptName": "OR, Operation performed coded",
         "nonCodedConceptName": "OR, Operation performed non coded",
         "allowAddMore": true
-      },
-      "Specimen Sample Source": {
-        "multiSelect": true
       }
     }
   }
