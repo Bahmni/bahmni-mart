@@ -56,7 +56,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Obs> process(Map<String, Object> obsRow) {
+    public List<Obs> process(Map<String, Object> obsRow) throws Exception {
         List<Integer> allChildObsIds = new ArrayList<>();
 
         if (form.getFormName().getIsSet() == 1) {
