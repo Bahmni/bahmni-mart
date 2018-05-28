@@ -1,6 +1,8 @@
 <@compress single_line=true>
 
-    SELECT obs0.obs_id FROM obs obs0 WHERE obs0.concept_id =${input.formName.id?c} AND obs0.voided = 0
+    SELECT obs_id FROM obs
+    INNER JOIN concept c on c.concept_id = obs.concept_id
+    WHERE obs.concept_id = ${input.formName.id?c} AND obs.voided = 0 and c.is_set = 0
 
     <#list input.fields as concept>
     UNION

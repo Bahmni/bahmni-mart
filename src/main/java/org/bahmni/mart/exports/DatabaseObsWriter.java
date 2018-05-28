@@ -37,7 +37,7 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
 
 
     @Override
-    public void write(List<? extends List<Obs>> items) {
+    public void write(List<? extends List<Obs>> items) throws Exception {
         insertRecords(items);
     }
 
