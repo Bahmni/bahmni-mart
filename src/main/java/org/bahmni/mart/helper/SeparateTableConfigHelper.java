@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.SeparateTableConfig;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
 import org.slf4j.Logger;
@@ -43,12 +42,9 @@ public class SeparateTableConfigHelper extends AbstractConfigParserHelper {
 
     private List<String> defaultAddMoreAndMultiSelectConceptsNames;
 
-    private List<String> defaultAddMoreConceptNames = new ArrayList<>();
-
     @PostConstruct
     private void separateTableConfigHelperPostConstruct() {
         defaultAddMoreAndMultiSelectConceptsNames = getAddMoreAndMultiSelectConceptNames();
-        setAddMoreConceptNames();
     }
 
     public List<String> getAddMoreAndMultiSelectConceptNames() {
@@ -63,25 +59,8 @@ public class SeparateTableConfigHelper extends AbstractConfigParserHelper {
         return multiSelectAndAddMore;
     }
 
-    public boolean isAddMore(String conceptName) {
-        return defaultAddMoreConceptNames.contains(conceptName);
-    }
-
-    private void setAddMoreConceptNames() {
-        for (Map.Entry<String, JsonElement> concept : getAllConceptSet()) {
-            JsonObject conceptConfig = concept.getValue().getAsJsonObject();
-            if (getBoolean(conceptConfig.get(ALLOW_ADD_MORE_KEY))) {
-                defaultAddMoreConceptNames.add(concept.getKey());
-            }
-        }
-    }
-
     private boolean isAddMoreOrMultiSelect(JsonElement allowAddMore, JsonElement multiSelect) {
         return getBoolean(allowAddMore) || getBoolean(multiSelect);
-    }
-
-    public boolean isAddMoreOrMultiSelect(Concept concept) {
-        return defaultAddMoreAndMultiSelectConceptsNames.contains(concept.getName());
     }
 
     private boolean getBoolean(JsonElement value) {
@@ -104,9 +83,7 @@ public class SeparateTableConfigHelper extends AbstractConfigParserHelper {
     public HashSet<Concept> getSeparateTableConceptsForJob(JobDefinition jobDefinition) {
         HashSet<Concept> separateTableConcepts = new HashSet<>();
         List<String> separateTableConceptNames = getSeparateTableNamesForJob(jobDefinition);
-        SeparateTableConfig separateTableConfig = jobDefinition.getSeparateTableConfig();
-        if (separateTableConfig != null && separateTableConfig.isEnableForAddMoreAndMultiSelect())
-            separateTableConceptNames.addAll(defaultAddMoreAndMultiSelectConceptsNames);
+        separateTableConceptNames.addAll(defaultAddMoreAndMultiSelectConceptsNames);
         if (!separateTableConceptNames.isEmpty()) {
             separateTableConcepts.addAll(conceptService.getConceptsByNames(separateTableConceptNames));
         }

@@ -1,8 +1,6 @@
 package org.bahmni.mart.form.service;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.form.domain.Concept;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,17 +11,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -95,60 +89,5 @@ public class ConceptServiceTest {
         verify(namedParameterJdbcTemplate, times(1))
                 .query(eq("freeTextConceptSql"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
 
-    }
-
-    @Test
-    public void shouldReturnNullAsImmediateParentIfParentAndChildConceptsAreSame() {
-        Concept rootConcept = mock(Concept.class);
-
-        Concept immediateParentOfChildFromRootConcept = conceptService
-                .getImmediateParentOfChildFromRootConcept(rootConcept, rootConcept);
-
-        assertNull(immediateParentOfChildFromRootConcept);
-
-    }
-
-    @Test
-    public void shouldReturnRootConceptIfItIsImmediateParentOfChildConcept() {
-
-        Concept rootConcept = mock(Concept.class);
-        when(rootConcept.getName()).thenReturn("root concept name");
-
-        Concept childConcept = mock(Concept.class);
-        when(childConcept.getName()).thenReturn("child concept name");
-
-        when(namedParameterJdbcTemplate.query(anyString(), any(SqlParameterSource.class),
-                any(BeanPropertyRowMapper.class))).thenReturn(Arrays.asList(childConcept));
-
-        Concept immediateParentOfChildFromRootConcept = conceptService
-                .getImmediateParentOfChildFromRootConcept(rootConcept, childConcept);
-
-        Assert.assertEquals(rootConcept, immediateParentOfChildFromRootConcept);
-    }
-
-    @Test
-    public void shouldReturnParentConceptIfItIsImmediateParentOfChildConcept() {
-
-        Concept rootConcept = mock(Concept.class);
-        when(rootConcept.getName()).thenReturn("root concept name");
-
-        Concept parentConcept = mock(Concept.class);
-        when(parentConcept.getName()).thenReturn("parent concept name");
-
-        Concept childConcept = mock(Concept.class);
-        when(childConcept.getName()).thenReturn("child concept name");
-
-        Concept targetChildConcept = mock(Concept.class);
-        when(targetChildConcept.getName()).thenReturn("target child concept name");
-
-        when(namedParameterJdbcTemplate.query(anyString(), any(SqlParameterSource.class),
-                any(BeanPropertyRowMapper.class))).thenReturn(Arrays.asList(parentConcept))
-                .thenReturn(Arrays.asList(childConcept, targetChildConcept))
-                .thenReturn(Collections.EMPTY_LIST);
-
-        Concept immediateParentOfChildFromRootConcept = conceptService
-                .getImmediateParentOfChildFromRootConcept(rootConcept, childConcept);
-
-        Assert.assertEquals(parentConcept, immediateParentOfChildFromRootConcept);
     }
 }

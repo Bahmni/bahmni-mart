@@ -173,35 +173,26 @@ public class JobDefinitionUtilTest {
     @Test
     public void shouldReturnSeparateTableList() {
         JobDefinition jobDefinition = mock(JobDefinition.class);
-        List<String> separateTables = Arrays.asList("table1", "table2");
-
-        SeparateTableConfig separateTableConfig = mock(SeparateTableConfig.class);
-        when(jobDefinition.getSeparateTableConfig()).thenReturn(separateTableConfig);
-        when(separateTableConfig.getSeparateTables()).thenReturn(separateTables);
+        List<String> seperateTables = Arrays.asList("table1", "table2");
+        when(jobDefinition.getSeparateTables()).thenReturn(seperateTables);
 
         List<String> expected = getSeparateTableNamesForJob(jobDefinition);
 
         assertNotNull(expected);
         assertEquals(2, expected.size());
-        assertEquals(separateTables.get(0), expected.get(0));
-        assertEquals(separateTables.get(1), expected.get(1));
-
-        verify(jobDefinition, times(1)).getSeparateTableConfig();
-        verify(separateTableConfig, times(1)).getSeparateTables();
+        assertEquals(seperateTables.get(0), expected.get(0));
+        assertEquals(seperateTables.get(1), expected.get(1));
     }
 
     @Test
     public void shouldGiveEmptyListAsSeparateTableNamesForAJobIfConfigIsNotPresent() {
         when(jobDefinition2.getType()).thenReturn("obs");
-        SeparateTableConfig separateTableConfig = mock(SeparateTableConfig.class);
-        when(jobDefinition2.getSeparateTableConfig()).thenReturn(separateTableConfig);
-        when(separateTableConfig.getSeparateTables()).thenReturn(null);
+        when(jobDefinition2.getSeparateTables()).thenReturn(null);
 
         List<String> separateTableNames = getSeparateTableNamesForJob(jobDefinition2);
 
         assertTrue(separateTableNames.isEmpty());
-        verify(jobDefinition2, times(1)).getSeparateTableConfig();
-        verify(separateTableConfig, times(1)).getSeparateTables();
+        verify(jobDefinition2, times(1)).getSeparateTables();
     }
 
 }

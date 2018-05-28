@@ -1,8 +1,6 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.SeparateTableConfig;
-import org.bahmni.mart.form.BahmniFormFactory;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
@@ -43,9 +41,6 @@ public class ObservationExportStep {
     @Autowired
     private ObjectFactory<DatabaseObsWriter> databaseObsWriterObjectFactory;
 
-    @Autowired
-    private BahmniFormFactory bahmniFormFactory;
-
     private JobDefinition jobDefinition;
 
     public Step getStep() {
@@ -58,19 +53,12 @@ public class ObservationExportStep {
     }
 
     private JdbcCursorItemReader<Map<String, Object>> obsReader() {
+        String sql = freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form);
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
-        reader.setSql(getReaderSql());
+        reader.setSql(sql);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
-    }
-
-    private String getReaderSql() {
-        SeparateTableConfig separateTableConfig = jobDefinition.getSeparateTableConfig();
-        return separateTableConfig != null && separateTableConfig.isEnableForAddMoreAndMultiSelect() ?
-                freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form)
-                : freeMarkerEvaluator.evaluate("obsWithAddMoreAndMultiSelect.ftl", bahmniFormFactory
-                .getFormWithAddMoreAndMultiSelectConceptsAlone(form));
     }
 
     private ObservationProcessor observationProcessor() {
