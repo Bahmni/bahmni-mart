@@ -27,7 +27,7 @@ public class JobDefinitionUtil {
     public static List<String> getSeparateTableNamesForJob(JobDefinition jobDefinition) {
         SeparateTableConfig separateTableConfig = jobDefinition.getSeparateTableConfig();
         return getDefaultIfNotPresent(separateTableConfig != null ?
-                    separateTableConfig.getSeparateTables() : new ArrayList<>());
+                separateTableConfig.getSeparateTables() : new ArrayList<>());
     }
 
     private static List<String> getDefaultIfNotPresent(List<String> names) {
@@ -46,5 +46,18 @@ public class JobDefinitionUtil {
         }
         Resource readerSqlResource = SQLFileLoader.loadResource(jobDefinition.getSourceFilePath());
         return BatchUtils.convertResourceOutputToString(readerSqlResource);
+    }
+
+    public static boolean isAddMoreMultiSelectEnabled(JobDefinition jobDefinition) {
+        if (jobDefinition == null) {
+            return true;
+        }
+        SeparateTableConfig separateTableConfig = jobDefinition.getSeparateTableConfig();
+        return separateTableConfig == null || isAddMoreMultiSelectEnabled(separateTableConfig);
+    }
+
+    private static boolean isAddMoreMultiSelectEnabled(SeparateTableConfig separateTableConfig) {
+        Boolean enableForAddMoreAndMultiSelect = separateTableConfig.getEnableForAddMoreAndMultiSelect();
+        return enableForAddMoreAndMultiSelect == null ? true : enableForAddMoreAndMultiSelect;
     }
 }

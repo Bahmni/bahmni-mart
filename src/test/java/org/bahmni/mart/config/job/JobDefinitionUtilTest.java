@@ -21,6 +21,7 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByTyp
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForJob;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -204,4 +205,49 @@ public class JobDefinitionUtilTest {
         verify(separateTableConfig, times(1)).getSeparateTables();
     }
 
+    @Test
+    public void shouldReturnTrueWhenJobDefinitionIsNull() {
+
+        when(jobDefinition1.getSeparateTableConfig()).thenReturn(null);
+
+        assertTrue(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition1));
+    }
+
+    @Test
+    public void shouldReturnTrueWhenSeparateTableConfigIsNull() {
+
+        when(jobDefinition1.getSeparateTableConfig()).thenReturn(null);
+
+        assertTrue(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition1));
+    }
+
+    @Test
+    public void shouldReturnTrueWhenAddMoreAndMultiSelectFlagIsNull() {
+
+        SeparateTableConfig separateTableConfig = mock(SeparateTableConfig.class);
+        when(jobDefinition1.getSeparateTableConfig()).thenReturn(separateTableConfig);
+        when(separateTableConfig.getEnableForAddMoreAndMultiSelect()).thenReturn(null);
+
+        assertTrue(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition1));
+    }
+
+    @Test
+    public void shouldReturnTrueWhenAddMoreAndMultiSelectFlagIsTrue() {
+
+        SeparateTableConfig separateTableConfig = mock(SeparateTableConfig.class);
+        when(jobDefinition1.getSeparateTableConfig()).thenReturn(separateTableConfig);
+        when(separateTableConfig.getEnableForAddMoreAndMultiSelect()).thenReturn(true);
+
+        assertTrue(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition1));
+    }
+
+    @Test
+    public void shouldReturnFalseWhenAddMoreAndMultiSelectFlagIsFalse() {
+
+        SeparateTableConfig separateTableConfig = mock(SeparateTableConfig.class);
+        when(jobDefinition1.getSeparateTableConfig()).thenReturn(separateTableConfig);
+        when(separateTableConfig.getEnableForAddMoreAndMultiSelect()).thenReturn(false);
+
+        assertFalse(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition1));
+    }
 }
