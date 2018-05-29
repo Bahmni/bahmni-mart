@@ -19,6 +19,7 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -81,7 +82,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyRecords(patientList);
         verifyViews();
         verifyDiagnoses();
-        verifyNoSeparateTableForSpecimenSampleSource(tableNames);
+        verifyBacteriologyData(tableNames);
     }
 
     @Test
@@ -468,6 +469,39 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
             for (String columnName : expectedRow.keySet())
                 assertEquals(expectedRow.get(columnName), actualRow.get(columnName));
         }
+    }
+
+    private void verifyBacteriologyData(List<String> tableNames) {
+
+        verifyNoSeparateTableForSpecimenSampleSource(tableNames);
+
+        List<Map<String, Object>> bacteriologyRows = martJdbcTemplate
+                .queryForList("select * from bacteriology_concept_set");
+
+        assertEquals(2, bacteriologyRows.size());
+
+        Map<String, Object> firstRow = bacteriologyRows.get(0);
+        Map<String, Object> secondRow = bacteriologyRows.get(1);
+
+        assertEquals(10, firstRow.size());
+        assertEquals(10, secondRow.size());
+
+        assertEquals(1, firstRow.get("specimen_sample_source"));
+        assertEquals(2, secondRow.get("specimen_sample_source"));
+
+        bacteriologyRows.forEach(row -> {
+
+            assertEquals(2820, row.get("id_bacteriology_concept_set"));
+            assertEquals(124, row.get("patient_id"));
+            assertEquals(22, row.get("encounter_id"));
+            assertEquals("2015-01-22 00:00:00.0", row.get("obs_datetime"));
+            assertEquals(8, row.get("location_id"));
+            assertNull(row.get("location_name"));
+            assertEquals(1, row.get("program_id"));
+            assertEquals("Program Name", row.get("program_name"));
+            assertNull(row.get("specimen_id"));
+
+        });
     }
 
     /**

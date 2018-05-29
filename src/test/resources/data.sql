@@ -254,6 +254,34 @@ INSERT INTO episode_patient_program (episode_id, patient_program_id) VALUES (1, 
 INSERT INTO patient_program (patient_program_id,patient_id, program_id, date_enrolled, date_completed, location_id, outcome_concept_id, creator, date_created, changed_by, date_changed, voided, voided_by, date_voided, void_reason, uuid) VALUES (1, 124, 1, '2015-01-22 00:00:00', null, null, null, 22, '2016-11-09 15:28:30', null, null, 0, null, null, null, 'd0ec40b7-8348-40ed-8284-fd58686c27ef');
 INSERT INTO program (program_id, concept_id, outcomes_concept_id, creator, date_created, changed_by, date_changed, retired, name, description, uuid) VALUES (1, 236, 623, 8, '2016-08-11 12:28:52', 8, '2016-10-03 05:39:49', 0, 'Program Name', 'Program for Patient', '029262f3-b618-4c1e-80c2-d4ecadd38fb2');
 
+-- Start of test data for bacteriology job
 
+-- Adding two obs for multi-select concept 'Specimen Sample Source' (in defaultApp.json)
+INSERT INTO obs (obs_id, person_id, concept_id, encounter_id, order_id, obs_datetime, location_id, obs_group_id,
+accession_number, value_group_id, value_coded, value_coded_name_id, value_drug, value_datetime, value_numeric,
+value_modifier, value_text, value_complex, comments, creator, date_created, voided, voided_by, date_voided, void_reason,
+uuid, previous_version, form_namespace_and_path, status, interpretation)
+VALUES (2820,124, 134, 22, null, '2015-01-22 00:00:00', 8, null,
+null, null, null, null, null, null, null,
+null, null, null, null, 22, '2016-11-09 15:40:12', 0, null, null, null,
+'5f391d5d-d31a-485e-b90e-811aiddfb820', null, null, 'FINAL', null);
 
+INSERT INTO obs (obs_id, person_id, concept_id, encounter_id, order_id, obs_datetime, location_id, obs_group_id,
+accession_number, value_group_id, value_coded, value_coded_name_id, value_drug, value_datetime, value_numeric,
+value_modifier, value_text, value_complex, comments, creator, date_created,
+voided, voided_by, date_voided, void_reason, uuid, previous_version, form_namespace_and_path, status, interpretation)
+VALUES (2821,124, 136, 22, null, '2015-01-22 00:00:00', 8, 2820,
+null, null, null, null, null, null, 1,
+null, null, null, null, 22, '2016-11-09 15:40:12',
+0, null, null, null, '5f391d5d-d31a-485e-b90e-811aiddfb820', null, null, 'FINAL', null);
+
+INSERT INTO obs (obs_id, person_id, concept_id, encounter_id, order_id, obs_datetime, location_id, obs_group_id,
+accession_number, value_group_id, value_coded, value_coded_name_id, value_drug, value_datetime, value_numeric, value_modifier, value_text, value_complex, comments, creator, date_created,
+voided, voided_by, date_voided, void_reason, uuid, previous_version, form_namespace_and_path, status, interpretation)
+VALUES (2822,124, 136, 22, null, '2015-01-22 00:00:00', 8, 2820,
+null, null, null, null, null, null, 2,
+null, null, null, null, 22, '2016-11-09 15:40:12',
+0, null, null, null, '5f391d5d-d31a-485e-b90e-811aiddfb820', null, null, 'FINAL', null);
+
+--End of test data for bacteriology job
 
