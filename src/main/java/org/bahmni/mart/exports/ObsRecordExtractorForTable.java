@@ -18,6 +18,8 @@ public class ObsRecordExtractorForTable {
 
     private String tableName;
 
+    private boolean isAddMoreMultiSelectEnabledForSeparateTable = true;
+
     private List<Map<String, String>> recordList = new ArrayList<>();
 
     public ObsRecordExtractorForTable(String tableName) {
@@ -42,12 +44,26 @@ public class ObsRecordExtractorForTable {
         record.forEach(obs -> tableData.getColumns().forEach(tableColumn -> {
             String tableColumnName = tableColumn.getName();
             String actualColumnName = SpecialCharacterResolver.getActualColumnName(tableData, tableColumn);
-            if (getProcessedName(obs.getField().getName()).equals(actualColumnName)) {
+            if (getProcessedName(obs.getField().getName()).equals(actualColumnName) &&
+                    isNull(recordMap, tableColumnName)) {
                 replace(recordMap, tableColumnName, obs.getValue(), tableColumn.getType());
             } else if (tableColumnName.contains("id_") && isNull(recordMap, tableColumnName)) {
-                mapConstraints(recordMap, obs, tableColumn, actualColumnName);
+                if (isAddMoreMultiSelectEnabledForSeparateTable) {
+                    mapConstraints(recordMap, obs, tableColumn, actualColumnName);
+                } else {
+                    mapObsIdAndParentObsIds(recordMap, obs, tableColumn, actualColumnName);
+                }
             }
         }));
+    }
+
+    private void mapObsIdAndParentObsIds(Map<String, String> recordMap, Obs obs, TableColumn tableColumn,
+                                         String actualColumnName) {
+        if (obs.getParentName() != null && isConstraintName(obs.getParentName(), actualColumnName)) {
+            replace(recordMap, tableColumn.getName(), obs.getParentId().toString(), tableColumn.getType());
+        } else if (isConstraintName(tableName, tableColumn.getName())) {
+            replace(recordMap, tableColumn.getName(), obs.getId().toString(), tableColumn.getType());
+        }
     }
 
     private boolean isNull(Map<String, String> recordMap, String tableColumnName) {
@@ -56,7 +72,7 @@ public class ObsRecordExtractorForTable {
 
     private void mapConstraints(Map<String, String> recordMap, Obs obs,
                                 TableColumn tableColumn, String actualColumnName) {
-        if (isForeignKey(obs,tableColumn, actualColumnName)) {
+        if (isForeignKey(obs, tableColumn, actualColumnName)) {
             replace(recordMap, tableColumn.getName(), obs.getParentId().toString(), tableColumn.getType());
         } else if (tableColumn.getReference() == null && isConstraintName(tableName, tableColumn.getName())) {
             replace(recordMap, tableColumn.getName(), obs.getId().toString(), tableColumn.getType());
@@ -111,6 +127,10 @@ public class ObsRecordExtractorForTable {
         return recordList;
     }
 
+    public void setRecordList(List<Map<String, String>> recordList) {
+        this.recordList = recordList;
+    }
+
     public String getTableName() {
         return tableName;
     }
@@ -119,9 +139,7 @@ public class ObsRecordExtractorForTable {
         this.tableName = tableName;
     }
 
-    public void setRecordList(List<Map<String, String>> recordList) {
-        this.recordList = recordList;
+    public void setAddMoreMultiSelectEnabledForSeparateTables(boolean addMoreMultiSelectEnabled) {
+        isAddMoreMultiSelectEnabledForSeparateTable = addMoreMultiSelectEnabled;
     }
-
-
 }

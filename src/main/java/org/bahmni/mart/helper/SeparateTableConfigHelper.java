@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
 import org.slf4j.Logger;
@@ -81,9 +82,12 @@ public class SeparateTableConfigHelper extends AbstractConfigParserHelper {
     }
 
     public HashSet<Concept> getSeparateTableConceptsForJob(JobDefinition jobDefinition) {
+
         HashSet<Concept> separateTableConcepts = new HashSet<>();
         List<String> separateTableConceptNames = getSeparateTableNamesForJob(jobDefinition);
-        separateTableConceptNames.addAll(defaultAddMoreAndMultiSelectConceptsNames);
+
+        if (JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition))
+            separateTableConceptNames.addAll(defaultAddMoreAndMultiSelectConceptsNames);
         if (!separateTableConceptNames.isEmpty()) {
             separateTableConcepts.addAll(conceptService.getConceptsByNames(separateTableConceptNames));
         }

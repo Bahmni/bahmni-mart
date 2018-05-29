@@ -15,7 +15,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -39,7 +41,7 @@ public class ObsRecordExtractorForTableTest {
     }
 
     @Test
-    public void shouldDoNothingGivenEmptyObsListAndEmptyTableData() throws Exception {
+    public void shouldDoNothingGivenEmptyObsListAndEmptyTableData() {
         TableData tableData = new TableData();
         List<Obs> obsList = new ArrayList<>();
         obsRecordExtractorForTable.execute(Arrays.asList(obsList), tableData);
@@ -48,7 +50,7 @@ public class ObsRecordExtractorForTableTest {
     }
 
     @Test
-    public void shouldGiveRecordsGivenTableDataAndObsData() throws Exception {
+    public void shouldGiveRecordsGivenTableDataAndObsData() {
         TableData tableData = new TableData();
         tableData.setName("tableName");
         TableColumn column1 = new TableColumn("first", "integer", true, null);
@@ -77,7 +79,7 @@ public class ObsRecordExtractorForTableTest {
     }
 
     @Test
-    public void shouldGiveRecordsGivenTableDataWithPrimaryAndForeignKeys() throws Exception {
+    public void shouldGiveRecordsGivenTableDataWithPrimaryAndForeignKeys() {
         TableData tableData = new TableData();
         tableData.setName("tableName");
         TableColumn column1 = new TableColumn("id_tablename", "integer", true, null);
@@ -107,7 +109,80 @@ public class ObsRecordExtractorForTableTest {
     }
 
     @Test
-    public void shouldGiveRecordsGivenTableDataWithMultipleForeignKeys() throws Exception {
+    public void shouldGiveRecordsWithParentIdOfObsForGivenTableDataWithNoPrimaryKey() {
+
+        String primaryKeyColumnName = "id_tablename";
+
+        TableData tableData = new TableData();
+        tableData.setName("tableName");
+        TableColumn primaryKeyColumn = new TableColumn(primaryKeyColumnName, "integer", false, null);
+        tableData.setColumns(Collections.singletonList(primaryKeyColumn));
+
+        Obs obs1 = new Obs();
+        obs1.setField(new Concept(000, "some concept", 0));
+        obs1.setId(111);
+
+        Obs obs2 = new Obs();
+        obs2.setField(new Concept(002, "any concept", 0));
+        obs2.setId(123);
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, primaryKeyColumn))
+                .thenReturn(primaryKeyColumnName);
+
+        obsRecordExtractorForTable.setAddMoreMultiSelectEnabledForSeparateTables(false);
+        obsRecordExtractorForTable.execute(Arrays.asList(Collections.singletonList(obs1),
+                Collections.singletonList(obs2)), tableData);
+
+        List<Map<String, String>> recordList = obsRecordExtractorForTable.getRecordList();
+
+        assertTrue(recordList.get(0).keySet().contains(primaryKeyColumnName));
+        assertTrue(recordList.get(1).keySet().contains(primaryKeyColumnName));
+        assertEquals("111", recordList.get(0).get(primaryKeyColumnName));
+        assertEquals("123", recordList.get(1).get(primaryKeyColumnName));
+    }
+
+    @Test
+    public void shouldGiveRecordsWithParentIdOfObsForGivenTableDataWithNoForeignKey() {
+
+        TableData tableData = new TableData();
+        tableData.setName("tableName");
+        String foreignKeyColumnName = "id_another_tablename";
+        TableColumn foreignKey = new TableColumn(foreignKeyColumnName, "integer", false, null);
+        tableData.setColumns(Collections.singletonList(foreignKey));
+
+        int parentId = 1000;
+
+        Obs obs1 = new Obs();
+        obs1.setField(new Concept(000, "tablename", 0));
+        obs1.setId(111);
+        obs1.setParentId(parentId);
+        obs1.setParentName("another_tablename");
+
+        Obs obs2 = new Obs();
+        obs2.setField(new Concept(002, "tablename", 0));
+        obs2.setId(222);
+        obs2.setParentId(parentId);
+        obs2.setParentName("another_tablename");
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, foreignKey)).thenReturn(foreignKeyColumnName);
+
+        obsRecordExtractorForTable.setAddMoreMultiSelectEnabledForSeparateTables(false);
+        obsRecordExtractorForTable.execute(Arrays.asList(Collections.singletonList(obs1),
+                Collections.singletonList(obs2)), tableData);
+
+        List<Map<String, String>> recordList = obsRecordExtractorForTable.getRecordList();
+
+        assertNotNull(recordList);
+        assertThat(recordList.size(), is(2));
+        recordList.forEach(record -> {
+            assertTrue(record.keySet().contains(foreignKeyColumnName));
+            assertEquals(parentId, (Integer.parseInt(record.get(foreignKeyColumnName))));
+        });
+
+    }
+
+    @Test
+    public void shouldGiveRecordsGivenTableDataWithMultipleForeignKeys() {
         TableData tableData = new TableData();
         tableData.setName("tableName");
         TableColumn column1 = new TableColumn("id_first", "integer", true,
@@ -176,7 +251,7 @@ public class ObsRecordExtractorForTableTest {
     }
 
     @Test
-    public void shouldGiveRecordsGivenTableDataWithEncounterId() throws Exception {
+    public void shouldGiveRecordsGivenTableDataWithEncounterId() {
         TableData tableData = new TableData();
         tableData.setName("tableName");
         TableColumn column = new TableColumn("encounter_id", "integer", true, null);
@@ -196,7 +271,7 @@ public class ObsRecordExtractorForTableTest {
     }
 
     @Test
-    public void shouldGiveRecordsGivenTableDataWithPatientId() throws Exception {
+    public void shouldGiveRecordsGivenTableDataWithPatientId() {
         TableData tableData = new TableData();
         tableData.setName("tableName");
         TableColumn column = new TableColumn("patient_id", "integer", true, null);

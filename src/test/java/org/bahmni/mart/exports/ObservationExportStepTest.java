@@ -2,6 +2,8 @@ package org.bahmni.mart.exports;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.CommonTestHelper;
+import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
@@ -29,7 +31,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-@PrepareForTest(BatchUtils.class)
+@PrepareForTest({BatchUtils.class, JobDefinitionUtil.class})
 @RunWith(PowerMockRunner.class)
 public class ObservationExportStepTest {
 
@@ -65,7 +67,7 @@ public class ObservationExportStepTest {
     }
 
     @Test
-    public void shouldSetTheForm() throws Exception {
+    public void shouldSetTheForm() {
         BahmniForm form = mock(BahmniForm.class);
         Concept formName = mock(Concept.class);
 
@@ -85,7 +87,7 @@ public class ObservationExportStepTest {
     }
 
     @Test
-    public void shouldGetTheBatchStepForBaseExport() throws Exception {
+    public void shouldGetTheBatchStepForBaseExport() {
         StepBuilder stepBuilder = mock(StepBuilder.class);
         BahmniForm form = mock(BahmniForm.class);
         Concept formNameConcept = mock(Concept.class);
@@ -104,6 +106,9 @@ public class ObservationExportStepTest {
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
+
+        PowerMockito.mockStatic(JobDefinitionUtil.class);
+        when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(any(JobDefinition.class))).thenReturn(true);
 
         Step observationExportStepStep = observationExportStep.getStep();
 

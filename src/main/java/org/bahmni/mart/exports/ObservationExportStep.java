@@ -1,6 +1,7 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
@@ -71,6 +72,7 @@ public class ObservationExportStep {
     private DatabaseObsWriter getWriter() {
         DatabaseObsWriter writer = databaseObsWriterObjectFactory.getObject();
         writer.setForm(this.form);
+        writer.setAddMoreMultiSelectEnabled(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition));
         return writer;
     }
 

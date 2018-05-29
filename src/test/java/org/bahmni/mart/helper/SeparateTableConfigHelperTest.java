@@ -109,7 +109,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -161,7 +161,7 @@ public class SeparateTableConfigHelperTest {
                 "Video", "Test Concept");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
 
         whenNew(FileReader.class).withArguments("conf/app.json").thenThrow(new FileNotFoundException());
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
@@ -205,7 +205,7 @@ public class SeparateTableConfigHelperTest {
                 "Test Concept", "Video");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenThrow(new FileNotFoundException());
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -280,7 +280,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -305,7 +305,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -330,7 +330,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -399,15 +399,15 @@ public class SeparateTableConfigHelperTest {
     }
 
     @Test
-    public void shouldReturnListOfSeparateTableNames() throws Exception {
+    public void shouldReturnListOfSeparateTableNamesWhenAddMoreMultiSelectFlagIsTrueInJobDefinition() throws Exception {
 
         JobDefinition jobDefinition = mock(JobDefinition.class);
         mockStatic(JobDefinitionUtil.class);
         List<String> separateTableNames = new ArrayList<>();
         separateTableNames.add("obs separate table");
 
-        when(JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition))
-                .thenReturn(separateTableNames);
+        when(JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition)).thenReturn(separateTableNames);
+        when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(true);
 
         Concept concept1 = new Concept(1, "OR, Operation performed", 0);
         Concept concept2 = new Concept(2, "Video", 0);
@@ -423,8 +423,7 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
                 Arrays.asList("OR, Operation performed", "Video", "Test Concept"));
 
-        HashSet<Concept> expectedSeparateTables = new HashSet<>();
-        expectedSeparateTables.addAll(Arrays.asList(concept1, concept2, concept3, concept4));
+        HashSet<Concept> expectedSeparateTables = new HashSet<>(Arrays.asList(concept1, concept2, concept3, concept4));
 
         HashSet<Concept> allSeparateConceptNames = separateTableConfigHelper
                 .getSeparateTableConceptsForJob(jobDefinition);
@@ -437,6 +436,42 @@ public class SeparateTableConfigHelperTest {
 
         verify(conceptService, times(1)).getConceptsByNames(any());
 
+    }
+
+    @Test
+    public void shouldReturnListOfSeparateTablesWhenAddMoreMultiSelectFlagIsFalseInJobDefinition() throws Exception {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        mockStatic(JobDefinitionUtil.class);
+        List<String> separateTableNames = new ArrayList<>();
+        separateTableNames.add("obs separate table");
+
+        when(JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition)).thenReturn(separateTableNames);
+        when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
+
+        Concept concept1 = new Concept(1, "OR, Operation performed", 0);
+
+        ConceptService conceptService = mock(ConceptService.class);
+        setValuesForMemberFields(separateTableConfigHelper, "conceptService", conceptService);
+        when(conceptService.getConceptsByNames(separateTableNames)).thenReturn(Collections.singletonList(concept1));
+
+        setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
+                Arrays.asList("OR, Operation performed", "Video", "Test Concept"));
+
+        HashSet<Concept> expectedSeparateTables = new HashSet<>(Collections.singletonList(concept1));
+
+        HashSet<Concept> allSeparateConceptNames = separateTableConfigHelper
+                .getSeparateTableConceptsForJob(jobDefinition);
+
+        assertEquals(1, allSeparateConceptNames.size());
+        assertThat(expectedSeparateTables, containsInAnyOrder(allSeparateConceptNames.toArray()));
+
+        verify(JobDefinitionUtil.class, times(1));
+        JobDefinitionUtil.getSeparateTableNamesForJob(jobDefinition);
+
+        verify(JobDefinitionUtil.class, times(1));
+        JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition);
+
+        verify(conceptService, times(1)).getConceptsByNames(any());
     }
 
     @Test
