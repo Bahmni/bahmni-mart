@@ -162,7 +162,6 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
 
-
         whenNew(FileReader.class).withArguments("conf/app.json").thenThrow(new FileNotFoundException());
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -205,7 +204,7 @@ public class SeparateTableConfigHelperTest {
                 "Test Concept", "Video");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-
+        
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenThrow(new FileNotFoundException());
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -280,7 +279,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-
+        
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -305,7 +304,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-
+        
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -330,7 +329,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-
+        
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -418,7 +417,6 @@ public class SeparateTableConfigHelperTest {
         setValuesForMemberFields(separateTableConfigHelper, "conceptService", conceptService);
         when(conceptService.getConceptsByNames(separateTableNames))
                 .thenReturn(Arrays.asList(concept1, concept2, concept3, concept4));
-
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultAddMoreAndMultiSelectConceptsNames",
                 Arrays.asList("OR, Operation performed", "Video", "Test Concept"));

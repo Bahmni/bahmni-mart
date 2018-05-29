@@ -81,6 +81,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyRecords(patientList);
         verifyViews();
         verifyDiagnoses();
+        verifyNoSeparateTableForSpecimenSampleSource(tableNames);
     }
 
     @Test
@@ -467,5 +468,16 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
             for (String columnName : expectedRow.keySet())
                 assertEquals(expectedRow.get(columnName), actualRow.get(columnName));
         }
+    }
+
+    /**
+     * No separate table for "Specimen Sample Source" even though it's a
+     * multi-select(defaultApp.json) since "enableForAddMoreAndMultiSelect"
+     * flag is false for bacteriology job
+     *
+     * @param tableNames table names in mart test database
+     */
+    private void verifyNoSeparateTableForSpecimenSampleSource(List<String> tableNames) {
+        assertFalse(tableNames.contains("specimen_sample_source"));
     }
 }
