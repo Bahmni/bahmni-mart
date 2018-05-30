@@ -365,13 +365,13 @@
     },
     {
       "name": "Bacteriology Data",
-      "conceptReferenceSource": "MSF-INTERNAL",
+      "conceptReferenceSource": "",
       "type": "bacteriology"
     },
     {
       "name": "MetaData Dictionary",
       "type": "metadata",
-      "conceptReferenceSource": "MSF-INTERNAL"
+      "conceptReferenceSource": ""
     },
     {
       "name": "Obs Data",
@@ -384,7 +384,7 @@
          "FV, Outcomes FV"
        ]
      },
-      "conceptReferenceSource": "MSF-INTERNAL",
+      "conceptReferenceSource": "",
       "ignoreAllFreeTextConcepts": true,
       "columnsToIgnore": [
         "Video",
