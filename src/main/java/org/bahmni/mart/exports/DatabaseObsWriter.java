@@ -47,13 +47,13 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
     private void insertRecords(List<? extends List<Obs>> items) {
         TableData tableData = formTableMetadataGenerator.getTableData(this.form);
         ObsRecordExtractorForTable extractor = getObsRecordExtractor(items, tableData);
-        extractor.setAddMoreMultiSelectEnabledForSeparateTables(isAddMoreMultiSelectEnabled);
         String sql = freeMarkerEvaluatorForTableRecords.evaluate("insertObs.ftl", extractor);
         martJdbcTemplate.execute(sql);
     }
 
     private ObsRecordExtractorForTable getObsRecordExtractor(List<? extends List<Obs>> items, TableData tableData) {
         ObsRecordExtractorForTable extractor = new ObsRecordExtractorForTable(tableData.getName());
+        extractor.setAddMoreMultiSelectEnabledForSeparateTables(isAddMoreMultiSelectEnabled);
         if (isAddMoreMultiSelectEnabled) {
             extractor.execute(items, tableData);
             return extractor;

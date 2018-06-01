@@ -119,7 +119,7 @@ public class ObservationProcessorTest {
     }
 
     @Test
-    public void shouldReturnObsListOfAllLeafObs() throws Exception {
+    public void shouldReturnObsListOfAllLeafObs() {
 
         Concept systolicConcept = new Concept(1, "systolic", 0);
         Concept diastolicConcept = new Concept(2, "diastolic", 0);
@@ -154,6 +154,36 @@ public class ObservationProcessorTest {
         assertEquals(new Integer(1), obsListActual.get(1).getParentId());
         assertEquals(new Integer(1), obsListActual.get(2).getParentId());
     }
+
+    @Test
+    public void shouldReturnFormObsOnlyIfItIsSet() {
+
+        Concept systolicConcept = new Concept(1, "systolic", 0);
+        Concept diastolicConcept = new Concept(2, "diastolic", 1);
+
+        form.addField(systolicConcept);
+        form.addField(diastolicConcept);
+        obsList = new ArrayList<>();
+        obsList.add(new Obs(1, 0, systolicConcept, "120"));
+        obsList.add(new Obs(2, 0, diastolicConcept, "80"));
+
+        when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(Arrays.asList(1, 2));
+
+        observationProcessor.setForm(form);
+        observationProcessor.postConstruct();
+
+        when(namedParameterJdbcTemplate.query(eq("get..some..child"), any(Map.class), any(BeanPropertyRowMapper.class)))
+                .thenReturn(obsList);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("parent_obs_id", new Integer(1));
+        map.put("obs_id", new Integer(0));
+
+        List<Obs> obsListActual = observationProcessor.process(map);
+        assertEquals(1, obsListActual.size());
+        assertEquals(new Integer(1), obsListActual.get(0).getParentId());
+    }
+
 
     @Test
     public void shouldReturnEmptyListWhenChildObsAndFieldIdsAreEmpty() throws Exception {

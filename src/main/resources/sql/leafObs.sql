@@ -10,8 +10,9 @@ SELECT
   o.obs_datetime                   AS obsDateTime,
   o.location_id                    AS locationId,
   l.name                           AS locationName,
-  p.program_id                    AS programId,
-  p.name                  AS programName
+  p.program_id                     AS programId,
+  p.name                           AS programName,
+  c.is_set                         AS isSet
 FROM obs o
   JOIN concept_view obs_con ON o.concept_id = obs_con.concept_id
   LEFT OUTER JOIN obs AS form_obs ON form_obs.obs_id = o.obs_group_id AND form_obs.voided = 0
@@ -27,6 +28,8 @@ FROM obs o
   LEFT OUTER JOIN concept_reference_term_map_view vcc ON vcc.concept_id = o.value_coded
                                                          AND vcc.concept_map_type_name = 'SAME-AS'
                                                          AND vcc.concept_reference_source_name = :conceptReferenceSource
+  LEFT OUTER JOIN concept c on c.concept_id = o.concept_id
+
 WHERE
   o.obs_id IN (:childObsIds)
   AND obs_con.concept_id IN (:leafConceptIds)

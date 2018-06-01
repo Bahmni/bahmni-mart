@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Scope(value = "prototype")
@@ -56,7 +57,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override
-    public List<Obs> process(Map<String, Object> obsRow) throws Exception {
+    public List<Obs> process(Map<String, Object> obsRow) {
         List<Integer> allChildObsIds = new ArrayList<>();
 
         if (form.getFormName().getIsSet() == 1) {
@@ -66,10 +67,16 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
         }
 
         List<Obs> obsRows = fetchAllLeafObs(allChildObsIds,(Integer) obsRow.get("parent_obs_id"));
-        obsRows.addAll(formObs((Integer) obsRow.get("obs_id"),(Integer) obsRow.get("parent_obs_id")));
+        obsRows.addAll(getFormObs(obsRow));
         setObsIdAndParentObsId(obsRows, (Integer) obsRow.get("obs_id"), (Integer) obsRow.get("parent_obs_id"));
 
         return obsRows;
+    }
+
+    private List<Obs> getFormObs(Map<String, Object> obsRow) {
+
+        List<Obs> formObs = formObs((Integer) obsRow.get("obs_id"), (Integer) obsRow.get("parent_obs_id"));
+        return formObs.stream().filter(obs -> obs.getField().getIsSet() == 1).collect(Collectors.toList());
     }
 
     private List<Obs> formObs(Integer obsId, Integer parentObsId) {
@@ -85,7 +92,8 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
             @Override
             public Obs mapRow(ResultSet resultSet, int rowNumber) throws SQLException {
                 Obs obs = super.mapRow(resultSet, rowNumber);
-                Concept concept = new Concept(resultSet.getInt("conceptId"), resultSet.getString("conceptName"), 0, "");
+                Concept concept = new Concept(resultSet.getInt("conceptId"), resultSet.getString("conceptName"),
+                        resultSet.getInt("isSet"), "");
                 obs.setParentName(resultSet.getString("parentConceptName"));
                 obs.setField(concept);
                 return obs;
