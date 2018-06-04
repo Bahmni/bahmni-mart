@@ -6,4 +6,30 @@ launch_bahmni_mart(){
     echo "Done"
 }
 
-launch_bahmni_mart
+bahmni_mart_backup(){
+    sh /opt/bahmni-mart/bin/bahmni-mart-backup.sh
+}
+
+bahmni_mart_restore(){
+    sh /opt/bahmni-mart/bin/bahmni-mart-restore.sh
+}
+
+display_help(){
+    printf "Usage:
+    bahmni-mart [OPTIONS]
+    By default it will launch bahmni-mart application
+    Options :
+        backup: To take encrypted db backup
+        restore: To restore encrypted db
+    RUN 'bahmni-mart --help' for more information on a command \n"
+}
+
+if [[ -z $1 ]]; then
+    launch_bahmni_mart;
+elif [[ "$1" == "backup" ]]; then
+    bahmni_mart_backup;
+elif [[ "$1" == "restore" ]]; then
+    bahmni_mart_restore;
+else
+    display_help
+fi
