@@ -376,14 +376,14 @@
     {
       "name": "Obs Data",
       "type": "obs",
-     "separateTableConfig": {
-       "enableForAddMoreAndMultiSelect": true,
-       "separateTables": [
-         "PA, Location of Assessment",
-         "SMH, Pain Assessment",
-         "FV, Outcomes FV"
-       ]
-     },
+      "separateTableConfig": {
+        "enableForAddMoreAndMultiSelect": true,
+        "separateTables": [
+          "PA, Location of Assessment",
+          "SMH, Pain Assessment",
+          "FV, Outcomes FV"
+        ]
+      },
       "conceptReferenceSource": "",
       "ignoreAllFreeTextConcepts": true,
       "columnsToIgnore": [
@@ -433,7 +433,7 @@
   "views": [
     {
       "name": "patient_program_view",
-      "sql": "SELECT pat.*, pa.address1, pa.address2, pa.address3, pa.address4, pa.address6, pa.state_province, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, program_id, patient_program_id, date_enrolled, date_completed, location_name, program_outcome FROM person_details pd LEFT OUTER JOIN person_address pa ON pa.person_id = pd.person_id LEFT OUTER JOIN person_attributes pat ON pat.person_id = pa.person_id LEFT OUTER JOIN patient_program_data ppd ON ppd.patient_id = pat.person_id"
+      "sourceFilePath":"classpath:viewSql/patientProgramView.sql"
     },
     {
       "name": "patient_visits_encounters_view",
@@ -470,6 +470,26 @@
     {
       "name":"bed_management_locations_view",
       "sourceFilePath":"classpath:viewSql/locationWiseDischarge.sql"
+    },
+    {
+      "name": "patient_bed_view",
+      "sourceFilePath": "classpath:viewSql/patientBedView.sql"
+    },
+    {
+      "name": "patient_operation_theatre_view",
+      "sourceFilePath": "classpath:viewSql/patientOperationTheatreView.sql"
+    },
+    {
+      "name": "patient_appointment_view",
+      "sourceFilePath": "classpath:viewSql/patientAppointmentView.sql"
+    },
+    {
+      "name": "patient_program_medication_view",
+      "sourceFilePath": "classpath:viewSql/patientProgramMedicationView.sql"
+    },
+    {
+      "name":"patient_diagnosis_condition_view",
+      "sourceFilePath":"classpath:viewSql/patientDiagnosisConditionView.sql"
     }
   ]
 }
