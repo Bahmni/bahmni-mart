@@ -25,7 +25,7 @@ openssl smime -decrypt -in ${BACKUP_FILE_LOCATION} -binary -inform DER -inkey ${
 EXIT_CODE=$?
 echo
 
-if [ ${EXIT_CODE}==0 ]; then
+if [ ${EXIT_CODE} == 0 ]; then
     echo "${ANALYTICS_DB_NAME} restore is successfully completed";
 else
     echo "${ANALYTICS_DB_NAME} restore is failed"

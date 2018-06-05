@@ -18,7 +18,7 @@ pg_dump -h ${ANALYTICS_DB_HOST} -p ${POSTGRESQL_PORT} -U ${ANALYTICS_DB_USERNAME
 EXIT_CODE=$?
 echo
 
-if [ ${EXIT_CODE}==0 ]; then
+if [ ${EXIT_CODE} == 0 ]; then
     echo "Backup of ${ANALYTICS_DB_NAME} is successfully completed";
 else
     echo "Backup of ${ANALYTICS_DB_NAME} is failed"
