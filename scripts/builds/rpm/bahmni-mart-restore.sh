@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-#!/usr/bin/env bash
-
-PATH_OF_CURRENT_SCRIPT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-. ${PATH_OF_CURRENT_SCRIPT}/bahmni-mart-db-details.sh
+ANALYTICS_DB_HOST="localhost"
+ANALYTICS_DB_USERNAME="analytics"
+ANALYTICS_DB_NAME="analytics"
+POSTGRESQL_PORT=5432
 
 read -p "Enter encrypted DB file location: " BACKUP_FILE_LOCATION
 
