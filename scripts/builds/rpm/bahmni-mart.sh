@@ -14,6 +14,14 @@ bahmni_mart_restore(){
     sh /opt/bahmni-mart/bin/bahmni-mart-restore.sh
 }
 
+import_key(){
+    sh /opt/bahmni-mart/bin/import-key.sh
+}
+
+create_new_key(){
+    sh /opt/bahmni-mart/bin/generate-new-key.sh
+}
+
 display_help(){
     printf "Usage:
     bahmni-mart [OPTIONS]
@@ -21,6 +29,8 @@ display_help(){
     Options :
         backup: To take encrypted db backup
         restore: To restore encrypted db
+        import-key: To import public key of others
+        create-key: Create a new public/private key pair
     RUN 'bahmni-mart --help' for more information on a command \n"
 }
 
@@ -28,6 +38,10 @@ if [[ -z $1 ]]; then
     launch_bahmni_mart;
 elif [[ "$1" == "backup" ]]; then
     bahmni_mart_backup;
+elif [[ "$1" == "import-key" ]]; then
+    import_key;
+elif [[ "$1" == "create-key" ]]; then
+    create_new_key;
 elif [[ "$1" == "restore" ]]; then
     bahmni_mart_restore;
 else
