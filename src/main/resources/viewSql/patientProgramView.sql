@@ -14,8 +14,8 @@ SELECT
   pg.program_name,
   ppd.patient_program_id,
   ppd.program_outcome,
-  ps.state,
-  ps.state_name,
+  ps.state      AS patient_program_state,
+  ps.state_name AS patient_program_state_name,
   ppd.date_enrolled,
   ppd.date_completed,
   ppd.location_id,
@@ -31,4 +31,4 @@ FROM person_details pd LEFT OUTER JOIN person_address pa ON pa.person_id = pd.pe
   LEFT OUTER JOIN person_attributes pat ON pat.person_id = pa.person_id
   LEFT OUTER JOIN patient_program_data ppd ON ppd.patient_id = pat.person_id
   LEFT OUTER JOIN programs pg ON pg.program_id = ppd.program_id
-  LEFT OUTER JOIN patient_state ps ON ps.patient_program_id = ppd.patient_program_id
+  LEFT OUTER JOIN patient_state ps ON ps.patient_program_id = ppd.patient_program_id;

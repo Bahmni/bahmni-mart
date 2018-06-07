@@ -488,8 +488,12 @@
       "sourceFilePath": "classpath:viewSql/patientProgramMedicationView.sql"
     },
     {
-      "name":"patient_diagnosis_condition_view",
-      "sourceFilePath":"classpath:viewSql/patientDiagnosisConditionView.sql"
+      "name": "patient_diagnosis_condition_view",
+      "sourceFilePath": "classpath:viewSql/patientDiagnosisConditionView.sql"
+    },
+    {
+      "name": "patient_bed_tags_history_view",
+      "sourceFilePath": "classpath:viewSql/patientBedTagView.sql"
     }
   ]
 }
