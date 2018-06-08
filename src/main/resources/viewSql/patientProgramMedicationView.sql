@@ -1,6 +1,5 @@
 SELECT
-  pd.person_id            AS patient_id,
-  pi."Patient_Identifier" AS patient_identifier,
+  pi.*,
   pd.gender,
   pd.birthdate            AS birth_date,
   pd.dead,
