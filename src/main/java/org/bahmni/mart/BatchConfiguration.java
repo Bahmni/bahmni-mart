@@ -11,6 +11,7 @@ import org.bahmni.mart.config.procedure.ProcedureExecutor;
 import org.bahmni.mart.config.stepconfigurer.BacteriologyStepConfigurer;
 import org.bahmni.mart.config.stepconfigurer.DiagnosesStepConfigurer;
 import org.bahmni.mart.config.stepconfigurer.DispositionStepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.FormBuilderStepConfigurer;
 import org.bahmni.mart.config.stepconfigurer.FormStepConfigurer;
 import org.bahmni.mart.config.stepconfigurer.MetaDataStepConfigurer;
 import org.bahmni.mart.config.stepconfigurer.OrderStepConfigurer;
@@ -105,6 +106,9 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
     @Autowired
     private DispositionStepConfigurer dispositionStepConfigurer;
 
+    @Autowired
+    private FormBuilderStepConfigurer formBuilderStepConfigurer;
+
     @Override
     public void run(String... args) {
         List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
@@ -171,9 +175,15 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
               return buildRspJob(jobDefinition);
           case "disposition":
               return buildDispositionJob(jobDefinition);
+          case "formbuilder":
+              return buildFormBuilderJob(jobDefinition);
           default:
               return simpleJobTemplateFactory.getObject().buildJob(jobDefinition);
         }
+    }
+
+    private Job buildFormBuilderJob(JobDefinition jobDefinition) {
+        return getFlowJob(jobDefinition, formBuilderStepConfigurer);
     }
 
     private Job buildDispositionJob(JobDefinition jobDefinition) {
