@@ -1,29 +1,17 @@
 {
-  "name": "Spike",
-  "id": 1,
-  "uuid": "90ae75dc-94c3-445f-9dd0-75cc2e0a1415",
+  "name": "spike",
+  "id": 2,
+  "uuid": "cc57868b-6028-405d-8c1f-856a6290dc72",
   "defaultLocale": "en",
   "controls": [
     {
-      "translationKey": "LABEL_1",
-      "type": "label",
-      "value": "Label",
-      "properties": {
-        "location": {
-          "column": 0,
-          "row": 0
-        }
-      },
-      "id": "1"
-    },
-    {
       "type": "obsControl",
       "label": {
-        "translationKey": "VS,_TEMPERATURE_2",
-        "id": "2",
-        "units": "(C)",
+        "translationKey": "HEIGHT_1",
+        "id": "1",
+        "units": "(cm)",
         "type": "label",
-        "value": "VS, Temperature"
+        "value": "Height"
       },
       "properties": {
         "mandatory": false,
@@ -33,14 +21,14 @@
         "controlEvent": false,
         "location": {
           "column": 0,
-          "row": 1
+          "row": 0
         },
         "abnormal": false
       },
-      "id": "2",
+      "id": "1",
       "concept": {
-        "name": "VS, Temperature",
-        "uuid": "42765af3-fb87-4d4f-a64d-e8b99736ad71",
+        "name": "Height",
+        "uuid": "841410a0-a101-48c3-ace0-0a08bd36e756",
         "datatype": "Numeric",
         "conceptClass": "Finding",
         "conceptHandler": null,
@@ -49,7 +37,7 @@
           "allowDecimal": true
         }
       },
-      "units": "C",
+      "units": "cm",
       "hiNormal": null,
       "lowNormal": null,
       "hiAbsolute": null,

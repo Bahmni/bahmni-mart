@@ -59,7 +59,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
         }
     }
 
-    private void revokeConstraints(TableData tableData) {
+    protected void revokeConstraints(TableData tableData) {
         tableData.getColumns().forEach(tableColumn -> {
             if (tableColumn.isPrimaryKey()) {
                 tableColumn.setPrimaryKey(false);

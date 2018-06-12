@@ -7,6 +7,7 @@ public class Concept {
     private Integer isSet;
     private String title;
     private Concept parent;
+    private String uuid;
 
     public Concept() {
     }
@@ -103,5 +104,13 @@ public class Concept {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (isSet != null ? isSet.hashCode() : 0);
         return result;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }
