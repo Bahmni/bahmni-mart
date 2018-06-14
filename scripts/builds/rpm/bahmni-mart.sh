@@ -28,7 +28,11 @@ display_help(){
     By default it will launch bahmni-mart application
     Options :
         backup: To take encrypted db backup
-        restore: To restore encrypted db
+            Currently there is 2 way to take backup using bahmni-mart
+                i. csv - Take backup in Comma Separated Value(CSV) format
+                ii. sql - Take backup as sql dump file
+            If you don't provide any format, by default it will use 'sql' format
+        restore: To restore db using encrypted sql dump file
         import-key: To import public key of others
         create-key: Create a new public/private key pair
     RUN 'bahmni-mart --help' for more information on a command \n"
