@@ -1,0 +1,1316 @@
+{
+  "name": "History",
+  "id": 4,
+  "uuid": "2cb7c3a5-0346-4105-ab93-73fb7b407852",
+  "defaultLocale": "en",
+  "controls": [
+    {
+      "translationKey": "LABEL_1",
+      "type": "label",
+      "value": "Label",
+      "properties": {
+        "location": {
+          "column": 0,
+          "row": 0
+        }
+      },
+      "id": "1"
+    },
+    {
+      "type": "section",
+      "label": {
+        "translationKey": "SECTION_2",
+        "type": "label",
+        "value": "Section",
+        "id": "2"
+      },
+      "properties": {
+        "location": {
+          "column": 0,
+          "row": 1
+        }
+      },
+      "id": "2",
+      "controls": [
+        {
+          "type": "obsControl",
+          "label": {
+            "translationKey": "HE,_DURATION_OF_SMOKING_(IN_YEARS)_3",
+            "id": "3",
+            "units": "",
+            "type": "label",
+            "value": "HE, Duration of smoking (in years)"
+          },
+          "properties": {
+            "mandatory": false,
+            "notes": false,
+            "addMore": false,
+            "hideLabel": false,
+            "controlEvent": false,
+            "location": {
+              "column": 0,
+              "row": 0
+            },
+            "abnormal": false
+          },
+          "id": "3",
+          "concept": {
+            "name": "HE, Duration of smoking (in years)",
+            "uuid": "b99a13ea-14e3-4111-8cfb-d917eeae5bdb",
+            "datatype": "Numeric",
+            "conceptClass": "Finding",
+            "conceptHandler": null,
+            "answers": [],
+            "properties": {
+              "allowDecimal": true
+            }
+          },
+          "units": null,
+          "hiNormal": null,
+          "lowNormal": null,
+          "hiAbsolute": null,
+          "lowAbsolute": null
+        },
+        {
+          "type": "obsControl",
+          "label": {
+            "translationKey": "HI,_PENICILLIN_4",
+            "id": "4",
+            "units": "",
+            "type": "label",
+            "value": "HI, Penicillin"
+          },
+          "properties": {
+            "mandatory": false,
+            "notes": false,
+            "addMore": false,
+            "hideLabel": false,
+            "controlEvent": false,
+            "location": {
+              "column": 0,
+              "row": 1
+            },
+            "autoComplete": false,
+            "multiSelect": false,
+            "dropDown": false
+          },
+          "id": "4",
+          "concept": {
+            "name": "HI, Penicillin",
+            "uuid": "f952b0f7-b7e7-46ae-b71c-26dfc7f343d7",
+            "datatype": "Coded",
+            "conceptClass": "Misc",
+            "conceptHandler": null,
+            "answers": [
+              {
+                "uuid": "9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1",
+                "name": {
+                  "display": "Susceptible",
+                  "uuid": "b522c92d-2e5e-4047-997e-5ef608cc9317",
+                  "name": "Susceptible",
+                  "locale": "en",
+                  "localePreferred": true,
+                  "conceptNameType": "FULLY_SPECIFIED",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1/name/b522c92d-2e5e-4047-997e-5ef608cc9317"
+                    },
+                    {
+                      "rel": "full",
+                      "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1/name/b522c92d-2e5e-4047-997e-5ef608cc9317?v=full"
+                    }
+                  ],
+                  "resourceVersion": "1.9"
+                },
+                "names": [
+                  {
+                    "display": "Susceptible",
+                    "uuid": "b522c92d-2e5e-4047-997e-5ef608cc9317",
+                    "name": "Susceptible",
+                    "locale": "en",
+                    "localePreferred": true,
+                    "conceptNameType": "FULLY_SPECIFIED",
+                    "links": [
+                      {
+                        "rel": "self",
+                        "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1/name/b522c92d-2e5e-4047-997e-5ef608cc9317"
+                      },
+                      {
+                        "rel": "full",
+                        "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1/name/b522c92d-2e5e-4047-997e-5ef608cc9317?v=full"
+                      }
+                    ],
+                    "resourceVersion": "1.9"
+                  }
+                ],
+                "displayString": "Susceptible",
+                "resourceVersion": "2.0",
+                "translationKey": "SUSCEPTIBLE_4"
+              },
+              {
+                "uuid": "a7411c07-b028-4b51-8f39-703c3ce849cf",
+                "name": {
+                  "display": "Resistant",
+                  "uuid": "55ac3508-a9e2-4d72-9652-8b1d387dabeb",
+                  "name": "Resistant",
+                  "locale": "en",
+                  "localePreferred": true,
+                  "conceptNameType": "FULLY_SPECIFIED",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/a7411c07-b028-4b51-8f39-703c3ce849cf/name/55ac3508-a9e2-4d72-9652-8b1d387dabeb"
+                    },
+                    {
+                      "rel": "full",
+                      "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/a7411c07-b028-4b51-8f39-703c3ce849cf/name/55ac3508-a9e2-4d72-9652-8b1d387dabeb?v=full"
+                    }
+                  ],
+                  "resourceVersion": "1.9"
+                },
+                "names": [
+                  {
+                    "display": "Resistant",
+                    "uuid": "55ac3508-a9e2-4d72-9652-8b1d387dabeb",
+                    "name": "Resistant",
+                    "locale": "en",
+                    "localePreferred": true,
+                    "conceptNameType": "FULLY_SPECIFIED",
+                    "links": [
+                      {
+                        "rel": "self",
+                        "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/a7411c07-b028-4b51-8f39-703c3ce849cf/name/55ac3508-a9e2-4d72-9652-8b1d387dabeb"
+                      },
+                      {
+                        "rel": "full",
+                        "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/a7411c07-b028-4b51-8f39-703c3ce849cf/name/55ac3508-a9e2-4d72-9652-8b1d387dabeb?v=full"
+                      }
+                    ],
+                    "resourceVersion": "1.9"
+                  }
+                ],
+                "displayString": "Resistant",
+                "resourceVersion": "2.0",
+                "translationKey": "RESISTANT_4"
+              },
+              {
+                "uuid": "339e2f8c-d52f-402a-a4ea-f6946d481e0b",
+                "name": {
+                  "display": "Intermediate",
+                  "uuid": "a7b6b0bd-60aa-4118-a580-bf18a0cefcc9",
+                  "name": "Intermediate",
+                  "locale": "en",
+                  "localePreferred": true,
+                  "conceptNameType": "FULLY_SPECIFIED",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/339e2f8c-d52f-402a-a4ea-f6946d481e0b/name/a7b6b0bd-60aa-4118-a580-bf18a0cefcc9"
+                    },
+                    {
+                      "rel": "full",
+                      "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/339e2f8c-d52f-402a-a4ea-f6946d481e0b/name/a7b6b0bd-60aa-4118-a580-bf18a0cefcc9?v=full"
+                    }
+                  ],
+                  "resourceVersion": "1.9"
+                },
+                "names": [
+                  {
+                    "display": "Intermediate",
+                    "uuid": "a7b6b0bd-60aa-4118-a580-bf18a0cefcc9",
+                    "name": "Intermediate",
+                    "locale": "en",
+                    "localePreferred": true,
+                    "conceptNameType": "FULLY_SPECIFIED",
+                    "links": [
+                      {
+                        "rel": "self",
+                        "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/339e2f8c-d52f-402a-a4ea-f6946d481e0b/name/a7b6b0bd-60aa-4118-a580-bf18a0cefcc9"
+                      },
+                      {
+                        "rel": "full",
+                        "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/339e2f8c-d52f-402a-a4ea-f6946d481e0b/name/a7b6b0bd-60aa-4118-a580-bf18a0cefcc9?v=full"
+                      }
+                    ],
+                    "resourceVersion": "1.9"
+                  }
+                ],
+                "displayString": "Intermediate",
+                "resourceVersion": "2.0",
+                "translationKey": "INTERMEDIATE_4"
+              }
+            ],
+            "properties": {
+              "allowDecimal": null
+            }
+          },
+          "units": null,
+          "hiNormal": null,
+          "lowNormal": null,
+          "hiAbsolute": null,
+          "lowAbsolute": null
+        },
+        {
+          "type": "section",
+          "label": {
+            "translationKey": "SECTION_5",
+            "type": "label",
+            "value": "Section",
+            "id": "5"
+          },
+          "properties": {
+            "location": {
+              "column": 0,
+              "row": 2
+            }
+          },
+          "id": "5",
+          "controls": [
+            {
+              "type": "obsGroupControl",
+              "label": {
+                "translationKey": "HISTORY_AND_EXAMINATION_6",
+                "type": "label",
+                "value": "History and Examination",
+                "id": "6"
+              },
+              "properties": {
+                "addMore": false,
+                "location": {
+                  "column": 0,
+                  "row": 0
+                }
+              },
+              "id": "6",
+              "concept": {
+                "name": "History and Examination",
+                "uuid": "7e12f2a2-a6fc-4b23-8088-db19912ea636",
+                "datatype": "N/A",
+                "conceptClass": "Misc",
+                "conceptHandler": null,
+                "set": true,
+                "setMembers": [
+                  {
+                    "name": "Video",
+                    "uuid": "a5b40e9d-c5ad-46df-b84e-cc85ac434318",
+                    "datatype": "Complex",
+                    "conceptClass": "Video",
+                    "conceptHandler": "VideoUrlHandler",
+                    "units": null,
+                    "hiNormal": null,
+                    "lowNormal": null,
+                    "hiAbsolute": null,
+                    "lowAbsolute": null,
+                    "answers": [],
+                    "properties": {
+                      "allowDecimal": null
+                    }
+                  }
+                ]
+              },
+              "controls": [
+                {
+                  "type": "obsControl",
+                  "label": {
+                    "translationKey": "VIDEO_7",
+                    "id": "7",
+                    "units": "",
+                    "type": "label",
+                    "value": "Video"
+                  },
+                  "properties": {
+                    "mandatory": false,
+                    "notes": false,
+                    "addMore": false,
+                    "hideLabel": false,
+                    "controlEvent": false,
+                    "location": {
+                      "row": 0,
+                      "column": 0
+                    }
+                  },
+                  "id": "7",
+                  "concept": {
+                    "name": "Video",
+                    "uuid": "a5b40e9d-c5ad-46df-b84e-cc85ac434318",
+                    "datatype": "Complex",
+                    "conceptClass": "Video",
+                    "conceptHandler": "VideoUrlHandler",
+                    "units": null,
+                    "hiNormal": null,
+                    "lowNormal": null,
+                    "hiAbsolute": null,
+                    "lowAbsolute": null,
+                    "answers": [],
+                    "properties": {
+                      "allowDecimal": null
+                    }
+                  },
+                  "units": null,
+                  "hiNormal": null,
+                  "lowNormal": null,
+                  "hiAbsolute": null,
+                  "lowAbsolute": null
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "label": {
+                "translationKey": "SECTION_8",
+                "type": "label",
+                "value": "Section",
+                "id": "8"
+              },
+              "properties": {
+                "location": {
+                  "column": 0,
+                  "row": 1
+                }
+              },
+              "id": "8",
+              "controls": [
+                {
+                  "type": "obsGroupControl",
+                  "label": {
+                    "translationKey": "DISPOSITION_SET_9",
+                    "type": "label",
+                    "value": "Disposition Set",
+                    "id": "9"
+                  },
+                  "properties": {
+                    "addMore": false,
+                    "location": {
+                      "column": 0,
+                      "row": 0
+                    }
+                  },
+                  "id": "9",
+                  "concept": {
+                    "name": "Disposition Set",
+                    "uuid": "7e2b720f-e42f-11e5-8c3e-08002715d519",
+                    "datatype": "N/A",
+                    "conceptClass": "Misc",
+                    "conceptHandler": null,
+                    "set": true,
+                    "setMembers": [
+                      {
+                        "name": "Disposition",
+                        "uuid": "7e2af61f-e42f-11e5-8c3e-08002715d519",
+                        "datatype": "Coded",
+                        "conceptClass": "Question",
+                        "conceptHandler": null,
+                        "units": null,
+                        "hiNormal": null,
+                        "lowNormal": null,
+                        "hiAbsolute": null,
+                        "lowAbsolute": null,
+                        "answers": [
+                          {
+                            "uuid": "51402d62-463a-40eb-92b1-1aa590435922",
+                            "name": {
+                              "display": "Admit to RC",
+                              "uuid": "971bedca-2308-4b72-8e86-f5d7b764a6cf",
+                              "name": "Admit to RC",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/51402d62-463a-40eb-92b1-1aa590435922/name/971bedca-2308-4b72-8e86-f5d7b764a6cf"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/51402d62-463a-40eb-92b1-1aa590435922/name/971bedca-2308-4b72-8e86-f5d7b764a6cf?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Admit to RC",
+                                "uuid": "971bedca-2308-4b72-8e86-f5d7b764a6cf",
+                                "name": "Admit to RC",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/51402d62-463a-40eb-92b1-1aa590435922/name/971bedca-2308-4b72-8e86-f5d7b764a6cf"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/51402d62-463a-40eb-92b1-1aa590435922/name/971bedca-2308-4b72-8e86-f5d7b764a6cf?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Admit to RC",
+                            "resourceVersion": "2.0"
+                          },
+                          {
+                            "uuid": "e5ef1ccf-8f38-4b31-9a80-931171d6099c",
+                            "name": {
+                              "display": "Admit to Ward",
+                              "uuid": "4e5fa7d2-e798-4abe-aaf2-142f278132cc",
+                              "name": "Admit to Ward",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/e5ef1ccf-8f38-4b31-9a80-931171d6099c/name/4e5fa7d2-e798-4abe-aaf2-142f278132cc"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/e5ef1ccf-8f38-4b31-9a80-931171d6099c/name/4e5fa7d2-e798-4abe-aaf2-142f278132cc?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Admit to Ward",
+                                "uuid": "4e5fa7d2-e798-4abe-aaf2-142f278132cc",
+                                "name": "Admit to Ward",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/e5ef1ccf-8f38-4b31-9a80-931171d6099c/name/4e5fa7d2-e798-4abe-aaf2-142f278132cc"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/e5ef1ccf-8f38-4b31-9a80-931171d6099c/name/4e5fa7d2-e798-4abe-aaf2-142f278132cc?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Admit to Ward",
+                            "resourceVersion": "2.0"
+                          },
+                          {
+                            "uuid": "7b358f85-8314-4555-b898-bd633f714d69",
+                            "name": {
+                              "display": "Admit to Kahramana",
+                              "uuid": "4506817e-1133-4808-8935-37177eb644e2",
+                              "name": "Admit to Kahramana",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/7b358f85-8314-4555-b898-bd633f714d69/name/4506817e-1133-4808-8935-37177eb644e2"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/7b358f85-8314-4555-b898-bd633f714d69/name/4506817e-1133-4808-8935-37177eb644e2?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Admit to Kahramana",
+                                "uuid": "4506817e-1133-4808-8935-37177eb644e2",
+                                "name": "Admit to Kahramana",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/7b358f85-8314-4555-b898-bd633f714d69/name/4506817e-1133-4808-8935-37177eb644e2"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/7b358f85-8314-4555-b898-bd633f714d69/name/4506817e-1133-4808-8935-37177eb644e2?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Admit to Kahramana",
+                            "resourceVersion": "2.0"
+                          },
+                          {
+                            "uuid": "31d2844f-e1af-4133-a303-52061b855baa",
+                            "name": {
+                              "display": "Movement to Ward",
+                              "uuid": "a1fe9f70-6eea-4feb-be85-7923e71e47a6",
+                              "name": "Movement to Ward",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/31d2844f-e1af-4133-a303-52061b855baa/name/a1fe9f70-6eea-4feb-be85-7923e71e47a6"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/31d2844f-e1af-4133-a303-52061b855baa/name/a1fe9f70-6eea-4feb-be85-7923e71e47a6?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Movement to Ward",
+                                "uuid": "a1fe9f70-6eea-4feb-be85-7923e71e47a6",
+                                "name": "Movement to Ward",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/31d2844f-e1af-4133-a303-52061b855baa/name/a1fe9f70-6eea-4feb-be85-7923e71e47a6"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/31d2844f-e1af-4133-a303-52061b855baa/name/a1fe9f70-6eea-4feb-be85-7923e71e47a6?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Movement to Ward",
+                            "resourceVersion": "2.0"
+                          },
+                          {
+                            "uuid": "264251ff-4392-4ecf-940e-9e2afc374766",
+                            "name": {
+                              "display": "Movement to RC",
+                              "uuid": "e3b35abd-6d86-4d99-b691-ba98b4aef9c4",
+                              "name": "Movement to RC",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/264251ff-4392-4ecf-940e-9e2afc374766/name/e3b35abd-6d86-4d99-b691-ba98b4aef9c4"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/264251ff-4392-4ecf-940e-9e2afc374766/name/e3b35abd-6d86-4d99-b691-ba98b4aef9c4?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Movement to RC",
+                                "uuid": "e3b35abd-6d86-4d99-b691-ba98b4aef9c4",
+                                "name": "Movement to RC",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/264251ff-4392-4ecf-940e-9e2afc374766/name/e3b35abd-6d86-4d99-b691-ba98b4aef9c4"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/264251ff-4392-4ecf-940e-9e2afc374766/name/e3b35abd-6d86-4d99-b691-ba98b4aef9c4?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Movement to RC",
+                            "resourceVersion": "2.0"
+                          },
+                          {
+                            "uuid": "03deec04-2457-414f-977b-31d75a358be4",
+                            "name": {
+                              "display": "Movement to Kahramana",
+                              "uuid": "15f62f82-2b59-424e-89dc-df5aa970cb26",
+                              "name": "Movement to Kahramana",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/03deec04-2457-414f-977b-31d75a358be4/name/15f62f82-2b59-424e-89dc-df5aa970cb26"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/03deec04-2457-414f-977b-31d75a358be4/name/15f62f82-2b59-424e-89dc-df5aa970cb26?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Movement to Kahramana",
+                                "uuid": "15f62f82-2b59-424e-89dc-df5aa970cb26",
+                                "name": "Movement to Kahramana",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/03deec04-2457-414f-977b-31d75a358be4/name/15f62f82-2b59-424e-89dc-df5aa970cb26"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/03deec04-2457-414f-977b-31d75a358be4/name/15f62f82-2b59-424e-89dc-df5aa970cb26?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Movement to Kahramana",
+                            "resourceVersion": "2.0"
+                          },
+                          {
+                            "uuid": "d815b04d-c097-48bf-93b1-61e8c682fcc8",
+                            "name": {
+                              "display": "Transfer Home",
+                              "uuid": "e5561000-d255-4022-9234-40554efdcd77",
+                              "name": "Transfer Home",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/d815b04d-c097-48bf-93b1-61e8c682fcc8/name/e5561000-d255-4022-9234-40554efdcd77"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/d815b04d-c097-48bf-93b1-61e8c682fcc8/name/e5561000-d255-4022-9234-40554efdcd77?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Transfer Home",
+                                "uuid": "e5561000-d255-4022-9234-40554efdcd77",
+                                "name": "Transfer Home",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/d815b04d-c097-48bf-93b1-61e8c682fcc8/name/e5561000-d255-4022-9234-40554efdcd77"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/d815b04d-c097-48bf-93b1-61e8c682fcc8/name/e5561000-d255-4022-9234-40554efdcd77?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Transfer Home",
+                            "resourceVersion": "2.0"
+                          }
+                        ],
+                        "properties": {
+                          "allowDecimal": null
+                        }
+                      },
+                      {
+                        "name": "Disposition Note",
+                        "uuid": "7e2bdbd0-e42f-11e5-8c3e-08002715d519",
+                        "datatype": "Text",
+                        "conceptClass": "Misc",
+                        "conceptHandler": null,
+                        "units": null,
+                        "hiNormal": null,
+                        "lowNormal": null,
+                        "hiAbsolute": null,
+                        "lowAbsolute": null,
+                        "answers": [],
+                        "properties": {
+                          "allowDecimal": null
+                        }
+                      }
+                    ]
+                  },
+                  "controls": [
+                    {
+                      "type": "obsControl",
+                      "label": {
+                        "translationKey": "DISPOSITION_10",
+                        "id": "10",
+                        "units": "",
+                        "type": "label",
+                        "value": "Disposition"
+                      },
+                      "properties": {
+                        "mandatory": false,
+                        "notes": false,
+                        "addMore": false,
+                        "hideLabel": false,
+                        "controlEvent": false,
+                        "location": {
+                          "row": 0,
+                          "column": 0
+                        }
+                      },
+                      "id": "10",
+                      "concept": {
+                        "name": "Disposition",
+                        "uuid": "7e2af61f-e42f-11e5-8c3e-08002715d519",
+                        "datatype": "Coded",
+                        "conceptClass": "Question",
+                        "conceptHandler": null,
+                        "units": null,
+                        "hiNormal": null,
+                        "lowNormal": null,
+                        "hiAbsolute": null,
+                        "lowAbsolute": null,
+                        "answers": [
+                          {
+                            "uuid": "51402d62-463a-40eb-92b1-1aa590435922",
+                            "name": {
+                              "display": "Admit to RC",
+                              "uuid": "971bedca-2308-4b72-8e86-f5d7b764a6cf",
+                              "name": "Admit to RC",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/51402d62-463a-40eb-92b1-1aa590435922/name/971bedca-2308-4b72-8e86-f5d7b764a6cf"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/51402d62-463a-40eb-92b1-1aa590435922/name/971bedca-2308-4b72-8e86-f5d7b764a6cf?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Admit to RC",
+                                "uuid": "971bedca-2308-4b72-8e86-f5d7b764a6cf",
+                                "name": "Admit to RC",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/51402d62-463a-40eb-92b1-1aa590435922/name/971bedca-2308-4b72-8e86-f5d7b764a6cf"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/51402d62-463a-40eb-92b1-1aa590435922/name/971bedca-2308-4b72-8e86-f5d7b764a6cf?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Admit to RC",
+                            "resourceVersion": "2.0",
+                            "translationKey": "ADMIT_TO_RC_10"
+                          },
+                          {
+                            "uuid": "e5ef1ccf-8f38-4b31-9a80-931171d6099c",
+                            "name": {
+                              "display": "Admit to Ward",
+                              "uuid": "4e5fa7d2-e798-4abe-aaf2-142f278132cc",
+                              "name": "Admit to Ward",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/e5ef1ccf-8f38-4b31-9a80-931171d6099c/name/4e5fa7d2-e798-4abe-aaf2-142f278132cc"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/e5ef1ccf-8f38-4b31-9a80-931171d6099c/name/4e5fa7d2-e798-4abe-aaf2-142f278132cc?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Admit to Ward",
+                                "uuid": "4e5fa7d2-e798-4abe-aaf2-142f278132cc",
+                                "name": "Admit to Ward",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/e5ef1ccf-8f38-4b31-9a80-931171d6099c/name/4e5fa7d2-e798-4abe-aaf2-142f278132cc"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/e5ef1ccf-8f38-4b31-9a80-931171d6099c/name/4e5fa7d2-e798-4abe-aaf2-142f278132cc?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Admit to Ward",
+                            "resourceVersion": "2.0",
+                            "translationKey": "ADMIT_TO_WARD_10"
+                          },
+                          {
+                            "uuid": "7b358f85-8314-4555-b898-bd633f714d69",
+                            "name": {
+                              "display": "Admit to Kahramana",
+                              "uuid": "4506817e-1133-4808-8935-37177eb644e2",
+                              "name": "Admit to Kahramana",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/7b358f85-8314-4555-b898-bd633f714d69/name/4506817e-1133-4808-8935-37177eb644e2"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/7b358f85-8314-4555-b898-bd633f714d69/name/4506817e-1133-4808-8935-37177eb644e2?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Admit to Kahramana",
+                                "uuid": "4506817e-1133-4808-8935-37177eb644e2",
+                                "name": "Admit to Kahramana",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/7b358f85-8314-4555-b898-bd633f714d69/name/4506817e-1133-4808-8935-37177eb644e2"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/7b358f85-8314-4555-b898-bd633f714d69/name/4506817e-1133-4808-8935-37177eb644e2?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Admit to Kahramana",
+                            "resourceVersion": "2.0",
+                            "translationKey": "ADMIT_TO_KAHRAMANA_10"
+                          },
+                          {
+                            "uuid": "31d2844f-e1af-4133-a303-52061b855baa",
+                            "name": {
+                              "display": "Movement to Ward",
+                              "uuid": "a1fe9f70-6eea-4feb-be85-7923e71e47a6",
+                              "name": "Movement to Ward",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/31d2844f-e1af-4133-a303-52061b855baa/name/a1fe9f70-6eea-4feb-be85-7923e71e47a6"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/31d2844f-e1af-4133-a303-52061b855baa/name/a1fe9f70-6eea-4feb-be85-7923e71e47a6?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Movement to Ward",
+                                "uuid": "a1fe9f70-6eea-4feb-be85-7923e71e47a6",
+                                "name": "Movement to Ward",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/31d2844f-e1af-4133-a303-52061b855baa/name/a1fe9f70-6eea-4feb-be85-7923e71e47a6"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/31d2844f-e1af-4133-a303-52061b855baa/name/a1fe9f70-6eea-4feb-be85-7923e71e47a6?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Movement to Ward",
+                            "resourceVersion": "2.0",
+                            "translationKey": "MOVEMENT_TO_WARD_10"
+                          },
+                          {
+                            "uuid": "264251ff-4392-4ecf-940e-9e2afc374766",
+                            "name": {
+                              "display": "Movement to RC",
+                              "uuid": "e3b35abd-6d86-4d99-b691-ba98b4aef9c4",
+                              "name": "Movement to RC",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/264251ff-4392-4ecf-940e-9e2afc374766/name/e3b35abd-6d86-4d99-b691-ba98b4aef9c4"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/264251ff-4392-4ecf-940e-9e2afc374766/name/e3b35abd-6d86-4d99-b691-ba98b4aef9c4?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Movement to RC",
+                                "uuid": "e3b35abd-6d86-4d99-b691-ba98b4aef9c4",
+                                "name": "Movement to RC",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/264251ff-4392-4ecf-940e-9e2afc374766/name/e3b35abd-6d86-4d99-b691-ba98b4aef9c4"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/264251ff-4392-4ecf-940e-9e2afc374766/name/e3b35abd-6d86-4d99-b691-ba98b4aef9c4?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Movement to RC",
+                            "resourceVersion": "2.0",
+                            "translationKey": "MOVEMENT_TO_RC_10"
+                          },
+                          {
+                            "uuid": "03deec04-2457-414f-977b-31d75a358be4",
+                            "name": {
+                              "display": "Movement to Kahramana",
+                              "uuid": "15f62f82-2b59-424e-89dc-df5aa970cb26",
+                              "name": "Movement to Kahramana",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/03deec04-2457-414f-977b-31d75a358be4/name/15f62f82-2b59-424e-89dc-df5aa970cb26"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/03deec04-2457-414f-977b-31d75a358be4/name/15f62f82-2b59-424e-89dc-df5aa970cb26?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Movement to Kahramana",
+                                "uuid": "15f62f82-2b59-424e-89dc-df5aa970cb26",
+                                "name": "Movement to Kahramana",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/03deec04-2457-414f-977b-31d75a358be4/name/15f62f82-2b59-424e-89dc-df5aa970cb26"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/03deec04-2457-414f-977b-31d75a358be4/name/15f62f82-2b59-424e-89dc-df5aa970cb26?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Movement to Kahramana",
+                            "resourceVersion": "2.0",
+                            "translationKey": "MOVEMENT_TO_KAHRAMANA_10"
+                          },
+                          {
+                            "uuid": "d815b04d-c097-48bf-93b1-61e8c682fcc8",
+                            "name": {
+                              "display": "Transfer Home",
+                              "uuid": "e5561000-d255-4022-9234-40554efdcd77",
+                              "name": "Transfer Home",
+                              "locale": "en",
+                              "localePreferred": true,
+                              "conceptNameType": "FULLY_SPECIFIED",
+                              "links": [
+                                {
+                                  "rel": "self",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/d815b04d-c097-48bf-93b1-61e8c682fcc8/name/e5561000-d255-4022-9234-40554efdcd77"
+                                },
+                                {
+                                  "rel": "full",
+                                  "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/d815b04d-c097-48bf-93b1-61e8c682fcc8/name/e5561000-d255-4022-9234-40554efdcd77?v=full"
+                                }
+                              ],
+                              "resourceVersion": "1.9"
+                            },
+                            "names": [
+                              {
+                                "display": "Transfer Home",
+                                "uuid": "e5561000-d255-4022-9234-40554efdcd77",
+                                "name": "Transfer Home",
+                                "locale": "en",
+                                "localePreferred": true,
+                                "conceptNameType": "FULLY_SPECIFIED",
+                                "links": [
+                                  {
+                                    "rel": "self",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/d815b04d-c097-48bf-93b1-61e8c682fcc8/name/e5561000-d255-4022-9234-40554efdcd77"
+                                  },
+                                  {
+                                    "rel": "full",
+                                    "uri": "http://ci-agent03.mybahmni.org/openmrs/ws/rest/v1/concept/d815b04d-c097-48bf-93b1-61e8c682fcc8/name/e5561000-d255-4022-9234-40554efdcd77?v=full"
+                                  }
+                                ],
+                                "resourceVersion": "1.9"
+                              }
+                            ],
+                            "displayString": "Transfer Home",
+                            "resourceVersion": "2.0",
+                            "translationKey": "TRANSFER_HOME_10"
+                          }
+                        ],
+                        "properties": {
+                          "allowDecimal": null
+                        }
+                      },
+                      "units": null,
+                      "hiNormal": null,
+                      "lowNormal": null,
+                      "hiAbsolute": null,
+                      "lowAbsolute": null
+                    },
+                    {
+                      "type": "obsControl",
+                      "label": {
+                        "translationKey": "DISPOSITION_NOTE_11",
+                        "id": "11",
+                        "units": "",
+                        "type": "label",
+                        "value": "Disposition Note"
+                      },
+                      "properties": {
+                        "mandatory": false,
+                        "notes": false,
+                        "addMore": false,
+                        "hideLabel": false,
+                        "controlEvent": false,
+                        "location": {
+                          "row": 1,
+                          "column": 0
+                        }
+                      },
+                      "id": "11",
+                      "concept": {
+                        "name": "Disposition Note",
+                        "uuid": "7e2bdbd0-e42f-11e5-8c3e-08002715d519",
+                        "datatype": "Text",
+                        "conceptClass": "Misc",
+                        "conceptHandler": null,
+                        "units": null,
+                        "hiNormal": null,
+                        "lowNormal": null,
+                        "hiAbsolute": null,
+                        "lowAbsolute": null,
+                        "answers": [],
+                        "properties": {
+                          "allowDecimal": null
+                        }
+                      },
+                      "units": null,
+                      "hiNormal": null,
+                      "lowNormal": null,
+                      "hiAbsolute": null,
+                      "lowAbsolute": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "obsGroupControl",
+      "label": {
+        "translationKey": "VS,_BLOOD_PRESSURE_12",
+        "type": "label",
+        "value": "VS, Blood pressure",
+        "id": "12"
+      },
+      "properties": {
+        "addMore": false,
+        "location": {
+          "column": 0,
+          "row": 2
+        }
+      },
+      "id": "12",
+      "concept": {
+        "name": "VS, Blood pressure",
+        "uuid": "0bba9c93-bb5a-433e-8c86-4eda40238d4d",
+        "datatype": "N/A",
+        "conceptClass": "ConvSet",
+        "conceptHandler": null,
+        "set": true,
+        "setMembers": [
+          {
+            "name": "VS, Systolic blood pressure",
+            "uuid": "d4a50246-e698-4f9a-86c8-c98bde9faf15",
+            "datatype": "Numeric",
+            "conceptClass": "Finding",
+            "conceptHandler": null,
+            "units": "mmHg",
+            "hiNormal": null,
+            "lowNormal": null,
+            "hiAbsolute": null,
+            "lowAbsolute": null,
+            "answers": [],
+            "properties": {
+              "allowDecimal": true
+            }
+          },
+          {
+            "name": "VS, Diastolic blood pressure",
+            "uuid": "67408dee-a0e4-4a5e-b5ab-8c61e5be5e50",
+            "datatype": "Numeric",
+            "conceptClass": "Finding",
+            "conceptHandler": null,
+            "units": "mmHg",
+            "hiNormal": null,
+            "lowNormal": null,
+            "hiAbsolute": null,
+            "lowAbsolute": null,
+            "answers": [],
+            "properties": {
+              "allowDecimal": true
+            }
+          }
+        ]
+      },
+      "controls": [
+        {
+          "type": "obsControl",
+          "label": {
+            "translationKey": "VS,_SYSTOLIC_BLOOD_PRESSURE_13",
+            "id": "13",
+            "units": "(mmHg)",
+            "type": "label",
+            "value": "VS, Systolic blood pressure"
+          },
+          "properties": {
+            "mandatory": false,
+            "notes": false,
+            "addMore": false,
+            "hideLabel": false,
+            "controlEvent": false,
+            "location": {
+              "row": 0,
+              "column": 0
+            }
+          },
+          "id": "13",
+          "concept": {
+            "name": "VS, Systolic blood pressure",
+            "uuid": "d4a50246-e698-4f9a-86c8-c98bde9faf15",
+            "datatype": "Numeric",
+            "conceptClass": "Finding",
+            "conceptHandler": null,
+            "units": "mmHg",
+            "hiNormal": null,
+            "lowNormal": null,
+            "hiAbsolute": null,
+            "lowAbsolute": null,
+            "answers": [],
+            "properties": {
+              "allowDecimal": true
+            }
+          },
+          "units": "mmHg",
+          "hiNormal": null,
+          "lowNormal": null,
+          "hiAbsolute": null,
+          "lowAbsolute": null
+        },
+        {
+          "type": "obsControl",
+          "label": {
+            "translationKey": "VS,_DIASTOLIC_BLOOD_PRESSURE_14",
+            "id": "14",
+            "units": "(mmHg)",
+            "type": "label",
+            "value": "VS, Diastolic blood pressure"
+          },
+          "properties": {
+            "mandatory": false,
+            "notes": false,
+            "addMore": false,
+            "hideLabel": false,
+            "controlEvent": false,
+            "location": {
+              "row": 1,
+              "column": 0
+            }
+          },
+          "id": "14",
+          "concept": {
+            "name": "VS, Diastolic blood pressure",
+            "uuid": "67408dee-a0e4-4a5e-b5ab-8c61e5be5e50",
+            "datatype": "Numeric",
+            "conceptClass": "Finding",
+            "conceptHandler": null,
+            "units": "mmHg",
+            "hiNormal": null,
+            "lowNormal": null,
+            "hiAbsolute": null,
+            "lowAbsolute": null,
+            "answers": [],
+            "properties": {
+              "allowDecimal": true
+            }
+          },
+          "units": "mmHg",
+          "hiNormal": null,
+          "lowNormal": null,
+          "hiAbsolute": null,
+          "lowAbsolute": null
+        }
+      ]
+    }
+  ],
+  "events": {},
+  "translationsUrl": "/openmrs/ws/rest/v1/bahmniie/form/translations"
+}

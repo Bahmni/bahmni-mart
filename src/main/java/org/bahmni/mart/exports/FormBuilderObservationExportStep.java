@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
 import static org.bahmni.mart.BatchUtils.stepNumber;
 
 @Component
@@ -30,9 +31,6 @@ public class FormBuilderObservationExportStep {
 
     @Autowired
     private DataSource dataSource;
-
-    @Autowired
-    private FreeMarkerEvaluator<BahmniForm> freeMarkerEvaluator;
 
     private BahmniForm form;
 
@@ -54,16 +52,19 @@ public class FormBuilderObservationExportStep {
     }
 
     private JdbcCursorItemReader<Map<String, Object>> obsReader() {
-
         String sql = String.format("SELECT encounter_id, obs_id FROM obs WHERE form_namespace_and_path LIKE " +
                 "'Bahmni^%s%%' AND obs_group_id is NULL AND voided = false GROUP BY encounter_id",
-                form.getFormName().getName());
+                getRootForm(form).getFormName().getName());
 
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);
         reader.setRowMapper(new ColumnMapRowMapper());
         return reader;
+    }
+
+    private BahmniForm getRootForm(BahmniForm form) {
+        return isNull(form.getRootForm())? form : form.getRootForm();
     }
 
     private FormBuilderObservationProcessor observationProcessor() {

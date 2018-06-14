@@ -28,7 +28,7 @@ public class FormBuilderStepConfigurer extends StepConfigurer {
 
     @Override
     protected List<BahmniForm> getAllForms() {
-        return formBuilderFormListProcessor.getAllForms();
+        return formBuilderFormListProcessor.retrieveAllForms(null, null);
     }
 
     @Override
