@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -59,5 +60,36 @@ public class JobDefinitionUtil {
     private static boolean isAddMoreMultiSelectEnabled(SeparateTableConfig separateTableConfig) {
         Boolean enableForAddMoreAndMultiSelect = separateTableConfig.getEnableForAddMoreAndMultiSelect();
         return enableForAddMoreAndMultiSelect == null ? true : enableForAddMoreAndMultiSelect;
+    }
+
+    public static void setCommonPropertiesToGroupedJobs(JobDefinition sourceJobDefinition,
+                                                        List<JobDefinition> groupedJobDefinitions) {
+        int chunkSizeToRead = sourceJobDefinition.getChunkSizeToRead();
+        groupedJobDefinitions.forEach(groupedJobDefinition -> groupedJobDefinition.setChunkSizeToRead(chunkSizeToRead));
+    }
+
+    public static void setConfigToGroupedJobs(JobDefinition sourceJobDefinition,
+                                              List<JobDefinition> groupedJobDefinitions) {
+        List<GroupedJobConfig> groupedJobConfigs = sourceJobDefinition.getGroupedJobConfigs();
+
+        groupedJobConfigs.forEach(groupedJobConfig -> {
+            JobDefinition groupedJobDefinition = getJobDefinitionFromTable(groupedJobConfig.getTableName(),
+                    groupedJobDefinitions);
+
+            if (groupedJobDefinition != null) {
+                groupedJobDefinition.setColumnsToIgnore(groupedJobConfig.getColumnsToIgnore());
+                groupedJobDefinition.setCodeConfigs(groupedJobConfig.getCodeConfigs());
+            }
+        });
+    }
+
+    private static JobDefinition getJobDefinitionFromTable(String tableName,
+                                                           List<JobDefinition> groupedJobDefinitions) {
+        Optional<JobDefinition> optionalJobDefinition = groupedJobDefinitions.stream()
+                .filter(jobDefinition -> {
+                    String jobTableName = jobDefinition.getTableName();
+                    return jobTableName != null && jobTableName.equals(tableName);
+                }).findFirst();
+        return optionalJobDefinition.orElse(null);
     }
 }

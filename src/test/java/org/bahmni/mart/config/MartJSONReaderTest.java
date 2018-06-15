@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.core.io.Resource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -157,5 +158,40 @@ public class MartJSONReaderTest {
 
         verifyStatic(times(0));
         BatchUtils.convertResourceOutputToString(any());
+    }
+
+    @Test
+    public void shouldReturnListOfJobDefinitionsForAGivenResource() {
+
+        Resource resource = mock(Resource.class);
+
+        String json = "{\n" +
+                "  \"jobs\": [\n" +
+                "    {\n" +
+                "      \"name\": \"test name\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        mockStatic(BatchUtils.class);
+        when(BatchUtils.convertResourceOutputToString(resource)).thenReturn(json);
+
+        List<JobDefinition> actualJobDefinitions = martJSONReader.getJobDefinitions(resource);
+
+        assertEquals(1, actualJobDefinitions.size());
+        assertEquals("test name", actualJobDefinitions.get(0).getName());
+
+    }
+
+    @Test
+    public void shouldReturnEmptyListOfJobDefinitionsIfGivenResourceIsNull() {
+
+        mockStatic(BatchUtils.class);
+        when(BatchUtils.convertResourceOutputToString(null)).thenReturn(null);
+
+        List<JobDefinition> actualJobDefinitions = martJSONReader.getJobDefinitions(null);
+
+        assertEquals(0, actualJobDefinitions.size());
+
     }
 }

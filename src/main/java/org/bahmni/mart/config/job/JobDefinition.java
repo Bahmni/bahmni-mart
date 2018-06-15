@@ -15,6 +15,7 @@ public class JobDefinition {
     private String sourceFilePath;
     private boolean ignoreAllFreeTextConcepts;
     private List<CodeConfig> codeConfigs;
+    private List<GroupedJobConfig> groupedJobConfigs;
 
 
     public int getChunkSizeToRead() {
@@ -65,6 +66,10 @@ public class JobDefinition {
         return columnsToIgnore;
     }
 
+    public void setColumnsToIgnore(List<String> columnsToIgnore) {
+        this.columnsToIgnore = columnsToIgnore;
+    }
+
     public EavAttributes getEavAttributes() {
         return eavAttributes;
     }
@@ -81,7 +86,15 @@ public class JobDefinition {
         return codeConfigs;
     }
 
+    public void setCodeConfigs(List<CodeConfig> codeConfigs) {
+        this.codeConfigs = codeConfigs;
+    }
+
     public SeparateTableConfig getSeparateTableConfig() {
         return separateTableConfig;
+    }
+
+    public List<GroupedJobConfig> getGroupedJobConfigs() {
+        return groupedJobConfigs;
     }
 }

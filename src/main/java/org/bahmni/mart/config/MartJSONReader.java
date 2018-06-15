@@ -27,6 +27,15 @@ public class MartJSONReader {
         return CollectionUtils.isEmpty(jobDefinitions) ? new ArrayList<>() : jobDefinitions;
     }
 
+    public List<JobDefinition> getJobDefinitions(Resource resource) {
+        String json = BatchUtils.convertResourceOutputToString(resource);
+        BahmniMartJSON bahmniMartJSON = new Gson().fromJson(json, BahmniMartJSON.class);
+        if (bahmniMartJSON == null) {
+            return new ArrayList<>();
+        }
+        return bahmniMartJSON.getJobs();
+    }
+
     public List<ViewDefinition> getViewDefinitions() {
         List<ViewDefinition> viewDefinitions = bahmniMartJSON.getViews();
         return CollectionUtils.isEmpty(viewDefinitions) ? new ArrayList<>() : viewDefinitions;

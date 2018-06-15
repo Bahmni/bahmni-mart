@@ -20,6 +20,7 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNames
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getSeparateTableNamesForJob;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -249,5 +250,96 @@ public class JobDefinitionUtilTest {
         when(separateTableConfig.getEnableForAddMoreAndMultiSelect()).thenReturn(false);
 
         assertFalse(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition1));
+    }
+
+    @Test
+    public void shouldSetChunkSizeToGroupedJobs() {
+
+        int chunkSize = 500;
+
+        when(jobDefinition1.getChunkSizeToRead()).thenReturn(chunkSize);
+
+        List<JobDefinition> groupedJobDefinitions = Arrays.asList(new JobDefinition(), new JobDefinition());
+
+        JobDefinitionUtil.setCommonPropertiesToGroupedJobs(jobDefinition1, groupedJobDefinitions);
+
+        assertEquals(chunkSize, groupedJobDefinitions.get(0).getChunkSizeToRead());
+        assertEquals(chunkSize, groupedJobDefinitions.get(1).getChunkSizeToRead());
+
+        verify(jobDefinition1, times(1)).getChunkSizeToRead();
+
+    }
+
+    @Test
+    public void shouldSetColumnsToIgnoreConfigToTheGroupedJobToWhichTheTableNameIsProgram() {
+        GroupedJobConfig groupedJobConfig = mock(GroupedJobConfig.class);
+        String tableName = "program";
+
+        JobDefinition jobDefinition = new JobDefinition();
+        jobDefinition.setTableName(tableName);
+        JobDefinition anotherJobDefinition = new JobDefinition();
+        List<JobDefinition> groupedJobDefinitions = Arrays.asList(jobDefinition, anotherJobDefinition);
+
+        List<String> ignoredColumns = Arrays.asList("column1", "column2");
+        when(groupedJobConfig.getTableName()).thenReturn(tableName);
+        when(groupedJobConfig.getColumnsToIgnore()).thenReturn(ignoredColumns);
+        when(jobDefinition1.getGroupedJobConfigs()).thenReturn(Collections.singletonList(groupedJobConfig));
+
+        JobDefinitionUtil.setConfigToGroupedJobs(jobDefinition1, groupedJobDefinitions);
+
+        assertNotNull(jobDefinition.getColumnsToIgnore());
+        assertNull(anotherJobDefinition.getColumnsToIgnore());
+        containsInAnyOrder(ignoredColumns, jobDefinition.getColumnsToIgnore());
+
+        verify(groupedJobConfig, times(1)).getTableName();
+        verify(groupedJobConfig, times(1)).getColumnsToIgnore();
+        verify(jobDefinition1, times(1)).getGroupedJobConfigs();
+    }
+
+    @Test
+    public void shouldSetCodeConfigToTheGroupedJobToWhichTheTableNameIsProgram() {
+        GroupedJobConfig groupedJobConfig = mock(GroupedJobConfig.class);
+        String tableName = "program";
+
+        JobDefinition jobDefinition = new JobDefinition();
+        jobDefinition.setTableName(tableName);
+        JobDefinition anotherJobDefinition = new JobDefinition();
+        List<JobDefinition> groupedJobDefinitions = Arrays.asList(jobDefinition, anotherJobDefinition);
+
+        when(groupedJobConfig.getTableName()).thenReturn(tableName);
+        CodeConfig codeConfig = new CodeConfig();
+        when(groupedJobConfig.getCodeConfigs()).thenReturn(Collections.singletonList(codeConfig));
+        when(jobDefinition1.getGroupedJobConfigs()).thenReturn(Collections.singletonList(groupedJobConfig));
+
+        JobDefinitionUtil.setConfigToGroupedJobs(jobDefinition1, groupedJobDefinitions);
+
+        assertNotNull(jobDefinition.getCodeConfigs());
+        assertNull(anotherJobDefinition.getCodeConfigs());
+        assertEquals(1, jobDefinition.getCodeConfigs().size());
+        assertEquals(codeConfig, jobDefinition.getCodeConfigs().get(0));
+
+
+        verify(groupedJobConfig, times(1)).getTableName();
+        verify(groupedJobConfig, times(1)).getCodeConfigs();
+        verify(jobDefinition1, times(1)).getGroupedJobConfigs();
+    }
+
+    @Test
+    public void shouldNotSetAnyConfigForGroupedJobsIfTableNameDoesNotMatch() {
+        GroupedJobConfig groupedJobConfig = mock(GroupedJobConfig.class);
+
+        JobDefinition jobDefinition = new JobDefinition();
+        List<JobDefinition> groupedJobDefinitions = Collections.singletonList(jobDefinition);
+
+        when(groupedJobConfig.getTableName()).thenReturn("unknown_table");
+        when(jobDefinition1.getGroupedJobConfigs()).thenReturn(Collections.singletonList(groupedJobConfig));
+
+        JobDefinitionUtil.setConfigToGroupedJobs(jobDefinition1, groupedJobDefinitions);
+
+        assertNull(jobDefinition.getCodeConfigs());
+        assertNull(jobDefinition.getColumnsToIgnore());
+
+        verify(groupedJobConfig, times(1)).getTableName();
+        verify(jobDefinition1, times(1)).getGroupedJobConfigs();
     }
 }
