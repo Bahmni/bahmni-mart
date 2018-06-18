@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CustomSqlStrategyTest {
+public class CustomSqlJobStrategyTest {
 
     @Mock
     private ObjectFactory<SimpleJobTemplate> simpleJobTemplateObjectFactory;
@@ -35,9 +35,9 @@ public class CustomSqlStrategyTest {
         when(simpleJobTemplateObjectFactory.getObject()).thenReturn(simpleJobTemplate);
         when(simpleJobTemplate.buildJob(jobDefinition)).thenReturn(expectedJob);
 
-        CustomSqlStrategy customSqlStrategy = new CustomSqlStrategy(simpleJobTemplateObjectFactory);
+        CustomSqlJobStrategy customSqlJobStrategy = new CustomSqlJobStrategy(simpleJobTemplateObjectFactory);
 
-        Job actualJob = customSqlStrategy.getJob(jobDefinition);
+        Job actualJob = customSqlJobStrategy.getJob(jobDefinition);
 
         assertEquals(expectedJob, actualJob);
 

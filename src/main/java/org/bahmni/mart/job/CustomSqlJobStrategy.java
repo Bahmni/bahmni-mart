@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomSqlStrategy implements JobStrategy {
+public class CustomSqlJobStrategy implements JobStrategy {
 
     private final ObjectFactory<SimpleJobTemplate> simpleJobTemplateFactory;
 
     @Autowired
-    public CustomSqlStrategy(ObjectFactory<SimpleJobTemplate> simpleJobTemplateFactory) {
+    public CustomSqlJobStrategy(ObjectFactory<SimpleJobTemplate> simpleJobTemplateFactory) {
         this.simpleJobTemplateFactory = simpleJobTemplateFactory;
     }
 
