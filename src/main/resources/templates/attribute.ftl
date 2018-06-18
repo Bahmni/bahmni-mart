@@ -5,14 +5,14 @@ SELECT
             ${column.name}
             <#assign primary_key = column.name>
         <#else >
-        MAX(if( name =  '${column.name}',
-                    if  (value_table.${input.eavAttributes.valueColumnName} REGEXP '^[[:digit:]]*$' AND
-                        ${getType('${column.name}', '${input.eavAttributes.attributeTypeTableName}',
-                            '${input.typeColumnName}')} REGEXP '^org.openmrs.Concept$' AND
-                        ${getConceptName(input.eavAttributes.valueColumnName)} IS NOT NULL,
-                        ${getConceptName(input.eavAttributes.valueColumnName)},
+        MAX(if( name =  '${getProcessedName(column.name)}',
+                    if  (value_table.${getProcessedName(input.eavAttributes.valueColumnName)} REGEXP '^[[:digit:]]*$' AND
+            ${getType('${getProcessedName(column.name)}', '${getProcessedName(input.eavAttributes.attributeTypeTableName)}',
+            '${getProcessedName(input.typeColumnName)}')} REGEXP '^org.openmrs.Concept$' AND
+            ${getConceptName(input.eavAttributes.valueColumnName)} IS NOT NULL,
+            ${getConceptName(input.eavAttributes.valueColumnName)},
                         value_table.${input.eavAttributes.valueColumnName})
-        , NULL)) AS '${column.name}'
+        , NULL)) AS '${getProcessedName(column.name)}'
         </#if>
         <#if input.tableData.columns?seq_index_of(column) <=  input.tableData.columns?size - 2 >,</#if>
     </#list>
@@ -28,7 +28,11 @@ GROUP BY ${primary_key} ;
 
 <#function getType attributeName typeTableName typeColumnName>
     <#assign type="(select ${typeColumnName} from ${typeTableName} where name = '${attributeName}')">
-<#return type>
+    <#return type>
+</#function>
+
+<#function getProcessedName name>
+    <#return name?replace("'", "''")>
 </#function>
 
 
