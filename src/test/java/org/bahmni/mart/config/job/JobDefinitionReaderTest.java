@@ -50,6 +50,11 @@ public class JobDefinitionReaderTest {
                 "  \"columnsToIgnore\": [\n" +
                 "    \"MH, Name of MLO\"\n" +
                 "  ]\n" +
+                "}," +
+                "{\n" +
+                "      \"name\": \"programs\",\n" +
+                "      \"type\": \"programs\",\n" +
+                "      \"chunkSizeToRead\": 500" +
                 "}" +
                 "]}";
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(json);
@@ -63,7 +68,7 @@ public class JobDefinitionReaderTest {
         List<JobDefinition> jobDefinitions = jobDefinitionReader.getJobDefinitions();
 
         assertNotNull(jobDefinitions);
-        assertEquals(2, jobDefinitions.size());
+        assertEquals(3, jobDefinitions.size());
         JobDefinition genericJobDefinition = jobDefinitions.get(0);
         assertEquals("Program Data", genericJobDefinition.getName());
         assertEquals("customSql", genericJobDefinition.getType());
@@ -86,6 +91,12 @@ public class JobDefinitionReaderTest {
         List<String> actualColumnsToIgnore = obsJobDefinition.getColumnsToIgnore();
         assertEquals(1, actualColumnsToIgnore.size());
         assertThat(expectedIgnoredColumns, containsInAnyOrder(actualColumnsToIgnore.toArray()));
+
+        JobDefinition groupedJobDefinition = jobDefinitions.get(2);
+        assertEquals("programs", groupedJobDefinition.getName());
+        assertEquals("programs", groupedJobDefinition.getType());
+        assertEquals(500, groupedJobDefinition.getChunkSizeToRead());
+
     }
 
     @Test
@@ -108,5 +119,13 @@ public class JobDefinitionReaderTest {
         assertNull(personAttributeDefinition.getReaderSql());
         assertEquals(0, personAttributeDefinition.getChunkSizeToRead());
         assertNull(personAttributeDefinition.getTableName());
+    }
+
+    @Test
+    public void shouldReturnJobDefinitionsByGroupedJobType() {
+
+        List<JobDefinition> jobDefinitionsByGroupedJobTypes = jobDefinitionReader.getJobDefinitionsByGroupedJobTypes();
+
+        assertEquals(1, jobDefinitionsByGroupedJobTypes.size());
     }
 }
