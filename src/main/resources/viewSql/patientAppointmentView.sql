@@ -10,8 +10,9 @@ SELECT
   pap.appointment_end_time,
   pap.appointment_speciality,
   pap.appointment_service,
-  pap.appointment_service_type,
   pap.appointment_service_duration,
+  pap.appointment_service_type,
+  pap.appointment_service_type_duration,
   pap.appointment_status,
   pap.appointment_location,
   pap.appointment_kind
