@@ -12,13 +12,16 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
+@Order(value = MartExecutionOrder.JOB)
 public class MartJobExecutor implements MartExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(MartJobExecutor.class);
@@ -45,7 +48,11 @@ public class MartJobExecutor implements MartExecutor {
         allJobDefinitions.addAll(groupedJobDefinitions);
 
         validateJobDefinitions(allJobDefinitions);
-        launchJobs(allJobDefinitions);
+
+        List<Job> jobs = allJobDefinitions.stream().map(jobDefinition -> jobContext.getJob(jobDefinition))
+                .collect(Collectors.toList());
+
+        launchJobs(jobs);
     }
 
     private List<JobDefinition> getGroupedJobDefinitions() {
@@ -62,10 +69,10 @@ public class MartJobExecutor implements MartExecutor {
             throw new InvalidJobConfiguration();
     }
 
-    private void launchJobs(List<JobDefinition> jobDefinitions) {
-        jobDefinitions.forEach(jobDefinition -> {
+    private void launchJobs(List<Job> jobs) {
+
+        jobs.forEach(job -> {
             try {
-                Job job = jobContext.getJob(jobDefinition);
                 JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                 jobParametersBuilder.addDate(job.getName(), new Date());
                 jobLauncher.run(job, jobParametersBuilder.toJobParameters());

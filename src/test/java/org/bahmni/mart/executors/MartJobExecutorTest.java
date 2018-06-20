@@ -1,6 +1,5 @@
 package org.bahmni.mart.executors;
 
-import org.bahmni.mart.CommonTestHelper;
 import org.bahmni.mart.config.group.GroupedJob;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
@@ -22,6 +21,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 
 import java.util.Collections;
 
+import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
@@ -132,13 +132,12 @@ public class MartJobExecutorTest {
     public void shouldLogWarningWhenAnExceptionComesWhileLaunchingJobs() throws Exception {
 
         Logger log = mock(Logger.class);
-        CommonTestHelper.setValueForFinalStaticField(MartJobExecutor.class, "log", log);
-        when(jobContext.getJob(jobDefinition)).thenThrow(new RuntimeException("some message"));
+        setValueForFinalStaticField(MartJobExecutor.class, "log", log);
+        when(jobLauncher.run(any(Job.class), any(JobParameters.class))).thenThrow(new RuntimeException("some message"));
 
         martJobExecutor.execute();
 
-        verify(log, times(1)).warn(any(String.class), any(Exception.class));
-
+        verify(log, times(2)).warn(any(String.class), any(Exception.class));
 
     }
 }

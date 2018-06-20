@@ -7,11 +7,13 @@ import org.bahmni.mart.config.view.RspViewDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Order(value = MartExecutionOrder.VIEW)
 public class MartViewExecutor implements MartExecutor {
 
     private static final String REGISTRATION_SECOND_PAGE = "Registration Second Page";

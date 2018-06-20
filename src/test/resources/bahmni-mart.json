@@ -38,7 +38,7 @@
     },
     {
       "name": "Patient Details",
-      "type": "generic",
+      "type": "customSql",
       "sourceFilePath": "classpath:readerSql/reader.sql",
       "chunkSizeToRead": "500",
       "tableName": "patient_details",
