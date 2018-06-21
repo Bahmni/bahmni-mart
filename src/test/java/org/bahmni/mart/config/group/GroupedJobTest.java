@@ -28,7 +28,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(JobDefinitionUtil.class)
+@PrepareForTest({JobDefinitionUtil.class, GroupedJobType.class})
 public class GroupedJobTest {
 
     GroupedJob groupedJob;
@@ -71,5 +71,55 @@ public class GroupedJobTest {
         assertEquals(2, groupedJobDefinitions.size());
 
         containsInAnyOrder(expectedJobDefinitions, groupedJobDefinitions);
+    }
+
+    @Test
+    public void shouldReturnJobDefinitionsBySkippingGroupedTypeJobs() {
+        JobDefinition jobDefinition = new JobDefinition();
+        String customSql = "customSql";
+        jobDefinition.setType(customSql);
+
+        JobDefinition groupedTypeJobDefinition = new JobDefinition();
+        String programs = "programs";
+        groupedTypeJobDefinition.setType(programs);
+
+        mockStatic(GroupedJobType.class);
+
+        when(GroupedJobType.contains(customSql)).thenReturn(false);
+        when(GroupedJobType.contains(programs)).thenReturn(true);
+
+        List<JobDefinition> allJobDefinitions = Arrays.asList(jobDefinition, groupedTypeJobDefinition);
+        List<JobDefinition> jobDefinitions = groupedJob.getJobDefinitionsBySkippingGroupedTypeJobs(allJobDefinitions);
+
+        assertEquals(1, jobDefinitions.size());
+
+        assertEquals(jobDefinition, jobDefinitions.get(0));
+
+    }
+
+    @Test
+    public void shouldReturnGroupedTypeJobDefinitions() {
+        JobDefinition jobDefinition = new JobDefinition();
+        String customSql = "customSql";
+        jobDefinition.setType(customSql);
+
+        JobDefinition groupedTypeJobDefinition = new JobDefinition();
+        String programs = "programs";
+        groupedTypeJobDefinition.setType(programs);
+
+
+        when(martJSONReader.getJobDefinitionsFromBahmniMartJson())
+                .thenReturn(Arrays.asList(jobDefinition, groupedTypeJobDefinition));
+        mockStatic(GroupedJobType.class);
+
+        when(GroupedJobType.contains(customSql)).thenReturn(false);
+        when(GroupedJobType.contains(programs)).thenReturn(true);
+
+        List<JobDefinition> jobDefinitions = groupedJob.getGroupedTypeJobDefinitions();
+
+        assertEquals(1, jobDefinitions.size());
+
+        assertEquals(groupedTypeJobDefinition, jobDefinitions.get(0));
+
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
@@ -77,14 +78,10 @@ public class MartJobExecutorTest {
         mockStatic(JobDefinitionValidator.class);
 
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
-        when(jobDefinitionReader.getJobDefinitionsByGroupedJobTypes())
-                .thenReturn(Collections.singletonList(groupedTypeJobDefinition));
-
-        when(groupedJob.getJobDefinitions(groupedTypeJobDefinition))
-                .thenReturn(Collections.singletonList(groupedJobDefinition));
+        when(groupedJob.getJobDefinitionsBySkippingGroupedTypeJobs(anyListOf(JobDefinition.class)))
+                .thenReturn(Arrays.asList(jobDefinition, groupedJobDefinition, null));
 
         when(JobDefinitionValidator.validate(anyListOf(JobDefinition.class))).thenReturn(true);
-
 
         when(jobContext.getJob(jobDefinition)).thenReturn(job);
         when(jobContext.getJob(groupedJobDefinition)).thenReturn(groupJob);
@@ -96,8 +93,7 @@ public class MartJobExecutorTest {
         martJobExecutor.execute();
 
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
-        verify(jobDefinitionReader, times(1)).getJobDefinitionsByGroupedJobTypes();
-        verify(groupedJob, times(1)).getJobDefinitions(groupedTypeJobDefinition);
+        verify(groupedJob, times(1)).getJobDefinitionsBySkippingGroupedTypeJobs(anyListOf(JobDefinition.class));
 
         verifyStatic(times(1));
         JobDefinitionValidator.validate(anyListOf(JobDefinition.class));
@@ -106,7 +102,7 @@ public class MartJobExecutorTest {
         verify(jobContext, times(1)).getJob(groupedJobDefinition);
         verify(job, times(1)).getName();
         verify(groupJob, times(1)).getName();
-
+        verify(groupedJob, times(1)).getJobDefinitionsBySkippingGroupedTypeJobs(anyListOf(JobDefinition.class));
         verify(jobLauncher, times(2)).run(any(Job.class), any(JobParameters.class));
     }
 
@@ -121,8 +117,6 @@ public class MartJobExecutorTest {
         martJobExecutor.execute();
 
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
-        verify(jobDefinitionReader, times(1)).getJobDefinitionsByGroupedJobTypes();
-        verify(groupedJob, times(1)).getJobDefinitions(groupedTypeJobDefinition);
 
         verifyStatic(times(1));
         JobDefinitionValidator.validate(anyListOf(JobDefinition.class));

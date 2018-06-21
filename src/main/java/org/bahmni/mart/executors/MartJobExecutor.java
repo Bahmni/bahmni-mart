@@ -15,9 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -41,27 +41,16 @@ public class MartJobExecutor implements MartExecutor {
     @Override
     public void execute() {
 
-        List<JobDefinition> bahmniMartJobDefinitions = jobDefinitionReader.getJobDefinitions();
-        List<JobDefinition> groupedJobDefinitions = getGroupedJobDefinitions();
+        List<JobDefinition> allJobDefinitions = jobDefinitionReader.getJobDefinitions();
 
-        List<JobDefinition> allJobDefinitions = new ArrayList<>(bahmniMartJobDefinitions);
-        allJobDefinitions.addAll(groupedJobDefinitions);
+        allJobDefinitions = groupedJob.getJobDefinitionsBySkippingGroupedTypeJobs(allJobDefinitions);
 
         validateJobDefinitions(allJobDefinitions);
 
         List<Job> jobs = allJobDefinitions.stream().map(jobDefinition -> jobContext.getJob(jobDefinition))
-                .collect(Collectors.toList());
+                .filter(Objects::nonNull).collect(Collectors.toList());
 
         launchJobs(jobs);
-    }
-
-    private List<JobDefinition> getGroupedJobDefinitions() {
-        List<JobDefinition> groupedJobDefinitions = new ArrayList<>();
-        List<JobDefinition> jobDefinitionsByGroupedJobTypes = jobDefinitionReader.getJobDefinitionsByGroupedJobTypes();
-        jobDefinitionsByGroupedJobTypes.forEach(jobDefinition -> {
-            groupedJobDefinitions.addAll(groupedJob.getJobDefinitions(jobDefinition));
-        });
-        return groupedJobDefinitions;
     }
 
     private void validateJobDefinitions(List<JobDefinition> jobDefinitions) {

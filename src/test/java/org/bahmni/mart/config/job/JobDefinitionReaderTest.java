@@ -1,9 +1,11 @@
 package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.group.GroupedJob;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -11,6 +13,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -25,8 +28,11 @@ public class JobDefinitionReaderTest {
 
     private JobDefinitionReader jobDefinitionReader;
 
+    @Mock
+    private GroupedJob groupedJob;
+
     @Before
-    public void setUp() {
+    public void setUp() throws NoSuchFieldException, IllegalAccessException {
         PowerMockito.mockStatic(BatchUtils.class);
         String json = "{\"jobs\": [\n" +
                 "  {\n" +
@@ -60,6 +66,7 @@ public class JobDefinitionReaderTest {
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(json);
 
         jobDefinitionReader = new JobDefinitionReader();
+        setValuesForSuperClassMemberFields(jobDefinitionReader, "groupedJob", groupedJob);
         jobDefinitionReader.read();
     }
 
@@ -119,13 +126,5 @@ public class JobDefinitionReaderTest {
         assertNull(personAttributeDefinition.getReaderSql());
         assertEquals(0, personAttributeDefinition.getChunkSizeToRead());
         assertNull(personAttributeDefinition.getTableName());
-    }
-
-    @Test
-    public void shouldReturnJobDefinitionsByGroupedJobType() {
-
-        List<JobDefinition> jobDefinitionsByGroupedJobTypes = jobDefinitionReader.getJobDefinitionsByGroupedJobTypes();
-
-        assertEquals(1, jobDefinitionsByGroupedJobTypes.size());
     }
 }

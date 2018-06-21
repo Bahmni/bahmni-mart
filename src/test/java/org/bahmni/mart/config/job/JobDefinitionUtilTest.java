@@ -342,4 +342,19 @@ public class JobDefinitionUtilTest {
         verify(groupedJobConfig, times(1)).getTableName();
         verify(jobDefinition1, times(1)).getGroupedJobConfigs();
     }
+
+    @Test
+    public void shouldNotSetAnyConfigIfGroupedJobConfigIsNull() {
+
+        when(jobDefinition1.getGroupedJobConfigs()).thenReturn(null);
+        JobDefinition jobDefinition = new JobDefinition();
+        List<JobDefinition> groupedJobDefinitions = Collections.singletonList(jobDefinition);
+
+        JobDefinitionUtil.setConfigToGroupedJobs(jobDefinition1, groupedJobDefinitions);
+
+        assertNull(jobDefinition.getCodeConfigs());
+        assertNull(jobDefinition.getColumnsToIgnore());
+
+        verify(jobDefinition1, times(1)).getGroupedJobConfigs();
+    }
 }

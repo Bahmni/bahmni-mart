@@ -71,7 +71,8 @@ public class JobDefinitionUtil {
     public static void setConfigToGroupedJobs(JobDefinition sourceJobDefinition,
                                               List<JobDefinition> groupedJobDefinitions) {
         List<GroupedJobConfig> groupedJobConfigs = sourceJobDefinition.getGroupedJobConfigs();
-
+        if (groupedJobConfigs == null)
+            return;
         groupedJobConfigs.forEach(groupedJobConfig -> {
             JobDefinition groupedJobDefinition = getJobDefinitionFromTable(groupedJobConfig.getTableName(),
                     groupedJobDefinitions);

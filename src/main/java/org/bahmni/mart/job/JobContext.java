@@ -1,7 +1,8 @@
 package org.bahmni.mart.job;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.exception.InvalidJobConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Component
 public class JobContext {
+    private static final Logger log = LoggerFactory.getLogger(JobContext.class);
 
     @Autowired
     private CustomSqlJobStrategy customSqlJobStrategy;
@@ -46,10 +48,13 @@ public class JobContext {
     private Map<String, JobStrategy> jobStrategies;
 
     public Job getJob(JobDefinition jobDefinition) {
-        JobStrategy jobStrategy = jobStrategies.get(jobDefinition.getType().toLowerCase());
+        String jobDefinitionType = jobDefinition.getType();
+
+        JobStrategy jobStrategy = jobStrategies.get(jobDefinitionType.toLowerCase());
         if (jobStrategy == null) {
-            throw new InvalidJobConfiguration(String.format("Invalid job type '%s' for the job '%s'",
-                    jobDefinition.getType(), jobDefinition.getName()));
+            log.warn(String.format("'%s' type is invalid for the job '%s'",
+                    jobDefinitionType, jobDefinition.getName()));
+            return null;
         }
         return jobStrategy.getJob(jobDefinition);
     }

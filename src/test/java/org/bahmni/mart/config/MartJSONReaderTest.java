@@ -1,6 +1,7 @@
 package org.bahmni.mart.config;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.group.GroupedJob;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.procedure.ProcedureDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
@@ -12,7 +13,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.core.io.Resource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
@@ -36,6 +39,13 @@ public class MartJSONReaderTest {
     @Mock
     private BahmniMartJSON bahmniMartJSON;
 
+    @Mock
+    private GroupedJob groupedJob;
+
+    private JobDefinition groupedJobDefinition;
+
+    private JobDefinition groupedTypeJobDefintion;
+
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
 
@@ -45,6 +55,11 @@ public class MartJSONReaderTest {
         when(jobDefinition.getReaderSql()).thenReturn("select * from program");
         when(jobDefinition.getChunkSizeToRead()).thenReturn(1000);
         when(jobDefinition.getTableName()).thenReturn("MyProgram");
+
+        groupedTypeJobDefintion = mock(JobDefinition.class);
+        groupedJobDefinition = mock(JobDefinition.class);
+        when(groupedJob.getGroupedTypeJobDefinitions()).thenReturn(Arrays.asList(groupedTypeJobDefintion));
+        when(groupedJob.getJobDefinitions(groupedTypeJobDefintion)).thenReturn(Arrays.asList(groupedJobDefinition));
 
         ViewDefinition viewDefinition = mock(ViewDefinition.class);
         when(viewDefinition.getName()).thenReturn("patient_program_view");
@@ -61,11 +76,33 @@ public class MartJSONReaderTest {
 
         martJSONReader = new MartJSONReader();
         setValuesForMemberFields(martJSONReader, "bahmniMartJSON", bahmniMartJSON);
+        setValuesForMemberFields(martJSONReader, "groupedJob", groupedJob);
     }
 
     @Test
-    public void shouldReturnJobDefinitions() {
-        List<JobDefinition> actualJobDefinitions = martJSONReader.getJobDefinitions();
+    public void shouldReturnAllJobDefinitions() {
+        List<JobDefinition> jobDefinitions = martJSONReader.getJobDefinitions();
+
+        assertEquals(2, jobDefinitions.size());
+
+        JobDefinition jobDefinition = jobDefinitions.get(0);
+        assertEquals("Program Data", jobDefinition.getName());
+        assertEquals("customSql", jobDefinition.getType());
+        assertEquals("select * from program", jobDefinition.getReaderSql());
+        assertEquals(1000, jobDefinition.getChunkSizeToRead());
+        assertEquals("MyProgram", jobDefinition.getTableName());
+
+        assertEquals(groupedJobDefinition, jobDefinitions.get(1));
+
+        verify(bahmniMartJSON, times(1)).getJobs();
+        verify(groupedJob, times(1)).getGroupedTypeJobDefinitions();
+        verify(groupedJob, times(1)).getJobDefinitions(groupedTypeJobDefintion);
+
+    }
+
+    @Test
+    public void shouldReturnNonGroupedJobDefinitions() {
+        List<JobDefinition> actualJobDefinitions = martJSONReader.getJobDefinitionsFromBahmniMartJson();
 
         assertEquals(1, actualJobDefinitions.size());
         JobDefinition jobDefinition = actualJobDefinitions.get(0);
@@ -103,12 +140,16 @@ public class MartJSONReaderTest {
     }
 
     @Test
-    public void shouldGiveEmptyListAsJobDefinitionsIfJobsAreNotPresent() throws Exception {
-        BahmniMartJSON spyMartJson = spy(new BahmniMartJSON());
-        setValuesForMemberFields(martJSONReader, "bahmniMartJSON", spyMartJson);
+    public void shouldGiveEmptyListAsJobDefinitionsIfJobsAreNotPresent() {
+        when(bahmniMartJSON.getJobs()).thenReturn(new ArrayList<>());
+        when(groupedJob.getGroupedTypeJobDefinitions()).thenReturn(Collections.emptyList());
 
-        assertTrue(martJSONReader.getJobDefinitions().isEmpty());
-        verify(spyMartJson, times(1)).getJobs();
+        List<JobDefinition> jobDefinitions = martJSONReader.getJobDefinitions();
+
+        assertTrue(jobDefinitions.isEmpty());
+        verify(bahmniMartJSON, times(1)).getJobs();
+        verify(groupedJob, times(1)).getGroupedTypeJobDefinitions();
+        verify(groupedJob, times(0)).getJobDefinitions(groupedTypeJobDefintion);
     }
 
     @Test
@@ -147,7 +188,7 @@ public class MartJSONReaderTest {
         verifyStatic(times(1));
         BatchUtils.convertResourceOutputToString(any());
 
-        assertEquals(1, martJSONReader.getJobDefinitions().size());
+        assertEquals(2, martJSONReader.getJobDefinitions().size());
     }
 
     @Test

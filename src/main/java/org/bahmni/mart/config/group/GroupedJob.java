@@ -8,6 +8,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.bahmni.mart.config.job.JobDefinitionUtil.setCommonPropertiesToGroupedJobs;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.setConfigToGroupedJobs;
@@ -43,4 +44,13 @@ public class GroupedJob {
         return resourceLoader.getResource(jsonClassPath);
     }
 
+    public List<JobDefinition> getJobDefinitionsBySkippingGroupedTypeJobs(List<JobDefinition> allJobDefinitions) {
+        return allJobDefinitions.stream().filter(jobDefinition -> !GroupedJobType.contains(jobDefinition.getType()))
+                .collect(Collectors.toList());
+    }
+
+    public List<JobDefinition> getGroupedTypeJobDefinitions() {
+        return martJSONReader.getJobDefinitionsFromBahmniMartJson().stream()
+                .filter(jobDefinition -> GroupedJobType.contains(jobDefinition.getType())).collect(Collectors.toList());
+    }
 }

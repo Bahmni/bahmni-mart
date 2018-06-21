@@ -1,7 +1,6 @@
 package org.bahmni.mart.job;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -9,12 +8,15 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 import org.springframework.batch.core.Job;
 
 import java.util.Map;
 
+import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,17 +69,18 @@ public class JobContextTest {
     }
 
     @Test
-    public void shouldThrowExceptionIfJobDefinitionIsInvalid() {
+    public void shouldLogWarningForInvalidJobType() throws NoSuchFieldException, IllegalAccessException {
 
         when(jobStrategies.get(jobType)).thenReturn(null);
-
-        expectedException.expect(InvalidJobConfiguration.class);
-        expectedException.expectMessage("Invalid job type 'obs' for the job 'null'");
+        when(jobDefinition.getName()).thenReturn("Obs Data");
+        Logger log = mock(Logger.class);
+        setValueForFinalStaticField(JobContext.class, "log", log);
 
         jobContext.getJob(jobDefinition);
+        verify(log, times(1)).warn("'obs' type is invalid for the job 'Obs Data'");
 
         verify(jobDefinition, times(1)).getType();
-        verify(obsJobStrategy, times(1)).getJob(jobDefinition);
+        verify(obsJobStrategy, times(0)).getJob(jobDefinition);
 
     }
 }
