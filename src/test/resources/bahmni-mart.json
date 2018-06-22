@@ -6,11 +6,9 @@
       "sourceFilePath": "src/test/resources/customCodes.csv"
     },
     {
-      "name": "Patient allergy status",
-      "type": "customSql",
-      "readerSql": "SELECT patient_id, allergy_status FROM patient",
-      "chunkSizeToRead": "500",
-      "tableName": "patient_allergy_status_test_default"
+      "name": "Patients",
+      "type": "patients",
+      "chunkSizeToRead": "500"
     },
     {
       "name": "Patient allergy status Coded",

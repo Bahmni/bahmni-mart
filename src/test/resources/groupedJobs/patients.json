@@ -1,0 +1,10 @@
+{
+  "jobs": [
+    {
+      "name": "Patient allergy status",
+      "type": "customSql",
+      "readerSql": "SELECT patient_id, allergy_status FROM patient",
+      "tableName": "patient_allergy_status_test_default"
+    }
+  ]
+}

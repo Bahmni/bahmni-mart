@@ -165,7 +165,7 @@
       "type": "metadata",
       "conceptReferenceSource": ""
     },
-    /*{
+    {
       "name": "Obs Data",
       "type": "obs",
       "separateTableConfig": {
@@ -190,7 +190,7 @@
         "FUP, Comments about next follow-up",
         "FSTG, Comments about refusal"
       ]
-    },*/
+    },
     {
       "name": "Orders Data",
       "type": "orders",
