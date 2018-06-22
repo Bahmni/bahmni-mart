@@ -66,7 +66,7 @@ public class GroupedJobTest {
 
         verify(martJSONReader, times(1)).getJobDefinitions(any(Resource.class));
         verify(jobDefinition, times(1)).getType();
-        verify(resourceLoader, times(1)).getResource("classpath:groupedModules/" + programs + ".json");
+        verify(resourceLoader, times(1)).getResource("classpath:groupedJobs/" + programs + ".json");
 
         assertEquals(2, groupedJobDefinitions.size());
 

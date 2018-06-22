@@ -39,7 +39,7 @@ public class GroupedJob {
 
     private Resource getGroupedJsonResource(JobDefinition jobDefinition) {
         String type = jobDefinition.getType();
-        String jsonClassPath = "classpath:groupedModules/" + type + ".json";
+        String jsonClassPath = "classpath:groupedJobs/" + type + ".json";
 
         return resourceLoader.getResource(jsonClassPath);
     }

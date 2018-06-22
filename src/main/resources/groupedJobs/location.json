@@ -1,0 +1,22 @@
+{
+  "jobs": [
+    {
+      "name": "Locations",
+      "type": "customSql",
+      "readerSql": "SELECT location_id, name, description, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14,  address15, city_village, state_province, postal_code, country, latitude, longitude, county_district, parent_location from location WHERE retired = FALSE",
+      "tableName": "location"
+    },
+    {
+      "name": "Location Tag Map",
+      "type": "customSql",
+      "readerSql": "SELECT ltm.location_id as location_id, lt.location_tag_id as location_tag_id, lt.name as location_tag_name, lt.description as location_tag_description from location_tag_map ltm INNER JOIN location_tag lt on ltm.location_tag_id = lt.location_tag_id AND lt.retired = FALSE",
+      "tableName": "location_tag_map"
+    },
+    {
+      "name": "Location Attribute Details",
+      "type": "customSql",
+      "readerSql": "SELECT location_attribute_id, location_id, lat.location_attribute_type_id as attribute_type_id, la.value_reference as value_reference, lat.name as location_attribute_type_name, lat.description as location_attribute_type_description, lat.datatype as location_attribute_type_datatype, lat.datatype_config as location_attribute_type_datatype_config, lat.preferred_handler as location_attribute_type_preferred_handler, lat.handler_config as location_attribute_type_handler_config, lat.min_occurs as location_attribute_type_min_occurs, lat.max_occurs as location_attribute_type_max_occurs from location_attribute la INNER JOIN location_attribute_type lat on la.attribute_type_id = lat.location_attribute_type_id AND la.voided = FALSE AND lat.retired = FALSE",
+      "tableName": "location_attribute_details"
+    }
+  ]
+}
