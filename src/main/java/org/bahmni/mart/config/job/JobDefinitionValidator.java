@@ -17,10 +17,23 @@ public class JobDefinitionValidator {
     private static final String CUSTOM_SQL = "customSql";
 
     public static boolean validate(List<JobDefinition> jobDefinitions) {
+        boolean areJobNamesUnique = verifyAllJobNamesShouldBeUnique(jobDefinitions);
         List<JobDefinition> genericJobDefinitions = jobDefinitions.stream().filter(jobDefinition ->
                 jobDefinition.getType().equals(CUSTOM_SQL)).collect(Collectors.toList());
-        return hasNoEmptyReaderSqlOrTableName(genericJobDefinitions) &&
+        return areJobNamesUnique && hasNoEmptyReaderSqlOrTableName(genericJobDefinitions) &&
                 hasUniqueJobNamesAndTableNames(genericJobDefinitions);
+    }
+
+    private static boolean verifyAllJobNamesShouldBeUnique(List<JobDefinition> jobDefinitions) {
+        Set<String> jobNames = new HashSet<>();
+        for (JobDefinition jobDefinition : jobDefinitions) {
+            boolean isAdded = jobNames.add(jobDefinition.getName());
+            if (!isAdded) {
+                logger.error(String.format("Duplicate jobs found with the same name '%s'", jobDefinition.getName()));
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean hasNoEmptyReaderSqlOrTableName(List<JobDefinition> jobDefinitions) {

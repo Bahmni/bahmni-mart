@@ -43,9 +43,9 @@ public class MartJobExecutor implements MartExecutor {
 
         List<JobDefinition> allJobDefinitions = jobDefinitionReader.getJobDefinitions();
 
-        allJobDefinitions = groupedJob.getJobDefinitionsBySkippingGroupedTypeJobs(allJobDefinitions);
-
         validateJobDefinitions(allJobDefinitions);
+
+        allJobDefinitions = groupedJob.getJobDefinitionsBySkippingGroupedTypeJobs(allJobDefinitions);
 
         List<Job> jobs = allJobDefinitions.stream().map(jobDefinition -> jobContext.getJob(jobDefinition))
                 .filter(Objects::nonNull).collect(Collectors.toList());

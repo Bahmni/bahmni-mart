@@ -171,7 +171,10 @@ public class JobDefinitionValidatorTest {
         jobDefinitions.add(jobDefinition2);
         jobDefinitions.add(jobDefinition1);
         jobDefinitions.add(jobDefinition);
+
         assertFalse(JobDefinitionValidator.validate(jobDefinitions));
+        verify(logger, times(1)).error("Duplicate jobs found with the same name 'test'");
+
     }
 
     @Test
