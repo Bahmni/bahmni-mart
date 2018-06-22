@@ -3,7 +3,7 @@ package org.bahmni.mart.config.group;
 import java.util.Arrays;
 
 public enum GroupedJobType {
-    PROGRAMS;
+    PROGRAMS, PATIENTS, APPOINTMENTS;
 
     public static boolean contains(String groupedJobType) {
         return Arrays.stream(GroupedJobType.values())

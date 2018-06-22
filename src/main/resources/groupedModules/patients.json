@@ -1,0 +1,41 @@
+{
+  "jobs": [
+    {
+      "name": "Patient State",
+      "type": "customSql",
+      "readerSql": "SELECT ps.patient_state_id, ps.patient_program_id, p.patient_id, pp.program_id, pr.name AS program_name, ps.state, cv.concept_full_name AS state_name, ps.start_date, ps.end_date, ps.creator AS creator_id, pn.creator_name, ps.date_created, ps.date_changed, ps.changed_by AS changed_by_id, pn2.changed_by_name FROM patient p INNER JOIN patient_program pp ON pp.patient_id = p.patient_id AND p.voided = FALSE AND pp.voided = FALSE INNER JOIN program pr ON pr.program_id = pp.program_id AND pr.retired = FALSE INNER JOIN patient_state ps ON ps.patient_program_id = pp.patient_program_id AND ps.voided = FALSE INNER JOIN (SELECT concat_ws(' ', ifnull(n.given_name, ''), ifnull(n.family_name, '')) AS creator_name, users.user_id FROM users INNER JOIN person_name n ON users.person_id = n.person_id AND users.retired = FALSE AND n.voided = FALSE) pn ON pn.user_id = ps.creator LEFT OUTER JOIN (SELECT concat_ws(' ', ifnull(n.given_name, ''), ifnull(n.family_name, '')) AS changed_by_name, users.user_id FROM users INNER JOIN person_name n ON users.person_id = n.person_id AND users.retired = FALSE AND n.voided = FALSE) pn2 ON pn2.user_id = ps.changed_by INNER JOIN program_workflow_state pws ON pws.program_workflow_state_id = ps.state AND ps.voided = FALSE AND pws.retired = FALSE LEFT OUTER JOIN concept_view cv ON cv.concept_id = pws.concept_id AND cv.retired = FALSE",
+      "tableName": "patient_state"
+    },
+    {
+      "name": "Patient allergy status",
+      "type": "customSql",
+      "readerSql": "SELECT patient_id, allergy_status FROM patient WHERE voided = FALSE",
+      "tableName": "patient_allergy_status"
+    },
+    {
+      "name": "Patient Visit Details",
+      "type": "customSql",
+      "readerSql": "SELECT visit_id, patient.patient_id AS patient_id, visit.visit_type_id AS visit_type_id, vt.name AS visit_type_name, vt.description AS visit_type_description, date_started AS visit_start_date, date_stopped AS visit_end_date, indication_concept_id, visit.location_id AS location_id, location.name AS location_name FROM patient INNER JOIN visit ON patient.patient_id = visit.patient_id AND patient.voided = FALSE AND visit.voided = FALSE INNER JOIN visit_type vt ON visit.visit_type_id = vt.visit_type_id AND vt.retired = FALSE LEFT OUTER JOIN location ON visit.location_id = location.location_id AND location.retired = FALSE",
+      "tableName": "patient_visit_details"
+    },
+    {
+      "name": "Patient Encounter Details",
+      "type": "customSql",
+      "readerSql": "SELECT patient.patient_id, visit_id, ee.episode_id AS episode_id, encounter.encounter_id, et.encounter_type_id AS encounter_type_id, et.name AS encounter_type_name, et.description AS encounter_type_description, et.edit_privilege AS edit_privilege, et.view_privilege AS view_privilege, location.name AS location_name, form_id, encounter_datetime, er.encounter_role_id AS encounter_role_id, er.name AS encounter_role_name, ep.provider_id AS provider_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS provider_name, er.description AS encounter_role_description FROM patient INNER JOIN encounter ON patient.patient_id = encounter.patient_id AND patient.voided = FALSE AND encounter.voided = FALSE INNER JOIN encounter_type et ON encounter.encounter_type = et.encounter_type_id AND et.retired = FALSE INNER JOIN encounter_provider ep ON encounter.encounter_id = ep.encounter_id AND ep.voided = FALSE INNER JOIN encounter_role er ON ep.encounter_role_id = er.encounter_role_id AND er.retired = FALSE LEFT OUTER JOIN episode_encounter ee ON encounter.encounter_id = ee.encounter_id INNER JOIN provider p ON ep.provider_id = p.provider_id AND p.retired = FALSE INNER JOIN person_name pn ON pn.person_id = p.person_id AND pn.voided = FALSE LEFT OUTER JOIN location ON encounter.location_id = location.location_id AND location.retired = FALSE",
+      "tableName": "patient_encounter_details"
+    },
+    {
+      "name": "Patient identification",
+      "type": "eav",
+      "tableName": "patient_identifier",
+      "eavAttributes": {
+        "attributeTypeTableName": "patient_identifier_type",
+        "attributeTableName": "patient_identifier",
+        "valueTableJoiningId": "identifier_type",
+        "typeTableJoiningId": "patient_identifier_type_id",
+        "valueColumnName": "identifier",
+        "primaryKey": "patient_id"
+      }
+    }
+  ]
+}
