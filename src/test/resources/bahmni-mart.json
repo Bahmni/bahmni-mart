@@ -10,14 +10,14 @@
       "type": "customSql",
       "readerSql": "SELECT patient_id, allergy_status FROM patient",
       "chunkSizeToRead": "500",
-      "tableName": "patient_allergy_status_test"
+      "tableName": "patient_allergy_status_test_default"
     },
     {
       "name": "Patient allergy status Coded",
       "type": "customSql",
       "readerSql": "SELECT patient_id, allergy_status FROM patient",
       "chunkSizeToRead": "500",
-      "tableName": "patient_allergy_status_test_coded",
+      "tableName": "patient_allergy_status_test_coded_default",
       "codeConfigs": [
         {
           "source": "bahmni",
@@ -33,7 +33,7 @@
       "type": "customSql",
       "readerSql": "SELECT p.patient_id, p.allergy_status, p.creator, p.date_changed AS `date` FROM patient p",
       "chunkSizeToRead": "500",
-      "tableName": "patient_allergy_status_test1",
+      "tableName": "patient_allergy_status_test1_default",
       "columnsToIgnore": ["creator", "date"]
     },
     {
@@ -41,7 +41,7 @@
       "type": "customSql",
       "sourceFilePath": "classpath:readerSql/reader.sql",
       "chunkSizeToRead": "500",
-      "tableName": "patient_details",
+      "tableName": "patient_details_default",
       "columnsToIgnore": ["date_created"]
     },
     {
@@ -110,7 +110,7 @@
   "views": [
     {
       "name": "test_view",
-      "sql": "select * from \"patient_allergy_status_test\""
+      "sql": "select * from \"patient_allergy_status_test_default\""
     },
     {
       "name": "view_from_file",

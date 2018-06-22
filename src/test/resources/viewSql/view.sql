@@ -1,1 +1,1 @@
-select * from patient_allergy_status_test
+select * from patient_allergy_status_test_default

@@ -1,0 +1,26 @@
+SELECT
+  ppd.patient_id,
+  p.program_id,
+  p.program_name,
+  ppd.patient_program_id,
+  date_enrolled       AS program_date_enrolled,
+  date_completed      AS program_date_completed,
+  location_id,
+  location_name,
+  program_outcome,
+  ppd.creator_name    AS patient_program_creator_name,
+  ppd.creator_id      AS patient_program_creator_id,
+  ppd.date_created    AS patient_program_date_created,
+  ppd.date_changed    AS patient_program_date_changed,
+  ppd.changed_by_name AS patient_program_changed_by_name,
+  ppd.changed_by_id   AS patient_program_changed_by_id,
+  ps.state            AS patient_state,
+  ps.state_name       AS patient_state_name,
+  ps.start_date       AS patient_state_start_date,
+  ps.end_date         AS patient_state_end_date,
+  ps.creator_name     AS patient_state_creator,
+  ps.date_created     AS patient_state_date_created,
+  ps.date_changed     AS patient_state_date_changed,
+  ps.changed_by_name  AS patient_state_changed_by
+FROM programs_default p INNER JOIN patient_program_data_default ppd ON ppd.program_id = p.program_id
+  LEFT JOIN patient_state_default ps ON ps.patient_program_id = ppd.patient_program_id AND ps.program_id = p.program_id

@@ -68,7 +68,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         List<String> tableNames = tables.stream().map(table -> table.get("TABLE_NAME").toString())
                 .collect(Collectors.toList());
-        List<String> expectedTableNames = Arrays.asList("patient_allergy_status_test", "first_stage_validation",
+        List<String> expectedTableNames = Arrays.asList("patient_allergy_status_test_default", "first_stage_validation",
                 "fstg_specialty_determined_by_mlo", "fstg_medical_files", "follow_up_validation", "stage",
                 "person_attributes", "bacteriology_concept_set", "visit_diagnoses");
         assertTrue(tableNames.containsAll(expectedTableNames));
@@ -76,7 +76,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyObsRecords();
 
         List<Map<String, Object>> patientList = martJdbcTemplate
-                .queryForList("SELECT * FROM \"patient_allergy_status_test\"");
+                .queryForList("SELECT * FROM \"patient_allergy_status_test_default\"");
         assertEquals(10, patientList.size());
 
         verifyRecords(patientList);
@@ -90,11 +90,11 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         batchConfiguration.run();
 
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
-                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_allergy_status_test1'" +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_allergy_status_test1_default'" +
                 " AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
         List<Map<String, Object>> patientList = martJdbcTemplate
-                .queryForList("SELECT * FROM \"patient_allergy_status_test1\"");
+                .queryForList("SELECT * FROM \"patient_allergy_status_test1_default\"");
         List<String> columnsName = tableDataColumns.stream().map(name -> name.toString().toLowerCase())
                 .collect(Collectors.toList());
 
@@ -110,7 +110,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         batchConfiguration.run();
 
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
-                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_details'" +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_details_default'" +
                 " AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
         List<String> columnsName = tableDataColumns.stream().map(name -> name.toString().toLowerCase())
@@ -118,7 +118,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         assertEquals(2, tableDataColumns.size());
         assertTrue(columnsName.containsAll(Arrays.asList("patient_id", "allergy_status")));
-        verifyRecords(martJdbcTemplate.queryForList("SELECT * FROM \"patient_details\""));
+        verifyRecords(martJdbcTemplate.queryForList("SELECT * FROM \"patient_details_default\""));
     }
 
     @Test
@@ -162,7 +162,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     public void shouldAddCodesToNonConceptsGiveValidCodeConfigs() {
         batchConfiguration.run();
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
-                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_allergy_status_test_coded'" +
+                "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'patient_allergy_status_test_coded_default'" +
                 " AND TABLE_SCHEMA='public';")
                 .stream().map(columns -> columns.get("COLUMN_NAME")).collect(Collectors.toList());
 
@@ -171,7 +171,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(2, tableDataColumns.size());
         assertTrue(tableDataColumns.containsAll(expectedColumns));
         List<Map<String, Object>> records = martJdbcTemplate.queryForList(
-                "SELECT * FROM \"patient_allergy_status_test_coded\"");
+                "SELECT * FROM \"patient_allergy_status_test_coded_default\"");
         assertNotNull(records);
         assertFalse(records.isEmpty());
         verifyCodedPatientRecords(records);
@@ -183,7 +183,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         List<Map<String, Object>> procRecords = martJdbcTemplate.queryForList(
                 "SELECT patient_id,getAllergyStatus(patient_id) AS allergy_status FROM " +
-                "\"patient_allergy_status_test\"");
+                "\"patient_allergy_status_test_default\"");
 
         verifyRecords(procRecords);
     }
@@ -308,7 +308,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     private void verifyTableColumns() {
         HashMap<String, List<String>> tableMap = new HashMap<>();
-        tableMap.put("patient_allergy_status_test", Arrays.asList("patient_id", "allergy_status"));
+        tableMap.put("patient_allergy_status_test_default", Arrays.asList("patient_id", "allergy_status"));
 
         tableMap.put("first_stage_validation",
                 Arrays.asList("id_first_stage_validation", "patient_id", "encounter_id",

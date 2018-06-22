@@ -22,10 +22,10 @@ SELECT
   sa.creator_name            AS surgery_creator_name,
   sa.changed_by              AS surgery_date_changed_by
 
-FROM person_details pd
+FROM person_details_default pd
 
   LEFT JOIN person_attributes pa on pa.person_id = pd.person_id
   LEFT JOIN patient_identifier pi on pi.patient_id = pd.person_id
-  LEFT JOIN surgical_appointment sa on sa.patient_id = pd.person_id
-  LEFT JOIN surgical_block sb on sb.surgical_block_id = sa.surgical_block_id
+  LEFT JOIN surgical_appointment_default sa on sa.patient_id = pd.person_id
+  LEFT JOIN surgical_block_default sb on sb.surgical_block_id = sa.surgical_block_id
   LEFT JOIN surgical_appointment_attributes saa on saa.surgical_appointment_id = sa.surgical_appointment_id

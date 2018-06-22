@@ -27,8 +27,8 @@ SELECT
   ppd.changed_by_id,
   ppd.changed_by_name
 
-FROM person_details pd LEFT OUTER JOIN person_address pa ON pa.person_id = pd.person_id
+FROM person_details_default pd LEFT OUTER JOIN person_address_default pa ON pa.person_id = pd.person_id
   LEFT OUTER JOIN person_attributes pat ON pat.person_id = pa.person_id
-  LEFT OUTER JOIN patient_program_data ppd ON ppd.patient_id = pat.person_id
-  LEFT OUTER JOIN programs pg ON pg.program_id = ppd.program_id
-  LEFT OUTER JOIN patient_state ps ON ps.patient_program_id = ppd.patient_program_id;
+  LEFT OUTER JOIN patient_program_data_default ppd ON ppd.patient_id = pat.person_id
+  LEFT OUTER JOIN programs_default pg ON pg.program_id = ppd.program_id
+  LEFT OUTER JOIN patient_state_default ps ON ps.patient_program_id = ppd.patient_program_id;

@@ -4,19 +4,19 @@
       "name": "Person details",
       "type": "customSql",
       "readerSql": "SELECT p.person_id, pn.person_name_id, pn.preferred, pn.prefix, pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name2, pn.family_name_suffix, p.gender, p.birthdate, p.birthtime, p.birthdate_estimated, FORMAT((DATEDIFF(CURRENT_DATE, p.birthdate) / 365), 0) AS age, CASE WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) < '5' THEN '0-5' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '5' AND '14' THEN '05-14' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '15' AND '24' THEN '15-24' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '25' AND '34' THEN '25-34' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '35' AND '44' THEN '35-44' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '45' AND '54' THEN '45-54' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '55' AND '64' THEN '55-64' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) >= '65' THEN '65+' END AS age_group, p.dead, p.death_date, p.deathdate_estimated, p.cause_of_death FROM person p INNER JOIN person_name pn ON p.person_id = pn.person_id AND p.voided = FALSE AND pn.voided = FALSE",
-      "tableName": "person_details"
+      "tableName": "person_details_default"
     },
     {
       "name": "Person address",
       "type": "customSql",
       "readerSql": "SELECT person_id, preferred, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14, address15, city_village, state_province, postal_code, country, county_district, latitude, longitude, start_date, end_date FROM person_address WHERE voided = FALSE",
-      "tableName": "person_address"
+      "tableName": "person_address_default"
     },
     {
       "name": "Person Attribute Info",
       "type": "customSql",
       "readerSql": "SELECT person_attribute_type_id, name, description FROM person_attribute_type",
-      "tableName": "person_attribute_info"
+      "tableName": "person_attribute_info_default"
     },
     {
       "name": "Person Attributes",

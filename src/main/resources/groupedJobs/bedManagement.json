@@ -4,19 +4,19 @@
       "name": "Bed Patient Assignment",
       "type": "customSql",
       "readerSql": "SELECT bpam.patient_id, bpam.bed_id, b.bed_number, bpam.date_started, bpam.date_stopped, l.name AS location, bpam.encounter_id, e.encounter_datetime, e.visit_id, vt.name AS visit_type FROM bed_patient_assignment_map bpam INNER JOIN bed b ON b.bed_id = bpam.bed_id AND b.voided = FALSE AND bpam.voided = FALSE INNER JOIN bed_location_map blm ON blm.bed_id = bpam.bed_id INNER JOIN location l ON l.location_id = blm.location_id AND l.retired IS FALSE INNER JOIN encounter e ON e.encounter_id = bpam.encounter_id AND e.voided = FALSE INNER JOIN visit v ON v.visit_id = e.visit_id AND v.voided = FALSE INNER JOIN visit_type vt ON vt.visit_type_id = v.visit_type_id AND vt.retired = FALSE",
-      "tableName": "bed_patient_assignment"
+      "tableName": "bed_patient_assignment_default"
     },
     {
       "name": "Bed Tags",
       "type": "customSql",
       "readerSql": "SELECT b.bed_id, l.name AS bed_location, b.bed_number, b.status AS bed_status, bt.name AS bed_tag_name, btm.date_created, btm.date_changed, btm.date_voided AS date_stopped FROM bed b INNER JOIN bed_tag_map btm ON btm.bed_id = b.bed_id AND b.voided = FALSE INNER JOIN bed_tag bt ON bt.bed_tag_id = btm.bed_tag_id AND bt.voided = FALSE INNER JOIN bed_location_map blm ON blm.bed_id = b.bed_id INNER JOIN location l ON blm.location_id = l.location_id AND l.retired = FALSE",
-      "tableName": "bed_tags"
+      "tableName": "bed_tags_default"
     },
     {
       "name": "Current Bed Details",
       "type": "customSql",
       "readerSql": "SELECT b.bed_id, l.name AS bed_location, b.bed_number, bt.name AS bed_type, b.status AS bed_status FROM bed b INNER JOIN bed_location_map blm ON blm.bed_id = b.bed_id AND b.voided = FALSE INNER JOIN location l ON blm.location_id = l.location_id AND l.retired = FALSE INNER JOIN bed_type bt ON bt.bed_type_id = b.bed_type_id",
-      "tableName": "current_bed_details"
+      "tableName": "current_bed_details_default"
     }
   ]
 }

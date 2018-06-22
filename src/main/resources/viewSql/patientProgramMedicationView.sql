@@ -28,7 +28,7 @@ SELECT
   md.visit_id,
   md.visit_type
 
-FROM person_details pd
+FROM person_details_default pd
   LEFT JOIN person_attributes pa ON pa.person_id = pd.person_id
   LEFT JOIN patient_identifier pi ON pi.patient_id = pd.person_id
-  LEFT JOIN medication_data md ON md.patient_id = pd.person_id
+  LEFT JOIN medication_data_default md ON md.patient_id = pd.person_id

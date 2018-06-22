@@ -20,8 +20,8 @@ SELECT
   vd.diagnosis_order,
   vd.obs_datetime
 
-FROM person_details pd
+FROM person_details_default pd
   LEFT JOIN person_attributes pa ON pa.person_id = pd.person_id
   LEFT JOIN patient_identifier pi ON pi.patient_id = pd.person_id
-LEFT JOIN conditions c ON c.patient_id = pd.person_id
-LEFT JOIN visit_diagnoses vd ON vd.patient_id = pd.person_id
+  LEFT JOIN conditions_default c ON c.patient_id = pd.person_id
+  LEFT JOIN visit_diagnoses vd ON vd.patient_id = pd.person_id

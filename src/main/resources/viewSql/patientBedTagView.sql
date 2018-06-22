@@ -30,10 +30,10 @@ FROM (
          WHEN (bt.date_created > bpa.date_stopped)
            THEN NULL
          END                              AS bed_tag_created,
-        /*
-        'bed_tag_removed' should be between 'assigned_on' and 'discharged_on'.
-        If bed tag is removed after 'discharged_on' then 'bed_tag_removed' will be 'discharged_on'
-        */
+         /*
+         'bed_tag_removed' should be between 'assigned_on' and 'discharged_on'.
+         If bed tag is removed after 'discharged_on' then 'bed_tag_removed' will be 'discharged_on'
+         */
          CASE
          WHEN (bt.date_stopped IS NULL AND bpa.date_stopped IS NULL)
            THEN NULL
@@ -49,7 +49,7 @@ FROM (
            THEN bpa.date_stopped
          END                              AS bed_tag_removed
 
-       FROM bed_patient_ASsignment bpa LEFT JOIN bed_tags bt ON bpa.bed_id = bt.bed_id
-         LEFT JOIN patient_encounter_details ped ON ped.encounter_id = bpa.encounter_id
+       FROM bed_patient_assignment_default bpa LEFT JOIN bed_tags_default bt ON bpa.bed_id = bt.bed_id
+         LEFT JOIN patient_encounter_details_default ped ON ped.encounter_id = bpa.encounter_id
      ) AS result
 WHERE bed_tag_created IS NOT NULL

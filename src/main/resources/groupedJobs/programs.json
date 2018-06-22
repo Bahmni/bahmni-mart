@@ -4,31 +4,31 @@
       "name": "Program data",
       "type": "customSql",
       "readerSql": "SELECT program_id, name AS program_name, description AS program_description, creator AS creator_id, creator_details.username AS creator_name, date_created, date_changed, changed_by AS changed_by_id, changer_details.username AS changed_by_name FROM program p INNER JOIN (SELECT user_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS username FROM users u INNER JOIN person_name pn ON u.person_id = pn.person_id AND u.retired = FALSE AND pn.voided = FALSE) creator_details ON creator_details.user_id = p.creator LEFT OUTER JOIN (SELECT user_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS username FROM users u INNER JOIN person_name pn ON u.person_id = pn.person_id AND u.retired = FALSE AND pn.voided = FALSE) changer_details ON changer_details.user_id = p.changed_by WHERE retired = FALSE",
-      "tableName": "programs"
+      "tableName": "programs_default"
     },
     {
       "name": "Program outcomes",
       "type": "customSql",
       "readerSql": "SELECT p.program_id, p.name AS `program_name`, cv.concept_full_name AS `program_outcome` FROM program p INNER JOIN concept c ON c.concept_id = p.outcomes_concept_id AND c.retired = FALSE AND p.retired = FALSE INNER JOIN concept_set cs ON cs.concept_set = c.concept_id LEFT OUTER JOIN concept_view cv ON cv.concept_id = cs.concept_id AND cv.retired = FALSE",
-      "tableName": "program_outcomes"
+      "tableName": "program_outcomes_default"
     },
     {
       "name": "Patient program data",
       "type": "customSql",
       "readerSql": "SELECT pp.patient_id, pp.program_id, pp.patient_program_id, pp.date_enrolled, FORMAT((DATEDIFF(pp.date_enrolled, p.birthdate) / 365), 0) AS age_during_enrollment, pp.date_completed, FORMAT((DATEDIFF(pp.date_completed, p.birthdate) / 365), 0) AS age_during_completion, pp.location_id, l.name AS location_name, cn_outcome.concept_full_name AS program_outcome, pp.creator AS creator_id, creator_details.name AS creator_name, pp.date_created, pp.date_changed, pp.changed_by AS changed_by_id, changer_details.name AS changed_by_name FROM patient_program pp INNER JOIN person p ON p.person_id = pp.patient_id INNER JOIN (SELECT users.user_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS name FROM users INNER JOIN person_name pn ON users.person_id = pn.person_id) creator_details ON creator_details.user_id = pp.creator LEFT OUTER JOIN (SELECT users.user_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS name FROM users INNER JOIN person_name pn ON users.person_id = pn.person_id) changer_details ON changer_details.user_id = pp.changed_by LEFT OUTER JOIN concept_view cn_outcome ON cn_outcome.concept_id = pp.outcome_concept_id AND cn_outcome.retired = FALSE LEFT OUTER JOIN location l ON l.location_id = pp.location_id AND l.retired = FALSE",
-      "tableName": "patient_program_data"
+      "tableName": "patient_program_data_default"
     },
     {
       "name": "Program Workflow",
       "type": "customSql",
       "readerSql": "SELECT pw.program_id, pw.program_workflow_id, cv.concept_full_name AS program_workflow_name FROM program_workflow pw INNER JOIN concept_view cv ON cv.concept_id = pw.concept_id AND cv.retired = FALSE AND pw.retired = FALSE",
-      "tableName": "program_workflow"
+      "tableName": "program_workflow_default"
     },
     {
       "name": "Program Workflow States",
       "type": "customSql",
       "readerSql": "SELECT pws.program_workflow_state_id, pws.program_workflow_id, pwscv.concept_full_name AS state_name, pwcv.concept_full_name AS program_workflow_name, pws.initial, pws.terminal, pws.creator AS creator_id, pn.creator_name, pws.date_created, pws.date_changed, pws.changed_by AS changed_by_id, pn2.changed_by_name FROM program_workflow_state pws INNER JOIN program_workflow pw ON pw.program_workflow_id = pws.program_workflow_id AND pws.retired = FALSE AND pw.retired = FALSE INNER JOIN (SELECT concat_ws(' ', ifnull(n.given_name, ''), ifnull(n.family_name, '')) AS creator_name, users.user_id FROM users INNER JOIN person_name n ON users.person_id = n.person_id AND users.retired = FALSE AND n.voided = FALSE) pn ON pn.user_id = pws.creator LEFT OUTER JOIN (SELECT concat_ws(' ', ifnull(n.given_name, ''), ifnull(n.family_name, '')) AS changed_by_name, users.user_id FROM users INNER JOIN person_name n ON users.person_id = n.person_id AND users.retired = FALSE AND n.voided = FALSE) pn2 ON pn2.user_id = pws.changed_by LEFT JOIN concept_view pwcv ON pwcv.concept_id = pw.concept_id AND pwcv.retired = FALSE LEFT JOIN concept_view pwscv ON pwscv.concept_id = pws.concept_id AND pwscv.retired = FALSE",
-      "tableName": "program_workflow_states"
+      "tableName": "program_workflow_states_default"
     },
     {
       "name": "Program Attributes",

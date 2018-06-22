@@ -114,14 +114,14 @@
       "type": "customSql",
       "readerSql": "SELECT address_hierarchy_level_id, name, parent_level_id, address_field FROM address_hierarchy_level",
       "chunkSizeToRead": "500",
-      "tableName": "address_hierarchy_level"
+      "tableName": "address_hierarchy_level_default"
     },
     {
       "name": "Medication Data",
       "type": "customSql",
       "sourceFilePath": "classpath:readerSql/drugOrder.sql",
       "chunkSizeToRead": "500",
-      "tableName": "medication_data",
+      "tableName": "medication_data_default",
       "columnsToIgnore": [
         "instructions",
         "stop_notes"
@@ -132,14 +132,14 @@
       "type": "customSql",
       "readerSql": "SELECT va.visit_id AS visit_id, va.visit_attribute_id AS visit_attribute_id, va.value_reference AS value_reference, vat.visit_attribute_type_id AS visit_attribute_type_id, vat.name AS visit_attribute_type_name, vat.description AS visit_attribute_type_description, vat.datatype AS visit_attribute_type_datatype, vat.datatype_config AS visit_attribute_type_datatype_config, vat.preferred_handler AS visit_attribute_type_preferred_handler, vat.handler_config AS visit_attribute_type_handler_config, vat.min_occurs AS visit_attribute_type_min_occurs, vat.max_occurs AS visit_attribute_type_max_occurs FROM visit INNER JOIN visit_attribute va on visit.visit_id = va.visit_id AND visit.voided = FALSE INNER JOIN visit_attribute_type vat ON va.attribute_type_id = vat.visit_attribute_type_id AND va.voided = FALSE AND vat.retired = FALSE",
       "chunkSizeToRead": "500",
-      "tableName": "visit_attribute_details"
+      "tableName": "visit_attribute_details_default"
     },
     {
       "name": "Conditions",
       "type": "customSql",
       "readerSql": "SELECT condition_id, previous_condition_id, patient_id, status, coalesce(condition_non_coded, cv.concept_full_name) AS condition_name, CASE WHEN condition_non_coded IS NULL THEN TRUE ELSE FALSE END AS is_coded_condition_name, onset_date, additional_detail, end_date, end_reason, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name, conditions.date_created FROM conditions INNER JOIN concept_view cv ON cv.concept_id = conditions.concept_id AND conditions.voided = 0 AND cv.retired = 0 INNER JOIN users ON users.user_id = conditions.creator INNER JOIN person_name pn ON pn.person_id = users.person_id",
       "chunkSizeToRead": "500",
-      "tableName": "conditions"
+      "tableName": "conditions_default"
     },
     {
       "name": "Visit Attributes",
@@ -165,7 +165,7 @@
       "type": "metadata",
       "conceptReferenceSource": ""
     },
-    {
+    /*{
       "name": "Obs Data",
       "type": "obs",
       "separateTableConfig": {
@@ -190,7 +190,7 @@
         "FUP, Comments about next follow-up",
         "FSTG, Comments about refusal"
       ]
-    },
+    },*/
     {
       "name": "Orders Data",
       "type": "orders",
@@ -229,35 +229,35 @@
     },
     {
       "name": "patient_visits_encounters_view",
-      "sql": "SELECT pd.person_id, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, pvd.visit_id, pvd.visit_type_name, pvd.visit_start_date, pvd.visit_end_date, pvd.location_name, visit_type_name AS visit_type, encounter_id, encounter_type_id, encounter_type_name, ped.location_name AS encounter_location FROM person_details pd LEFT OUTER JOIN patient_visit_details pvd ON pvd.patient_id = pd.person_id LEFT OUTER JOIN patient_encounter_details ped ON ped.patient_id = pvd.patient_id"
+      "sql": "SELECT pd.person_id, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, pvd.visit_id, pvd.visit_type_name, pvd.visit_start_date, pvd.visit_end_date, pvd.location_name, visit_type_name AS visit_type, encounter_id, encounter_type_id, encounter_type_name, ped.location_name AS encounter_location FROM person_details_default pd LEFT OUTER JOIN patient_visit_details_default pvd ON pvd.patient_id = pd.person_id LEFT OUTER JOIN patient_encounter_details_default ped ON ped.patient_id = pvd.patient_id"
     },
     {
       "name": "appointment_admin_panel_view",
-      "sql": "SELECT * FROM appointment_service LEFT OUTER JOIN service_availability USING (appointment_service_id, service_name)"
+      "sql": "SELECT * FROM appointment_service_default LEFT OUTER JOIN service_availability_default USING (appointment_service_id, service_name)"
     },
     {
       "name": "patient_details_view",
-      "sql": "select pi.*, gender, birthdate, birthtime, birthdate_estimated, dead, death_date, deathdate_estimated, cause_of_death, pat.* from patient_identifier pi LEFT OUTER JOIN person_details pd on pd.person_id = pi.patient_id LEFT OUTER JOIN person_attributes pat on pat.person_id = pi.patient_id"
+      "sql": "select pi.*, gender, birthdate, birthtime, birthdate_estimated, dead, death_date, deathdate_estimated, cause_of_death, pat.* from patient_identifier pi LEFT OUTER JOIN person_details_default pd on pd.person_id = pi.patient_id LEFT OUTER JOIN person_attributes pat on pat.person_id = pi.patient_id"
     },
     {
       "name": "surgery_details",
-      "sql": "SELECT sa.surgical_block_id, sb.primary_provider_name, sb.location_name, sb.block_starttime, sb.block_endtime, sb.date_created AS block_datecreated, sb.date_changed AS block_datechanged, patient_id, sort_weight, status, saa.*, actual_start_datetime, actual_end_datetime, sa.date_created AS surgery_date_created, sa.date_changed AS surgery_date_changed FROM surgical_block sb LEFT OUTER JOIN surgical_appointment sa ON sa.surgical_block_id = sb.surgical_block_id LEFT OUTER JOIN surgical_appointment_attributes saa ON saa.surgical_appointment_id = sa.surgical_appointment_id"
+      "sql": "SELECT sa.surgical_block_id, sb.primary_provider_name, sb.location_name, sb.block_starttime, sb.block_endtime, sb.date_created AS block_datecreated, sb.date_changed AS block_datechanged, patient_id, sort_weight, status, saa.*, actual_start_datetime, actual_end_datetime, sa.date_created AS surgery_date_created, sa.date_changed AS surgery_date_changed FROM surgical_block_default sb LEFT OUTER JOIN surgical_appointment_default sa ON sa.surgical_block_id = sb.surgical_block_id LEFT OUTER JOIN surgical_appointment_attributes saa ON saa.surgical_appointment_id = sa.surgical_appointment_id"
     },
     {
       "name": "patient_Information_view",
-      "sql": "SELECT pa.*, pi.\"Patient_Identifier\", pd.gender, pd.birthtime, pd.birthdate_estimated, pd.death_date, pd.deathdate_estimated, pd.cause_of_death, pad.address1, pad.address2, pad.address3, pad.address4, pad.address5, pad.address6, pad.address7, pad.address8, pad.address9, pad.address10, pad.address11, pad.address12, pad.address13, pad.address14, pad.address15, pad.city_village, pad.state_province, pad.postal_code, pad.country, pad.county_district, pad.latitude, pad.longitude, pad.start_date, pad.end_date FROM patient_identifier pi LEFT JOIN person_details pd ON pi.patient_id = pd.person_id LEFT JOIN person_attributes pa ON pa.person_id = pi.patient_id LEFT JOIN person_address pad ON pad.person_id = pi.patient_id WHERE pad.preferred = 'true'"
+      "sql": "SELECT pa.*, pi.\"Patient_Identifier\", pd.gender, pd.birthtime, pd.birthdate_estimated, pd.death_date, pd.deathdate_estimated, pd.cause_of_death, pad.address1, pad.address2, pad.address3, pad.address4, pad.address5, pad.address6, pad.address7, pad.address8, pad.address9, pad.address10, pad.address11, pad.address12, pad.address13, pad.address14, pad.address15, pad.city_village, pad.state_province, pad.postal_code, pad.country, pad.county_district, pad.latitude, pad.longitude, pad.start_date, pad.end_date FROM patient_identifier pi LEFT JOIN person_details_default pd ON pi.patient_id = pd.person_id LEFT JOIN person_attributes pa ON pa.person_id = pi.patient_id LEFT JOIN person_address_default pad ON pad.person_id = pi.patient_id WHERE pad.preferred = 'true'"
     },
     {
       "name": "patient_program_info_view",
-      "sql": "SELECT ppd.patient_id, p.program_id, p.program_name, ppd.patient_program_id, date_enrolled AS program_date_enrolled, date_completed AS program_date_completed, location_id, location_name, program_outcome, ppd.creator_name AS patient_program_creator_name, ppd.creator_id AS patient_program_creator_id, ppd.date_created AS patient_program_date_created, ppd.date_changed AS patient_program_date_changed, ppd.changed_by_name AS patient_program_changed_by_name, ppd.changed_by_id AS patient_program_changed_by_id, ps.state AS patient_state, ps.state_name AS patient_state_name, ps.start_date AS patient_state_start_date, ps.end_date AS patient_state_end_date, ps.creator_name AS patient_state_creator, ps.date_created AS patient_state_date_created, ps.date_changed AS patient_state_date_changed, ps.changed_by_name AS patient_state_changed_by FROM programs p INNER JOIN patient_program_data ppd ON ppd.program_id = p.program_id LEFT JOIN patient_state ps ON ps.patient_program_id = ppd.patient_program_id AND ps.program_id = p.program_id"
+      "sourceFilePath": "classpath:viewSql/patientProgramInfoView.sql"
     },
     {
       "name": "operation_theater_view",
-      "sql": "SELECT sa.patient_id, sb.surgical_block_id, primary_provider_name, sb.creator_name AS block_creator_name, location_name, block_starttime AS block_start_time, block_endtime AS block_end_time, sb.date_created AS block_date_created, sb.date_changed AS block_date_changed, sb.changed_by AS block_changed_by, saa.*, sa.sort_weight AS surgery_sort_weight, sa.status AS surgery_status, sa.actual_start_datetime AS surgery_actual_startime, sa.actual_end_datetime AS surgery_actual_endtime, sa.notes AS surgery_notes, sa.date_created AS surgery_datecreated, sa.date_changed AS surgery_date_changed, sa.creator_name AS sugery_creator_name, sa.changed_by AS surgery_changed_by FROM surgical_block sb LEFT JOIN surgical_appointment sa ON sa.surgical_block_id = sb.surgical_block_id LEFT JOIN surgical_appointment_attributes saa ON saa.surgical_appointment_id = sa.surgical_appointment_id"
+      "sourceFilePath": "classpath:viewSql/operationTheaterView.sql"
     },
     {
       "name":"bed_management_view",
-      "sql":"SELECT bpa.patient_id, bpa.bed_number, bpa.date_started, bpa.date_stopped, bpa.location, ped.encounter_type_name, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM bed_patient_assignment bpa INNER JOIN patient_encounter_details ped ON ped.encounter_id = bpa.encounter_id LEFT JOIN bed_tags bt ON bt.bed_id = bpa.bed_id UNION (SELECT dateStopped.patient_id, dateStopped.bed_number, NULL AS date_started, dateStopped.date_stopped, dateStopped.location, ped.encounter_type_name, bt.bed_tag_name, bt.date_created AS tag_start_date, bt.date_stopped AS tag_end_date FROM (SELECT patient_id, date_stopped AS date_stopped, location, bed_number, bed_id FROM bed_patient_assignment) dateStopped INNER JOIN patient_encounter_details ped ON date(ped.encounter_datetime) = date(dateStopped.date_stopped) AND encounter_type_name = 'DISCHARGE' AND ped.patient_id = dateStopped.patient_id LEFT JOIN bed_tags bt ON bt.bed_id = dateStopped.bed_id) ORDER BY patient_id"
+      "sourceFilePath":"classpath:viewSql/bedManagementView.sql"
     },
     {
       "name":"bed_management_locations_view",
