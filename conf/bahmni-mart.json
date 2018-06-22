@@ -44,27 +44,70 @@
       "chunkSizeToRead": "500"
     },
     {
-      "name": "Person details",
-      "type": "customSql",
-      "readerSql": "SELECT p.person_id, pn.person_name_id, pn.preferred, pn.prefix, pn.given_name, pn.middle_name, pn.family_name_prefix, pn.family_name, pn.family_name2, pn.family_name_suffix, p.gender, p.birthdate, p.birthtime, p.birthdate_estimated, FORMAT((DATEDIFF(CURRENT_DATE, p.birthdate) / 365), 0) AS age, CASE WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) < '5' THEN '0-5' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '5' AND '14' THEN '05-14' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '15' AND '24' THEN '15-24' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '25' AND '34' THEN '25-34' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '35' AND '44' THEN '35-44' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '45' AND '54' THEN '45-54' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) BETWEEN '55' AND '64' THEN '55-64' WHEN ROUND(DATEDIFF(CURRENT_DATE(), p.birthdate) / 365, 0) >= '65' THEN '65+' END AS age_group, p.dead, p.death_date, p.deathdate_estimated, p.cause_of_death FROM person p INNER JOIN person_name pn ON p.person_id = pn.person_id AND p.voided = FALSE AND pn.voided = FALSE",
+      "name": "Person",
+      "type": "person",
       "chunkSizeToRead": "500",
-      "tableName": "person_details",
-      "columnsToIgnore": [
-        "prefix",
-        "given_name",
-        "middle_name",
-        "family_name_prefix",
-        "family_name",
-        "family_name2",
-        "family_name_suffix"
+      "groupedJobConfigs": [
+        {
+          "tableName": "person_attributes",
+          "columnsToIgnore": [
+            "primaryContact",
+            "secondaryContact",
+            "primaryRelative",
+            "id1Document",
+            "id1DocNumber",
+            "id1FullNameEnglish",
+            "id1FullNameArabic",
+            "id1DateOfExpiry",
+            "id2Document",
+            "id2DocNumber",
+            "id2FullNameEnglish",
+            "id2FullNameArabic",
+            "id2DateOfExpiry",
+            "id3Document",
+            "id3DocNumber",
+            "id3FullNameEnglish",
+            "id3FullNameArabic",
+            "id3DateOfExpiry",
+            "familyNameLocal",
+            "givenNameLocal",
+            "middleNameLocal",
+            "legalRepFullNameEnglish",
+            "legalRepFullNameArabic",
+            "phoneNumber1",
+            "phoneNumber2",
+            "phoneNumber3",
+            "emailAddress",
+            "whatsapp",
+            "viber",
+            "facebook",
+            "caretakerPhoneNumber1",
+            "caretakerPhoneNumber2",
+            "caretakerEmail",
+            "caretakerWhatsapp",
+            "caretakerViber",
+            "caretakerFacebook",
+            "campComments"
+          ]
+        },
+        {
+          "tableName": "person_details",
+          "columnsToIgnore": [
+            "prefix",
+            "given_name",
+            "middle_name",
+            "family_name_prefix",
+            "family_name",
+            "family_name2",
+            "family_name_suffix"
+          ]
+        }
       ]
     },
     {
-      "name": "Person address",
-      "type": "customSql",
-      "readerSql": "SELECT person_id, preferred, address1, address2, address3, address4, address5, address6, address7, address8, address9, address10, address11, address12, address13, address14, address15, city_village, state_province, postal_code, country, county_district, latitude, longitude, start_date, end_date FROM person_address WHERE voided = FALSE",
-      "chunkSizeToRead": "500",
-      "tableName": "person_address"
+      "name": "Provider",
+      "type": "provider",
+      "chunkSizeToRead": "500"
     },
     {
       "name": "Address hierarchy levels",
@@ -72,13 +115,6 @@
       "readerSql": "SELECT address_hierarchy_level_id, name, parent_level_id, address_field FROM address_hierarchy_level",
       "chunkSizeToRead": "500",
       "tableName": "address_hierarchy_level"
-    },
-    {
-      "name": "Person Attribute Info",
-      "type": "customSql",
-      "readerSql": "SELECT person_attribute_type_id, name, description FROM person_attribute_type",
-      "chunkSizeToRead": "500",
-      "tableName": "person_attribute_info"
     },
     {
       "name": "Medication Data",
@@ -92,13 +128,6 @@
       ]
     },
     {
-      "name": "Provider",
-      "type": "customSql",
-      "readerSql": "SELECT provider_id, person_id, name, identifier, provider_role_id from provider WHERE provider.retired = FALSE",
-      "chunkSizeToRead": "500",
-      "tableName": "provider"
-    },
-    {
       "name": "Visit Attribute Details",
       "type": "customSql",
       "readerSql": "SELECT va.visit_id AS visit_id, va.visit_attribute_id AS visit_attribute_id, va.value_reference AS value_reference, vat.visit_attribute_type_id AS visit_attribute_type_id, vat.name AS visit_attribute_type_name, vat.description AS visit_attribute_type_description, vat.datatype AS visit_attribute_type_datatype, vat.datatype_config AS visit_attribute_type_datatype_config, vat.preferred_handler AS visit_attribute_type_preferred_handler, vat.handler_config AS visit_attribute_type_handler_config, vat.min_occurs AS visit_attribute_type_min_occurs, vat.max_occurs AS visit_attribute_type_max_occurs FROM visit INNER JOIN visit_attribute va on visit.visit_id = va.visit_id AND visit.voided = FALSE INNER JOIN visit_attribute_type vat ON va.attribute_type_id = vat.visit_attribute_type_id AND va.voided = FALSE AND vat.retired = FALSE",
@@ -106,71 +135,11 @@
       "tableName": "visit_attribute_details"
     },
     {
-      "name": "Provider Attribute Details",
-      "type": "customSql",
-      "readerSql": "SELECT pa.provider_attribute_id AS provider_attribute_id, pat.provider_attribute_type_id AS attribute_type_id, pa.provider_id AS provider_id, pa.value_reference AS value_reference, pat.name AS provider_attribute_type_name, pat.description AS provider_attribute_type_description, pat.datatype AS provider_attribute_datatype, pat.datatype_config AS provider_attribute_datatype_config, pat.preferred_handler AS provider_attribute_type_preferred_handler, pat.handler_config AS provider_attribute_type_handler_config, pat.min_occurs AS provider_attribute_type_min_occurs, pat.max_occurs AS provider_attribute_type_max_occurs FROM provider INNER JOIN provider_attribute pa on provider.provider_id = pa.provider_id AND provider.retired = FALSE INNER JOIN provider_attribute_type pat ON pa.attribute_type_id = pat.provider_attribute_type_id AND pa.voided = FALSE AND pat.retired = FALSE",
-      "chunkSizeToRead": "500",
-      "tableName": "provider_attribute_details"
-    },
-    {
       "name": "Conditions",
       "type": "customSql",
       "readerSql": "SELECT condition_id, previous_condition_id, patient_id, status, coalesce(condition_non_coded, cv.concept_full_name) AS condition_name, CASE WHEN condition_non_coded IS NULL THEN TRUE ELSE FALSE END AS is_coded_condition_name, onset_date, additional_detail, end_date, end_reason, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name, conditions.date_created FROM conditions INNER JOIN concept_view cv ON cv.concept_id = conditions.concept_id AND conditions.voided = 0 AND cv.retired = 0 INNER JOIN users ON users.user_id = conditions.creator INNER JOIN person_name pn ON pn.person_id = users.person_id",
       "chunkSizeToRead": "500",
       "tableName": "conditions"
-    },
-    {
-      "name": "Person Attributes",
-      "type": "eav",
-      "chunkSizeToRead": "500",
-      "tableName": "person_attributes",
-      "eavAttributes": {
-        "attributeTypeTableName": "person_attribute_type",
-        "attributeTableName": "person_attribute",
-        "valueTableJoiningId": "person_attribute_type_id",
-        "typeTableJoiningId": "person_attribute_type_id",
-        "valueColumnName": "value",
-        "primaryKey": "person_id"
-      },
-      "columnsToIgnore": [
-        "primaryContact",
-        "secondaryContact",
-        "primaryRelative",
-        "id1Document",
-        "id1DocNumber",
-        "id1FullNameEnglish",
-        "id1FullNameArabic",
-        "id1DateOfExpiry",
-        "id2Document",
-        "id2DocNumber",
-        "id2FullNameEnglish",
-        "id2FullNameArabic",
-        "id2DateOfExpiry",
-        "id3Document",
-        "id3DocNumber",
-        "id3FullNameEnglish",
-        "id3FullNameArabic",
-        "id3DateOfExpiry",
-        "familyNameLocal",
-        "givenNameLocal",
-        "middleNameLocal",
-        "legalRepFullNameEnglish",
-        "legalRepFullNameArabic",
-        "phoneNumber1",
-        "phoneNumber2",
-        "phoneNumber3",
-        "emailAddress",
-        "whatsapp",
-        "viber",
-        "facebook",
-        "caretakerPhoneNumber1",
-        "caretakerPhoneNumber2",
-        "caretakerEmail",
-        "caretakerWhatsapp",
-        "caretakerViber",
-        "caretakerFacebook",
-        "campComments"
-      ]
     },
     {
       "name": "Visit Attributes",
@@ -184,20 +153,6 @@
         "typeTableJoiningId": "visit_attribute_type_id",
         "valueColumnName": "value_reference",
         "primaryKey": "visit_id"
-      }
-    },
-    {
-      "name": "Provider Attributes",
-      "type": "eav",
-      "chunkSizeToRead": "500",
-      "tableName": "provider_attributes",
-      "eavAttributes": {
-        "attributeTypeTableName": "provider_attribute_type",
-        "attributeTableName": "provider_attribute",
-        "valueTableJoiningId": "attribute_type_id",
-        "typeTableJoiningId": "provider_attribute_type_id",
-        "valueColumnName": "value_reference",
-        "primaryKey": "provider_id"
       }
     },
     {
