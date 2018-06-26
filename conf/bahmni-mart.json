@@ -110,13 +110,6 @@
       "chunkSizeToRead": "500"
     },
     {
-      "name": "Address hierarchy levels",
-      "type": "customSql",
-      "readerSql": "SELECT address_hierarchy_level_id, name, parent_level_id, address_field FROM address_hierarchy_level",
-      "chunkSizeToRead": "500",
-      "tableName": "address_hierarchy_level_default"
-    },
-    {
       "name": "Medication Data",
       "type": "customSql",
       "sourceFilePath": "classpath:readerSql/drugOrder.sql",

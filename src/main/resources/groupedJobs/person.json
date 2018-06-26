@@ -19,6 +19,12 @@
       "tableName": "person_attribute_info_default"
     },
     {
+      "name": "Address hierarchy levels",
+      "type": "customSql",
+      "readerSql": "SELECT address_hierarchy_level_id, name, parent_level_id, address_field FROM address_hierarchy_level",
+      "tableName": "address_hierarchy_level_default"
+    },
+    {
       "name": "Person Attributes",
       "type": "eav",
       "tableName": "person_attributes",
