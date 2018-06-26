@@ -191,7 +191,7 @@
     },
     {
       "name": "Registration Second Page",
-      "type": "rsp",
+      "type": "reg",
       "columnsToIgnore": [],
       "separateTableConfig": {
         "enableForAddMoreAndMultiSelect": true,

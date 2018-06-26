@@ -28,8 +28,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({RspConfigHelper.class, JsonParser.class, FileReader.class})
-public class RspConfigHelperTest {
+@PrepareForTest({RegConfigHelper.class, JsonParser.class, FileReader.class})
+public class RegConfigHelperTest {
     @Mock
     private FileReader defaultFileReader;
 
@@ -42,7 +42,7 @@ public class RspConfigHelperTest {
     @Mock
     private Logger logger;
 
-    private RspConfigHelper rspConfigHelper;
+    private RegConfigHelper regConfigHelper;
 
     private String defaultExtFilePath = "default.json";
     private String implExtFilePath = "implementation.json";
@@ -77,15 +77,15 @@ public class RspConfigHelperTest {
 
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
-        rspConfigHelper = new RspConfigHelper();
-        setValuesForMemberFields(rspConfigHelper, "defaultExtensionConfigFile", "default.json");
-        setValuesForMemberFields(rspConfigHelper, "implementationExtensionConfigFile", "implementation.json");
-        setValueForFinalStaticField(RspConfigHelper.class, "log", logger);
+        regConfigHelper = new RegConfigHelper();
+        setValuesForMemberFields(regConfigHelper, "defaultExtensionConfigFile", "default.json");
+        setValuesForMemberFields(regConfigHelper, "implementationExtensionConfigFile", "implementation.json");
+        setValueForFinalStaticField(RegConfigHelper.class, "log", logger);
 
     }
 
     @Test
-    public void shouldGiveAllRspConceptNames() throws Exception {
+    public void shouldGiveAllRegConceptNames() throws Exception {
         String defaultJson = "{\n" +
                 "  \"nutritionalValues\": {\n" +
                 "    \"extensionPointId\": \"org.bahmni.registration.conceptSetGroup.observations\",\n" +
@@ -134,8 +134,8 @@ public class RspConfigHelperTest {
                 "  }\n" +
                 "}";
 
-        setValuesForMemberFields(rspConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
-        setValuesForMemberFields(rspConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
+        setValuesForMemberFields(regConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
+        setValuesForMemberFields(regConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
 
         List<String> expected = Arrays.asList("Nutritional", "Fee Information", "Nutritional Temp");
 
@@ -146,36 +146,36 @@ public class RspConfigHelperTest {
 
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
 
-        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
+        List<String> regConcepts = regConfigHelper.getRegConcepts();
 
         verify(jsonParser, times(1)).parse(defaultFileReader);
         verify(jsonParser, times(1)).parse(implementationFileReader);
-        assertEquals(3, rspConcepts.size());
-        assertTrue(rspConcepts.containsAll(expected));
+        assertEquals(3, regConcepts.size());
+        assertTrue(regConcepts.containsAll(expected));
     }
 
     @Test
-    public void shouldGiveEmptyListAsRspConcept() throws Exception {
+    public void shouldGiveEmptyListAsRegConcept() throws Exception {
         whenNew(FileReader.class).withAnyArguments().thenReturn(defaultFileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
 
         when(jsonParser.parse(defaultFileReader)).thenReturn(new JsonObject());
 
-        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
-        assertTrue(rspConcepts.isEmpty());
+        List<String> regConcepts = regConfigHelper.getRegConcepts();
+        assertTrue(regConcepts.isEmpty());
     }
 
     @Test
     public void shouldGiveEmptyListWhenBothFilesIsNotPresent() throws Exception {
         whenNew(FileReader.class).withArguments(defaultExtFilePath).thenThrow(new FileNotFoundException());
         whenNew(FileReader.class).withArguments(implExtFilePath).thenThrow(new FileNotFoundException());
-        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
+        List<String> regConcepts = regConfigHelper.getRegConcepts();
         verify(logger, times(2)).warn(any(), any(FileNotFoundException.class));
-        assertTrue(rspConcepts.isEmpty());
+        assertTrue(regConcepts.isEmpty());
     }
 
     @Test
-    public void shouldGiveAllRspConceptNamesEvenIfImplementationJsonFileIsNotPresent() throws Exception {
+    public void shouldGiveAllRegConceptNamesEvenIfImplementationJsonFileIsNotPresent() throws Exception {
         whenNew(FileReader.class).withArguments(defaultExtFilePath).thenReturn(defaultFileReader);
         whenNew(FileReader.class).withArguments(implExtFilePath).thenThrow(new FileNotFoundException());
         JsonElement jsonConfig = new JsonParser().parse(jsonString);
@@ -184,16 +184,16 @@ public class RspConfigHelperTest {
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
         when(jsonParser.parse(defaultFileReader)).thenReturn(jsonConfig);
 
-        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
+        List<String> regConcepts = regConfigHelper.getRegConcepts();
 
         verify(jsonParser, times(1)).parse(defaultFileReader);
-        assertEquals(2, rspConcepts.size());
-        assertTrue(rspConcepts.containsAll(expected));
+        assertEquals(2, regConcepts.size());
+        assertTrue(regConcepts.containsAll(expected));
         verify(logger, times(1)).warn(any(), any(FileNotFoundException.class));
     }
 
     @Test
-    public void shouldGiveAllRspConceptNamesEvenIfDefaultJsonFileIsNotPresent() throws Exception {
+    public void shouldGiveAllRegConceptNamesEvenIfDefaultJsonFileIsNotPresent() throws Exception {
         whenNew(FileReader.class).withArguments(defaultExtFilePath).thenThrow(new FileNotFoundException());
         whenNew(FileReader.class).withArguments(implExtFilePath).thenReturn(defaultFileReader);
         JsonElement jsonConfig = new JsonParser().parse(jsonString);
@@ -202,11 +202,11 @@ public class RspConfigHelperTest {
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
         when(jsonParser.parse(defaultFileReader)).thenReturn(jsonConfig);
 
-        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
+        List<String> regConcepts = regConfigHelper.getRegConcepts();
 
         verify(jsonParser, times(1)).parse(defaultFileReader);
-        assertEquals(2, rspConcepts.size());
-        assertTrue(rspConcepts.containsAll(expected));
+        assertEquals(2, regConcepts.size());
+        assertTrue(regConcepts.containsAll(expected));
         verify(logger, times(1)).warn(any(), any(FileNotFoundException.class));
     }
 
@@ -233,8 +233,8 @@ public class RspConfigHelperTest {
                 "}";
         List<String> expected = Arrays.asList("Fee Information", "Nutritional Values");
 
-        setValuesForMemberFields(rspConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
-        setValuesForMemberFields(rspConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
+        setValuesForMemberFields(regConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
+        setValuesForMemberFields(regConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
 
 
         whenNew(FileReader.class).withArguments(defaultExtFilePath).thenReturn(defaultFileReader);
@@ -244,7 +244,7 @@ public class RspConfigHelperTest {
 
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
 
-        assertEquals(expected, rspConfigHelper.getRspConcepts());
+        assertEquals(expected, regConfigHelper.getRegConcepts());
         verify(jsonParser, times(1)).parse(defaultFileReader);
         verify(jsonParser, times(1)).parse(implementationFileReader);
     }
@@ -266,8 +266,8 @@ public class RspConfigHelperTest {
                 "  }\n" +
                 "}";
 
-        setValuesForMemberFields(rspConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
-        setValuesForMemberFields(rspConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
+        setValuesForMemberFields(regConfigHelper, "defaultExtensionConfigFile", defaultExtFilePath);
+        setValuesForMemberFields(regConfigHelper, "implementationExtensionConfigFile", implExtFilePath);
 
         List<String> expected = Collections.singletonList("Nutritional Values");
 
@@ -278,7 +278,7 @@ public class RspConfigHelperTest {
 
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
 
-        assertEquals(expected, rspConfigHelper.getRspConcepts());
+        assertEquals(expected, regConfigHelper.getRegConcepts());
         verify(jsonParser, times(1)).parse(defaultFileReader);
         verify(jsonParser, times(1)).parse(implementationFileReader);
     }

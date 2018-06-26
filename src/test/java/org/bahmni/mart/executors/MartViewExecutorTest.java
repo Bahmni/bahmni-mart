@@ -3,7 +3,7 @@ package org.bahmni.mart.executors;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
-import org.bahmni.mart.config.view.RspViewDefinition;
+import org.bahmni.mart.config.view.RegViewDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
 import org.junit.Before;
@@ -35,7 +35,7 @@ public class MartViewExecutorTest {
     private ViewExecutor viewExecutor;
 
     @Mock
-    private RspViewDefinition rspViewDefinition;
+    private RegViewDefinition regViewDefinition;
 
     @Mock
     private JobDefinition jobDefinition;
@@ -55,7 +55,7 @@ public class MartViewExecutorTest {
         setValuesForMemberFields(martViewExecutor, "jobDefinitionReader", jobDefinitionReader);
         setValuesForMemberFields(martViewExecutor, "martJSONReader", martJSONReader);
         setValuesForMemberFields(martViewExecutor, "viewExecutor", viewExecutor);
-        setValuesForMemberFields(martViewExecutor, "rspViewDefinition", rspViewDefinition);
+        setValuesForMemberFields(martViewExecutor, "regViewDefinition", regViewDefinition);
 
         viewDefinitions = new ArrayList<>();
         viewDefinitions.add(new ViewDefinition());
@@ -65,7 +65,7 @@ public class MartViewExecutorTest {
     }
 
     @Test
-    public void shouldExecuteViewsWithOutRspView() {
+    public void shouldExecuteViewsWithOutRegView() {
 
         when(jobDefinition.getName()).thenReturn("");
 
@@ -75,7 +75,7 @@ public class MartViewExecutorTest {
         verify(jobDefinitionReader, times(1)).getJobDefinitionByName(registrationSecondPage);
         verify(jobDefinition, times(1)).getName();
         verify(viewExecutor).execute(viewDefinitions);
-        verify(rspViewDefinition, times(0)).getDefinition();
+        verify(regViewDefinition, times(0)).getDefinition();
         verify(viewExecutor, times(1)).execute(viewDefinitions);
 
         assertEquals(1, viewDefinitions.size());
@@ -83,10 +83,10 @@ public class MartViewExecutorTest {
     }
 
     @Test
-    public void shouldExecuteViewsWithRspView() {
+    public void shouldExecuteViewsWithRegView() {
 
         when(jobDefinition.getName()).thenReturn("obs");
-        when(rspViewDefinition.getDefinition()).thenReturn(mock(ViewDefinition.class));
+        when(regViewDefinition.getDefinition()).thenReturn(mock(ViewDefinition.class));
 
         martViewExecutor.execute();
 
@@ -94,7 +94,7 @@ public class MartViewExecutorTest {
         verify(jobDefinitionReader, times(1)).getJobDefinitionByName(registrationSecondPage);
         verify(jobDefinition, times(1)).getName();
         verify(viewExecutor).execute(viewDefinitions);
-        verify(rspViewDefinition, times(1)).getDefinition();
+        verify(regViewDefinition, times(1)).getDefinition();
         verify(viewExecutor, times(1)).execute(viewDefinitions);
 
         assertEquals(2, viewDefinitions.size());

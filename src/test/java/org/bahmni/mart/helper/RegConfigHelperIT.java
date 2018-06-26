@@ -10,16 +10,16 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RspConfigHelperIT extends AbstractBaseBatchIT {
+public class RegConfigHelperIT extends AbstractBaseBatchIT {
     @Autowired
-    private RspConfigHelper rspConfigHelper;
+    private RegConfigHelper regConfigHelper;
 
     @Test
-    public void shouldGiveAllRspConceptNames() {
+    public void shouldGiveAllRegConceptNames() {
         List<String> expected = Arrays.asList("Nutritional", "Fee Information", "Nutritional Temp");
 
-        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
-        assertEquals(3, rspConcepts.size());
-        assertTrue(rspConcepts.containsAll(expected));
+        List<String> regConcepts = regConfigHelper.getRegConcepts();
+        assertEquals(3, regConcepts.size());
+        assertTrue(regConcepts.containsAll(expected));
     }
 }

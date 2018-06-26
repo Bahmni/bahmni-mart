@@ -3,7 +3,7 @@ package org.bahmni.mart.executors;
 import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.config.MartJSONReader;
 import org.bahmni.mart.config.job.JobDefinitionReader;
-import org.bahmni.mart.config.view.RspViewDefinition;
+import org.bahmni.mart.config.view.RegViewDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.bahmni.mart.config.view.ViewExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class MartViewExecutor implements MartExecutor {
     private ViewExecutor viewExecutor;
 
     @Autowired
-    private RspViewDefinition rspViewDefinition;
+    private RegViewDefinition regViewDefinition;
 
     @Override
     public void execute() {
@@ -36,7 +36,7 @@ public class MartViewExecutor implements MartExecutor {
         List<ViewDefinition> viewDefinitions = martJSONReader.getViewDefinitions();
 
         if (!StringUtils.isEmpty(jobDefinitionReader.getJobDefinitionByName(REGISTRATION_SECOND_PAGE).getName())) {
-            viewDefinitions.add(rspViewDefinition.getDefinition());
+            viewDefinitions.add(regViewDefinition.getDefinition());
         }
         viewExecutor.execute(viewDefinitions);
     }

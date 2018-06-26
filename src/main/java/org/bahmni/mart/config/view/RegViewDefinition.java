@@ -1,7 +1,7 @@
 package org.bahmni.mart.config.view;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bahmni.mart.helper.RspConfigHelper;
+import org.bahmni.mart.helper.RegConfigHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -18,13 +18,13 @@ import static org.bahmni.mart.table.FormTableMetadataGenerator.addPrefixToName;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
 @Component
-public class RspViewDefinition {
+public class RegViewDefinition {
     //TODO: Refactor This Class Suman
 
-    private static final String RSP = "Rsp";
+    private static final String REG = "Reg";
 
     @Autowired
-    private RspConfigHelper rspConfigHelper;
+    private RegConfigHelper regConfigHelper;
 
     @Qualifier("martNamedJdbcTemplate")
     @Autowired
@@ -39,9 +39,9 @@ public class RspViewDefinition {
     }
 
     private String getSql() {
-        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
-        List<String> tableNames = rspConcepts.stream()
-                .map(conceptName -> getProcessedName(addPrefixToName(conceptName, RSP)))
+        List<String> regConcepts = regConfigHelper.getRegConcepts();
+        List<String> tableNames = regConcepts.stream()
+                .map(conceptName -> getProcessedName(addPrefixToName(conceptName, REG)))
                 .collect(Collectors.toList());
 
         return tableNames.size() > 0 ? createSql(tableNames) : "";

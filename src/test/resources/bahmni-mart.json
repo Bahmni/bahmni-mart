@@ -96,7 +96,7 @@
     },
     {
       "name": "Registration Second Page",
-      "type": "rsp"
+      "type": "reg"
     }
   ],
   "procedures":[

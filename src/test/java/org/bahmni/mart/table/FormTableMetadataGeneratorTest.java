@@ -101,7 +101,7 @@ public class FormTableMetadataGeneratorTest {
 
     @Test
     public void shouldAddPrefixToGivenName() {
-        assertEquals("rsp test_name", FormTableMetadataGenerator.addPrefixToName("test_name", "rsp"));
+        assertEquals("reg test_name", FormTableMetadataGenerator.addPrefixToName("test_name", "reg"));
     }
 
     @Test

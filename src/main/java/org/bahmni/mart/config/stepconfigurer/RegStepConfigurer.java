@@ -3,7 +3,7 @@ package org.bahmni.mart.config.stepconfigurer;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.helper.RspConfigHelper;
+import org.bahmni.mart.helper.RegConfigHelper;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,21 +15,21 @@ import java.util.stream.Collectors;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 
 @Component
-public class RspStepConfigurer extends StepConfigurer {
-    private static final String TYPE = "rsp";
+public class RegStepConfigurer extends StepConfigurer {
+    private static final String TYPE = "reg";
 
     @Autowired
-    private RspConfigHelper rspConfigHelper;
+    private RegConfigHelper regConfigHelper;
 
     @Override
     protected List<BahmniForm> getAllForms() {
         JobDefinition jobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE);
 
-        List<String> rspConcepts = rspConfigHelper.getRspConcepts();
-        if (rspConcepts.isEmpty())
+        List<String> regConcepts = regConfigHelper.getRegConcepts();
+        if (regConcepts.isEmpty())
             return new ArrayList<>();
 
-        List<Concept> allFormConcepts = conceptService.getConceptsByNames(rspConcepts);
+        List<Concept> allFormConcepts = conceptService.getConceptsByNames(regConcepts);
         return addPrefixToFormsName(formListProcessor.retrieveAllForms(allFormConcepts, jobDefinition));
     }
 

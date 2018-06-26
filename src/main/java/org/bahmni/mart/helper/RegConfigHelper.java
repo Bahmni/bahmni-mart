@@ -16,10 +16,10 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-public class RspConfigHelper extends AbstractConfigParserHelper {
-    private static final Logger log = LoggerFactory.getLogger(RspConfigHelper.class);
-    private static final String RSP_EXTENSION_POINT_ID = "org.bahmni.registration.conceptSetGroup.observations";
-    private static final String RSP_TYPE = "config";
+public class RegConfigHelper extends AbstractConfigParserHelper {
+    private static final Logger log = LoggerFactory.getLogger(RegConfigHelper.class);
+    private static final String REG_EXTENSION_POINT_ID = "org.bahmni.registration.conceptSetGroup.observations";
+    private static final String REG_TYPE = "config";
 
     @Value("${defaultExtensionConfigPath}")
     private String defaultExtensionConfigFile;
@@ -38,21 +38,21 @@ public class RspConfigHelper extends AbstractConfigParserHelper {
     }
 
 
-    public List<String> getRspConcepts() {
-        ArrayList<String> rspConcepts = new ArrayList<>();
+    public List<String> getRegConcepts() {
+        ArrayList<String> regConcepts = new ArrayList<>();
         Set<Map.Entry<String, JsonElement>> allConcepts = getAllConcepts(implementationExtensionConfigFile,
                 defaultExtensionConfigFile);
         for (Map.Entry<String, JsonElement> concept : allConcepts) {
             JsonObject jsonObject = concept.getValue().getAsJsonObject();
             JsonElement extensionPointId = jsonObject.get("extensionPointId");
-            JsonElement rspType = jsonObject.get("type");
+            JsonElement regType = jsonObject.get("type");
             JsonElement extensionParams = jsonObject.get("extensionParams");
-            if (extensionPointId != null && rspType != null && extensionParams != null &&
-                    RSP_EXTENSION_POINT_ID.equals(extensionPointId.getAsString()) &&
-                    RSP_TYPE.equals(rspType.getAsString()))
-                rspConcepts.add(extensionParams.getAsJsonObject().get("conceptName").getAsString());
+            if (extensionPointId != null && regType != null && extensionParams != null &&
+                    REG_EXTENSION_POINT_ID.equals(extensionPointId.getAsString()) &&
+                    REG_TYPE.equals(regType.getAsString()))
+                regConcepts.add(extensionParams.getAsJsonObject().get("conceptName").getAsString());
         }
-        return rspConcepts;
+        return regConcepts;
     }
 
 }

@@ -40,7 +40,7 @@ public class JobContext {
     private CSVUploadJobStrategy csvUploadJobStrategy;
 
     @Autowired
-    private RSPJobStrategy rspJobStrategy;
+    private REGJobStrategy regJobStrategy;
 
     @Autowired
     private DispositionJobStrategy dispositionJobStrategy;
@@ -74,7 +74,7 @@ public class JobContext {
         strategyMap.put(JobType.ORDERS.toString().toLowerCase(), orderJobStrategy);
         strategyMap.put(JobType.DIAGNOSES.toString().toLowerCase(), diagnosesJobStrategy);
         strategyMap.put(JobType.CSVUPLOAD.toString().toLowerCase(), csvUploadJobStrategy);
-        strategyMap.put(JobType.RSP.toString().toLowerCase(), rspJobStrategy);
+        strategyMap.put(JobType.REG.toString().toLowerCase(), regJobStrategy);
         strategyMap.put(JobType.DISPOSITION.toString().toLowerCase(), dispositionJobStrategy);
         return strategyMap;
     }

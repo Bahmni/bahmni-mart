@@ -272,15 +272,15 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     private void verifyViews() {
-        String rspViewSql = "SELECT * FROM registration_second_page_view";
+        String regViewSql = "SELECT * FROM registration_second_page_view";
         List<Map<String, Object>> view = martJdbcTemplate.queryForList("SELECT * from test_view");
         List<Map<String, Object>> viewFromFile = martJdbcTemplate.queryForList("SELECT * FROM view_from_file");
-        List<Map<String, Object>> rspView = martJdbcTemplate.queryForList(rspViewSql);
+        List<Map<String, Object>> regView = martJdbcTemplate.queryForList(regViewSql);
         Set<String> columnNamesView = view.get(0).keySet();
         Set<String> columnNamesViewFromFile = viewFromFile.get(0).keySet();
-        Set<String> rspViewColumns = rspView.get(0).keySet();
-        List<String> rspViewExpectedCoulumns = Arrays.asList("rsp_fee_information_registration_fee",
-                "rsp_nutritional_temp_height", "rsp_nutritional_weight", "patient_id", "encounter_id",
+        Set<String> regViewColumns = regView.get(0).keySet();
+        List<String> regViewExpectedCoulumns = Arrays.asList("reg_fee_information_registration_fee",
+                "reg_nutritional_temp_height", "reg_nutritional_weight", "patient_id", "encounter_id",
                 "obs_datetime", "location_id", "location_name", "program_id", "program_name"
         );
 
@@ -291,9 +291,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 containsInAnyOrder(columnNamesViewFromFile.toArray()));
         assertEquals(10, view.size());
         assertEquals(10, viewFromFile.size());
-        assertEquals(10, rspViewColumns.size());
-        assertThat(rspViewExpectedCoulumns, containsInAnyOrder(rspViewColumns.toArray()));
-        assertEquals(1, rspView.size());
+        assertEquals(10, regViewColumns.size());
+        assertThat(regViewExpectedCoulumns, containsInAnyOrder(regViewColumns.toArray()));
+        assertEquals(1, regView.size());
         verifyRecords(view);
         verifyRecords(viewFromFile);
     }

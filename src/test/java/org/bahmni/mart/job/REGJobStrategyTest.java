@@ -1,7 +1,7 @@
 package org.bahmni.mart.job;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.stepconfigurer.RspStepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.RegStepConfigurer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,19 +15,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RSPJobStrategyTest extends StepRegisterTestHelper {
-    private RSPJobStrategy rspJobStrategy;
+public class REGJobStrategyTest extends StepRegisterTestHelper {
+    private REGJobStrategy regJobStrategy;
 
     @Mock
-    private RspStepConfigurer rspStepConfigurer;
+    private RegStepConfigurer regStepConfigurer;
 
     @Mock
     private JobDefinition jobDefinition;
 
     @Before
     public void setUp() throws Exception {
-        rspJobStrategy = new RSPJobStrategy(rspStepConfigurer);
-        super.setUp(rspJobStrategy, jobDefinition);
+        regJobStrategy = new REGJobStrategy(regStepConfigurer);
+        super.setUp(regJobStrategy, jobDefinition);
     }
 
     @After
@@ -38,11 +38,11 @@ public class RSPJobStrategyTest extends StepRegisterTestHelper {
     @Test
     public void shouldReturnAJob() {
 
-        Job actualJob = rspJobStrategy.getJob(jobDefinition);
+        Job actualJob = regJobStrategy.getJob(jobDefinition);
 
         assertEquals(expectedJob, actualJob);
 
-        verify(rspStepConfigurer, times(1)).createTables();
-        verify(rspStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
+        verify(regStepConfigurer, times(1)).createTables();
+        verify(regStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
     }
 }
