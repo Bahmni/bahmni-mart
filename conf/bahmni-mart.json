@@ -21,7 +21,7 @@
       "chunkSizeToRead": "500",
       "groupedJobConfigs": [
         {
-          "tableName": "appointment_service",
+          "tableName": "appointment_service_default",
           "columnsToIgnore": [
             "speciality"
           ]
@@ -91,7 +91,7 @@
           ]
         },
         {
-          "tableName": "person_details",
+          "tableName": "person_details_default",
           "columnsToIgnore": [
             "prefix",
             "given_name",
