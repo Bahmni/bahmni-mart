@@ -8,7 +8,7 @@ BEGIN
 SELECT patient_id,
   date_started,date_stopped
 INTO current_patient,curr_start_date,curr_stop_date
-FROM bed_patient_assignment bpam
+FROM bed_patient_assignment_default bpam
 WHERE bpam.location = locationName
       AND patient_id = patientId AND date_started = dateStopped
 LIMIT 1;
