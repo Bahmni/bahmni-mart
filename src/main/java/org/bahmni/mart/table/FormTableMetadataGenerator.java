@@ -20,6 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
+
 @Primary
 @Component("FormTableMetadataGenerator")
 public class FormTableMetadataGenerator implements TableMetadataGenerator {
@@ -140,5 +142,9 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
 
     public static String getProcessedName(String formName) {
         return formName.trim().replaceAll("\\s+", "_").toLowerCase();
+    }
+
+    public boolean isMetaDataChanged(BahmniForm form) {
+        return nonNull(nonExistentTableData.get(getProcessedName(form.getFormName().getName())));
     }
 }

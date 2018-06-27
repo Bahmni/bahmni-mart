@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -135,7 +136,7 @@ public class FormTableMetadataGeneratorTest {
     @Test
     public void shouldNotAddTableDataToMapWhenThereIsNoMetadataChange() {
         BahmniForm form = new BahmniForm();
-        String formName = "formName";
+        String formName = "formNameOne";
         form.setFormName(new Concept(123, formName, 1));
         Concept field1 = new Concept(1, "field,1", 0);
         field1.setDataType("int");
@@ -144,9 +145,9 @@ public class FormTableMetadataGeneratorTest {
         form.addField(field1);
         form.addField(field2);
 
-        TableData existingTableData = new TableData("formname");
+        TableData existingTableData = new TableData("formnameone");
         List<TableColumn> tableColumns = new ArrayList<>();
-        tableColumns.add(new TableColumn("id_formname","integer",true,null));
+        tableColumns.add(new TableColumn("id_formnameone","integer",true,null));
         tableColumns.add(new TableColumn("field_1","int",false,null));
         tableColumns.add(new TableColumn("field2","text",false,null));
         tableColumns.add(new TableColumn("patient_id", "integer", false, null));
@@ -157,7 +158,7 @@ public class FormTableMetadataGeneratorTest {
         tableColumns.add(new TableColumn("program_id", "integer", false, null));
         tableColumns.add(new TableColumn("program_name", "text", false, null));
         existingTableData.setColumns(tableColumns);
-        when(tableDataGenerator.getTableDataFromMart(formName.toLowerCase(),"SELECT * FROM formname"))
+        when(tableDataGenerator.getTableDataFromMart(formName.toLowerCase(),"SELECT * FROM formnameone"))
                 .thenReturn(existingTableData);
 
         formTableMetadataGenerator.addMetadataForForm(form);
@@ -224,7 +225,7 @@ public class FormTableMetadataGeneratorTest {
     @Test
     public void shouldAddTableDataToMapWhenTableIsNotPresentInMartDatabase() {
         BahmniForm form = new BahmniForm();
-        String formName = "formName";
+        String formName = "formNameTwo";
         form.setFormName(new Concept(123, formName, 1));
         Concept field1 = new Concept(1, "field1", 0);
         field1.setDataType("int");
@@ -233,12 +234,12 @@ public class FormTableMetadataGeneratorTest {
         form.addField(field1);
         form.addField(field2);
 
-        TableData expected = new TableData("formname");
+        TableData expected = new TableData("formnametwo");
         TableColumn tableColumnOne = new TableColumn("field1","int",false,null);
         TableColumn tableColumnTwo = new TableColumn("field2","text",false,null);
         expected.setColumns(Arrays.asList(tableColumnOne, tableColumnTwo));
 
-        when(tableDataGenerator.getTableDataFromMart(formName.toLowerCase(),"SELECT * FROM formname"))
+        when(tableDataGenerator.getTableDataFromMart(formName.toLowerCase(),"SELECT * FROM formnametwo"))
                 .thenThrow(BadSqlGrammarException.class);
 
         formTableMetadataGenerator.addMetadataForForm(form);
@@ -261,17 +262,77 @@ public class FormTableMetadataGeneratorTest {
         setValueForFinalStaticField(FormTableMetadataGenerator.class, "logger", logger);
 
         BahmniForm form = new BahmniForm();
-        String formName = "formName";
+        String formName = "formNameThree";
         form.setFormName(new Concept(123, formName, 1));
         Concept field1 = new Concept(1, "field1", 0);
         field1.setDataType("int");
         form.addField(field1);
 
-        when(tableDataGenerator.getTableDataFromMart(formName.toLowerCase(),"SELECT * FROM formname"))
+        when(tableDataGenerator.getTableDataFromMart(formName.toLowerCase(),"SELECT * FROM formnamethree"))
                 .thenThrow(BadSqlGrammarException.class);
 
         formTableMetadataGenerator.addMetadataForForm(form);
 
-        verify(logger).info("formname table is not an existing table");
+        verify(logger).info("formnamethree table is not an existing table");
+    }
+
+    @Test
+    public void shouldReturnTrueIfMetaDataIsChangedForGivenForm() {
+        BahmniForm form = new BahmniForm();
+        String formName = "formNameFour";
+        form.setFormName(new Concept(123, formName, 1));
+        Concept field1 = new Concept(1, "field,1", 0);
+        field1.setDataType("int");
+        Concept field2 = new Concept(2, "field2", 0);
+        field2.setDataType("text");
+        form.addField(field1);
+        form.addField(field2);
+
+        TableData existingTableData = new TableData("formnamefour");
+        List<TableColumn> tableColumns = new ArrayList<>();
+        tableColumns.add(new TableColumn("field_1","int",false,null));
+        existingTableData.setColumns(tableColumns);
+
+        when(tableDataGenerator.getTableDataFromMart(formName.toLowerCase(),"SELECT * FROM formnamefour"))
+                .thenReturn(existingTableData);
+
+        formTableMetadataGenerator.addMetadataForForm(form);
+
+        assertTrue(formTableMetadataGenerator.isMetaDataChanged(form));
+    }
+
+    @Test
+    public void shouldReturnFalseIfMetaDataIsNotChangedForGivenForm() {
+        BahmniForm form = new BahmniForm();
+        String formName = "formNameFive";
+        form.setFormName(new Concept(123, formName, 1));
+        Concept field1 = new Concept(1, "field,1", 0);
+        field1.setDataType("int");
+        Concept field2 = new Concept(2, "field2", 0);
+        field2.setDataType("text");
+        form.addField(field1);
+        form.addField(field2);
+
+        TableData existingTableData = new TableData("formnamefive");
+        List<TableColumn> tableColumns = new ArrayList<>();
+        tableColumns.add(new TableColumn("id_formnamefive","integer",true,null));
+        tableColumns.add(new TableColumn("field_1","int",false,null));
+        tableColumns.add(new TableColumn("field2","text",false,null));
+        tableColumns.add(new TableColumn("patient_id", "integer", false, null));
+        tableColumns.add(new TableColumn("encounter_id", "integer", false, null));
+        tableColumns.add(new TableColumn("obs_datetime", "text", false, null));
+        tableColumns.add(new TableColumn("location_id", "integer", false, null));
+        tableColumns.add(new TableColumn("location_name", "text", false, null));
+        tableColumns.add(new TableColumn("program_id", "integer", false, null));
+        tableColumns.add(new TableColumn("program_name", "text", false, null));
+        existingTableData.setColumns(tableColumns);
+        existingTableData.setColumns(tableColumns);
+
+        when(tableDataGenerator.getTableDataFromMart(formName.toLowerCase(),"SELECT * FROM formnamefive"))
+                .thenReturn(existingTableData);
+
+        formTableMetadataGenerator.addMetadataForForm(form);
+
+        assertFalse(formTableMetadataGenerator.isMetaDataChanged(form));
     }
 }
