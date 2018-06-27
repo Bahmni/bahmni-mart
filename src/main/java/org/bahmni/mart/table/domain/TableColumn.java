@@ -53,10 +53,8 @@ public class TableColumn {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TableColumn that = (TableColumn) o;
-        return isPrimaryKey == that.isPrimaryKey &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(reference, that.reference);
+        return Objects.equals(name, that.name) &&
+                Objects.equals(type, that.type);
     }
 
     @Override
