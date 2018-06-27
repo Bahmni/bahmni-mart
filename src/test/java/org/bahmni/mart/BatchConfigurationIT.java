@@ -1,6 +1,7 @@
 package org.bahmni.mart;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -56,6 +57,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         expectedFormGenericData.put("obs_datetime", "2015-01-22 00:00:00.0");
     }
 
+    @Ignore
     @Test
     @Sql(scripts = {"classpath:testDataSet/insertPatientDataWithDiagnoses.sql"},
             config = @SqlConfig(transactionManager = "customITContext"))

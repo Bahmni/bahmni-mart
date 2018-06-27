@@ -149,32 +149,6 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         verifyNoPrimaryOrForeignKeyConstraints(tableDataList);
     }
 
-    private void verifyNoPrimaryOrForeignKeyConstraints(List<TableData> tableDataList) {
-        tableDataList.forEach(tableData -> tableData.getColumns().forEach(tableColumn -> {
-            assertFalse(tableColumn.isPrimaryKey());
-            assertNull(tableColumn.getReference());
-        }));
-    }
-
-    private List<TableData> getTableData() {
-
-        String medicalHistoryFormName = "medical_history";
-        String medicalHistoryPrimaryKey = "id_medical_hostory";
-
-        TableData medicalHistoryTableData = new TableData(medicalHistoryFormName);
-        TableColumn idMedicalHistory = new TableColumn(medicalHistoryPrimaryKey, "int", true, null);
-        TableColumn someColumnInMedicalHistory = new TableColumn("some column", "int", false, null);
-        medicalHistoryTableData.setColumns(Arrays.asList(idMedicalHistory, someColumnInMedicalHistory));
-
-        TableData fstgTableData = new TableData("fstg");
-        ForeignKey foreignKeyToMedicalHistory = new ForeignKey(medicalHistoryPrimaryKey, medicalHistoryFormName);
-        TableColumn foreignKeyColumn = new TableColumn("id_medical_history", "int", false, foreignKeyToMedicalHistory);
-        TableColumn someColumnInFstg = new TableColumn("some column", "int", false, null);
-        fstgTableData.setColumns(Arrays.asList(foreignKeyColumn, someColumnInFstg));
-
-        return Arrays.asList(medicalHistoryTableData, fstgTableData);
-    }
-
     @Test
     public void shouldGetAllFormsUnderAllObservationTemplates() {
         List<String> ignoreConcepts = Arrays.asList("video", "image");
@@ -200,5 +174,43 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         getJobDefinitionByType(jobDefinitions, "obs");
         verify(conceptService, times(1)).getChildConcepts(allObservationTemplates);
         verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, obsJobDefinition);
+    }
+
+    @Test
+    public void shouldNotThrowNullPointerExceptionWhileRevokingConstraintsWhenTableDataIsNotPresentInMap() {
+        ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
+        setUpBahmniFormsAndSteps(bahmniForms);
+
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
+        when(formTableMetadataGenerator.getTableData(any())).thenReturn(null);
+
+        formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
+    }
+
+    private void verifyNoPrimaryOrForeignKeyConstraints(List<TableData> tableDataList) {
+        tableDataList.forEach(tableData -> tableData.getColumns().forEach(tableColumn -> {
+            assertFalse(tableColumn.isPrimaryKey());
+            assertNull(tableColumn.getReference());
+        }));
+    }
+
+    private List<TableData> getTableData() {
+
+        String medicalHistoryFormName = "medical_history";
+        String medicalHistoryPrimaryKey = "id_medical_hostory";
+
+        TableData medicalHistoryTableData = new TableData(medicalHistoryFormName);
+        TableColumn idMedicalHistory = new TableColumn(medicalHistoryPrimaryKey, "int", true, null);
+        TableColumn someColumnInMedicalHistory = new TableColumn("some column", "int", false, null);
+        medicalHistoryTableData.setColumns(Arrays.asList(idMedicalHistory, someColumnInMedicalHistory));
+
+        TableData fstgTableData = new TableData("fstg");
+        ForeignKey foreignKeyToMedicalHistory = new ForeignKey(medicalHistoryPrimaryKey, medicalHistoryFormName);
+        TableColumn foreignKeyColumn = new TableColumn("id_medical_history", "int", false, foreignKeyToMedicalHistory);
+        TableColumn someColumnInFstg = new TableColumn("some column", "int", false, null);
+        fstgTableData.setColumns(Arrays.asList(foreignKeyColumn, someColumnInFstg));
+
+        return Arrays.asList(medicalHistoryTableData, fstgTableData);
     }
 }

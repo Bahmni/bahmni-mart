@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static java.util.Objects.isNull;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.isAddMoreMultiSelectEnabled;
 
 public abstract class StepConfigurer implements StepConfigurerContract {
@@ -60,6 +61,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     }
 
     private void revokeConstraints(TableData tableData) {
+        if (isNull(tableData)) return;
         tableData.getColumns().forEach(tableColumn -> {
             if (tableColumn.isPrimaryKey()) {
                 tableColumn.setPrimaryKey(false);
