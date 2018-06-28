@@ -1,5 +1,6 @@
 <@compress single_line=true>
 SELECT
+    obs0.encounter_id,
     obs0.obs_id
     <#if input.depthToParent &gt;0>
         , obs${input.depthToParent-input.parent.depthToParent}.obs_id as parent_obs_id
