@@ -1,11 +1,14 @@
 SELECT
-  pi.*,
+  pd.person_id AS patient_id,
   pd.gender,
   pd.birthdate               AS birth_date,
+   EXTRACT(YEAR FROM (SELECT age( sb.block_starttime, pd.birthdate))) AS age_at_surgery,
+  age_group(sb.block_starttime, pd.birthdate) AS age_group_at_surgery,
   pd.dead,
   pa.*,
   sa.surgical_block_id,
   sb.primary_provider_name,
+  sb.location_name,
   sb.creator_name            AS block_creator_name,
   sb.date_created            AS block_date_created,
   sb.date_changed            AS block_date_changed,
@@ -14,6 +17,7 @@ SELECT
   sb.block_endtime           AS block_end_time,
   saa.*,
   sa.sort_weight             AS surgery_sort_weight,
+  sa.status                  AS surgery_status,
   sa.actual_start_datetime   AS surgery_actual_start_time,
   sa.actual_end_datetime     AS surgery_actual_end_time,
   sa.notes                   AS surgery_notes,
@@ -25,7 +29,6 @@ SELECT
 FROM person_details_default pd
 
   LEFT JOIN person_attributes pa on pa.person_id = pd.person_id
-  LEFT JOIN patient_identifier pi on pi.patient_id = pd.person_id
   LEFT JOIN surgical_appointment_default sa on sa.patient_id = pd.person_id
   LEFT JOIN surgical_block_default sb on sb.surgical_block_id = sa.surgical_block_id
   LEFT JOIN surgical_appointment_attributes saa on saa.surgical_appointment_id = sa.surgical_appointment_id

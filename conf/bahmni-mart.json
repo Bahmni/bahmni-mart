@@ -87,7 +87,18 @@
             "caretakerWhatsapp",
             "caretakerViber",
             "caretakerFacebook",
-            "campComments"
+            "campComments",
+            "campDistrict",
+            "campVillage",
+            "caretakerNameArabic",
+            "caretakerNameEnglish",
+            "caretakerDob",
+            "emergencyContactName",
+            "emergencyContactNumber",
+            "legalRepDob",
+            "nameoftheBlock",
+            "nameoftheStreet",
+            "orkut"
           ]
         },
         {
@@ -213,6 +224,10 @@
     {
       "name":"Discharge Date Procedure",
       "sourceFilePath":"classpath:procedureSql/dischargeDateProc.sql"
+    },
+    {
+      "name":"Age Group Procedure",
+      "sourceFilePath":"classpath:procedureSql/ageGroupProc.sql"
     }
   ],
   "views": [
@@ -222,7 +237,7 @@
     },
     {
       "name": "patient_visits_encounters_view",
-      "sql": "SELECT pd.person_id, pd.gender, pd.birthdate, pd.birthtime, pd.birthdate_estimated, pvd.visit_id, pvd.visit_type_name, pvd.visit_start_date, pvd.visit_end_date, pvd.location_name, visit_type_name AS visit_type, encounter_id, encounter_type_id, encounter_type_name, ped.location_name AS encounter_location FROM person_details_default pd LEFT OUTER JOIN patient_visit_details_default pvd ON pvd.patient_id = pd.person_id LEFT OUTER JOIN patient_encounter_details_default ped ON ped.patient_id = pvd.patient_id"
+      "sourceFilePath": "classpath:viewSql/patientVisitsEncountersView.sql"
     },
     {
       "name": "appointment_admin_panel_view",
@@ -230,23 +245,11 @@
     },
     {
       "name": "patient_details_view",
-      "sql": "select pi.*, gender, birthdate, birthtime, birthdate_estimated, dead, death_date, deathdate_estimated, cause_of_death, pat.* from patient_identifier pi LEFT OUTER JOIN person_details_default pd on pd.person_id = pi.patient_id LEFT OUTER JOIN person_attributes pat on pat.person_id = pi.patient_id"
+      "sourceFilePath": "classpath:viewSql/patientDetailsView.sql"
     },
     {
-      "name": "surgery_details",
-      "sql": "SELECT sa.surgical_block_id, sb.primary_provider_name, sb.location_name, sb.block_starttime, sb.block_endtime, sb.date_created AS block_datecreated, sb.date_changed AS block_datechanged, patient_id, sort_weight, status, saa.*, actual_start_datetime, actual_end_datetime, sa.date_created AS surgery_date_created, sa.date_changed AS surgery_date_changed FROM surgical_block_default sb LEFT OUTER JOIN surgical_appointment_default sa ON sa.surgical_block_id = sb.surgical_block_id LEFT OUTER JOIN surgical_appointment_attributes saa ON saa.surgical_appointment_id = sa.surgical_appointment_id"
-    },
-    {
-      "name": "patient_Information_view",
-      "sql": "SELECT pa.*, pi.\"Patient_Identifier\", pd.gender, pd.birthtime, pd.birthdate_estimated, pd.death_date, pd.deathdate_estimated, pd.cause_of_death, pad.address1, pad.address2, pad.address3, pad.address4, pad.address5, pad.address6, pad.address7, pad.address8, pad.address9, pad.address10, pad.address11, pad.address12, pad.address13, pad.address14, pad.address15, pad.city_village, pad.state_province, pad.postal_code, pad.country, pad.county_district, pad.latitude, pad.longitude, pad.start_date, pad.end_date FROM patient_identifier pi LEFT JOIN person_details_default pd ON pi.patient_id = pd.person_id LEFT JOIN person_attributes pa ON pa.person_id = pi.patient_id LEFT JOIN person_address_default pad ON pad.person_id = pi.patient_id WHERE pad.preferred = 'true'"
-    },
-    {
-      "name": "patient_program_info_view",
-      "sourceFilePath": "classpath:viewSql/patientProgramInfoView.sql"
-    },
-    {
-      "name": "operation_theater_view",
-      "sourceFilePath": "classpath:viewSql/operationTheaterView.sql"
+      "name": "patient_information_view",
+      "sourceFilePath": "classpath:viewSql/patientInformationView.sql"
     },
     {
       "name":"bed_management_view",

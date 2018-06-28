@@ -1,0 +1,37 @@
+SELECT
+  pd.person_id AS patient_id,
+  pd.gender,
+  pd.birthtime,
+  pd.birthdate_estimated,
+  pd.death_date,
+  pd.deathdate_estimated,
+  pd.cause_of_death,
+  pad.address1,
+  pad.address2,
+  pad.address3,
+  pad.address4,
+  pad.address5,
+  pad.address6,
+  pad.address7,
+  pad.address8,
+  pad.address9,
+  pad.address10,
+  pad.address11,
+  pad.address12,
+  pad.address13,
+  pad.address14,
+  pad.address15,
+  pad.city_village,
+  pad.state_province,
+  pad.postal_code,
+  pad.country,
+  pad.county_district,
+  pad.latitude,
+  pad.longitude,
+  pad.start_date,
+  pad.end_date,
+  pa.*
+FROM person_details_default pd
+  LEFT JOIN person_attributes pa ON pa.person_id = pd.person_id
+  LEFT JOIN person_address_default pad ON pad.person_id = pd.person_id
+WHERE pad.preferred = 'true'
