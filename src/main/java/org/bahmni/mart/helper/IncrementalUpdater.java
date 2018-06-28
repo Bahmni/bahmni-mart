@@ -16,10 +16,10 @@ public class IncrementalUpdater {
     private static final String EVENT_RECORD_ID = "event_record_id";
     private static final String CATEGORY = "category";
     private static final String TABLE_NAME = "table_name";
-    private static final String QUERY_FOR_UUID_EXTRACTION = "SELECT substring_index(substring_index(object, '/', -1)," +
-            " '?', 1) as uuid FROM event_records WHERE id > %d AND category = '%s'";
+    private static final String QUERY_FOR_UUID_EXTRACTION = "SELECT DISTINCT substring_index(substring_index(object, " +
+            "'/', -1), '?', 1) as uuid FROM event_records WHERE id > %d AND category = '%s'";
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
-    private static final String WHERE_CLAUSE = " WHERE %s IN (%s)";
+    private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
     private static final String NON_EXISTED_ID = "-1";
 
     @Autowired
@@ -35,7 +35,7 @@ public class IncrementalUpdater {
             return readerSql;
         }
         String joinedIds = getJoinedIds(optionalMarkerMap.get());
-        return readerSql.concat(String.format(WHERE_CLAUSE, updateOn, joinedIds));
+        return String.format(UPDATED_READER_SQL, readerSql, updateOn, joinedIds);
     }
 
     private String getJoinedIds(Map<String, Object> markerMap) {

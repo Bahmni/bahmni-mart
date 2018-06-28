@@ -50,8 +50,8 @@ public class IncrementalUpdaterTest {
         setValuesForMemberFields(incrementalUpdater, "openmrsJdbcTemplate", openmrsJdbcTemplate);
         setValuesForMemberFields(incrementalUpdater, "markerMapper", markerMapper);
         updateOn = "id";
-        queryForEventObjects = "SELECT substring_index(substring_index(object, '/', -1), '?', 1) as uuid FROM " +
-                "event_records WHERE id > %d AND category = '%s'";
+        queryForEventObjects = "SELECT DISTINCT substring_index(substring_index(object, '/', -1), '?', 1) as uuid " +
+                "FROM event_records WHERE id > %d AND category = '%s'";
         queryForIds = String.format("SELECT %s_id FROM %s WHERE uuid in ('%s','%s')",
                 tableName, tableName,
                 "2c2ca648-3fae-4719-a164-3b603b7d6d41",
@@ -114,7 +114,8 @@ public class IncrementalUpdaterTest {
         setUpForUuids();
         List<Long> ids = Arrays.asList(1L, 2L);
         when(openmrsJdbcTemplate.queryForList(queryForIds, Long.class)).thenReturn(ids);
-        String expectedUpdatedReaderSql = String.format("%s WHERE %s IN (1,2)", readerSql, updateOn);
+        String expectedUpdatedReaderSql = String.format("SELECT * FROM ( %s ) result WHERE %s IN (1,2)", readerSql,
+                updateOn);
 
         String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
@@ -126,7 +127,8 @@ public class IncrementalUpdaterTest {
         setUpForMarkerMap();
         when(openmrsJdbcTemplate.queryForList(String.format(queryForEventObjects, 10, category), String.class))
                 .thenReturn(new ArrayList<>());
-        String expectedUpdatedReaderSql = String.format("%s WHERE %s IN (-1)", readerSql, updateOn);
+        String expectedUpdatedReaderSql = String.format("SELECT * FROM ( %s ) result WHERE %s IN (-1)", readerSql,
+                updateOn);
 
         String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
