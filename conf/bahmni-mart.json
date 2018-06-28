@@ -1,11 +1,6 @@
 {
   "jobs": [
     {
-      "name": "Custom Codes Export",
-      "type": "csvupload",
-      "sourceFilePath": "conf/customCodes.csv"
-    },
-    {
       "name": "Programs",
       "type": "programs",
       "chunkSizeToRead": "500"
@@ -23,7 +18,6 @@
         {
           "tableName": "appointment_service_default",
           "columnsToIgnore": [
-            "speciality"
           ]
         }
       ]
@@ -54,51 +48,9 @@
             "primaryContact",
             "secondaryContact",
             "primaryRelative",
-            "id1Document",
-            "id1DocNumber",
-            "id1FullNameEnglish",
-            "id1FullNameArabic",
-            "id1DateOfExpiry",
-            "id2Document",
-            "id2DocNumber",
-            "id2FullNameEnglish",
-            "id2FullNameArabic",
-            "id2DateOfExpiry",
-            "id3Document",
-            "id3DocNumber",
-            "id3FullNameEnglish",
-            "id3FullNameArabic",
-            "id3DateOfExpiry",
             "familyNameLocal",
             "givenNameLocal",
-            "middleNameLocal",
-            "legalRepFullNameEnglish",
-            "legalRepFullNameArabic",
-            "phoneNumber1",
-            "phoneNumber2",
-            "phoneNumber3",
-            "emailAddress",
-            "whatsapp",
-            "viber",
-            "facebook",
-            "caretakerPhoneNumber1",
-            "caretakerPhoneNumber2",
-            "caretakerEmail",
-            "caretakerWhatsapp",
-            "caretakerViber",
-            "caretakerFacebook",
-            "campComments",
-            "campDistrict",
-            "campVillage",
-            "caretakerNameArabic",
-            "caretakerNameEnglish",
-            "caretakerDob",
-            "emergencyContactName",
-            "emergencyContactNumber",
-            "legalRepDob",
-            "nameoftheBlock",
-            "nameoftheStreet",
-            "orkut"
+            "middleNameLocal"
           ]
         },
         {
@@ -160,24 +112,12 @@
       "separateTableConfig": {
         "enableForAddMoreAndMultiSelect": true,
         "separateTables": [
-          "PA, Location of Assessment",
-          "SMH, Pain Assessment",
-          "FV, Outcomes FV"
         ]
       },
       "conceptReferenceSource": "",
       "ignoreAllFreeTextConcepts": true,
       "columnsToIgnore": [
-        "Video",
-        "Image",
-        "Documents, Image Upload",
-        "Documents, Image",
-        "Radiology Documents",
-        "FSTG, Comments",
-        "CC, Additional comments, complications",
-        "FUP, Comments about dismissal",
-        "FUP, Comments about next follow-up",
-        "FSTG, Comments about refusal"
+        "Image"
       ]
     },
     {
