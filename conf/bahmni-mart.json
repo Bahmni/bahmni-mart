@@ -121,43 +121,28 @@
       "chunkSizeToRead": "500"
     },
     {
-      "name": "Medication Data",
-      "type": "customSql",
-      "sourceFilePath": "classpath:readerSql/drugOrder.sql",
+      "name": "Visits And Encounters",
+      "type": "visitsAndEncounters",
+      "chunkSizeToRead": "500"
+    },
+    {
+      "name": "Medication And Orders",
+      "type": "medicationAndOrders",
       "chunkSizeToRead": "500",
-      "tableName": "medication_data_default",
-      "columnsToIgnore": [
-        "instructions",
-        "stop_notes"
+      "groupedJobConfigs": [
+        {
+          "tableName": "medication_data_default",
+          "columnsToIgnore": [
+            "instructions",
+            "stop_notes"
+          ]
+        }
       ]
     },
     {
-      "name": "Visit Attribute Details",
-      "type": "customSql",
-      "readerSql": "SELECT va.visit_id AS visit_id, va.visit_attribute_id AS visit_attribute_id, va.value_reference AS value_reference, vat.visit_attribute_type_id AS visit_attribute_type_id, vat.name AS visit_attribute_type_name, vat.description AS visit_attribute_type_description, vat.datatype AS visit_attribute_type_datatype, vat.datatype_config AS visit_attribute_type_datatype_config, vat.preferred_handler AS visit_attribute_type_preferred_handler, vat.handler_config AS visit_attribute_type_handler_config, vat.min_occurs AS visit_attribute_type_min_occurs, vat.max_occurs AS visit_attribute_type_max_occurs FROM visit INNER JOIN visit_attribute va on visit.visit_id = va.visit_id AND visit.voided = FALSE INNER JOIN visit_attribute_type vat ON va.attribute_type_id = vat.visit_attribute_type_id AND va.voided = FALSE AND vat.retired = FALSE",
-      "chunkSizeToRead": "500",
-      "tableName": "visit_attribute_details_default"
-    },
-    {
-      "name": "Conditions",
-      "type": "customSql",
-      "readerSql": "SELECT condition_id, previous_condition_id, patient_id, status, coalesce(condition_non_coded, cv.concept_full_name) AS condition_name, CASE WHEN condition_non_coded IS NULL THEN TRUE ELSE FALSE END AS is_coded_condition_name, onset_date, additional_detail, end_date, end_reason, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name, conditions.date_created FROM conditions INNER JOIN concept_view cv ON cv.concept_id = conditions.concept_id AND conditions.voided = 0 AND cv.retired = 0 INNER JOIN users ON users.user_id = conditions.creator INNER JOIN person_name pn ON pn.person_id = users.person_id",
-      "chunkSizeToRead": "500",
-      "tableName": "conditions_default"
-    },
-    {
-      "name": "Visit Attributes",
-      "type": "eav",
-      "chunkSizeToRead": "500",
-      "tableName": "visit_attributes",
-      "eavAttributes": {
-        "attributeTypeTableName": "visit_attribute_type",
-        "attributeTableName": "visit_attribute",
-        "valueTableJoiningId": "attribute_type_id",
-        "typeTableJoiningId": "visit_attribute_type_id",
-        "valueColumnName": "value_reference",
-        "primaryKey": "visit_id"
-      }
+      "name": "Diagnoses And Conditions",
+      "type": "diagnosesAndConditions",
+      "chunkSizeToRead": "500"
     },
     {
       "name": "Bacteriology Data",
@@ -196,11 +181,6 @@
       ]
     },
     {
-      "name": "Orders Data",
-      "type": "orders",
-      "chunkSizeToRead": 500
-    },
-    {
       "name": "Registration Second Page",
       "type": "reg",
       "columnsToIgnore": [],
@@ -208,11 +188,6 @@
         "enableForAddMoreAndMultiSelect": true,
         "separateTables": []
       }
-    },
-    {
-      "name": "Diagnoses Data",
-      "type": "diagnoses",
-      "columnsToIgnore": []
     },
     {
       "name": "Disposition Data",
@@ -264,8 +239,8 @@
       "sourceFilePath": "classpath:viewSql/patientBedView.sql"
     },
     {
-      "name": "patient_operation_theatre_view",
-      "sourceFilePath": "classpath:viewSql/patientOperationTheatreView.sql"
+      "name": "patient_operation_theater_view",
+      "sourceFilePath": "classpath:viewSql/patientOperationTheaterView.sql"
     },
     {
       "name": "patient_appointment_view",
