@@ -1,0 +1,14 @@
+{
+  "jobs": [
+    {
+      "name": "Medication Data",
+      "type": "customSql",
+      "sourceFilePath": "classpath:readerSql/drugOrder.sql",
+      "tableName": "medication_data_default"
+    },
+    {
+      "name": "Orders Data",
+      "type": "orders"
+    }
+  ]
+}

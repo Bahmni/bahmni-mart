@@ -16,7 +16,9 @@ import java.util.Arrays;
  */
 public enum GroupedJobType {
     PROGRAMS("programs"), PATIENTS("patients"), APPOINTMENTS("appointments"), LOCATION("location"),
-    OPERATION_THEATER("operationTheater"), BED_MANAGEMENT("bedManagement"), PERSON("person"), PROVIDER("provider");
+    OPERATION_THEATER("operationTheater"), BED_MANAGEMENT("bedManagement"), PERSON("person"), PROVIDER("provider"),
+    VISITS_AND_ENCOUNTERS("visitsAndEncounters"), MEDICATION_AND_ORDERS("medicationAndOrders"),
+    DIAGNOSES_AND_CONDITIONS("diagnosesAndConditions");
 
     private final String typeValue;
 
