@@ -10,6 +10,10 @@ bahmni_mart_backup(){
     sh /opt/bahmni-mart/bin/bahmni-mart-backup.sh
 }
 
+metabase_backup(){
+    sh /opt/bahmni-mart/bin/metabase-backup.sh
+}
+
 bahmni_mart_restore(){
     sh /opt/bahmni-mart/bin/bahmni-mart-restore.sh
 }
@@ -33,6 +37,7 @@ display_help(){
                 ii. sql - Take backup as sql dump file
             If you don't provide any format, by default it will use 'sql' format
         restore: To restore db using encrypted sql dump file
+        metabase-backup: To take metabase db backup. (only if metabase is installed)
         import-key: To import public key of others
         create-key: Create a new public/private key pair
     RUN 'bahmni-mart --help' for more information on a command \n"
@@ -42,6 +47,8 @@ if [[ -z $1 ]]; then
     launch_bahmni_mart;
 elif [[ "$1" == "backup" ]]; then
     bahmni_mart_backup;
+elif [[ "$1" == "metabase-backup" ]]; then
+    metabase_backup;
 elif [[ "$1" == "import-key" ]]; then
     import_key;
 elif [[ "$1" == "create-key" ]]; then
