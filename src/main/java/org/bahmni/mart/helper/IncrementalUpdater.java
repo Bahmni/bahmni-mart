@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,6 +27,10 @@ public class IncrementalUpdater {
     @Autowired
     @Qualifier("openmrsJdbcTemplate")
     private JdbcTemplate openmrsJdbcTemplate;
+
+    @Autowired
+    @Qualifier("martJdbcTemplate")
+    private JdbcTemplate martJdbcTemplate;
 
     @Autowired
     private MarkerMapper markerMapper;
@@ -48,8 +54,8 @@ public class IncrementalUpdater {
         }
 
         return getIdListFor(tableName, uuids).stream()
-                                            .map(String::valueOf)
-                                            .collect(Collectors.joining(","));
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
     }
 
     private List<String> getEventRecordUuids(Integer eventRecordId, String category) {
@@ -61,5 +67,13 @@ public class IncrementalUpdater {
         String joinedUuids = uuids.stream().map(uuid -> String.format("'%s'", uuid)).collect(Collectors.joining(","));
         return openmrsJdbcTemplate.queryForList(String.format(QUERY_FOR_ID_EXTRACTION, tableName, tableName,
                 joinedUuids), String.class);
+    }
+
+    public void deleteVoidedRecords(Set<String> ids, String table, String column) {
+        if (Objects.isNull(ids) || ids.isEmpty()) {
+            return;
+        }
+        String deleteSql = String.format("DELETE FROM %s WHERE %s IN (%s)", table, column, String.join(",", ids));
+        martJdbcTemplate.execute(deleteSql);
     }
 }

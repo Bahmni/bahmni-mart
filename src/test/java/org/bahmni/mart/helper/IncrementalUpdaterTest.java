@@ -9,13 +9,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +33,9 @@ public class IncrementalUpdaterTest {
 
     @Mock
     private JdbcTemplate openmrsJdbcTemplate;
+
+    @Mock
+    private JdbcTemplate martJdbcTemplate;
 
     @Mock
     private MarkerMapper markerMapper;
@@ -48,6 +56,7 @@ public class IncrementalUpdaterTest {
         readerSql = "SELECT id, name FROM test";
 
         setValuesForMemberFields(incrementalUpdater, "openmrsJdbcTemplate", openmrsJdbcTemplate);
+        setValuesForMemberFields(incrementalUpdater, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(incrementalUpdater, "markerMapper", markerMapper);
         updateOn = "id";
         queryForEventObjects = "SELECT DISTINCT substring_index(substring_index(object, '/', -1), '?', 1) as uuid " +
@@ -133,6 +142,34 @@ public class IncrementalUpdaterTest {
         String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
         assertEquals(expectedUpdatedReaderSql, updatedReaderSql);
+    }
+
+    @Test
+    public void shouldExecuteDeleteSqlForGivenIds() {
+        Set<String> ids = new HashSet<>(Arrays.asList("1", "2"));
+        String table = "table";
+        String column = "column";
+
+        incrementalUpdater.deleteVoidedRecords(ids, table, column);
+        String sql = String.format("DELETE FROM table WHERE column IN (1,2)");
+
+        verify(martJdbcTemplate).execute(sql);
+    }
+
+    @Test
+    public void shouldNotExecuteDeleteSqlWhenIdListIsNull() {
+
+        incrementalUpdater.deleteVoidedRecords(null, "table", "column");
+
+        verify(martJdbcTemplate, never()).execute(anyString());
+    }
+
+    @Test
+    public void shouldNotExecuteDeleteSqlWhenIdListIsEmpty() {
+
+        incrementalUpdater.deleteVoidedRecords(Collections.emptySet(), "table", "column");
+
+        verify(martJdbcTemplate, never()).execute(anyString());
     }
 
     private void setUpForMarkerMap() {
