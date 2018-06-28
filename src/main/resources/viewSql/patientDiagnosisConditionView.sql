@@ -1,7 +1,9 @@
 SELECT
-  pi.*,
+  pd.person_id AS patient_id,
   pd.gender,
   pd.birthdate               AS birth_date,
+  EXTRACT(YEAR FROM (SELECT age( c.onset_date, pd.birthdate))) AS age_at_condition,
+  age_group(c.onset_date, pd.birthdate) AS age_group_at_condition,
   pd.dead,
   pa.*,
   c.condition_id,
@@ -22,6 +24,5 @@ SELECT
 
 FROM person_details_default pd
   LEFT JOIN person_attributes pa ON pa.person_id = pd.person_id
-  LEFT JOIN patient_identifier pi ON pi.patient_id = pd.person_id
   LEFT JOIN conditions_default c ON c.patient_id = pd.person_id
   LEFT JOIN visit_diagnoses vd ON vd.patient_id = pd.person_id

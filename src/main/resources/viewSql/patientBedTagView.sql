@@ -5,6 +5,8 @@ FROM (
          bpa.encounter_id,
          bpa.bed_number,
          bpa.location,
+         EXTRACT(YEAR FROM (SELECT age( bpa.date_started, pd.birthdate))) AS age_at_bed_assignment,
+         age_group(bpa.date_started, pd.birthdate) AS age_group_at_bed_assignment,
          CASE WHEN ped.encounter_type_name = 'TRANSFER'
            THEN 'MOVEMENT'
          ELSE ped.encounter_type_name END AS action,
@@ -51,5 +53,6 @@ FROM (
 
        FROM bed_patient_assignment_default bpa LEFT JOIN bed_tags_default bt ON bpa.bed_id = bt.bed_id
          LEFT JOIN patient_encounter_details_default ped ON ped.encounter_id = bpa.encounter_id
+  LEFT JOIN person_details_default pd ON pd.person_id = bpa.patient_id
      ) AS result
 WHERE bed_tag_created IS NOT NULL
