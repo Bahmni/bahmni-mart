@@ -57,9 +57,9 @@ public class IncrementalUpdater {
         return openmrsJdbcTemplate.queryForList(queryForEventRecordObjects, String.class);
     }
 
-    private List<Long> getIdListFor(String tableName, List<String> uuids) {
+    private List<String> getIdListFor(String tableName, List<String> uuids) {
         String joinedUuids = uuids.stream().map(uuid -> String.format("'%s'", uuid)).collect(Collectors.joining(","));
         return openmrsJdbcTemplate.queryForList(String.format(QUERY_FOR_ID_EXTRACTION, tableName, tableName,
-                joinedUuids), Long.class);
+                joinedUuids), String.class);
     }
 }

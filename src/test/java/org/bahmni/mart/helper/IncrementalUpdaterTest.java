@@ -104,7 +104,7 @@ public class IncrementalUpdaterTest {
         incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
         verify(openmrsJdbcTemplate).queryForList(String.format(queryForEventObjects, 10, category), String.class);
-        verify(openmrsJdbcTemplate).queryForList(queryForIds, Long.class);
+        verify(openmrsJdbcTemplate).queryForList(queryForIds, String.class);
     }
 
 
@@ -112,8 +112,8 @@ public class IncrementalUpdaterTest {
     public void shouldUpdateReaderSqlGivenNonZeroEventRecordIdAndNonEmptyUuidsList() {
         setUpForMarkerMap();
         setUpForUuids();
-        List<Long> ids = Arrays.asList(1L, 2L);
-        when(openmrsJdbcTemplate.queryForList(queryForIds, Long.class)).thenReturn(ids);
+        List<String> ids = Arrays.asList("1", "2");
+        when(openmrsJdbcTemplate.queryForList(queryForIds, String.class)).thenReturn(ids);
         String expectedUpdatedReaderSql = String.format("SELECT * FROM ( %s ) result WHERE %s IN (1,2)", readerSql,
                 updateOn);
 
