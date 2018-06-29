@@ -46,6 +46,7 @@ public class IncrementalUpdaterTest {
     private String tableName;
     private String queryForEventObjects;
     private String queryForIds;
+    private String queryForMaxEventRecordId;
 
     @Before
     public void setUp() throws Exception {
@@ -65,6 +66,7 @@ public class IncrementalUpdaterTest {
                 tableName, tableName,
                 "2c2ca648-3fae-4719-a164-3b603b7d6d41",
                 "a76f74db-9ec4-4d20-9fc9-cb449ab331a5");
+        queryForMaxEventRecordId = "SELECT MAX(id) FROM event_records";
     }
 
     @Test
@@ -170,6 +172,27 @@ public class IncrementalUpdaterTest {
         incrementalUpdater.deleteVoidedRecords(Collections.emptySet(), "table", "column");
 
         verify(martJdbcTemplate, never()).execute(anyString());
+    }
+
+    @Test
+    public void shouldCallUpdateMarkerWithMaxEventRecordIdForGivenJobName() {
+        String jobName = "obs";
+        when(openmrsJdbcTemplate.queryForObject(queryForMaxEventRecordId, String.class)).thenReturn("145678");
+
+        incrementalUpdater.updateMarker(jobName);
+
+        verify(openmrsJdbcTemplate).queryForObject(queryForMaxEventRecordId, String.class);
+        verify(markerMapper).updateMarker(jobName, "145678");
+    }
+
+    @Test
+    public void shouldCallUpdateMarkerWithZeroWhenMaxMarkerIdIsNull() {
+        String jobName = "obs";
+        when(openmrsJdbcTemplate.queryForObject(queryForMaxEventRecordId, String.class)).thenReturn(null);
+
+        incrementalUpdater.updateMarker(jobName);
+        verify(openmrsJdbcTemplate).queryForObject(queryForMaxEventRecordId, String.class);
+        verify(markerMapper).updateMarker(jobName, "0");
     }
 
     private void setUpForMarkerMap() {

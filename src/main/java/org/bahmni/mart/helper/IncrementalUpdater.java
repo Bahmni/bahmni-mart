@@ -7,10 +7,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 @Component
 public class IncrementalUpdater {
@@ -23,6 +24,7 @@ public class IncrementalUpdater {
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
     private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
     private static final String NON_EXISTED_ID = "-1";
+    public static final String QUERY_FOR_MAX_EVENT_RECORD_ID = "SELECT MAX(id) FROM event_records";
 
     @Autowired
     @Qualifier("openmrsJdbcTemplate")
@@ -70,10 +72,18 @@ public class IncrementalUpdater {
     }
 
     public void deleteVoidedRecords(Set<String> ids, String table, String column) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
+        if (isNull(ids) || ids.isEmpty()) {
             return;
         }
         String deleteSql = String.format("DELETE FROM %s WHERE %s IN (%s)", table, column, String.join(",", ids));
         martJdbcTemplate.execute(deleteSql);
+    }
+
+    public void updateMarker(String jobName) {
+        String maxEventRecordId = openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
+        if (isNull(maxEventRecordId)) {
+            maxEventRecordId = String.valueOf(0);
+        }
+        markerMapper.updateMarker(jobName, maxEventRecordId);
     }
 }
