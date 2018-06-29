@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -14,9 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,10 +33,14 @@ public class MarkerMapperTest {
 
     private MarkerMapper markerMapper;
 
+    @Mock
+    private Logger logger;
+
     @Before
     public void setUp() throws Exception {
         markerMapper = new MarkerMapper();
         setValuesForMemberFields(markerMapper, "martJdbcTemplate", martJdbcTemplate);
+        setValueForFinalStaticField(MarkerMapper.class, "logger", logger);
     }
 
     @Test
@@ -76,5 +84,21 @@ public class MarkerMapperTest {
 
         verify(martJdbcTemplate).queryForList(markersQuery);
         assertEquals(Optional.empty(), actualMarkerMap);
+    }
+
+    @Test
+    public void shouldUpdateMarkerTableWithGivenEventRecordIdForGivenJob() {
+        markerMapper.updateMarker("obs", "123");
+
+        verify(martJdbcTemplate).execute("UPDATE markers SET event_record_id = 123 WHERE job_name = 'obs'");
+    }
+
+    @Test
+    public void shouldLogErrorWhenMarkersTableIsNotPresent() {
+        doThrow(BadSqlGrammarException.class).when(martJdbcTemplate).execute(anyString());
+
+        markerMapper.updateMarker("obs", "123");
+
+        verify(logger).error("Failed to update event_record_id for obs, markers table is not present");
     }
 }

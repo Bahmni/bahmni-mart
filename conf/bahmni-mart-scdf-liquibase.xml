@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="180520181534" author="Suman M">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(nspname) FROM pg_catalog.pg_namespace WHERE nspname='bahmni_mart_scdf';
+            </sqlCheck>
+        </preConditions>
+        <comment>Creating bahmni_mart_scdf schema for Bahmni mart dataflow server</comment>
+        <sql>
+            CREATE SCHEMA bahmni_mart_scdf;
+        </sql>
+    </changeSet>
+
+    <changeSet id="180520181538" author="Suman M">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="URI_REGISTRY" schemaName="bahmni_mart_scdf"/>
+            </not>
+        </preConditions>
+        <comment>Creating the URI_REGISTRY table if not exists in bahmni_mart_scdf schema</comment>
+        <sql>
+            CREATE TABLE IF NOT EXISTS bahmni_mart_scdf.URI_REGISTRY (
+                NAME VARCHAR(255) NOT NULL PRIMARY KEY,
+                URI VARCHAR(255) NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="180520181544" author="Suman M">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="TASK_DEFINITIONS" schemaName="bahmni_mart_scdf"/>
+            </not>
+        </preConditions>
+        <comment>Creating the TASK_DEFINITIONS table if not exists in bahmni_mart_scdf schema</comment>
+        <sql>
+            CREATE TABLE IF NOT EXISTS bahmni_mart_scdf.TASK_DEFINITIONS (
+                DEFINITION_NAME VARCHAR(255) NOT NULL PRIMARY KEY,
+                DEFINITION TEXT DEFAULT NULL
+            );
+        </sql>
+    </changeSet>
+
+    <changeSet id="180520181547" author="Suman M">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM bahmni_mart_scdf.URI_REGISTRY WHERE NAME='task.bahmni-mart';
+            </sqlCheck>
+        </preConditions>
+        <comment>Adding bahmni-mart app to SCDF server</comment>
+        <sql>
+            INSERT INTO bahmni_mart_scdf.uri_registry (NAME, URI)
+            VALUES ('task.bahmni-mart', 'file:///opt/bahmni-mart/lib/bahmni-mart.jar');
+        </sql>
+    </changeSet>
+
+    <changeSet id="180520181554" author="Suman M">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM bahmni_mart_scdf.TASK_DEFINITIONS WHERE DEFINITION_NAME='create-bahmni-mart';
+            </sqlCheck>
+        </preConditions>
+        <comment>Adding task definition for bahmni-mart app to SCDF server</comment>
+        <sql>
+            INSERT INTO bahmni_mart_scdf.task_definitions (DEFINITION_NAME, DEFINITION)
+            VALUES ('create-bahmni-mart',
+            'bahmni-mart --spring.profiles.active="docker" --spring.config.location="/opt/bahmni-mart/properties/"');
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -19,6 +19,7 @@ public class Constants {
             put("varchar", "text");
             put("complex", "text");
             put("double","double precision");
+            put("int4","integer");
         }
     };
 

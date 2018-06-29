@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 
 public class TableData {
     private String name;
@@ -55,13 +54,15 @@ public class TableData {
             return true;
         }
 
-        boolean isTableNameMatches = Objects.equals(this.getName(), that.getName());
-        if (isTableNameMatches && isNull(this.getColumns()) && isNull(that.getColumns())) {
+        return Objects.equals(this.getName(), that.getName()) && isColumnListMatches(that);
+    }
+
+    private boolean isColumnListMatches(TableData that) {
+        if (isNull(this.getColumns()) && isNull(that.getColumns())) {
             return true;
         }
-
-        return isTableNameMatches &&
-                nonNull(this.getColumns()) && nonNull(that.getColumns()) &&
-                isEqualCollection(this.getColumns(), that.getColumns());
+        return nonNull(this.getColumns()) && nonNull(that.getColumns()) &&
+                this.getColumns().size() == that.getColumns().size() &&
+                this.getColumns().containsAll(that.getColumns());
     }
 }

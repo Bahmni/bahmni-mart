@@ -2,6 +2,7 @@ package org.bahmni.mart.job;
 
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
+import org.bahmni.mart.table.listener.ObsJobListener;
 import org.mockito.Mock;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -35,6 +36,9 @@ public abstract class StepRegisterTestHelper {
     private JobBuilder jobBuilder;
 
     @Mock
+    private ObsJobListener obsJobListener;
+
+    @Mock
     private Step step;
 
     @Mock
@@ -49,6 +53,7 @@ public abstract class StepRegisterTestHelper {
         this.jobDefinition = jobDefinition;
 
         setValuesForSuperClassMemberFields(jobStrategy, "jobBuilderFactory", jobBuilderFactory);
+        setValuesForSuperClassMemberFields(jobStrategy, "obsJobListener", obsJobListener);
         setValuesForSuperClassMemberFields(jobStrategy, "treatmentRegistrationBaseExportStep",
                 treatmentRegistrationBaseExportStep);
 
@@ -56,6 +61,7 @@ public abstract class StepRegisterTestHelper {
         when(jobBuilderFactory.get(jobName)).thenReturn(jobBuilder);
         when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
         when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
+        when(jobBuilder.listener(obsJobListener)).thenReturn(jobBuilder);
         when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(step);
         when(jobBuilder.flow(step)).thenReturn(jobFlowBuilder);
         when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);

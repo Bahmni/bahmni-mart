@@ -1,13 +1,14 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.CommonTestHelper;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
+import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,10 +25,14 @@ import org.springframework.beans.factory.ObjectFactory;
 
 import javax.sql.DataSource;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -50,20 +55,30 @@ public class ObservationExportStepTest {
     @Mock
     private ObjectFactory<DatabaseObsWriter> obsWriterObjectFactory;
 
+    @Mock
+    private IncrementalUpdater incrementalUpdater;
+
+    @Mock
+    private FormTableMetadataGenerator formTableMetadataGenerator;
+
     private ObservationExportStep observationExportStep = new ObservationExportStep();
 
     @Before
     public void setUp() throws Exception {
         PowerMockito.mockStatic(BatchUtils.class);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(observationExportStep,
                 "dataSource", dataSource);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep, "stepBuilderFactory", stepBuilderFactory);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep, "freeMarkerEvaluator", freeMarkerEvaluator);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(observationExportStep, "stepBuilderFactory", stepBuilderFactory);
+        setValuesForMemberFields(observationExportStep, "freeMarkerEvaluator", freeMarkerEvaluator);
+        setValuesForMemberFields(observationExportStep,
                 "observationProcessorFactory", observationProcessorFactory);
-        CommonTestHelper.setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(observationExportStep,
                 "databaseObsWriterObjectFactory", obsWriterObjectFactory);
+        setValuesForMemberFields(observationExportStep, "incrementalUpdater", incrementalUpdater);
+        setValuesForMemberFields(observationExportStep, "formTableMetadataGenerator", formTableMetadataGenerator);
         BatchUtils.stepNumber = 0;
+        when(formTableMetadataGenerator.isMetaDataChanged(any())).thenReturn(true);
+
     }
 
     @Test
@@ -88,13 +103,13 @@ public class ObservationExportStepTest {
 
     @Test
     public void shouldGetTheBatchStepForBaseExport() {
+        String formName = "Form";
+        TaskletStep expectedBaseExportStep = mock(TaskletStep.class);
         StepBuilder stepBuilder = mock(StepBuilder.class);
         BahmniForm form = mock(BahmniForm.class);
         Concept formNameConcept = mock(Concept.class);
-        String formName = "Form";
         observationExportStep.setForm(form);
         SimpleStepBuilder simpleStepBuilder = mock(SimpleStepBuilder.class);
-        TaskletStep expectedBaseExportStep = mock(TaskletStep.class);
 
         when(form.getFormName()).thenReturn(formNameConcept);
         when(formNameConcept.getName()).thenReturn(formName);
@@ -105,6 +120,7 @@ public class ObservationExportStepTest {
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
+
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
 
         PowerMockito.mockStatic(JobDefinitionUtil.class);
@@ -114,5 +130,55 @@ public class ObservationExportStepTest {
 
         assertNotNull(observationExportStepStep);
         assertEquals(expectedBaseExportStep, observationExportStepStep);
+    }
+
+    @Test
+    public void shouldCallIncrementalUpdaterForExistingTables() {
+        String formName = "FormOne";
+        BahmniForm form = mock(BahmniForm.class);
+        setUpStepConfig(formName, form);
+        JobDefinition jobDefinition = new JobDefinition();
+        String jobName = "job Name";
+        jobDefinition.setName(jobName);
+        observationExportStep.setJobDefinition(jobDefinition);
+        when(formTableMetadataGenerator.isMetaDataChanged(form)).thenReturn(false);
+
+        observationExportStep.getStep();
+
+        verify(stepBuilderFactory).get("Step-1 " + formName);
+        verify(formTableMetadataGenerator).isMetaDataChanged(form);
+        verify(incrementalUpdater).updateReaderSql("some sql", jobName, "encounter_id");
+    }
+
+    @Test
+    public void shouldNotCallIncrementalUpdaterForNonExistingTables() {
+        String formName = "FormTwo";
+        BahmniForm form = mock(BahmniForm.class);
+        setUpStepConfig(formName, form);
+        when(formTableMetadataGenerator.isMetaDataChanged(form)).thenReturn(true);
+
+        observationExportStep.getStep();
+
+        verify(stepBuilderFactory).get("Step-1 " + formName);
+        verify(formTableMetadataGenerator).isMetaDataChanged(form);
+        verify(incrementalUpdater, never()).updateReaderSql(anyString(), anyString(), anyString());
+    }
+
+    private void setUpStepConfig(String formName, BahmniForm form) {
+        StepBuilder stepBuilder = mock(StepBuilder.class);
+        Concept formNameConcept = mock(Concept.class);
+        observationExportStep.setForm(form);
+        SimpleStepBuilder simpleStepBuilder = mock(SimpleStepBuilder.class);
+
+        when(form.getFormName()).thenReturn(formNameConcept);
+        when(formNameConcept.getName()).thenReturn(formName);
+        when(stepBuilderFactory.get("Step-1 " + formName)).thenReturn(stepBuilder);
+        when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
+        when(observationProcessorFactory.getObject()).thenReturn(new ObservationProcessor());
+        when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
+        when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
+        when(freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form)).thenReturn("some sql");
     }
 }

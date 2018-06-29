@@ -18,9 +18,21 @@ public class TableDataGenerator {
     @Autowired
     private JdbcTemplate openmrsJdbcTemplate;
 
+    @Qualifier("martJdbcTemplate")
+    @Autowired
+    private JdbcTemplate martJdbcTemplate;
+
     public TableData getTableData(String tableName, String sql) {
+        return getTableDataFrom(openmrsJdbcTemplate, tableName, sql);
+    }
+
+    public TableData getTableDataFromMart(String tableName, String sql) {
+        return getTableDataFrom(martJdbcTemplate, tableName, sql);
+    }
+
+    private TableData getTableDataFrom(JdbcTemplate jdbcTemplate, String tableName, String sql) {
         ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
-        TableData tableData = openmrsJdbcTemplate.query(sql + LIMIT, resultSetExtractor);
+        TableData tableData = jdbcTemplate.query(sql + LIMIT, resultSetExtractor);
         tableData.setName(FormTableMetadataGenerator.getProcessedName(tableName));
         tableData.getColumns().forEach(tableColumn
             -> tableColumn.setType(Constants.getPostgresDataTypeFor(tableColumn.getType())));
