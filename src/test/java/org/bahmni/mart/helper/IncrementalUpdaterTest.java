@@ -153,9 +153,8 @@ public class IncrementalUpdaterTest {
         String column = "column";
 
         incrementalUpdater.deleteVoidedRecords(ids, table, column);
-        String sql = String.format("DELETE FROM table WHERE column IN (1,2)");
 
-        verify(martJdbcTemplate).execute(sql);
+        verify(martJdbcTemplate).execute("DELETE FROM table WHERE column IN (1,2)");
     }
 
     @Test
@@ -191,8 +190,18 @@ public class IncrementalUpdaterTest {
         when(openmrsJdbcTemplate.queryForObject(queryForMaxEventRecordId, String.class)).thenReturn(null);
 
         incrementalUpdater.updateMarker(jobName);
+
         verify(openmrsJdbcTemplate).queryForObject(queryForMaxEventRecordId, String.class);
         verify(markerMapper).updateMarker(jobName, "0");
+    }
+
+    @Test
+    public void shouldNotQueryForMaxEventRecordIdWhenTheSameFieldIsNotNull() throws Exception {
+        setValuesForMemberFields(incrementalUpdater, "maxEventRecordId", "123");
+
+        incrementalUpdater.updateMarker("jobName");
+
+        verify(openmrsJdbcTemplate, never()).queryForObject(queryForMaxEventRecordId, String.class);
     }
 
     private void setUpForMarkerMap() {

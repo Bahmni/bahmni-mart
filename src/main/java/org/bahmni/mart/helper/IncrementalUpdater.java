@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,6 +37,8 @@ public class IncrementalUpdater {
 
     @Autowired
     private MarkerMapper markerMapper;
+
+    private String maxEventRecordId;
 
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
         Optional<Map<String, Object>> optionalMarkerMap = markerMapper.getJobMarkerMap(jobName);
@@ -80,10 +83,17 @@ public class IncrementalUpdater {
     }
 
     public void updateMarker(String jobName) {
-        String maxEventRecordId = openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
+        maxEventRecordId = getMaxEventRecordId();
         if (isNull(maxEventRecordId)) {
             maxEventRecordId = String.valueOf(0);
         }
         markerMapper.updateMarker(jobName, maxEventRecordId);
+    }
+
+    private String getMaxEventRecordId() {
+        if (Objects.nonNull(maxEventRecordId)) {
+            return maxEventRecordId;
+        }
+        return openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
     }
 }
