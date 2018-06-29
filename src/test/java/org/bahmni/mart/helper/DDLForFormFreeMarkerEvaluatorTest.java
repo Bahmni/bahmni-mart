@@ -107,7 +107,7 @@ public class DDLForFormFreeMarkerEvaluatorTest {
         assertNotNull(generatedSql);
         assertEquals("DROP TABLE IF EXISTS \"formWithChildren\" CASCADE; CREATE TABLE " +
                 "\"formWithChildren\"( \"patient_id\" integer PRIMARY KEY , \"encounter_id\" " +
-                "integer REFERENCES \"encounter\" (\"id\") );", generatedSql);
+                "integer REFERENCES \"encounter\" (\"id\") ON DELETE CASCADE );", generatedSql);
     }
 
 }
