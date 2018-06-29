@@ -131,6 +131,12 @@ ospackage {
         createDirectoryEntry = true
         into "/opt/bahmni-mart/conf"
     }
+
+    from("${projectDir}/conf/bahmni-mart-scdf-liquibase.xml") {
+        fileMode = 0766
+        createDirectoryEntry = true
+        into "/opt/bahmni-mart/conf"
+    }
 }
 
 buildRpm {
