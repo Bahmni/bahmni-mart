@@ -64,7 +64,7 @@ public class ObservationExportStep {
     private JdbcCursorItemReader<Map<String, Object>> obsReader() {
         String sql = freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form);
         if (!formTableMetadataGenerator.isMetaDataChanged(form)) {
-            sql = incrementalUpdater.updateReaderSql(sql, "obs", "encounter_id");
+            sql = incrementalUpdater.updateReaderSql(sql, jobDefinition.getName(), "encounter_id");
         }
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);

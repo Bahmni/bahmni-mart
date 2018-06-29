@@ -77,6 +77,8 @@ public class ObservationExportStepTest {
         setValuesForMemberFields(observationExportStep, "incrementalUpdater", incrementalUpdater);
         setValuesForMemberFields(observationExportStep, "formTableMetadataGenerator", formTableMetadataGenerator);
         BatchUtils.stepNumber = 0;
+        when(formTableMetadataGenerator.isMetaDataChanged(any())).thenReturn(true);
+
     }
 
     @Test
@@ -135,13 +137,17 @@ public class ObservationExportStepTest {
         String formName = "FormOne";
         BahmniForm form = mock(BahmniForm.class);
         setUpStepConfig(formName, form);
+        JobDefinition jobDefinition = new JobDefinition();
+        String jobName = "job Name";
+        jobDefinition.setName(jobName);
+        observationExportStep.setJobDefinition(jobDefinition);
         when(formTableMetadataGenerator.isMetaDataChanged(form)).thenReturn(false);
 
         observationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Step-1 " + formName);
         verify(formTableMetadataGenerator).isMetaDataChanged(form);
-        verify(incrementalUpdater).updateReaderSql("some sql", "obs", "encounter_id");
+        verify(incrementalUpdater).updateReaderSql("some sql", jobName, "encounter_id");
     }
 
     @Test
