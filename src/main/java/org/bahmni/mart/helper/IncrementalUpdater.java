@@ -19,7 +19,7 @@ public class IncrementalUpdater {
     private static final String CATEGORY = "category";
     private static final String TABLE_NAME = "table_name";
     private static final String QUERY_FOR_UUID_EXTRACTION = "SELECT DISTINCT substring_index(substring_index(object, " +
-            "'/', -1), '?', 1) as uuid FROM event_records WHERE id > %d AND category = '%s'";
+            "'/', -1), '?', 1) as uuid FROM event_records WHERE id > %s AND category = '%s'";
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
     private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
     private static final String NON_EXISTED_ID = "-1";
@@ -45,7 +45,7 @@ public class IncrementalUpdater {
     }
 
     private String getJoinedIds(Map<String, Object> markerMap) {
-        Integer eventRecordId = (Integer) markerMap.get(EVENT_RECORD_ID);
+        String eventRecordId = String.valueOf(markerMap.get(EVENT_RECORD_ID));
         String category = (String) markerMap.get(CATEGORY);
         String tableName = (String) markerMap.get(TABLE_NAME);
         List<String> uuids = getEventRecordUuids(eventRecordId, category);
@@ -58,7 +58,7 @@ public class IncrementalUpdater {
                 .collect(Collectors.joining(","));
     }
 
-    private List<String> getEventRecordUuids(Integer eventRecordId, String category) {
+    private List<String> getEventRecordUuids(String eventRecordId, String category) {
         String queryForEventRecordObjects = String.format(QUERY_FOR_UUID_EXTRACTION, eventRecordId, category);
         return openmrsJdbcTemplate.queryForList(queryForEventRecordObjects, String.class);
     }

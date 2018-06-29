@@ -60,7 +60,7 @@ public class IncrementalUpdaterTest {
         setValuesForMemberFields(incrementalUpdater, "markerMapper", markerMapper);
         updateOn = "id";
         queryForEventObjects = "SELECT DISTINCT substring_index(substring_index(object, '/', -1), '?', 1) as uuid " +
-                "FROM event_records WHERE id > %d AND category = '%s'";
+                "FROM event_records WHERE id > %s AND category = '%s'";
         queryForIds = String.format("SELECT %s_id FROM %s WHERE uuid in ('%s','%s')",
                 tableName, tableName,
                 "2c2ca648-3fae-4719-a164-3b603b7d6d41",
@@ -93,7 +93,7 @@ public class IncrementalUpdaterTest {
     @Test
     public void shouldQueryFromEventRecordsTableWhenEventRecordIdIsNotZeroForGivenJob() {
         Map markerMap = mock(Map.class);
-        when(markerMap.get("event_record_id")).thenReturn(10);
+        when(markerMap.get("event_record_id")).thenReturn("10");
         when(markerMap.get("category")).thenReturn(category);
         when(markerMapper.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
 
@@ -102,7 +102,7 @@ public class IncrementalUpdaterTest {
         verify(markerMapper).getJobMarkerMap(jobName);
         verify(markerMap, times(2)).get("event_record_id");
         verify(markerMap).get("category");
-        verify(openmrsJdbcTemplate).queryForList(String.format(queryForEventObjects, 10, category), String.class);
+        verify(openmrsJdbcTemplate).queryForList(String.format(queryForEventObjects, "10", category), String.class);
     }
 
     @Test
@@ -112,7 +112,7 @@ public class IncrementalUpdaterTest {
 
         incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
-        verify(openmrsJdbcTemplate).queryForList(String.format(queryForEventObjects, 10, category), String.class);
+        verify(openmrsJdbcTemplate).queryForList(String.format(queryForEventObjects, "10", category), String.class);
         verify(openmrsJdbcTemplate).queryForList(queryForIds, String.class);
     }
 
@@ -134,7 +134,7 @@ public class IncrementalUpdaterTest {
     @Test
     public void shouldUpdateReaderSqlWithNonExistedIdWhenUuidListIsEmpty() {
         setUpForMarkerMap();
-        when(openmrsJdbcTemplate.queryForList(String.format(queryForEventObjects, 10, category), String.class))
+        when(openmrsJdbcTemplate.queryForList(String.format(queryForEventObjects, "10", category), String.class))
                 .thenReturn(new ArrayList<>());
         String expectedUpdatedReaderSql = String.format("SELECT * FROM ( %s ) result WHERE %s IN (-1)", readerSql,
                 updateOn);
@@ -174,7 +174,7 @@ public class IncrementalUpdaterTest {
 
     private void setUpForMarkerMap() {
         Map markerMap = mock(Map.class);
-        when(markerMap.get("event_record_id")).thenReturn(10);
+        when(markerMap.get("event_record_id")).thenReturn("10");
         when(markerMap.get("category")).thenReturn(category);
         when(markerMap.get("table_name")).thenReturn(tableName);
         when(markerMapper.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
@@ -184,7 +184,7 @@ public class IncrementalUpdaterTest {
         List<String> eventRecordObjects = new ArrayList<>();
         eventRecordObjects.add("2c2ca648-3fae-4719-a164-3b603b7d6d41");
         eventRecordObjects.add("a76f74db-9ec4-4d20-9fc9-cb449ab331a5");
-        when(openmrsJdbcTemplate.queryForList(String.format(queryForEventObjects, 10, category), String.class))
+        when(openmrsJdbcTemplate.queryForList(String.format(queryForEventObjects, "10", category), String.class))
                 .thenReturn(eventRecordObjects);
     }
 }
