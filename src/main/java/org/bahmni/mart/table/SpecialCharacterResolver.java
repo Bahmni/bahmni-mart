@@ -115,4 +115,8 @@ public class SpecialCharacterResolver {
         return updatedToActualColumnsMap == null ? actualColumnName
                 : (String) updatedToActualColumnsMap.getKey(actualColumnName);
     }
+
+    public static String getActualTableName(String updatedTableName) {
+        return String.valueOf(updatedToActualTableNames.get(updatedTableName));
+    }
 }

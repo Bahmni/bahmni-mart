@@ -5,6 +5,7 @@ import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -112,6 +113,25 @@ public class SpecialCharacterResolverTest {
         String updatedTableName = SpecialCharacterResolver.getActualColumnName(tableData, tableColumn);
 
         assertEquals("test@id2", updatedTableName);
+    }
+
+    @Test
+    public void shouldReturnActualTableForGivenUpdatedTableName() {
+
+        String expectedTableName = "form,name@one";
+        TableData tableData = new TableData(expectedTableName);
+        List<TableColumn> tableColumns = new ArrayList<>();
+        tableColumns.add(new TableColumn("id_formnameone","integer",true,null));
+        tableColumns.add(new TableColumn("field","int",false,null));
+        tableData.setColumns(tableColumns);
+
+        SpecialCharacterResolver.resolveTableData(tableData);
+
+        String updatedTableName = tableData.getName();
+        assertEquals("form_name_one", updatedTableName);
+
+        String actualTableName = SpecialCharacterResolver.getActualTableName(updatedTableName);
+        assertEquals(expectedTableName, actualTableName);
     }
 }
 
