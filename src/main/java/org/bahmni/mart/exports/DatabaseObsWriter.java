@@ -44,7 +44,7 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
     @Override
     public void write(List<? extends List<Obs>> items) throws Exception {
         TableData tableData = formTableMetadataGenerator.getTableData(form);
-        if (!formTableMetadataGenerator.isMetaDataChanged(form)) {
+        if (!incrementalUpdater.isMetaDataChanged(form.getFormName().getName())) {
             deleteVoidedRecords(items, tableData);
         }
         insertRecords(items, tableData);

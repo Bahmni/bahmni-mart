@@ -1,15 +1,23 @@
 package org.bahmni.mart.helper;
 
+import org.bahmni.mart.table.FormTableMetadataGenerator;
+import org.bahmni.mart.table.SpecialCharacterResolver;
+import org.bahmni.mart.table.domain.TableColumn;
+import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.Spy;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +25,22 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
+import static org.bahmni.mart.table.SpecialCharacterResolver.getUpdatedTableNameIfExist;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
-@RunWith(MockitoJUnitRunner.class)
+@PrepareForTest(SpecialCharacterResolver.class)
+@RunWith(PowerMockRunner.class)
 public class IncrementalUpdaterTest {
 
     private IncrementalUpdater incrementalUpdater;
@@ -39,6 +54,16 @@ public class IncrementalUpdaterTest {
 
     @Mock
     private MarkerMapper markerMapper;
+
+    @Mock
+    private TableDataGenerator tableDataGenerator;
+
+    @Mock
+    private FormTableMetadataGenerator formTableMetadataGenerator;
+
+    @Spy
+    private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
+
 
     private String readerSql;
     private String updateOn;
@@ -59,6 +84,9 @@ public class IncrementalUpdaterTest {
         setValuesForMemberFields(incrementalUpdater, "openmrsJdbcTemplate", openmrsJdbcTemplate);
         setValuesForMemberFields(incrementalUpdater, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(incrementalUpdater, "markerMapper", markerMapper);
+        setValuesForMemberFields(incrementalUpdater, "tableDataGenerator", tableDataGenerator);
+        setValuesForMemberFields(incrementalUpdater, "formTableMetadataGenerator", formTableMetadataGenerator);
+        setValuesForMemberFields(incrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
         updateOn = "id";
         queryForEventObjects = "SELECT DISTINCT substring_index(substring_index(object, '/', -1), '?', 1) as uuid " +
                 "FROM event_records WHERE id > %s AND category = '%s'";
@@ -67,6 +95,8 @@ public class IncrementalUpdaterTest {
                 "2c2ca648-3fae-4719-a164-3b603b7d6d41",
                 "a76f74db-9ec4-4d20-9fc9-cb449ab331a5");
         queryForMaxEventRecordId = "SELECT MAX(id) FROM event_records";
+
+        mockStatic(SpecialCharacterResolver.class);
     }
 
     @Test
@@ -202,6 +232,97 @@ public class IncrementalUpdaterTest {
         incrementalUpdater.updateMarker("jobName");
 
         verify(openmrsJdbcTemplate, never()).queryForObject(queryForMaxEventRecordId, String.class);
+    }
+
+    @Test
+    public void shouldReturnTrueWhenThereIsMetaDataChange() {
+        String formName = "form, name@one";
+        String actualTableName = getProcessedName(formName);
+        TableData tableData = new TableData(actualTableName);
+        List<TableColumn> tableColumns = new ArrayList<>();
+        tableColumns.add(new TableColumn("id_form_name_one", "integer", true, null));
+        tableColumns.add(new TableColumn("field_1", "int", false, null));
+        tableData.setColumns(tableColumns);
+
+        String updatedTableName = "form_name_one";
+        when(getUpdatedTableNameIfExist(actualTableName)).thenReturn(updatedTableName);
+        when(tableDataGenerator.getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one"))
+                .thenReturn(new TableData());
+        when(formTableMetadataGenerator.getTableDataByName(actualTableName))
+                .thenReturn(tableData);
+
+        boolean metaDataChanged = incrementalUpdater.isMetaDataChanged(formName);
+
+        assertTrue(metaDataChanged);
+        verifyStatic();
+        getUpdatedTableNameIfExist(actualTableName);
+
+        verify(tableDataGenerator).getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one");
+        verify(formTableMetadataGenerator).getTableDataByName(actualTableName);
+        assertFalse(metaDataChangeMap.isEmpty());
+        verify(metaDataChangeMap).put("form,_name@one", true);
+    }
+
+    @Test
+    public void shouldReturnFalseWhenThereIsNoMetaDataChange() {
+        String formName = "form, name@one";
+        String actualTableName = getProcessedName(formName);
+        TableData tableData = new TableData(actualTableName);
+        List<TableColumn> tableColumns = new ArrayList<>();
+        tableColumns.add(new TableColumn("id_form_name_one", "integer", true, null));
+        tableColumns.add(new TableColumn("field_1", "int", false, null));
+        tableData.setColumns(tableColumns);
+
+        String updatedTableName = "form_name_one";
+        when(getUpdatedTableNameIfExist(actualTableName)).thenReturn(updatedTableName);
+        when(tableDataGenerator.getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one"))
+                .thenReturn(tableData);
+        when(formTableMetadataGenerator.getTableDataByName(actualTableName))
+                .thenReturn(tableData);
+
+        boolean metaDataChanged = incrementalUpdater.isMetaDataChanged(formName);
+
+        assertFalse(metaDataChanged);
+        verifyStatic();
+        getUpdatedTableNameIfExist(actualTableName);
+
+        verify(tableDataGenerator).getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one");
+        verify(formTableMetadataGenerator).getTableDataByName(actualTableName);
+        assertFalse(metaDataChangeMap.isEmpty());
+        verify(metaDataChangeMap).put("form,_name@one", false);
+    }
+
+    @Test
+    public void shouldReturnFromMetaDataChangeMapWhenTheEntryIsStoredInMap() {
+        String formName = "form, name@one";
+        String actualTableName = getProcessedName(formName);
+        metaDataChangeMap.put(actualTableName, true);
+
+        assertTrue(incrementalUpdater.isMetaDataChanged(formName));
+
+        verify(metaDataChangeMap).get(actualTableName);
+        verifyStatic(never());
+        getUpdatedTableNameIfExist(actualTableName);
+
+        verify(tableDataGenerator, never()).getTableDataFromMart(anyString(), anyString());
+        verify(formTableMetadataGenerator, never()).getTableDataByName(actualTableName);
+    }
+
+    @Test
+    public void shouldNotThrowBadSalGrammarExceptionWhenTheTableIsNotPresent() {
+        String formName = "table, name";
+        String actualTableName = getProcessedName(formName);
+        when(formTableMetadataGenerator.getTableDataByName(actualTableName)).thenReturn(new TableData(actualTableName));
+        when(getUpdatedTableNameIfExist(actualTableName)).thenReturn("table_name");
+        when(tableDataGenerator.getTableDataFromMart("table_name", "SELECT * FROM table_name"))
+                .thenThrow(BadSqlGrammarException.class);
+
+        boolean metaDataChanged = incrementalUpdater.isMetaDataChanged(formName);
+
+        assertTrue(metaDataChanged);
+        verifyStatic();
+        getUpdatedTableNameIfExist(actualTableName);
+        verify(tableDataGenerator).getTableDataFromMart("table_name", "SELECT * FROM table_name");
     }
 
     private void setUpForMarkerMap() {

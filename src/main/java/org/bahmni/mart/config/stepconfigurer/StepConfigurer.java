@@ -48,7 +48,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
 
     @Override
     public void createTables() {
-        tableGeneratorStep.createTables(formTableMetadataGenerator.getTableDataList());
+        tableGeneratorStep.createTablesForObs(formTableMetadataGenerator.getTableDataList());
     }
 
     @Override

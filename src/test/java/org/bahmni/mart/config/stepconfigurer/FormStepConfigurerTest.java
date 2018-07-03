@@ -70,13 +70,13 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     }
 
     @Test
-    public void shouldCallCreateTables() {
+    public void shouldCallCreateTablesForObs() {
         List<TableData> tableDataList = new ArrayList<>();
         when(formTableMetadataGenerator.getTableDataList()).thenReturn(tableDataList);
 
         formStepConfigurer.createTables();
 
-        verify(tableGeneratorStep, times(1)).createTables(tableDataList);
+        verify(tableGeneratorStep, times(1)).createTablesForObs(tableDataList);
     }
 
     @Test

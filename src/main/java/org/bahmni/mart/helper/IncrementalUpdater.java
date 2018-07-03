@@ -1,10 +1,15 @@
 package org.bahmni.mart.helper;
 
+import org.bahmni.mart.table.FormTableMetadataGenerator;
+import org.bahmni.mart.table.SpecialCharacterResolver;
+import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
 @Component
 public class IncrementalUpdater {
@@ -25,7 +31,8 @@ public class IncrementalUpdater {
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
     private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
     private static final String NON_EXISTED_ID = "-1";
-    public static final String QUERY_FOR_MAX_EVENT_RECORD_ID = "SELECT MAX(id) FROM event_records";
+    private static final String QUERY_FOR_MAX_EVENT_RECORD_ID = "SELECT MAX(id) FROM event_records";
+    private static final TableData NON_EXISTENT_TABLE_DATA = new TableData();
 
     @Autowired
     @Qualifier("openmrsJdbcTemplate")
@@ -38,6 +45,14 @@ public class IncrementalUpdater {
     @Autowired
     private MarkerMapper markerMapper;
 
+    @Autowired
+    private TableDataGenerator tableDataGenerator;
+
+    @Autowired
+    private FormTableMetadataGenerator formTableMetadataGenerator;
+
+    private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
+
     private String maxEventRecordId;
 
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
@@ -47,6 +62,39 @@ public class IncrementalUpdater {
         }
         String joinedIds = getJoinedIds(optionalMarkerMap.get());
         return String.format(UPDATED_READER_SQL, readerSql, updateOn, joinedIds);
+    }
+
+    public void deleteVoidedRecords(Set<String> ids, String table, String column) {
+        if (isNull(ids) || ids.isEmpty()) {
+            return;
+        }
+        String deleteSql = String.format("DELETE FROM %s WHERE %s IN (%s)", table, column, String.join(",", ids));
+        martJdbcTemplate.execute(deleteSql);
+    }
+
+    public void updateMarker(String jobName) {
+        maxEventRecordId = getMaxEventRecordId();
+        if (isNull(maxEventRecordId)) {
+            maxEventRecordId = String.valueOf(0);
+        }
+        markerMapper.updateMarker(jobName, maxEventRecordId);
+    }
+
+    public boolean isMetaDataChanged(String formName) {
+        String actualTableName = getProcessedName(formName);
+        if (metaDataChangeMap.containsKey(actualTableName)) {
+            return metaDataChangeMap.get(actualTableName);
+        }
+
+        TableData currentTableData = formTableMetadataGenerator.getTableDataByName(actualTableName);
+        TableData existingTableData = getExistingTableData(actualTableName);
+        boolean metaDataChanged = true;
+        if (currentTableData.equals(existingTableData)) {
+            metaDataChanged = false;
+        }
+
+        metaDataChangeMap.put(actualTableName, metaDataChanged);
+        return metaDataChanged;
     }
 
     private String getJoinedIds(Map<String, Object> markerMap) {
@@ -74,26 +122,21 @@ public class IncrementalUpdater {
                 joinedUuids), String.class);
     }
 
-    public void deleteVoidedRecords(Set<String> ids, String table, String column) {
-        if (isNull(ids) || ids.isEmpty()) {
-            return;
-        }
-        String deleteSql = String.format("DELETE FROM %s WHERE %s IN (%s)", table, column, String.join(",", ids));
-        martJdbcTemplate.execute(deleteSql);
-    }
-
-    public void updateMarker(String jobName) {
-        maxEventRecordId = getMaxEventRecordId();
-        if (isNull(maxEventRecordId)) {
-            maxEventRecordId = String.valueOf(0);
-        }
-        markerMapper.updateMarker(jobName, maxEventRecordId);
-    }
-
     private String getMaxEventRecordId() {
         if (Objects.nonNull(maxEventRecordId)) {
             return maxEventRecordId;
         }
         return openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
+    }
+
+
+    private TableData getExistingTableData(String actualTableName) {
+        String updatedTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(actualTableName);
+        String sql = String.format("SELECT * FROM %s", updatedTableName);
+        try {
+            return tableDataGenerator.getTableDataFromMart(updatedTableName, sql);
+        } catch (BadSqlGrammarException exception) {
+            return NON_EXISTENT_TABLE_DATA;
+        }
     }
 }

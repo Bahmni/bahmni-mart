@@ -6,6 +6,7 @@ import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.helper.IncrementalUpdater;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
+import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,9 @@ public class DatabaseObsWriterTest {
 
     @Mock
     private FormTableMetadataGenerator formTableMetadataGenerator;
+
+    @Mock
+    private TableGeneratorStep tableGeneratorStep;
 
     @Mock
     private JdbcTemplate martJdbcTemplate;
@@ -93,12 +97,12 @@ public class DatabaseObsWriterTest {
         items.add(obsList2);
 
         databaseObsWriter.setForm(bahmniForm);
-        when(formTableMetadataGenerator.isMetaDataChanged(bahmniForm)).thenReturn(false);
+        when(incrementalUpdater.isMetaDataChanged(formName.getName())).thenReturn(false);
         when(formTableMetadataGenerator.getTableData(bahmniForm)).thenReturn(new TableData("test"));
 
         databaseObsWriter.write(items);
 
-        verify(formTableMetadataGenerator).isMetaDataChanged(bahmniForm);
+        verify(incrementalUpdater).isMetaDataChanged(formName.getName());
         HashSet<String> encounterIds = new HashSet<>(Arrays.asList("56", "560"));
         verify(incrementalUpdater).deleteVoidedRecords(encounterIds,"test","encounter_id");
     }
@@ -143,12 +147,12 @@ public class DatabaseObsWriterTest {
         items.add(obsList2);
 
         databaseObsWriter.setForm(bahmniForm);
-        when(formTableMetadataGenerator.isMetaDataChanged(bahmniForm)).thenReturn(true);
+        when(incrementalUpdater.isMetaDataChanged(formName.getName())).thenReturn(true);
         when(formTableMetadataGenerator.getTableData(bahmniForm)).thenReturn(new TableData("test"));
 
         databaseObsWriter.write(items);
 
-        verify(formTableMetadataGenerator).isMetaDataChanged(bahmniForm);
+        verify(incrementalUpdater).isMetaDataChanged(formName.getName());
         verify(incrementalUpdater, never()).deleteVoidedRecords(anySet(),anyString(),anyString());
     }
 }

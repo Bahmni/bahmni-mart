@@ -4,15 +4,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.helper.Constants;
-import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.domain.ForeignKey;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,22 +15,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
-
 @Primary
 @Component("FormTableMetadataGenerator")
 public class FormTableMetadataGenerator implements TableMetadataGenerator {
 
     private Map<String, TableData> tableDataMap = new LinkedHashMap<>();
-    private Map<String, TableData> nonExistentTableData = new LinkedHashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(FormTableMetadataGenerator.class);
-
-
-    @Autowired
-    private TableDataGenerator tableDataGenerator;
 
     public List<TableData> getTableDataList() {
-        return new ArrayList<>(nonExistentTableData.values());
+        return new ArrayList<>(tableDataMap.values());
     }
 
     public void setTableDataMap(Map<String, TableData> tableDataMap) {
@@ -50,28 +37,11 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
             TableColumn foreignKeyColumn = getForeignKeyColumn(form);
             if (foreignKeyColumn != null && !tableData.getColumns().contains(foreignKeyColumn))
                 tableData.addColumn(foreignKeyColumn);
-            putNonExistentTableData(tableData, formName);
         } else {
             tableData = new TableData(formName);
             tableData.addAllColumns(getColumns(form));
-            putNonExistentTableData(tableData, formName);
         }
         tableDataMap.put(formName, tableData);
-    }
-
-    private void putNonExistentTableData(TableData tableData, String formName) {
-        SpecialCharacterResolver.resolveTableData(tableData);
-        String tableName = tableData.getName();
-        String sql = String.format("SELECT * FROM %s", tableName);
-        try {
-            TableData existedTableData = tableDataGenerator.getTableDataFromMart(tableName, sql);
-            if (tableData.equals(existedTableData)) {
-                return;
-            }
-        } catch (BadSqlGrammarException ignored) {
-            logger.info(tableName + " table is not an existing table");
-        }
-        nonExistentTableData.put(formName, tableData);
     }
 
     private List<TableColumn> getColumns(BahmniForm form) {
@@ -125,7 +95,8 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
     }
 
     public TableData getTableData(BahmniForm form) {
-        return tableDataMap.get(getProcessedName(form.getFormName().getName()));
+        String processedFormName = getProcessedName(form.getFormName().getName());
+        return getTableDataByName(processedFormName);
     }
 
     public int getTableDataMapSize() {
@@ -144,7 +115,7 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
         return formName.trim().replaceAll("\\s+", "_").toLowerCase();
     }
 
-    public boolean isMetaDataChanged(BahmniForm form) {
-        return nonNull(nonExistentTableData.get(getProcessedName(form.getFormName().getName())));
+    public TableData getTableDataByName(String processedFormName) {
+        return tableDataMap.get(processedFormName);
     }
 }
