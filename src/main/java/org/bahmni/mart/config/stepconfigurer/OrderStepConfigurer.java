@@ -79,9 +79,16 @@ public class OrderStepConfigurer implements StepConfigurerContract {
 
     private List<String> orderableConceptNames;
 
+    private List<TableData> orderablesTableData;
+
+    @Override
+    public void generateTableData(JobDefinition jobDefinition) {
+        orderablesTableData = getOrderablesTableData(getOrderables());
+    }
+
     @Override
     public void createTables() {
-        tableGeneratorStep.createTables(getOrderablesTableData(getOrderables()));
+        tableGeneratorStep.createTables(orderablesTableData);
     }
 
     private List<String> getOrderables() {
@@ -98,7 +105,6 @@ public class OrderStepConfigurer implements StepConfigurerContract {
         orderableNames.forEach(orderable -> {
             try {
                 String orderSQL = getOrderReaderSQL(orderable);
-
                 tableData.add(tableDataGenerator.getTableData(orderable, orderSQL));
             } catch (NoSamplesFoundException | InvalidOrderTypeException e) {
                 logger.info(e.getMessage());

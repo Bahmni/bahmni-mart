@@ -38,6 +38,13 @@ public abstract class StepConfigurer implements StepConfigurerContract {
 
     @Autowired
     protected ConceptService conceptService;
+    private List<BahmniForm> allForms;
+
+    @Override
+    public void generateTableData(JobDefinition jobDefinition) {
+        allForms = getAllForms();
+        allForms.forEach(formTableMetadataGenerator::addMetadataForForm);
+    }
 
     @Override
     public void createTables() {
@@ -46,9 +53,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
 
     @Override
     public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition) {
-        List<BahmniForm> forms = getAllForms();
-        for (BahmniForm form : forms) {
-            formTableMetadataGenerator.addMetadataForForm(form);
+        for (BahmniForm form : allForms) {
             ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
             observationExportStep.setJobDefinition(jobDefinition);
             observationExportStep.setForm(form);

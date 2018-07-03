@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -79,17 +80,27 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     }
 
     @Test
-    public void shouldRegisterObservationStepsForTwoForms() {
-
+    public void shouldGenerateMetaDataForForms() {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
+
+        formStepConfigurer.generateTableData(mock(JobDefinition.class));
+
+        verify(formTableMetadataGenerator).addMetadataForForm(bahmniForms.get(BAHMNI_FORM));
+        verify(formTableMetadataGenerator).addMetadataForForm(bahmniForms.get(FSTG_FORM));
+    }
+
+    @Test
+    public void shouldRegisterObservationStepsForTwoForms() throws Exception {
+        ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
+        setUpBahmniFormsAndSteps(bahmniForms);
+        setValuesForSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
 
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(true);
 
         formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 
-        verify(formListProcessor, times(1)).retrieveAllForms(any(), any());
         verify(observationExportStepFactory, times(2)).getObject();
         verify(medicalHistoryObservationExportStep, times(1)).setForm(bahmniForms.get(BAHMNI_FORM));
         verify(fstgObservationExportStep, times(1)).setForm(bahmniForms.get(FSTG_FORM));
@@ -97,43 +108,23 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         verify(fstgObservationExportStep, times(1)).getStep();
         verify(completeDataExport, times(1)).next(medicalHistoryStep);
         verify(completeDataExport, times(1)).next(fstgStep);
-        verify(formTableMetadataGenerator, times(1)).addMetadataForForm(bahmniForms.get(BAHMNI_FORM));
-        verify(formTableMetadataGenerator, times(1)).addMetadataForForm(bahmniForms.get(FSTG_FORM));
-    }
-
-    private void setUpBahmniFormsAndSteps(ArrayList<BahmniForm> bahmniForms) {
-
-        BahmniForm medicalHistoryForm = new BahmniForm();
-        BahmniForm fstg = new BahmniForm();
-        bahmniForms.add(medicalHistoryForm);
-        bahmniForms.add(fstg);
-
-        when(formListProcessor.retrieveAllForms(any(), any())).thenReturn(bahmniForms);
-        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryObservationExportStep)
-                .thenReturn(fstgObservationExportStep);
-        when(medicalHistoryObservationExportStep.getStep()).thenReturn(medicalHistoryStep);
-        when(fstgObservationExportStep.getStep()).thenReturn(fstgStep);
     }
 
     @Test
-    public void shouldRegisterObservationStepsForTwoFormsAndPrimaryForeignKeyConstraintsAreRevoked() {
-
+    public void shouldRegisterObservationStepsForTwoFormsAndPrimaryForeignKeyConstraintsAreRevoked() throws Exception {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
-
+        setValuesForSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
         List<TableData> tableDataList = getTableData();
-
         when(formTableMetadataGenerator.getTableData(bahmniForms.get(BAHMNI_FORM)))
                 .thenReturn(tableDataList.get(BAHMNI_FORM));
         when(formTableMetadataGenerator.getTableData(bahmniForms.get(FSTG_FORM)))
                 .thenReturn(tableDataList.get(FSTG_FORM));
-
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
 
         formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 
-        verify(formListProcessor, times(1)).retrieveAllForms(any(), any());
         verify(observationExportStepFactory, times(2)).getObject();
         verify(medicalHistoryObservationExportStep, times(1)).setForm(bahmniForms.get(BAHMNI_FORM));
         verify(fstgObservationExportStep, times(1)).setForm(bahmniForms.get(FSTG_FORM));
@@ -141,11 +132,8 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         verify(fstgObservationExportStep, times(1)).getStep();
         verify(completeDataExport, times(1)).next(medicalHistoryStep);
         verify(completeDataExport, times(1)).next(fstgStep);
-        verify(formTableMetadataGenerator, times(1)).addMetadataForForm(bahmniForms.get(BAHMNI_FORM));
-        verify(formTableMetadataGenerator, times(1)).addMetadataForForm(bahmniForms.get(FSTG_FORM));
         verify(formTableMetadataGenerator, times(1)).getTableData(bahmniForms.get(BAHMNI_FORM));
         verify(formTableMetadataGenerator, times(1)).getTableData(bahmniForms.get(FSTG_FORM));
-
         verifyNoPrimaryOrForeignKeyConstraints(tableDataList);
     }
 
@@ -177,15 +165,29 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     }
 
     @Test
-    public void shouldNotThrowNullPointerExceptionWhileRevokingConstraintsWhenTableDataIsNotPresentInMap() {
+    public void shouldNotThrowNullPointerExceptionWhileRevokingConstraintsWhenTableDataIsNotPresentInMap() throws
+            NoSuchFieldException, IllegalAccessException {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
-
+        setValuesForSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
         when(formTableMetadataGenerator.getTableData(any())).thenReturn(null);
 
         formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
+    }
+
+    private void setUpBahmniFormsAndSteps(ArrayList<BahmniForm> bahmniForms) {
+        BahmniForm medicalHistoryForm = new BahmniForm();
+        BahmniForm fstg = new BahmniForm();
+        bahmniForms.add(medicalHistoryForm);
+        bahmniForms.add(fstg);
+
+        when(formListProcessor.retrieveAllForms(any(), any())).thenReturn(bahmniForms);
+        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryObservationExportStep)
+                .thenReturn(fstgObservationExportStep);
+        when(medicalHistoryObservationExportStep.getStep()).thenReturn(medicalHistoryStep);
+        when(fstgObservationExportStep.getStep()).thenReturn(fstgStep);
     }
 
     private void verifyNoPrimaryOrForeignKeyConstraints(List<TableData> tableDataList) {
@@ -196,7 +198,6 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     }
 
     private List<TableData> getTableData() {
-
         String medicalHistoryFormName = "medical_history";
         String medicalHistoryPrimaryKey = "id_medical_hostory";
 

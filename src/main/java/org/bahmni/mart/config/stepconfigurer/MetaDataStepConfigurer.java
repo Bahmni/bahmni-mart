@@ -1,6 +1,5 @@
 package org.bahmni.mart.config.stepconfigurer;
 
-import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.exports.MetaDataExportStep;
 import org.bahmni.mart.table.TableDataExtractor;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import static org.bahmni.mart.BatchUtils.constructSqlWithParameter;
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
 
 @Component
@@ -42,25 +42,26 @@ public class MetaDataStepConfigurer implements StepConfigurerContract {
     private TableData tableData;
 
     @Override
+    public void generateTableData(JobDefinition jobDefinition) {
+        String sql = convertResourceOutputToString(metaDataSqlResource);
+        ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
+        sql = constructSqlWithParameter(sql,"conceptReferenceSource",
+                jobDefinition.getConceptReferenceSource());
+        tableData = openmrsJDBCTemplate.query(sql + LIMIT, resultSetExtractor);
+        tableData.setName("meta_data_dictionary");
+    }
+
+    @Override
     public void createTables() {
         tableGeneratorStep.createTables(Arrays.asList(tableData));
     }
 
     @Override
     public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition) {
-        createTableData(jobDefinition);
         MetaDataExportStep metaDataExportStep = metaDataExportStepObjectFactory.getObject();
         metaDataExportStep.setJobDefinition(jobDefinition);
         metaDataExportStep.setTableData(tableData);
         completeDataExport.next(metaDataExportStep.getStep());
     }
 
-    private void createTableData(JobDefinition jobDefinition) {
-        String sql = convertResourceOutputToString(metaDataSqlResource);
-        ResultSetExtractor<TableData> resultSetExtractor = new TableDataExtractor();
-        sql = BatchUtils.constructSqlWithParameter(sql,"conceptReferenceSource",
-                jobDefinition.getConceptReferenceSource());
-        tableData = openmrsJDBCTemplate.query(sql + LIMIT, resultSetExtractor);
-        tableData.setName("meta_data_dictionary");
-    }
 }

@@ -26,8 +26,9 @@ public abstract class StepRegister {
 
     Job getJob(StepConfigurerContract stepConfigurerContract, JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowBuilder(jobDefinition.getName());
-        stepConfigurerContract.registerSteps(completeDataExport, jobDefinition);
+        stepConfigurerContract.generateTableData(jobDefinition);
         stepConfigurerContract.createTables();
+        stepConfigurerContract.registerSteps(completeDataExport, jobDefinition);
 
         return completeDataExport.end().build();
     }

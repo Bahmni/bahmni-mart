@@ -6,6 +6,8 @@ import org.springframework.batch.core.job.builder.FlowJobBuilder;
 
 public interface StepConfigurerContract {
 
+    void generateTableData(JobDefinition jobDefinition);
+
     void createTables();
 
     void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition);

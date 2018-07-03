@@ -29,6 +29,7 @@ import org.springframework.beans.factory.ObjectFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
@@ -86,6 +87,7 @@ public class OrderStepConfigurerTest {
 
     private String orderable = "Lab Samples";
 
+
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         orderStepConfigurer = new OrderStepConfigurer();
@@ -103,7 +105,7 @@ public class OrderStepConfigurerTest {
     }
 
     @Test
-    public void shouldCreateTablesForAllOrderables() throws InvalidOrderTypeException, NoSamplesFoundException {
+    public void shouldGenerateOrderablesTableData() throws InvalidOrderTypeException, NoSamplesFoundException {
         int orderTypeId = 1;
         String sql = "sql";
         when(conceptService.getChildConcepts(orderables)).thenReturn(Collections.singletonList(concept));
@@ -115,9 +117,8 @@ public class OrderStepConfigurerTest {
         when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
         when(jobDefinition.getColumnsToIgnore()).thenReturn(Collections.emptyList());
 
-        orderStepConfigurer.createTables();
+        orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(tableGeneratorStep, times(1)).createTables(Collections.singletonList(tableData));
         verify(conceptService, times(1)).getChildConcepts(orderables);
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
@@ -125,8 +126,8 @@ public class OrderStepConfigurerTest {
     }
 
     @Test
-    public void shouldCreateTablesByNotCallingDBForAllOrderablesOnSecondCallOnwards()
-            throws InvalidOrderTypeException, NoSamplesFoundException, NoSuchFieldException, IllegalAccessException {
+    public void shouldNotCallDBForAllOrderablesFromSecondCallOnwards() throws NoSuchFieldException,
+            IllegalAccessException, InvalidOrderTypeException, NoSamplesFoundException {
         int orderTypeId = 1;
         String sql = "sql";
         when(concept.getName()).thenReturn(orderable);
@@ -139,13 +140,22 @@ public class OrderStepConfigurerTest {
 
         setValuesForMemberFields(orderStepConfigurer, "orderableConceptNames", Arrays.asList("Lab Samples"));
 
-        orderStepConfigurer.createTables();
+        orderStepConfigurer.generateTableData(jobDefinition);
 
         verify(conceptService, never()).getChildConcepts(orderables);
 
-        verify(tableGeneratorStep, times(1)).createTables(Collections.singletonList(tableData));
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
         verify(tableDataGenerator, times(1)).getTableData(orderable, sql);
+    }
+
+    @Test
+    public void shouldCreateAllOrderableTables() throws NoSuchFieldException, IllegalAccessException {
+        List<TableData> orderablesTableData = Collections.singletonList(mock(TableData.class));
+        setValuesForMemberFields(orderStepConfigurer, "orderablesTableData", orderablesTableData);
+
+        orderStepConfigurer.createTables();
+
+        verify(tableGeneratorStep).createTables(orderablesTableData);
     }
 
     @Test
@@ -156,9 +166,8 @@ public class OrderStepConfigurerTest {
         when(concept.getName()).thenReturn(orderable);
         when(orderConceptUtil.getOrderTypeId(orderable)).thenThrow(new NoSamplesFoundException(exceptionMessage));
 
-        orderStepConfigurer.createTables();
+        orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(tableGeneratorStep, times(1)).createTables(Collections.emptyList());
         verify(conceptService, times(1)).getChildConcepts(orderables);
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
@@ -173,9 +182,8 @@ public class OrderStepConfigurerTest {
         when(concept.getName()).thenReturn(orderable);
         when(orderConceptUtil.getOrderTypeId(orderable)).thenThrow(new InvalidOrderTypeException(exceptionMessage));
 
-        orderStepConfigurer.createTables();
+        orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(tableGeneratorStep, times(1)).createTables(Collections.emptyList());
         verify(conceptService, times(1)).getChildConcepts(orderables);
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
@@ -189,9 +197,8 @@ public class OrderStepConfigurerTest {
         when(concept.getName()).thenReturn(orderable);
         when(orderConceptUtil.getOrderTypeId(orderable)).thenThrow(Exception.class);
 
-        orderStepConfigurer.createTables();
+        orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(tableGeneratorStep, times(1)).createTables(Collections.emptyList());
         verify(conceptService, times(1)).getChildConcepts(orderables);
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
