@@ -183,9 +183,47 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         List<Map<String, Object>> procRecords = martJdbcTemplate.queryForList(
                 "SELECT patient_id,getAllergyStatus(patient_id) AS allergy_status FROM " +
-                "\"patient_allergy_status_test_default\"");
+                    "\"patient_allergy_status_test_default\"");
 
         verifyRecords(procRecords);
+    }
+
+    @Test
+    public void shouldUpdateEventRecordIdInMarkerTable() {
+        assertEquals("0", getEventRecordId());
+
+        batchConfiguration.run();
+
+        assertEquals("1", getEventRecordId());
+        List<Map<String, Object>> healthEducationData = martJdbcTemplate.queryForList("SELECT * FROM health_education");
+        assertNotNull(healthEducationData);
+        assertEquals(1, healthEducationData.size());
+        assertEquals(58638, healthEducationData.get(0).get("encounter_id"));
+        assertEquals("Single", healthEducationData.get(0).get("he_marital_status"));
+        assertEquals("No formal education", healthEducationData.get(0).get("he_highest_education_level"));
+    }
+
+    @Test
+    @Sql(scripts = {"classpath:testDataSet/IncrementalUpdateData.sql"},
+            config = @SqlConfig(transactionManager = "customITContext"))
+    public void shouldApplyIncrementalUpdateForObsData() {
+        martJdbcTemplate.execute("UPDATE markers SET event_record_id = 1 WHERE job_name='Obs Data'");
+
+        batchConfiguration.run();
+
+        List<Map<String, Object>> healthEducationData = martJdbcTemplate.queryForList("SELECT * FROM health_education");
+
+        assertNotNull(healthEducationData);
+        assertEquals(2, healthEducationData.size());
+        assertEquals(58638, healthEducationData.get(0).get("encounter_id"));
+        assertEquals("Married", healthEducationData.get(0).get("he_marital_status"));
+        assertEquals("No formal education", healthEducationData.get(0).get("he_highest_education_level"));
+        assertEquals("True", healthEducationData.get(0).get("he_pregnancy_status"));
+
+        assertEquals(58639, healthEducationData.get(1).get("encounter_id"));
+        assertEquals("Single", healthEducationData.get(1).get("he_marital_status"));
+        assertEquals("True", healthEducationData.get(1).get("he_pregnancy_status"));
+
     }
 
     private void verifyObsRecords() {
@@ -513,5 +551,10 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
      */
     private void verifyNoSeparateTableForSpecimenSampleSource(List<String> tableNames) {
         assertFalse(tableNames.contains("specimen_sample_source"));
+    }
+
+    private String getEventRecordId() {
+        return martJdbcTemplate.queryForObject("SELECT event_record_id FROM markers where job_name = " +
+                "'Obs Data'", String.class);
     }
 }

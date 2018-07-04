@@ -774,6 +774,7 @@ CREATE TABLE person_attribute
   uuid                     CHAR(38)               NOT NULL
 );
 
+DROP TABLE IF EXISTS event_records CASCADE;
 create table event_records
 (
 	id int auto_increment
