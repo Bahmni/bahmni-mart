@@ -53,7 +53,7 @@ public class IncrementalUpdaterTest {
     private JdbcTemplate martJdbcTemplate;
 
     @Mock
-    private MarkerMapper markerMapper;
+    private MarkerManager markerManager;
 
     @Mock
     private TableDataGenerator tableDataGenerator;
@@ -83,7 +83,7 @@ public class IncrementalUpdaterTest {
 
         setValuesForMemberFields(incrementalUpdater, "openmrsJdbcTemplate", openmrsJdbcTemplate);
         setValuesForMemberFields(incrementalUpdater, "martJdbcTemplate", martJdbcTemplate);
-        setValuesForMemberFields(incrementalUpdater, "markerMapper", markerMapper);
+        setValuesForMemberFields(incrementalUpdater, "markerManager", markerManager);
         setValuesForMemberFields(incrementalUpdater, "tableDataGenerator", tableDataGenerator);
         setValuesForMemberFields(incrementalUpdater, "formTableMetadataGenerator", formTableMetadataGenerator);
         setValuesForMemberFields(incrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
@@ -101,23 +101,23 @@ public class IncrementalUpdaterTest {
 
     @Test
     public void shouldReturnSameReaderSqlWhenThereIsNoMarkerMapForGivenJob() {
-        when(markerMapper.getJobMarkerMap(jobName)).thenReturn(Optional.empty());
+        when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.empty());
 
         String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
-        verify(markerMapper).getJobMarkerMap(jobName);
+        verify(markerManager).getJobMarkerMap(jobName);
         assertEquals(readerSql, updatedReaderSql);
     }
 
     @Test
     public void shouldReturnSameReaderSqlWhenEventRecordIdForGivenJobIsZero() {
         Map markerMap = mock(Map.class);
-        when(markerMap.get("event_record_id")).thenReturn(0);
-        when(markerMapper.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
+        when(markerMap.get("event_record_id")).thenReturn("0");
+        when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
 
         String actualUpdatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
-        verify(markerMapper).getJobMarkerMap(jobName);
+        verify(markerManager).getJobMarkerMap(jobName);
         verify(markerMap).get("event_record_id");
         assertEquals(readerSql, actualUpdatedReaderSql);
     }
@@ -127,11 +127,11 @@ public class IncrementalUpdaterTest {
         Map markerMap = mock(Map.class);
         when(markerMap.get("event_record_id")).thenReturn("10");
         when(markerMap.get("category")).thenReturn(category);
-        when(markerMapper.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
+        when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
 
         incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
-        verify(markerMapper).getJobMarkerMap(jobName);
+        verify(markerManager).getJobMarkerMap(jobName);
         verify(markerMap, times(2)).get("event_record_id");
         verify(markerMap).get("category");
         verify(openmrsJdbcTemplate).queryForList(String.format(queryForEventObjects, "10", category), String.class);
@@ -211,7 +211,7 @@ public class IncrementalUpdaterTest {
         incrementalUpdater.updateMarker(jobName);
 
         verify(openmrsJdbcTemplate).queryForObject(queryForMaxEventRecordId, String.class);
-        verify(markerMapper).updateMarker(jobName, "145678");
+        verify(markerManager).updateMarker(jobName, "145678");
     }
 
     @Test
@@ -222,7 +222,7 @@ public class IncrementalUpdaterTest {
         incrementalUpdater.updateMarker(jobName);
 
         verify(openmrsJdbcTemplate).queryForObject(queryForMaxEventRecordId, String.class);
-        verify(markerMapper).updateMarker(jobName, "0");
+        verify(markerManager).updateMarker(jobName, "0");
     }
 
     @Test
@@ -330,7 +330,7 @@ public class IncrementalUpdaterTest {
         when(markerMap.get("event_record_id")).thenReturn("10");
         when(markerMap.get("category")).thenReturn(category);
         when(markerMap.get("table_name")).thenReturn(tableName);
-        when(markerMapper.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
+        when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
     }
 
     private void setUpForUuids() {

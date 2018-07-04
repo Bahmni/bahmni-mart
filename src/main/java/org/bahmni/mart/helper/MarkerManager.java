@@ -10,13 +10,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
-@Component
-public class MarkerMapper {
+import static java.util.Objects.isNull;
 
-    private static final Logger logger = LoggerFactory.getLogger(MarkerMapper.class);
+@Component
+public class MarkerManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(MarkerManager.class);
     private static final String MARKER_QUERY = "SELECT * FROM markers";
     private static final String UPDATE_QUERY = "UPDATE markers SET event_record_id = %s WHERE job_name = '%s'";
     public static final String ERROR_INFO = "Failed to update event_record_id for %s, markers table is not present";
@@ -28,7 +29,7 @@ public class MarkerMapper {
     private List<Map<String, Object>> markerMapList;
 
     public Optional<Map<String, Object>> getJobMarkerMap(String jobName) {
-        if (Objects.isNull(markerMapList)) {
+        if (isNull(markerMapList)) {
             try {
                 markerMapList = martJdbcTemplate.queryForList(MARKER_QUERY);
             } catch (BadSqlGrammarException e) {

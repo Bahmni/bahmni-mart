@@ -1,5 +1,6 @@
 package org.bahmni.mart.helper;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
@@ -12,12 +13,12 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
 @Component
@@ -33,6 +34,7 @@ public class IncrementalUpdater {
     private static final String NON_EXISTED_ID = "-1";
     private static final String QUERY_FOR_MAX_EVENT_RECORD_ID = "SELECT MAX(id) FROM event_records";
     private static final TableData NON_EXISTENT_TABLE_DATA = new TableData();
+    private static final String ZERO = "0";
 
     @Autowired
     @Qualifier("openmrsJdbcTemplate")
@@ -43,7 +45,7 @@ public class IncrementalUpdater {
     private JdbcTemplate martJdbcTemplate;
 
     @Autowired
-    private MarkerMapper markerMapper;
+    private MarkerManager markerManager;
 
     @Autowired
     private TableDataGenerator tableDataGenerator;
@@ -56,8 +58,8 @@ public class IncrementalUpdater {
     private String maxEventRecordId;
 
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
-        Optional<Map<String, Object>> optionalMarkerMap = markerMapper.getJobMarkerMap(jobName);
-        if (!optionalMarkerMap.isPresent() || optionalMarkerMap.get().get(EVENT_RECORD_ID).equals(0)) {
+        Optional<Map<String, Object>> optionalMarkerMap = markerManager.getJobMarkerMap(jobName);
+        if (!optionalMarkerMap.isPresent() || optionalMarkerMap.get().get(EVENT_RECORD_ID).equals(ZERO)) {
             return readerSql;
         }
         String joinedIds = getJoinedIds(optionalMarkerMap.get());
@@ -65,7 +67,7 @@ public class IncrementalUpdater {
     }
 
     public void deleteVoidedRecords(Set<String> ids, String table, String column) {
-        if (isNull(ids) || ids.isEmpty()) {
+        if (CollectionUtils.isEmpty(ids)) {
             return;
         }
         String deleteSql = String.format("DELETE FROM %s WHERE %s IN (%s)", table, column, String.join(",", ids));
@@ -77,7 +79,7 @@ public class IncrementalUpdater {
         if (isNull(maxEventRecordId)) {
             maxEventRecordId = String.valueOf(0);
         }
-        markerMapper.updateMarker(jobName, maxEventRecordId);
+        markerManager.updateMarker(jobName, maxEventRecordId);
     }
 
     public boolean isMetaDataChanged(String formName) {
@@ -85,13 +87,7 @@ public class IncrementalUpdater {
         if (metaDataChangeMap.containsKey(actualTableName)) {
             return metaDataChangeMap.get(actualTableName);
         }
-
-        TableData currentTableData = formTableMetadataGenerator.getTableDataByName(actualTableName);
-        TableData existingTableData = getExistingTableData(actualTableName);
-        boolean metaDataChanged = true;
-        if (currentTableData.equals(existingTableData)) {
-            metaDataChanged = false;
-        }
+        boolean metaDataChanged = getMetaDataChangeStatus(actualTableName);
 
         metaDataChangeMap.put(actualTableName, metaDataChanged);
         return metaDataChanged;
@@ -123,12 +119,21 @@ public class IncrementalUpdater {
     }
 
     private String getMaxEventRecordId() {
-        if (Objects.nonNull(maxEventRecordId)) {
+        if (nonNull(maxEventRecordId)) {
             return maxEventRecordId;
         }
         return openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
     }
 
+
+    private boolean getMetaDataChangeStatus(String actualTableName) {
+        TableData currentTableData = formTableMetadataGenerator.getTableDataByName(actualTableName);
+        TableData existingTableData = getExistingTableData(actualTableName);
+        if (currentTableData.equals(existingTableData)) {
+            return false;
+        }
+        return true;
+    }
 
     private TableData getExistingTableData(String actualTableName) {
         String updatedTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(actualTableName);

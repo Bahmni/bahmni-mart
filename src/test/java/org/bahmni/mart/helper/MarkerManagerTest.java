@@ -26,21 +26,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MarkerMapperTest {
+public class MarkerManagerTest {
 
     @Mock
     private JdbcTemplate martJdbcTemplate;
 
-    private MarkerMapper markerMapper;
+    private MarkerManager markerManager;
 
     @Mock
     private Logger logger;
 
     @Before
     public void setUp() throws Exception {
-        markerMapper = new MarkerMapper();
-        setValuesForMemberFields(markerMapper, "martJdbcTemplate", martJdbcTemplate);
-        setValueForFinalStaticField(MarkerMapper.class, "logger", logger);
+        markerManager = new MarkerManager();
+        setValuesForMemberFields(markerManager, "martJdbcTemplate", martJdbcTemplate);
+        setValueForFinalStaticField(MarkerManager.class, "logger", logger);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class MarkerMapperTest {
         markerMapList.add(obsMarkerMap);
         when(martJdbcTemplate.queryForList(markersQuery)).thenReturn(markerMapList);
 
-        Optional<Map<String, Object>> actualObsMarkerMap = markerMapper.getJobMarkerMap("Obs");
+        Optional<Map<String, Object>> actualObsMarkerMap = markerManager.getJobMarkerMap("Obs");
 
         verify(martJdbcTemplate).queryForList(markersQuery);
         assertTrue(actualObsMarkerMap.isPresent());
@@ -66,9 +66,9 @@ public class MarkerMapperTest {
         Map<String, Object> obsMarkerMap = new HashMap<>();
         obsMarkerMap.put("job_name", "Obs");
         markerMapList.add(obsMarkerMap);
-        setValuesForMemberFields(markerMapper, "markerMapList", markerMapList);
+        setValuesForMemberFields(markerManager, "markerMapList", markerMapList);
 
-        Optional<Map<String, Object>> actualObsMarkerMap = markerMapper.getJobMarkerMap("Obs");
+        Optional<Map<String, Object>> actualObsMarkerMap = markerManager.getJobMarkerMap("Obs");
 
         verify(martJdbcTemplate, times(0)).queryForList(markersQuery);
         assertTrue(actualObsMarkerMap.isPresent());
@@ -80,7 +80,7 @@ public class MarkerMapperTest {
         String markersQuery = "SELECT * FROM markers";
         when(martJdbcTemplate.queryForList(markersQuery)).thenThrow(BadSqlGrammarException.class);
 
-        Optional<Map<String, Object>> actualMarkerMap = markerMapper.getJobMarkerMap("Obs");
+        Optional<Map<String, Object>> actualMarkerMap = markerManager.getJobMarkerMap("Obs");
 
         verify(martJdbcTemplate).queryForList(markersQuery);
         assertEquals(Optional.empty(), actualMarkerMap);
@@ -88,7 +88,7 @@ public class MarkerMapperTest {
 
     @Test
     public void shouldUpdateMarkerTableWithGivenEventRecordIdForGivenJob() {
-        markerMapper.updateMarker("obs", "123");
+        markerManager.updateMarker("obs", "123");
 
         verify(martJdbcTemplate).execute("UPDATE markers SET event_record_id = 123 WHERE job_name = 'obs'");
     }
@@ -97,7 +97,7 @@ public class MarkerMapperTest {
     public void shouldLogErrorWhenMarkersTableIsNotPresent() {
         doThrow(BadSqlGrammarException.class).when(martJdbcTemplate).execute(anyString());
 
-        markerMapper.updateMarker("obs", "123");
+        markerManager.updateMarker("obs", "123");
 
         verify(logger).error("Failed to update event_record_id for obs, markers table is not present");
     }
