@@ -129,10 +129,7 @@ public class IncrementalUpdater {
     private boolean getMetaDataChangeStatus(String actualTableName) {
         TableData currentTableData = formTableMetadataGenerator.getTableDataByName(actualTableName);
         TableData existingTableData = getExistingTableData(actualTableName);
-        if (currentTableData.equals(existingTableData)) {
-            return false;
-        }
-        return true;
+        return !currentTableData.equals(existingTableData);
     }
 
     private TableData getExistingTableData(String actualTableName) {
