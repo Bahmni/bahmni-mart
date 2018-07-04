@@ -10,6 +10,7 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
 @Component
@@ -75,9 +75,8 @@ public class IncrementalUpdater {
     }
 
     public void updateMarker(String jobName) {
-        maxEventRecordId = getMaxEventRecordId();
         if (isNull(maxEventRecordId)) {
-            maxEventRecordId = String.valueOf(0);
+            maxEventRecordId = ZERO;
         }
         markerManager.updateMarker(jobName, maxEventRecordId);
     }
@@ -118,13 +117,10 @@ public class IncrementalUpdater {
                 joinedUuids), String.class);
     }
 
-    private String getMaxEventRecordId() {
-        if (nonNull(maxEventRecordId)) {
-            return maxEventRecordId;
-        }
-        return openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
+    @PostConstruct
+    private void initializeMaxEventRecordId() {
+        maxEventRecordId = openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
     }
-
 
     private boolean getMetaDataChangeStatus(String actualTableName) {
         TableData currentTableData = formTableMetadataGenerator.getTableDataByName(actualTableName);

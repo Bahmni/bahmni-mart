@@ -204,24 +204,21 @@ public class IncrementalUpdaterTest {
     }
 
     @Test
-    public void shouldCallUpdateMarkerWithMaxEventRecordIdForGivenJobName() {
+    public void shouldCallUpdateMarkerWithMaxEventRecordIdForGivenJobName() throws Exception {
         String jobName = "obs";
-        when(openmrsJdbcTemplate.queryForObject(queryForMaxEventRecordId, String.class)).thenReturn("145678");
+        setValuesForMemberFields(incrementalUpdater, "maxEventRecordId", "145678");
 
         incrementalUpdater.updateMarker(jobName);
 
-        verify(openmrsJdbcTemplate).queryForObject(queryForMaxEventRecordId, String.class);
         verify(markerManager).updateMarker(jobName, "145678");
     }
 
     @Test
     public void shouldCallUpdateMarkerWithZeroWhenMaxMarkerIdIsNull() {
         String jobName = "obs";
-        when(openmrsJdbcTemplate.queryForObject(queryForMaxEventRecordId, String.class)).thenReturn(null);
 
         incrementalUpdater.updateMarker(jobName);
 
-        verify(openmrsJdbcTemplate).queryForObject(queryForMaxEventRecordId, String.class);
         verify(markerManager).updateMarker(jobName, "0");
     }
 

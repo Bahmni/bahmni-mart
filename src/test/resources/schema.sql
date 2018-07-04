@@ -774,6 +774,21 @@ CREATE TABLE person_attribute
   uuid                     CHAR(38)               NOT NULL
 );
 
+create table event_records
+(
+	id int auto_increment
+		primary key,
+	uuid varchar(40) null,
+	title varchar(255) null,
+	timestamp timestamp default CURRENT_TIMESTAMP not null,
+	uri varchar(255) null,
+	object varchar(1000) null,
+	category varchar(255) null,
+	date_created timestamp default CURRENT_TIMESTAMP not null,
+	tags varchar(255) null,
+	constraint id
+		unique (id)
+);
 
 SET FOREIGN_KEY_CHECKS=1;
 
