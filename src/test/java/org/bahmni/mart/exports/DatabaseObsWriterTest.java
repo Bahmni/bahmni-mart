@@ -6,7 +6,6 @@ import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.helper.IncrementalUpdater;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
-import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,9 +32,6 @@ public class DatabaseObsWriterTest {
 
     @Mock
     private FormTableMetadataGenerator formTableMetadataGenerator;
-
-    @Mock
-    private TableGeneratorStep tableGeneratorStep;
 
     @Mock
     private JdbcTemplate martJdbcTemplate;

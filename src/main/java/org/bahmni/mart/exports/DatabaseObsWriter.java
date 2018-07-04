@@ -40,7 +40,6 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
 
     private boolean isAddMoreMultiSelectEnabled = true;
 
-
     @Override
     public void write(List<? extends List<Obs>> items) throws Exception {
         TableData tableData = formTableMetadataGenerator.getTableData(form);
