@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 import static org.bahmni.mart.table.SpecialCharacterResolver.getUpdatedTableNameIfExist;
@@ -87,10 +88,11 @@ public class IncrementalUpdaterTest {
         setValuesForMemberFields(incrementalUpdater, "tableDataGenerator", tableDataGenerator);
         setValuesForMemberFields(incrementalUpdater, "formTableMetadataGenerator", formTableMetadataGenerator);
         setValuesForMemberFields(incrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
+        setValuesForMemberFields(incrementalUpdater, "maxEventRecordId", "20");
         updateOn = "id";
         queryForEventObjects = "SELECT DISTINCT substring_index(substring_index(object, '/', -1), '?', 1) as uuid " +
-                "FROM event_records WHERE id > %s AND category = '%s'";
-        queryForIds = String.format("SELECT %s_id FROM %s WHERE uuid in ('%s','%s')",
+                "FROM event_records WHERE id BETWEEN %s AND %s AND category = '%s'";
+        queryForIds = format("SELECT %s_id FROM %s WHERE uuid in ('%s','%s')",
                 tableName, tableName,
                 "2c2ca648-3fae-4719-a164-3b603b7d6d41",
                 "a76f74db-9ec4-4d20-9fc9-cb449ab331a5");
@@ -123,7 +125,7 @@ public class IncrementalUpdaterTest {
     }
 
     @Test
-    public void shouldQueryFromEventRecordsTableWhenEventRecordIdIsNotZeroForGivenJob() {
+    public void shouldQueryFromEventRecordsTableWhenEventRecordIdIsNotZeroForGivenJob() throws Exception {
         Map markerMap = mock(Map.class);
         when(markerMap.get("event_record_id")).thenReturn("10");
         when(markerMap.get("category")).thenReturn(category);
@@ -134,7 +136,8 @@ public class IncrementalUpdaterTest {
         verify(markerManager).getJobMarkerMap(jobName);
         verify(markerMap, times(2)).get("event_record_id");
         verify(markerMap).get("category");
-        verify(openmrsJdbcTemplate).queryForList(String.format(queryForEventObjects, "10", category), String.class);
+        verify(openmrsJdbcTemplate).queryForList(format(queryForEventObjects, "10", "20", category),
+                String.class);
     }
 
     @Test
@@ -144,7 +147,7 @@ public class IncrementalUpdaterTest {
 
         incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
-        verify(openmrsJdbcTemplate).queryForList(String.format(queryForEventObjects, "10", category), String.class);
+        verify(openmrsJdbcTemplate).queryForList(format(queryForEventObjects, "10", "20", category), String.class);
         verify(openmrsJdbcTemplate).queryForList(queryForIds, String.class);
     }
 
@@ -155,7 +158,7 @@ public class IncrementalUpdaterTest {
         setUpForUuids();
         List<String> ids = Arrays.asList("1", "2");
         when(openmrsJdbcTemplate.queryForList(queryForIds, String.class)).thenReturn(ids);
-        String expectedUpdatedReaderSql = String.format("SELECT * FROM ( %s ) result WHERE %s IN (1,2)", readerSql,
+        String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (1,2)", readerSql,
                 updateOn);
 
         String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
@@ -166,9 +169,9 @@ public class IncrementalUpdaterTest {
     @Test
     public void shouldUpdateReaderSqlWithNonExistedIdWhenUuidListIsEmpty() {
         setUpForMarkerMap();
-        when(openmrsJdbcTemplate.queryForList(String.format(queryForEventObjects, "10", category), String.class))
+        when(openmrsJdbcTemplate.queryForList(format(queryForEventObjects, "10", "20", category), String.class))
                 .thenReturn(new ArrayList<>());
-        String expectedUpdatedReaderSql = String.format("SELECT * FROM ( %s ) result WHERE %s IN (-1)", readerSql,
+        String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (-1)", readerSql,
                 updateOn);
 
         String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
@@ -214,7 +217,9 @@ public class IncrementalUpdaterTest {
     }
 
     @Test
-    public void shouldCallUpdateMarkerWithZeroWhenMaxMarkerIdIsNull() {
+    public void shouldCallUpdateMarkerWithZeroWhenMaxMarkerIdIsNull() throws Exception {
+        setValuesForMemberFields(incrementalUpdater, "maxEventRecordId", null);
+
         String jobName = "obs";
 
         incrementalUpdater.updateMarker(jobName);
@@ -334,7 +339,7 @@ public class IncrementalUpdaterTest {
         List<String> eventRecordObjects = new ArrayList<>();
         eventRecordObjects.add("2c2ca648-3fae-4719-a164-3b603b7d6d41");
         eventRecordObjects.add("a76f74db-9ec4-4d20-9fc9-cb449ab331a5");
-        when(openmrsJdbcTemplate.queryForList(String.format(queryForEventObjects, "10", category), String.class))
+        when(openmrsJdbcTemplate.queryForList(format(queryForEventObjects, "10", "20", category), String.class))
                 .thenReturn(eventRecordObjects);
     }
 }
