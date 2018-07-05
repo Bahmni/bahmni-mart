@@ -6,15 +6,19 @@ import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.job.JobContext;
+import org.bahmni.mart.mail.MailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +42,11 @@ public class MartJobExecutor implements MartExecutor {
     @Autowired
     private GroupedJob groupedJob;
 
+    private List<JobExecution> jobExecutions = new ArrayList<>();
+
+    @Autowired(required = false)
+    private MailService mailService;
+
     @Override
     public void execute() {
 
@@ -51,6 +60,9 @@ public class MartJobExecutor implements MartExecutor {
                 .filter(Objects::nonNull).collect(Collectors.toList());
 
         launchJobs(jobs);
+        if (mailService != null) {
+            mailService.sendJobsStatus(getFailedJobNames());
+        }
     }
 
     private void validateJobDefinitions(List<JobDefinition> jobDefinitions) {
@@ -64,10 +76,17 @@ public class MartJobExecutor implements MartExecutor {
             try {
                 JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                 jobParametersBuilder.addDate(job.getName(), new Date());
-                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                JobExecution jobExecution = jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                jobExecutions.add(jobExecution);
             } catch (Exception e) {
                 log.warn(e.getMessage(), e);
             }
         });
+    }
+
+    private List<String> getFailedJobNames() {
+        return jobExecutions.stream().filter(jobExecution -> !jobExecution.getExitStatus().getExitCode()
+                .equals(ExitStatus.COMPLETED.getExitCode()))
+                .map(jobExecution -> jobExecution.getJobInstance().getJobName()).collect(Collectors.toList());
     }
 }
