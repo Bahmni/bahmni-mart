@@ -9,67 +9,85 @@ Standalone Batch Application based on spring-batch. This application will create
 
 ### Prerequisites
 * **java 8**
-* **docker** (version 1.7.1)
-    * For **CentOS 6.7** install **docker-io**. To install it run follow the steps presents [here](https://centos.pkgs.org/6/epel-x86_64/docker-io-1.7.1-2.el6.x86_64.rpm.html).
-* **docker-compose** (version 1.5.2)
-    * To install it in **CentOS 6.7** run the following commands
-    
-        ```bash
-            sudo wget http://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` -O /usr/bin/docker-compose
-            chmod +x /usr/bin/docker-compose
-        ```
-### Setting up Git Hooks
+
+### Setting up Git Hooks and Test DB
 To setup git hooks please run the following command
-* ```sh scripts/dev/setup.sh```
+```bash
+sh scripts/dev/setup.sh
+```
 
 ---
 ### Build 
 #### JAR
 To build JAR run the following command
-* ```./gradlew clean build```
- 
-#### Postgres docker image
-To build postgres docker image for bahmni mart run the following command
-* ```docker build -f PostgresqlDockerfile -t anallytics/postgres .```
+```bash
+./gradlew clean build
+```
 
 ---
 ### Checks/ Verifications
 #### Test
 To run tests run the following command
-* ```./gradlew test```
+```bash
+./gradlew test
+```
 
 #### Coverage
 To check code coverage run the following command
-* ```./gradlew clean jacocoTestCoverageVerification```
+```bash
+./gradlew clean jacocoTestCoverageVerification
+```
  
 #### Style
 To check code style run the following command
-* ```./gradlew clean checkstyleMain checkstyleTest```
+```bash
+./gradlew clean checkstyleMain checkstyleTest
+```
 
 #### All
 To run all chesks present in bahmni mart run the following command
-* ```./gradlew clean check```
+```bash
+./gradlew clean check
+```
 
 ---
-### Deployment Steps
-To deploy/install bahmni-mart using docker follow the steps given below
-* install docker-1.7.1
-* install docker-compose-1.5.2
-* download **bahmni-mart/scripts/install.sh** from github
-* run ```sh install.sh```
-* download **bahmni-mart/docker-compose.yml** from github
-* Change any config if needed. Bahmni-mart related config files will be present in **/opt/bahmni-mart/conf**. Change **application-docker.properties** if you want modify given parameters to bahmni-mart application or Spring cloud dataflow server
-* run ```docker-compose up -d```
+## Deployment Steps
+### Prerequisites
+* **Ansible Playbook (v2.2)**. To install it, run the following command 
+    ```bash
+    yum install ansible-2.2.0.0
+    ```
+### Installation Steps
+
+To install bahmni-mart follow the steps given below
+* Download Bahmni-mart playbook from Github
+    ```bash
+    wget -O /tmp/bahmni-mart-playbook.zip https://github.com/bahmni-msf/bahmni-mart-playbook/archive/master.zip && unzip -o /tmp/bahmni-mart-playbook.zip -d /tmp && sudo rm -rf /var/www/bahmni-mart-playbook && sudo mv /tmp/bahmni-mart-playbook-master /var/www/bahmni-mart-playbook && rm -rf /tmp/bahmni-mart-playbook.zip
+    ```
+* Update **/var/www/bahmni-mart-playbook/inventories/bahmni-mart** inventory file as part your requirement
+* Update the values presents in **/var/www/bahmni-mart-playbook/setup.yml** inventory file as part your requirement
+* Install **Bahmni-mart** application
+    ```bash
+    ansible-playbook -i /var/www/bahmni-mart-playbook/inventories/bahmni-mart /var/www/bahmni-mart-playbook/all.yml --extra-vars '@/var/www/bahmni-mart-playbook/setup.yml'
+    ```
+* Update **bahmni-mart** config. The config will be present in **/var/www/bahmni_config/bahmni-mart/bahmni-mart.json** 
+
+### Access the Application
+**Bahmni-mart** application should be installed on you system. To create flattened DB from CLI, run ```bahmni-mart``` command.
+
+You can access **Bahmni-mart** and other application from browser also.
+
+|Application | URL | Comment | 
+|:-----------|:------|:---------|
+|Bahmni mart  |http://<HOST NAME>/dashboard/#/tasks/definitions/launch/create-bahmni-mart| Only if bahmni-mart-scdf is installed|
+|Metabase|http://<HOST NAME>:9003|Only if metabase is installed|
 
 ---
 ### Commands to Remember
-* ```docker-compose up -d``` (Fetch docker images from remote if images are not present in local and run in headless mode)
 * ```docker ps -a``` (Check status of docker containers)
-* ```docker logs -f postgres-server``` (Check logs of postgres-server container)
+* ```docker logs -f metabase``` (Check logs of metabase container)
 * ```docker logs -f dataflow-server``` (Check logs of dataflow-server container)
-* ```docker-compose stop``` (Stop all docker containers)
-* ```docker-compose rm -f``` (Remove all stopped containers)
-* ```docker start <CONTAINER ID>``` (Start specific docker container)
-* ```docker exec -it postgres-server psql -Uanalytics``` (Access PSQL database of postgres-server container)
+* ```docker stop <CONATAINER NAME>``` (Stop specific docker container)
+* ```docker start <CONTAINER NAME>``` (Start specific docker container)
 * ```curl -X POST <HOST NAME>:9393/tasks/executions\?name\=create-bahmni-mart``` (Once Spring Cloud Dataflow Server is up, you can launch task using UI. But if you want to do it from command line you can run this command. It will launch **create-bahmni-mart** task)
 * ```tail -100f /var/log/bahmni-mart/bahmmni-mart.log``` (Log of **create-bahmni-mart** task will be present in **/var/log/bahmni-mart/bahmni-mart.log** of your host machine. Use this command to get last 100 lines of the file)
