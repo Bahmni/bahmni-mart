@@ -2,7 +2,7 @@ package org.bahmni.mart.job;
 
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.stepconfigurer.StepConfigurerContract;
-import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
+import org.bahmni.mart.exports.DummyStep;
 import org.bahmni.mart.table.listener.ObsJobListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -22,7 +22,7 @@ public abstract class StepRegister {
     private ObsJobListener obsJobListener;
 
     @Autowired
-    private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
+    private DummyStep dummyStep;
 
     Job getJob(StepConfigurerContract stepConfigurerContract, JobDefinition jobDefinition) {
         FlowBuilder<FlowJobBuilder> completeDataExport = getFlowBuilder(jobDefinition.getName());
@@ -34,10 +34,9 @@ public abstract class StepRegister {
     }
 
     private FlowBuilder<FlowJobBuilder> getFlowBuilder(String jobName) {
-        //TODO: Have to remove treatmentRegistrationBaseExportStep from flow
         return jobBuilderFactory.get(jobName)
                 .incrementer(new RunIdIncrementer()).preventRestart()
                 .listener(obsJobListener)
-                .flow(treatmentRegistrationBaseExportStep.getStep());
+                .flow(dummyStep.getStep());
     }
 }

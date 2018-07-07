@@ -3,14 +3,13 @@ package org.bahmni.mart.job;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.stepconfigurer.FormStepConfigurer;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.batch.core.Job;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -38,10 +37,7 @@ public class ObsJobStrategyTest extends StepRegisterTestHelper {
 
     @Test
     public void shouldReturnAJob() {
-
-        Job actualJob = obsJobStrategy.getJob(jobDefinition);
-
-        Assert.assertEquals(expectedJob, actualJob);
+        assertEquals(expectedJob, obsJobStrategy.getJob(jobDefinition));
 
         verify(formStepConfigurer, times(1)).createTables();
         verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);

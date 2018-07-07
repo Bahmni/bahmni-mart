@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.batch.core.Job;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
@@ -38,10 +37,7 @@ public class MetaDataJobStrategyTest extends StepRegisterTestHelper {
 
     @Test
     public void shouldReturnAJob() {
-
-        Job actualJob = metaDataJobStrategy.getJob(jobDefinition);
-
-        assertEquals(expectedJob, actualJob);
+        assertEquals(expectedJob, metaDataJobStrategy.getJob(jobDefinition));
 
         verify(metaDataStepConfigurer, times(1)).createTables();
         verify(metaDataStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);

@@ -1,7 +1,7 @@
 package org.bahmni.mart.job;
 
 import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.exports.TreatmentRegistrationBaseExportStep;
+import org.bahmni.mart.exports.DummyStep;
 import org.bahmni.mart.table.listener.ObsJobListener;
 import org.mockito.Mock;
 import org.springframework.batch.core.Job;
@@ -27,7 +27,7 @@ public abstract class StepRegisterTestHelper {
     JobFlowBuilder jobFlowBuilder;
 
     @Mock
-    private TreatmentRegistrationBaseExportStep treatmentRegistrationBaseExportStep;
+    private DummyStep dummyStep;
 
     @Mock
     private JobBuilderFactory jobBuilderFactory;
@@ -54,15 +54,14 @@ public abstract class StepRegisterTestHelper {
 
         setValuesForSuperClassMemberFields(jobStrategy, "jobBuilderFactory", jobBuilderFactory);
         setValuesForSuperClassMemberFields(jobStrategy, "obsJobListener", obsJobListener);
-        setValuesForSuperClassMemberFields(jobStrategy, "treatmentRegistrationBaseExportStep",
-                treatmentRegistrationBaseExportStep);
+        setValuesForSuperClassMemberFields(jobStrategy, "dummyStep", dummyStep);
 
         when(jobDefinition.getName()).thenReturn(jobName);
         when(jobBuilderFactory.get(jobName)).thenReturn(jobBuilder);
         when(jobBuilder.incrementer(any(RunIdIncrementer.class))).thenReturn(jobBuilder);
         when(jobBuilder.preventRestart()).thenReturn(jobBuilder);
         when(jobBuilder.listener(obsJobListener)).thenReturn(jobBuilder);
-        when(treatmentRegistrationBaseExportStep.getStep()).thenReturn(step);
+        when(dummyStep.getStep()).thenReturn(step);
         when(jobBuilder.flow(step)).thenReturn(jobFlowBuilder);
         when(jobFlowBuilder.end()).thenReturn(flowJobBuilder);
         when(flowJobBuilder.build()).thenReturn(expectedJob);
@@ -74,7 +73,7 @@ public abstract class StepRegisterTestHelper {
         verify(jobBuilderFactory, times(1)).get(jobName);
         verify(jobBuilder, times(1)).incrementer(any(RunIdIncrementer.class));
         verify(jobBuilder, times(1)).preventRestart();
-        verify(treatmentRegistrationBaseExportStep, times(1)).getStep();
+        verify(dummyStep, times(1)).getStep();
         verify(jobBuilder, times(1)).flow(step);
         verify(jobFlowBuilder, times(1)).end();
         verify(flowJobBuilder, times(1)).build();

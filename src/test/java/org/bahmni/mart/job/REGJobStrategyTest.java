@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.batch.core.Job;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
@@ -37,10 +36,7 @@ public class REGJobStrategyTest extends StepRegisterTestHelper {
 
     @Test
     public void shouldReturnAJob() {
-
-        Job actualJob = regJobStrategy.getJob(jobDefinition);
-
-        assertEquals(expectedJob, actualJob);
+        assertEquals(expectedJob, regJobStrategy.getJob(jobDefinition));
 
         verify(regStepConfigurer, times(1)).createTables();
         verify(regStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
