@@ -53,7 +53,7 @@ public abstract class AbstractIncrementalUpdater {
 
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
         Optional<Map<String, Object>> optionalMarkerMap = markerManager.getJobMarkerMap(jobName);
-        if (!optionalMarkerMap.isPresent() || optionalMarkerMap.get().get(EVENT_RECORD_ID).equals(ZERO)) {
+        if (!optionalMarkerMap.isPresent() || optionalMarkerMap.get().get(EVENT_RECORD_ID).equals(0)) {
             return readerSql;
         }
         String joinedIds = getJoinedIds(optionalMarkerMap.get());

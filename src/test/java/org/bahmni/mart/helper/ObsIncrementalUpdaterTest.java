@@ -115,7 +115,7 @@ public class ObsIncrementalUpdaterTest {
     @Test
     public void shouldReturnSameReaderSqlWhenEventRecordIdForGivenJobIsZero() {
         Map markerMap = mock(Map.class);
-        when(markerMap.get("event_record_id")).thenReturn("0");
+        when(markerMap.get("event_record_id")).thenReturn(0);
         when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
 
         String actualUpdatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
