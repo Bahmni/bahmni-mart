@@ -1,6 +1,6 @@
 package org.bahmni.mart.helper;
 
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
 import org.springframework.beans.factory.annotation.Autowired;

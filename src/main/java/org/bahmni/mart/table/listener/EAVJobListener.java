@@ -1,8 +1,8 @@
 package org.bahmni.mart.table.listener;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.bahmni.mart.config.job.EavAttributes;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.EavAttributes;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;

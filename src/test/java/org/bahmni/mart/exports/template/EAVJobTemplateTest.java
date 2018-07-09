@@ -1,8 +1,8 @@
 package org.bahmni.mart.exports.template;
 
-import org.bahmni.mart.config.job.CodeConfig;
-import org.bahmni.mart.config.job.EavAttributes;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.CodeConfig;
+import org.bahmni.mart.config.job.model.EavAttributes;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.table.CodesProcessor;

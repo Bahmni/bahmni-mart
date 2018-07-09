@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.apache.commons.collections.CollectionUtils;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.group.GroupedJob;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.procedure.ProcedureDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.springframework.beans.factory.annotation.Autowired;

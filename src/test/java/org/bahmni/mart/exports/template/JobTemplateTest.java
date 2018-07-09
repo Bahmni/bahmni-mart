@@ -1,6 +1,6 @@
 package org.bahmni.mart.exports.template;
 
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.listener.AbstractJobListener;
 import org.junit.Before;

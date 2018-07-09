@@ -1,6 +1,6 @@
 package org.bahmni.mart.job;
 
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

@@ -1,6 +1,6 @@
 package org.bahmni.mart.table.model;
 
-import org.bahmni.mart.config.job.EavAttributes;
+import org.bahmni.mart.config.job.model.EavAttributes;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Test;
 import org.junit.runner.RunWith;

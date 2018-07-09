@@ -2,7 +2,7 @@ package org.bahmni.mart.helper;
 
 import org.apache.commons.io.FileUtils;
 import org.bahmni.mart.AbstractBaseBatchIT;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.Concept;
 import org.junit.After;
 import org.junit.Test;

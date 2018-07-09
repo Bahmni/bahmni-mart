@@ -1,5 +1,6 @@
 package org.bahmni.mart.config.job;
 
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;

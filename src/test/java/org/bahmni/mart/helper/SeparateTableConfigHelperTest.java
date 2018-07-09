@@ -2,7 +2,7 @@ package org.bahmni.mart.helper;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;

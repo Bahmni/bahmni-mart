@@ -1,6 +1,6 @@
 package org.bahmni.mart.job;
 
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.stepconfigurer.DiagnosesStepConfigurer;
 import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.annotation.Autowired;

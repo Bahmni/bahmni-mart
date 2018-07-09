@@ -3,6 +3,9 @@ package org.bahmni.mart.config.job;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.model.GroupedJobConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.config.job.model.SeparateTableConfig;
 import org.bahmni.mart.config.jsql.SqlParser;
 import org.springframework.core.io.Resource;
 

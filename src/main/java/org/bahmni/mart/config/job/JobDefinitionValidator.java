@@ -1,6 +1,8 @@
 package org.bahmni.mart.config.job;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.bahmni.mart.config.job.model.CodeConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

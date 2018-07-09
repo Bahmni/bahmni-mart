@@ -1,6 +1,7 @@
 package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.config.MartJSONReader;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;

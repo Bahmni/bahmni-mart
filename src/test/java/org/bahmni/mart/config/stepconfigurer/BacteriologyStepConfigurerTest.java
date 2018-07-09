@@ -1,6 +1,6 @@
 package org.bahmni.mart.config.stepconfigurer;
 
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.FormListProcessor;

@@ -1,7 +1,7 @@
 package org.bahmni.mart.config.group;
 
 import org.bahmni.mart.config.MartJSONReader;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.junit.Before;
 import org.junit.Test;

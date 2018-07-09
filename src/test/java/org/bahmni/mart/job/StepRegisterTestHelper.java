@@ -1,6 +1,6 @@
 package org.bahmni.mart.job;
 
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.DummyStep;
 import org.bahmni.mart.table.listener.JobListener;
 import org.mockito.Mock;

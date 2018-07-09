@@ -1,4 +1,4 @@
-package org.bahmni.mart.config.job;
+package org.bahmni.mart.config.job.model;
 
 import java.util.List;
 

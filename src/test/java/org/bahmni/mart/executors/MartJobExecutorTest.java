@@ -1,7 +1,7 @@
 package org.bahmni.mart.executors;
 
 import org.bahmni.mart.config.group.GroupedJob;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.exception.InvalidJobConfiguration;

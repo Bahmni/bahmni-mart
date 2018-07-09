@@ -1,7 +1,7 @@
 package org.bahmni.mart.form;
 
-import org.bahmni.mart.config.job.JobDefinition;
-import org.bahmni.mart.config.job.SeparateTableConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.config.job.model.SeparateTableConfig;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;

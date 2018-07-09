@@ -2,7 +2,7 @@ package org.bahmni.mart.config;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.group.GroupedJob;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.procedure.ProcedureDefinition;
 import org.bahmni.mart.config.view.ViewDefinition;
 import org.junit.Before;

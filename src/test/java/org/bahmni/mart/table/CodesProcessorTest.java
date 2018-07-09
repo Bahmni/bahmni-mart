@@ -1,7 +1,7 @@
 package org.bahmni.mart.table;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.config.job.CodeConfig;
+import org.bahmni.mart.config.job.model.CodeConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

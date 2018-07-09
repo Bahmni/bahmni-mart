@@ -2,6 +2,8 @@ package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.group.GroupedJob;
+import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.config.job.model.SeparateTableConfig;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;

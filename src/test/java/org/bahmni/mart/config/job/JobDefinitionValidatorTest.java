@@ -1,5 +1,7 @@
 package org.bahmni.mart.config.job;
 
+import org.bahmni.mart.config.job.model.CodeConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

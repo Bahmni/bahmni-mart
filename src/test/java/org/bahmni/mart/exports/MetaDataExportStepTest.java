@@ -1,7 +1,7 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Assert;

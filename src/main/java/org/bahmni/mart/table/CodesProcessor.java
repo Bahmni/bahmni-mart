@@ -1,7 +1,7 @@
 package org.bahmni.mart.table;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.config.job.CodeConfig;
+import org.bahmni.mart.config.job.model.CodeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
