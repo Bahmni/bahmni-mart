@@ -2,6 +2,7 @@ package org.bahmni.mart.exports.template;
 
 import org.bahmni.mart.config.job.CodeConfig;
 import org.bahmni.mart.config.job.JobDefinition;
+import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.listener.TableGeneratorJobListener;
 import org.springframework.batch.core.Job;
@@ -23,18 +24,28 @@ public class SimpleJobTemplate extends JobTemplate {
     private TableGeneratorJobListener tableGeneratorJobListener;
 
     @Autowired
+    private CustomSqlIncrementalUpdater customSqlIncrementalUpdater;
+
+    @Autowired
     private CodesProcessor codesProcessor;
 
     public Job buildJob(JobDefinition jobConfiguration) {
-        List<String> columnsToIgnore = jobConfiguration.getColumnsToIgnore();
-        String readerSQL = getReaderSQL(jobConfiguration);
-        String readerSQLWithOutIgnoreColumns = getReaderSQLByIgnoringColumns(columnsToIgnore, readerSQL);
+        String readerSql = getReaderSql(jobConfiguration);
         List<CodeConfig> codeConfigs = jobConfiguration.getCodeConfigs();
         if (isValid(codeConfigs)) {
             codesProcessor.setCodeConfigs(codeConfigs);
             tableGeneratorJobListener.setCodesProcessor(codesProcessor);
             setPreProcessor(codesProcessor);
         }
-        return buildJob(jobConfiguration, tableGeneratorJobListener, readerSQLWithOutIgnoreColumns);
+        return buildJob(jobConfiguration, tableGeneratorJobListener, readerSql);
+    }
+
+    private String getReaderSql(JobDefinition jobDefinition) {
+        List<String> columnsToIgnore = jobDefinition.getColumnsToIgnore();
+        String readerSQL = getReaderSQLByIgnoringColumns(columnsToIgnore, getReaderSQL(jobDefinition));
+        boolean metaDataChanged = customSqlIncrementalUpdater.isMetaDataChanged(jobDefinition.getName());
+
+        return metaDataChanged ? readerSQL :
+                customSqlIncrementalUpdater.updateReaderSql(readerSQL, jobDefinition.getName(), "patient_id");
     }
 }

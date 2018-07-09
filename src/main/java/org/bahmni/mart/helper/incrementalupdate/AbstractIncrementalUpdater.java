@@ -47,7 +47,7 @@ public abstract class AbstractIncrementalUpdater {
     private MarkerManager markerManager;
 
     @Autowired
-    private TableDataGenerator tableDataGenerator;
+    protected TableDataGenerator tableDataGenerator;
 
     private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
 

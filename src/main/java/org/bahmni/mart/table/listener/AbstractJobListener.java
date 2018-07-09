@@ -4,14 +4,13 @@ import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Arrays;
 
-public abstract class AbstractJobListener extends JobExecutionListenerSupport {
+public abstract class AbstractJobListener extends JobListener {
     @Autowired
     protected JobDefinitionReader jobDefinitionReader;
 

@@ -4,6 +4,7 @@ import org.bahmni.mart.config.job.CodeConfig;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.listener.TableGeneratorJobListener;
 import org.junit.Before;
@@ -45,29 +46,35 @@ public class SimpleJobTemplateTest {
     private CodesProcessor codesProcessor;
 
     @Mock
+    private CustomSqlIncrementalUpdater customSqlIncrementalUpdater;
+
+    @Mock
     private JobDefinition jobDefinition;
 
     private SimpleJobTemplate spyJobTemplate;
     private String readerSql;
     private List<CodeConfig> codeConfigs;
+    private static final String JOB_NAME = "testJob";
+
 
     @Before
     public void setUp() throws Exception {
         SimpleJobTemplate simpleJobTemplate = new SimpleJobTemplate();
         setValuesForMemberFields(simpleJobTemplate, "codesProcessor", codesProcessor);
         setValuesForMemberFields(simpleJobTemplate, "tableGeneratorJobListener", listener);
+        setValuesForMemberFields(simpleJobTemplate, "customSqlIncrementalUpdater", customSqlIncrementalUpdater);
 
         spyJobTemplate = spy(simpleJobTemplate);
 
-        String jobName = "testJob";
         readerSql = "select * from table";
         CodeConfig codeConfig = mock(CodeConfig.class);
         codeConfigs = Arrays.asList(codeConfig);
         when(jobDefinition.getCodeConfigs()).thenReturn(codeConfigs);
-        when(jobDefinition.getName()).thenReturn(jobName);
+        when(jobDefinition.getName()).thenReturn(JOB_NAME);
         mockStatic(JobDefinitionValidator.class);
         mockStatic(JobDefinitionUtil.class);
 
+        when(customSqlIncrementalUpdater.isMetaDataChanged(JOB_NAME)).thenReturn(true);
         doReturn(job).when((JobTemplate) spyJobTemplate).buildJob(jobDefinition, listener, readerSql);
         when(JobDefinitionUtil.getReaderSQL(jobDefinition)).thenReturn(readerSql);
         when(JobDefinitionUtil.getReaderSQLByIgnoringColumns(any(), anyString())).thenReturn(readerSql);
@@ -80,6 +87,7 @@ public class SimpleJobTemplateTest {
         verify(spyJobTemplate, times(1)).buildJob(jobDefinition, listener, readerSql);
         verifyStatic(times(1));
         JobDefinitionUtil.getReaderSQLByIgnoringColumns(Collections.emptyList(), readerSql);
+        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
     }
 
     @Test
@@ -91,6 +99,7 @@ public class SimpleJobTemplateTest {
         verify(codesProcessor, times(1)).setCodeConfigs(codeConfigs);
         verify(listener, times(1)).setCodesProcessor(codesProcessor);
         verify(spyJobTemplate,times(1)).setPreProcessor(codesProcessor);
+        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
     }
@@ -101,9 +110,27 @@ public class SimpleJobTemplateTest {
 
         spyJobTemplate.buildJob(jobDefinition);
 
+        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
         verify(codesProcessor, never()).setUpCodesData();
         verify(spyJobTemplate,never()).setPreProcessor(codesProcessor);
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
+    }
+
+    @Test
+    public void shouldUpdateReaderSqlIfMetadataIsSame() {
+        when(customSqlIncrementalUpdater.isMetaDataChanged(JOB_NAME)).thenReturn(false);
+        String updatedReaderSql = String.format("SELECT * FROM (%s) result where patient_id in (1, 2, 3)", readerSql);
+        doReturn(job).when((JobTemplate) spyJobTemplate).buildJob(jobDefinition, listener, updatedReaderSql);
+        String updateOn = "patient_id";
+        when(customSqlIncrementalUpdater.updateReaderSql(readerSql, JOB_NAME, updateOn)).thenReturn(updatedReaderSql);
+
+        spyJobTemplate.buildJob(jobDefinition);
+
+        verify(spyJobTemplate, times(1)).buildJob(jobDefinition, listener, updatedReaderSql);
+        verifyStatic(times(1));
+        JobDefinitionUtil.getReaderSQLByIgnoringColumns(Collections.emptyList(), readerSql);
+        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
+        verify(customSqlIncrementalUpdater, times(1)).updateReaderSql(readerSql, JOB_NAME, updateOn);
     }
 }

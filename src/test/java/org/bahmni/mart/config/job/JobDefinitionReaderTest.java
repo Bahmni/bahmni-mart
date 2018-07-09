@@ -2,11 +2,11 @@ package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.group.GroupedJob;
+import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -21,8 +21,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
-@PrepareForTest(BatchUtils.class)
+@PrepareForTest({ BatchUtils.class, FormTableMetadataGenerator.class})
 @RunWith(PowerMockRunner.class)
 public class JobDefinitionReaderTest {
 
@@ -33,7 +35,7 @@ public class JobDefinitionReaderTest {
 
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
-        PowerMockito.mockStatic(BatchUtils.class);
+        mockStatic(BatchUtils.class);
         String json = "{\"jobs\": [\n" +
                 "  {\n" +
                 "    \"name\": \"Program Data\",\n" +
@@ -126,5 +128,21 @@ public class JobDefinitionReaderTest {
         assertNull(personAttributeDefinition.getReaderSql());
         assertEquals(0, personAttributeDefinition.getChunkSizeToRead());
         assertNull(personAttributeDefinition.getTableName());
+    }
+
+    @Test
+    public void shouldReturnJobDefinitionForGivenProcessedJobName() {
+        mockStatic(FormTableMetadataGenerator.class);
+        when(FormTableMetadataGenerator.getProcessedName("Program Data")).thenReturn("program_data");
+
+        JobDefinition programDataDefinition = jobDefinitionReader.getJobDefinitionByProcessedName("program_data");
+
+        assertEquals("Program Data", programDataDefinition.getName());
+        assertEquals("customSql", programDataDefinition.getType());
+        assertEquals("select * from program", programDataDefinition.getReaderSql());
+        assertEquals(1000, programDataDefinition.getChunkSizeToRead());
+        assertEquals("MyProgram", programDataDefinition.getTableName());
+        verifyStatic();
+        FormTableMetadataGenerator.getProcessedName("Program Data");
     }
 }

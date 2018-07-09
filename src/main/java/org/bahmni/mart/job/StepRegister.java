@@ -12,6 +12,8 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+// TODO: RENAME THIS CLASS AND MOVE ALL THE CODE FROM JobStrategy INTERFACE TO HERE.
+
 @Component
 public abstract class StepRegister {
 
