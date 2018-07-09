@@ -6,6 +6,7 @@ import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQL;
 
@@ -19,7 +20,7 @@ public class CustomSqlIncrementalUpdater extends AbstractIncrementalUpdater {
     @Override
     protected boolean getMetaDataChangeStatus(String jobName) {
         JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByProcessedName(jobName);
-        if (isEmpty(jobDefinition.getName()))
+        if (isEmpty(jobDefinition.getName()) || isNull(jobDefinition.getIncrementalUpdateConfig()))
             return true;
         String tableName = jobDefinition.getTableName();
 

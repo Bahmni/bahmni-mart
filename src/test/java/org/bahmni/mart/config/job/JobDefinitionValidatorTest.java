@@ -1,6 +1,7 @@
 package org.bahmni.mart.config.job;
 
 import org.bahmni.mart.config.job.model.CodeConfig;
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
@@ -27,6 +29,9 @@ import static org.mockito.Mockito.when;
 public class JobDefinitionValidatorTest {
     @Mock
     private Logger logger;
+
+    @Mock
+    private IncrementalUpdateConfig incrementalUpdateConfig;
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -146,6 +151,31 @@ public class JobDefinitionValidatorTest {
         when(jobDefinition.getType()).thenReturn(CUSTOM_SQL);
 
         assertTrue(JobDefinitionValidator.validate(Arrays.asList(jobDefinition)));
+    }
+
+    @Test
+    public void shouldGiveFalseIfItHasInvalidIncrementalUpdateConfig() {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinition.getName()).thenReturn("test1");
+        when(jobDefinition.getTableName()).thenReturn("table1");
+        when(jobDefinition.getReaderSql()).thenReturn("select * from table;");
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
+        when(incrementalUpdateConfig.getUpdateOn()).thenReturn(null);
+
+        assertFalse(JobDefinitionValidator.validate(Arrays.asList(jobDefinition)));
+        verify(jobDefinition).getIncrementalUpdateConfig();
+    }
+
+    @Test
+    public void shouldGiveTrueIfItHasNullAsIncrementalUpdateConfig() {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinition.getName()).thenReturn("test1");
+        when(jobDefinition.getTableName()).thenReturn("table1");
+        when(jobDefinition.getReaderSql()).thenReturn("select * from table;");
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
+
+        assertTrue(JobDefinitionValidator.validate(Collections.singletonList(jobDefinition)));
+        verify(jobDefinition).getIncrementalUpdateConfig();
     }
 
     @Test

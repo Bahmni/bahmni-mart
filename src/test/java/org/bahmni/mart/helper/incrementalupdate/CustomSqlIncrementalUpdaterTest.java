@@ -1,5 +1,6 @@
 package org.bahmni.mart.helper.incrementalupdate;
 
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
@@ -65,6 +66,7 @@ public class CustomSqlIncrementalUpdaterTest {
         when(jobDefinition.getName()).thenReturn("job name");
         tableName = "table name";
         when(jobDefinition.getTableName()).thenReturn(tableName);
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(new IncrementalUpdateConfig());
         readerSql = "select * from table";
         when(JobDefinitionUtil.getReaderSQL(jobDefinition)).thenReturn(readerSql);
         when(tableDataGenerator.getTableData(tableName, readerSql)).thenReturn(tableData);
@@ -106,6 +108,22 @@ public class CustomSqlIncrementalUpdaterTest {
     @Test
     public void shouldReturnTrueIfJobDefinitionNameIsEmpty() {
         when(jobDefinition.getName()).thenReturn("");
+
+        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(processedJobName);
+
+        assertTrue(status);
+        verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
+        verify(jobDefinition).getName();
+        verify(jobDefinition, never()).getTableName();
+        verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(tableName);
+        verifyStatic(never());
+        JobDefinitionUtil.getReaderSQL(jobDefinition);
+        verify(tableDataGenerator, never()).getTableData(any(), any());
+    }
+
+    @Test
+    public void shouldReturnTrueIfIncrementalUpdateConfigIsNull() {
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
 
         boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(processedJobName);
 

@@ -2,6 +2,7 @@ package org.bahmni.mart.config.job;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.bahmni.mart.config.job.model.CodeConfig;
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class JobDefinitionValidator {
 
@@ -20,10 +23,21 @@ public class JobDefinitionValidator {
 
     public static boolean validate(List<JobDefinition> jobDefinitions) {
         boolean areJobNamesUnique = verifyAllJobNamesShouldBeUnique(jobDefinitions);
+        boolean hasValidIncrementalUpdateConfig = verifyIncrementalUpdateConfig(jobDefinitions);
         List<JobDefinition> genericJobDefinitions = jobDefinitions.stream().filter(jobDefinition ->
-                jobDefinition.getType().equals(CUSTOM_SQL)).collect(Collectors.toList());
-        return areJobNamesUnique && hasNoEmptyReaderSqlOrTableName(genericJobDefinitions) &&
+                CUSTOM_SQL.equals(jobDefinition.getType())).collect(Collectors.toList());
+        return areJobNamesUnique && hasValidIncrementalUpdateConfig &&
+                hasNoEmptyReaderSqlOrTableName(genericJobDefinitions) &&
                 hasUniqueJobNamesAndTableNames(genericJobDefinitions);
+    }
+
+    private static boolean verifyIncrementalUpdateConfig(List<JobDefinition> jobDefinitions) {
+        return jobDefinitions.stream()
+                .allMatch(jobDefinition -> isValidIncrementalUpdateConfig(jobDefinition.getIncrementalUpdateConfig()));
+    }
+
+    private static boolean isValidIncrementalUpdateConfig(IncrementalUpdateConfig incrementalUpdateConfig) {
+        return isNull(incrementalUpdateConfig) || isNotEmpty(incrementalUpdateConfig.getUpdateOn());
     }
 
     private static boolean verifyAllJobNamesShouldBeUnique(List<JobDefinition> jobDefinitions) {
