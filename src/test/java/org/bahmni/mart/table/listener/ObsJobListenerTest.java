@@ -1,7 +1,7 @@
 package org.bahmni.mart.table.listener;
 
 import org.bahmni.mart.CommonTestHelper;
-import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.helper.ObsIncrementalUpdater;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,14 +26,14 @@ public class ObsJobListenerTest {
     private JobInstance jobInstance;
 
     @Mock
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
 
     private ObsJobListener obsJobListener;
 
     @Before
     public void setUp() throws Exception {
         obsJobListener = new ObsJobListener();
-        CommonTestHelper.setValuesForMemberFields(obsJobListener, "incrementalUpdater", incrementalUpdater);
+        CommonTestHelper.setValuesForMemberFields(obsJobListener, "obsIncrementalUpdater", obsIncrementalUpdater);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class ObsJobListenerTest {
 
         verify(jobExecution).getJobInstance();
         verify(jobInstance).getJobName();
-        verify(incrementalUpdater).updateMarker(jobName);
+        verify(obsIncrementalUpdater).updateMarker(jobName);
     }
 
     @Test
@@ -56,6 +56,6 @@ public class ObsJobListenerTest {
 
         obsJobListener.afterJob(jobExecution);
 
-        verify(incrementalUpdater, never()).updateMarker(anyString());
+        verify(obsIncrementalUpdater, never()).updateMarker(anyString());
     }
 }

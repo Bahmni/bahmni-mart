@@ -1,7 +1,7 @@
 package org.bahmni.mart.table;
 
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.helper.ObsIncrementalUpdater;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -34,14 +34,14 @@ public class TableGeneratorStepTest {
     private FreeMarkerEvaluator<TableData> freeMarkerEvaluatorForTables;
 
     @Mock
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
 
     @Before
     public void setUp() throws Exception {
         tableGeneratorStep = new TableGeneratorStep();
         setValuesForMemberFields(tableGeneratorStep, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(tableGeneratorStep, "freeMarkerEvaluatorForTables", freeMarkerEvaluatorForTables);
-        setValuesForMemberFields(tableGeneratorStep, "incrementalUpdater", incrementalUpdater);
+        setValuesForMemberFields(tableGeneratorStep, "obsIncrementalUpdater", obsIncrementalUpdater);
     }
 
     @Test
@@ -54,13 +54,13 @@ public class TableGeneratorStepTest {
         tableColumns.add(new TableColumn("field_1", "int", false, null));
         tableData.setColumns(tableColumns);
 
-        when(incrementalUpdater.isMetaDataChanged(actualTableName)).thenReturn(true);
+        when(obsIncrementalUpdater.isMetaDataChanged(actualTableName)).thenReturn(true);
         String sql = "some sql";
         when(freeMarkerEvaluatorForTables.evaluate("ddlForForm.ftl", tableData)).thenReturn(sql);
 
         tableGeneratorStep.createTablesForObs(Collections.singletonList(tableData));
 
-        verify(incrementalUpdater).isMetaDataChanged(actualTableName);
+        verify(obsIncrementalUpdater).isMetaDataChanged(actualTableName);
         verify(freeMarkerEvaluatorForTables).evaluate("ddlForForm.ftl", tableData);
         verify(martJdbcTemplate).execute(sql);
     }
@@ -80,13 +80,13 @@ public class TableGeneratorStepTest {
         TableData tableDataTwo = new TableData(actualTableNameTwo);
         when(freeMarkerEvaluatorForTables.evaluate("ddlForForm.ftl", tableDataOne)).thenReturn("table one sql");
         when(freeMarkerEvaluatorForTables.evaluate("ddlForForm.ftl", tableDataTwo)).thenReturn("table two sql");
-        when(incrementalUpdater.isMetaDataChanged(actualTableNameOne)).thenReturn(true);
-        when(incrementalUpdater.isMetaDataChanged(actualTableNameTwo)).thenReturn(false);
+        when(obsIncrementalUpdater.isMetaDataChanged(actualTableNameOne)).thenReturn(true);
+        when(obsIncrementalUpdater.isMetaDataChanged(actualTableNameTwo)).thenReturn(false);
 
         tableGeneratorStep.createTablesForObs(Arrays.asList(tableDataOne, tableDataTwo));
 
-        verify(incrementalUpdater).isMetaDataChanged(actualTableNameOne);
-        verify(incrementalUpdater).isMetaDataChanged(actualTableNameTwo);
+        verify(obsIncrementalUpdater).isMetaDataChanged(actualTableNameOne);
+        verify(obsIncrementalUpdater).isMetaDataChanged(actualTableNameTwo);
         verify(freeMarkerEvaluatorForTables).evaluate("ddlForForm.ftl", tableDataOne);
         verify(martJdbcTemplate).execute("table one sql");
         verify(freeMarkerEvaluatorForTables, never()).evaluate("ddlForForm.ftl", tableDataTwo);

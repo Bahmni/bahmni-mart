@@ -26,6 +26,7 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 import static org.bahmni.mart.table.SpecialCharacterResolver.getUpdatedTableNameIfExist;
 import static org.junit.Assert.assertEquals;
@@ -42,9 +43,9 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 @PrepareForTest(SpecialCharacterResolver.class)
 @RunWith(PowerMockRunner.class)
-public class IncrementalUpdaterTest {
+public class ObsIncrementalUpdaterTest {
 
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
     private String jobName;
 
     @Mock
@@ -76,19 +77,19 @@ public class IncrementalUpdaterTest {
 
     @Before
     public void setUp() throws Exception {
-        incrementalUpdater = new IncrementalUpdater();
+        obsIncrementalUpdater = new ObsIncrementalUpdater();
         jobName = "JobName";
         category = "CategoryName";
         tableName = "encounter";
         readerSql = "SELECT id, name FROM test";
 
-        setValuesForMemberFields(incrementalUpdater, "openmrsJdbcTemplate", openmrsJdbcTemplate);
-        setValuesForMemberFields(incrementalUpdater, "martJdbcTemplate", martJdbcTemplate);
-        setValuesForMemberFields(incrementalUpdater, "markerManager", markerManager);
-        setValuesForMemberFields(incrementalUpdater, "tableDataGenerator", tableDataGenerator);
-        setValuesForMemberFields(incrementalUpdater, "formTableMetadataGenerator", formTableMetadataGenerator);
-        setValuesForMemberFields(incrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
-        setValuesForMemberFields(incrementalUpdater, "maxEventRecordId", "20");
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "openmrsJdbcTemplate", openmrsJdbcTemplate);
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "martJdbcTemplate", martJdbcTemplate);
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "markerManager", markerManager);
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "tableDataGenerator", tableDataGenerator);
+        setValuesForMemberFields(obsIncrementalUpdater, "formTableMetadataGenerator", formTableMetadataGenerator);
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", "20");
         updateOn = "id";
         queryForEventObjects = "SELECT DISTINCT substring_index(substring_index(object, '/', -1), '?', 1) as uuid " +
                 "FROM event_records WHERE id BETWEEN %s AND %s AND category = '%s'";
@@ -105,7 +106,7 @@ public class IncrementalUpdaterTest {
     public void shouldReturnSameReaderSqlWhenThereIsNoMarkerMapForGivenJob() {
         when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.empty());
 
-        String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
         verify(markerManager).getJobMarkerMap(jobName);
         assertEquals(readerSql, updatedReaderSql);
@@ -117,7 +118,7 @@ public class IncrementalUpdaterTest {
         when(markerMap.get("event_record_id")).thenReturn("0");
         when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
 
-        String actualUpdatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        String actualUpdatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
         verify(markerManager).getJobMarkerMap(jobName);
         verify(markerMap).get("event_record_id");
@@ -131,7 +132,7 @@ public class IncrementalUpdaterTest {
         when(markerMap.get("category")).thenReturn(category);
         when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
 
-        incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
         verify(markerManager).getJobMarkerMap(jobName);
         verify(markerMap, times(2)).get("event_record_id");
@@ -145,7 +146,7 @@ public class IncrementalUpdaterTest {
         setUpForMarkerMap();
         setUpForUuids();
 
-        incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
         verify(openmrsJdbcTemplate).queryForList(format(queryForEventObjects, "10", "20", category), String.class);
         verify(openmrsJdbcTemplate).queryForList(queryForIds, String.class);
@@ -161,7 +162,7 @@ public class IncrementalUpdaterTest {
         String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (1,2)", readerSql,
                 updateOn);
 
-        String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
         assertEquals(expectedUpdatedReaderSql, updatedReaderSql);
     }
@@ -174,7 +175,7 @@ public class IncrementalUpdaterTest {
         String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (-1)", readerSql,
                 updateOn);
 
-        String updatedReaderSql = incrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
 
         assertEquals(expectedUpdatedReaderSql, updatedReaderSql);
     }
@@ -185,7 +186,7 @@ public class IncrementalUpdaterTest {
         String table = "table";
         String column = "column";
 
-        incrementalUpdater.deleteVoidedRecords(ids, table, column);
+        obsIncrementalUpdater.deleteVoidedRecords(ids, table, column);
 
         verify(martJdbcTemplate).execute("DELETE FROM table WHERE column IN (1,2)");
     }
@@ -193,7 +194,7 @@ public class IncrementalUpdaterTest {
     @Test
     public void shouldNotExecuteDeleteSqlWhenIdListIsNull() {
 
-        incrementalUpdater.deleteVoidedRecords(null, "table", "column");
+        obsIncrementalUpdater.deleteVoidedRecords(null, "table", "column");
 
         verify(martJdbcTemplate, never()).execute(anyString());
     }
@@ -201,7 +202,7 @@ public class IncrementalUpdaterTest {
     @Test
     public void shouldNotExecuteDeleteSqlWhenIdListIsEmpty() {
 
-        incrementalUpdater.deleteVoidedRecords(Collections.emptySet(), "table", "column");
+        obsIncrementalUpdater.deleteVoidedRecords(Collections.emptySet(), "table", "column");
 
         verify(martJdbcTemplate, never()).execute(anyString());
     }
@@ -209,29 +210,29 @@ public class IncrementalUpdaterTest {
     @Test
     public void shouldCallUpdateMarkerWithMaxEventRecordIdForGivenJobName() throws Exception {
         String jobName = "obs";
-        setValuesForMemberFields(incrementalUpdater, "maxEventRecordId", "145678");
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", "145678");
 
-        incrementalUpdater.updateMarker(jobName);
+        obsIncrementalUpdater.updateMarker(jobName);
 
         verify(markerManager).updateMarker(jobName, "145678");
     }
 
     @Test
     public void shouldCallUpdateMarkerWithZeroWhenMaxMarkerIdIsNull() throws Exception {
-        setValuesForMemberFields(incrementalUpdater, "maxEventRecordId", null);
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", null);
 
         String jobName = "obs";
 
-        incrementalUpdater.updateMarker(jobName);
+        obsIncrementalUpdater.updateMarker(jobName);
 
         verify(markerManager).updateMarker(jobName, "0");
     }
 
     @Test
     public void shouldNotQueryForMaxEventRecordIdWhenTheSameFieldIsNotNull() throws Exception {
-        setValuesForMemberFields(incrementalUpdater, "maxEventRecordId", "123");
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", "123");
 
-        incrementalUpdater.updateMarker("jobName");
+        obsIncrementalUpdater.updateMarker("jobName");
 
         verify(openmrsJdbcTemplate, never()).queryForObject(queryForMaxEventRecordId, String.class);
     }
@@ -253,7 +254,7 @@ public class IncrementalUpdaterTest {
         when(formTableMetadataGenerator.getTableDataByName(actualTableName))
                 .thenReturn(tableData);
 
-        boolean metaDataChanged = incrementalUpdater.isMetaDataChanged(formName);
+        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName);
 
         assertTrue(metaDataChanged);
         verifyStatic();
@@ -282,7 +283,7 @@ public class IncrementalUpdaterTest {
         when(formTableMetadataGenerator.getTableDataByName(actualTableName))
                 .thenReturn(tableData);
 
-        boolean metaDataChanged = incrementalUpdater.isMetaDataChanged(formName);
+        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName);
 
         assertFalse(metaDataChanged);
         verifyStatic();
@@ -300,7 +301,7 @@ public class IncrementalUpdaterTest {
         String actualTableName = getProcessedName(formName);
         metaDataChangeMap.put(actualTableName, true);
 
-        assertTrue(incrementalUpdater.isMetaDataChanged(formName));
+        assertTrue(obsIncrementalUpdater.isMetaDataChanged(formName));
 
         verify(metaDataChangeMap).get(actualTableName);
         verifyStatic(never());
@@ -319,7 +320,7 @@ public class IncrementalUpdaterTest {
         when(tableDataGenerator.getTableDataFromMart("table_name", "SELECT * FROM table_name"))
                 .thenThrow(BadSqlGrammarException.class);
 
-        boolean metaDataChanged = incrementalUpdater.isMetaDataChanged(formName);
+        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName);
 
         assertTrue(metaDataChanged);
         verifyStatic();

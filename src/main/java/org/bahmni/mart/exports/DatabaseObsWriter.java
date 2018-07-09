@@ -3,7 +3,7 @@ package org.bahmni.mart.exports;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.helper.ObsIncrementalUpdater;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.item.ItemWriter;
@@ -34,7 +34,7 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
     private FreeMarkerEvaluator<ObsRecordExtractorForTable> freeMarkerEvaluatorForTableRecords;
 
     @Autowired
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
 
     private BahmniForm form;
 
@@ -43,7 +43,7 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
     @Override
     public void write(List<? extends List<Obs>> items) throws Exception {
         TableData tableData = formTableMetadataGenerator.getTableData(form);
-        if (!incrementalUpdater.isMetaDataChanged(form.getFormName().getName())) {
+        if (!obsIncrementalUpdater.isMetaDataChanged(form.getFormName().getName())) {
             deleteVoidedRecords(items, tableData);
         }
         insertRecords(items, tableData);
@@ -74,7 +74,7 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
     private void deleteVoidedRecords(List<? extends List<Obs>> items, TableData tableData) {
         Set<String> encounterIds = new HashSet<>();
         items.forEach(item -> item.forEach(obs -> encounterIds.add(obs.getEncounterId())));
-        incrementalUpdater.deleteVoidedRecords(encounterIds, tableData.getName(), "encounter_id");
+        obsIncrementalUpdater.deleteVoidedRecords(encounterIds, tableData.getName(), "encounter_id");
     }
 
     public void setAddMoreMultiSelectEnabled(boolean addMoreMultiSelectEnabled) {

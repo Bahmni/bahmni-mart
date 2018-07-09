@@ -1,14 +1,12 @@
 package org.bahmni.mart.helper;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -21,8 +19,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
-@Component
-public class IncrementalUpdater {
+public abstract class AbstractIncrementalUpdater {
 
     private static final String EVENT_RECORD_ID = "event_record_id";
     private static final String CATEGORY = "category";
@@ -49,9 +46,6 @@ public class IncrementalUpdater {
 
     @Autowired
     private TableDataGenerator tableDataGenerator;
-
-    @Autowired
-    private FormTableMetadataGenerator formTableMetadataGenerator;
 
     private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
 
@@ -123,13 +117,9 @@ public class IncrementalUpdater {
         maxEventRecordId = openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
     }
 
-    private boolean getMetaDataChangeStatus(String actualTableName) {
-        TableData currentTableData = formTableMetadataGenerator.getTableDataByName(actualTableName);
-        TableData existingTableData = getExistingTableData(actualTableName);
-        return !currentTableData.equals(existingTableData);
-    }
+    protected abstract boolean getMetaDataChangeStatus(String actualTableName);
 
-    private TableData getExistingTableData(String actualTableName) {
+    protected TableData getExistingTableData(String actualTableName) {
         String updatedTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(actualTableName);
         String sql = String.format("SELECT * FROM %s", updatedTableName);
         try {

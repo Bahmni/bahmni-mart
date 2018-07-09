@@ -6,7 +6,7 @@ import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.helper.ObsIncrementalUpdater;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -48,7 +48,7 @@ public class ObservationExportStep {
     private FormTableMetadataGenerator formTableMetadataGenerator;
 
     @Autowired
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
 
     private JobDefinition jobDefinition;
 
@@ -63,8 +63,8 @@ public class ObservationExportStep {
 
     private JdbcCursorItemReader<Map<String, Object>> obsReader() {
         String sql = freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form);
-        if (!incrementalUpdater.isMetaDataChanged(form.getFormName().getName())) {
-            sql = incrementalUpdater.updateReaderSql(sql, jobDefinition.getName(), "encounter_id");
+        if (!obsIncrementalUpdater.isMetaDataChanged(form.getFormName().getName())) {
+            sql = obsIncrementalUpdater.updateReaderSql(sql, jobDefinition.getName(), "encounter_id");
         }
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);

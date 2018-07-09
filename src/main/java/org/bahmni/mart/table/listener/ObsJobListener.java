@@ -1,6 +1,6 @@
 package org.bahmni.mart.table.listener;
 
-import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.helper.ObsIncrementalUpdater;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import static org.springframework.batch.core.BatchStatus.COMPLETED;
 public class ObsJobListener implements JobExecutionListener {
 
     @Autowired
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
@@ -24,6 +24,6 @@ public class ObsJobListener implements JobExecutionListener {
             return;
         }
         String jobName = jobExecution.getJobInstance().getJobName();
-        incrementalUpdater.updateMarker(jobName);
+        obsIncrementalUpdater.updateMarker(jobName);
     }
 }

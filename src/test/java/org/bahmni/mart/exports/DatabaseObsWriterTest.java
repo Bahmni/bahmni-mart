@@ -4,7 +4,7 @@ import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.helper.ObsIncrementalUpdater;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class DatabaseObsWriterTest {
     private FreeMarkerEvaluator freeMarkerEvaluatorForTableRecords;
 
     @Mock
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
 
     @Before
     public void setUp() throws Exception {
@@ -50,7 +50,7 @@ public class DatabaseObsWriterTest {
         setValuesForMemberFields(databaseObsWriter, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(databaseObsWriter, "freeMarkerEvaluatorForTableRecords",
                 freeMarkerEvaluatorForTableRecords);
-        setValuesForMemberFields(databaseObsWriter, "incrementalUpdater", incrementalUpdater);
+        setValuesForMemberFields(databaseObsWriter, "obsIncrementalUpdater", obsIncrementalUpdater);
     }
 
     @Test
@@ -93,14 +93,14 @@ public class DatabaseObsWriterTest {
         items.add(obsList2);
 
         databaseObsWriter.setForm(bahmniForm);
-        when(incrementalUpdater.isMetaDataChanged(formName.getName())).thenReturn(false);
+        when(obsIncrementalUpdater.isMetaDataChanged(formName.getName())).thenReturn(false);
         when(formTableMetadataGenerator.getTableData(bahmniForm)).thenReturn(new TableData("test"));
 
         databaseObsWriter.write(items);
 
-        verify(incrementalUpdater).isMetaDataChanged(formName.getName());
+        verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName());
         HashSet<String> encounterIds = new HashSet<>(Arrays.asList("56", "560"));
-        verify(incrementalUpdater).deleteVoidedRecords(encounterIds,"test","encounter_id");
+        verify(obsIncrementalUpdater).deleteVoidedRecords(encounterIds,"test","encounter_id");
     }
 
     @Test
@@ -143,12 +143,12 @@ public class DatabaseObsWriterTest {
         items.add(obsList2);
 
         databaseObsWriter.setForm(bahmniForm);
-        when(incrementalUpdater.isMetaDataChanged(formName.getName())).thenReturn(true);
+        when(obsIncrementalUpdater.isMetaDataChanged(formName.getName())).thenReturn(true);
         when(formTableMetadataGenerator.getTableData(bahmniForm)).thenReturn(new TableData("test"));
 
         databaseObsWriter.write(items);
 
-        verify(incrementalUpdater).isMetaDataChanged(formName.getName());
-        verify(incrementalUpdater, never()).deleteVoidedRecords(anySet(),anyString(),anyString());
+        verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName());
+        verify(obsIncrementalUpdater, never()).deleteVoidedRecords(anySet(),anyString(),anyString());
     }
 }

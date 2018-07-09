@@ -1,7 +1,7 @@
 package org.bahmni.mart.table;
 
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.helper.ObsIncrementalUpdater;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +22,7 @@ public class TableGeneratorStep {
     private FreeMarkerEvaluator<TableData> freeMarkerEvaluatorForTables;
 
     @Autowired
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
 
     public void createTables(List<TableData> tables) {
         tables.forEach(tableData -> {
@@ -38,7 +38,7 @@ public class TableGeneratorStep {
         tables.forEach(tableData -> {
                 resolveTableData(tableData);
                 String actualTableName = SpecialCharacterResolver.getActualTableName(tableData.getName());
-                if (incrementalUpdater.isMetaDataChanged(actualTableName)) {
+                if (obsIncrementalUpdater.isMetaDataChanged(actualTableName)) {
                     String sql = freeMarkerEvaluatorForTables.evaluate("ddlForForm.ftl", tableData);
                     martJdbcTemplate.execute(sql);
                 }

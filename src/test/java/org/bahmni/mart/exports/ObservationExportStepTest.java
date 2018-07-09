@@ -7,7 +7,7 @@ import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.IncrementalUpdater;
+import org.bahmni.mart.helper.ObsIncrementalUpdater;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +56,7 @@ public class ObservationExportStepTest {
     private ObjectFactory<DatabaseObsWriter> obsWriterObjectFactory;
 
     @Mock
-    private IncrementalUpdater incrementalUpdater;
+    private ObsIncrementalUpdater obsIncrementalUpdater;
 
     @Mock
     private FormTableMetadataGenerator formTableMetadataGenerator;
@@ -74,10 +74,10 @@ public class ObservationExportStepTest {
                 "observationProcessorFactory", observationProcessorFactory);
         setValuesForMemberFields(observationExportStep,
                 "databaseObsWriterObjectFactory", obsWriterObjectFactory);
-        setValuesForMemberFields(observationExportStep, "incrementalUpdater", incrementalUpdater);
+        setValuesForMemberFields(observationExportStep, "obsIncrementalUpdater", obsIncrementalUpdater);
         setValuesForMemberFields(observationExportStep, "formTableMetadataGenerator", formTableMetadataGenerator);
         BatchUtils.stepNumber = 0;
-        when(incrementalUpdater.isMetaDataChanged(any())).thenReturn(true);
+        when(obsIncrementalUpdater.isMetaDataChanged(any())).thenReturn(true);
 
     }
 
@@ -141,13 +141,13 @@ public class ObservationExportStepTest {
         String jobName = "job Name";
         jobDefinition.setName(jobName);
         observationExportStep.setJobDefinition(jobDefinition);
-        when(incrementalUpdater.isMetaDataChanged(formName)).thenReturn(false);
+        when(obsIncrementalUpdater.isMetaDataChanged(formName)).thenReturn(false);
 
         observationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Step-1 " + formName);
-        verify(incrementalUpdater).isMetaDataChanged(formName);
-        verify(incrementalUpdater).updateReaderSql("some sql", jobName, "encounter_id");
+        verify(obsIncrementalUpdater).isMetaDataChanged(formName);
+        verify(obsIncrementalUpdater).updateReaderSql("some sql", jobName, "encounter_id");
     }
 
     @Test
@@ -155,13 +155,13 @@ public class ObservationExportStepTest {
         String formName = "FormTwo";
         BahmniForm form = mock(BahmniForm.class);
         setUpStepConfig(formName, form);
-        when(incrementalUpdater.isMetaDataChanged(formName)).thenReturn(true);
+        when(obsIncrementalUpdater.isMetaDataChanged(formName)).thenReturn(true);
 
         observationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Step-1 " + formName);
-        verify(incrementalUpdater).isMetaDataChanged(formName);
-        verify(incrementalUpdater, never()).updateReaderSql(anyString(), anyString(), anyString());
+        verify(obsIncrementalUpdater).isMetaDataChanged(formName);
+        verify(obsIncrementalUpdater, never()).updateReaderSql(anyString(), anyString(), anyString());
     }
 
     private void setUpStepConfig(String formName, BahmniForm form) {
