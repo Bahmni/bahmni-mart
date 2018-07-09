@@ -1,5 +1,6 @@
 package org.bahmni.mart.helper;
 
+import org.bahmni.mart.helper.incrementalupdate.ObsIncrementalUpdater;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableColumn;
@@ -89,7 +90,7 @@ public class ObsIncrementalUpdaterTest {
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "tableDataGenerator", tableDataGenerator);
         setValuesForMemberFields(obsIncrementalUpdater, "formTableMetadataGenerator", formTableMetadataGenerator);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
-        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", "20");
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", 20);
         updateOn = "id";
         queryForEventObjects = "SELECT DISTINCT substring_index(substring_index(object, '/', -1), '?', 1) as uuid " +
                 "FROM event_records WHERE id BETWEEN %s AND %s AND category = '%s'";
@@ -210,11 +211,11 @@ public class ObsIncrementalUpdaterTest {
     @Test
     public void shouldCallUpdateMarkerWithMaxEventRecordIdForGivenJobName() throws Exception {
         String jobName = "obs";
-        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", "145678");
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", 145678);
 
         obsIncrementalUpdater.updateMarker(jobName);
 
-        verify(markerManager).updateMarker(jobName, "145678");
+        verify(markerManager).updateMarker(jobName, 145678);
     }
 
     @Test
@@ -225,12 +226,12 @@ public class ObsIncrementalUpdaterTest {
 
         obsIncrementalUpdater.updateMarker(jobName);
 
-        verify(markerManager).updateMarker(jobName, "0");
+        verify(markerManager).updateMarker(jobName, 0);
     }
 
     @Test
     public void shouldNotQueryForMaxEventRecordIdWhenTheSameFieldIsNotNull() throws Exception {
-        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", "123");
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", 123);
 
         obsIncrementalUpdater.updateMarker("jobName");
 

@@ -1,4 +1,4 @@
-package org.bahmni.mart.helper;
+package org.bahmni.mart.helper.incrementalupdate;
 
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;

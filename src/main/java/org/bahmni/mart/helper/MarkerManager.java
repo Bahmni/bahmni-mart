@@ -41,7 +41,7 @@ public class MarkerManager {
                 .findFirst();
     }
 
-    public void updateMarker(String jobName, String eventRecordId) {
+    public void updateMarker(String jobName, Integer eventRecordId) {
         try {
             martJdbcTemplate.execute(String.format(UPDATE_QUERY, eventRecordId, jobName));
         } catch (BadSqlGrammarException e) {

@@ -1,6 +1,8 @@
-package org.bahmni.mart.helper;
+package org.bahmni.mart.helper.incrementalupdate;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.bahmni.mart.helper.MarkerManager;
+import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ public abstract class AbstractIncrementalUpdater {
     private static final String NON_EXISTED_ID = "-1";
     private static final String QUERY_FOR_MAX_EVENT_RECORD_ID = "SELECT MAX(id) FROM event_records";
     private static final TableData NON_EXISTENT_TABLE_DATA = new TableData();
-    private static final String ZERO = "0";
+    private static final Integer ZERO = 0;
 
     @Autowired
     @Qualifier("openmrsJdbcTemplate")
@@ -49,11 +51,11 @@ public abstract class AbstractIncrementalUpdater {
 
     private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
 
-    private String maxEventRecordId;
+    private Integer maxEventRecordId;
 
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
         Optional<Map<String, Object>> optionalMarkerMap = markerManager.getJobMarkerMap(jobName);
-        if (!optionalMarkerMap.isPresent() || optionalMarkerMap.get().get(EVENT_RECORD_ID).equals(0)) {
+        if (!optionalMarkerMap.isPresent() || ZERO.equals(optionalMarkerMap.get().get(EVENT_RECORD_ID))) {
             return readerSql;
         }
         String joinedIds = getJoinedIds(optionalMarkerMap.get());
@@ -114,7 +116,7 @@ public abstract class AbstractIncrementalUpdater {
 
     @PostConstruct
     private void initializeMaxEventRecordId() {
-        maxEventRecordId = openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, String.class);
+        maxEventRecordId = openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, Integer.class);
     }
 
     protected abstract boolean getMetaDataChangeStatus(String actualTableName);

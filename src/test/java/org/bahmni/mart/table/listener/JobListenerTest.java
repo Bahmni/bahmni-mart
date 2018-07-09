@@ -1,7 +1,7 @@
 package org.bahmni.mart.table.listener;
 
 import org.bahmni.mart.CommonTestHelper;
-import org.bahmni.mart.helper.ObsIncrementalUpdater;
+import org.bahmni.mart.helper.incrementalupdate.IncrementalUpdater;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ObsJobListenerTest {
+public class JobListenerTest {
 
     @Mock
     private JobExecution jobExecution;
@@ -26,14 +26,14 @@ public class ObsJobListenerTest {
     private JobInstance jobInstance;
 
     @Mock
-    private ObsIncrementalUpdater obsIncrementalUpdater;
+    private IncrementalUpdater incrementalUpdater;
 
-    private ObsJobListener obsJobListener;
+    private JobListener jobListener;
 
     @Before
     public void setUp() throws Exception {
-        obsJobListener = new ObsJobListener();
-        CommonTestHelper.setValuesForMemberFields(obsJobListener, "obsIncrementalUpdater", obsIncrementalUpdater);
+        jobListener = new JobListener();
+        CommonTestHelper.setValuesForMemberFields(jobListener, "incrementalUpdater", incrementalUpdater);
     }
 
     @Test
@@ -43,19 +43,19 @@ public class ObsJobListenerTest {
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
         when(jobInstance.getJobName()).thenReturn(jobName);
 
-        obsJobListener.afterJob(jobExecution);
+        jobListener.afterJob(jobExecution);
 
         verify(jobExecution).getJobInstance();
         verify(jobInstance).getJobName();
-        verify(obsIncrementalUpdater).updateMarker(jobName);
+        verify(incrementalUpdater).updateMarker(jobName);
     }
 
     @Test
     public void shouldNotUpdateMarkerWhenJobExecutionIsNotCompleted() {
         when(jobExecution.getStatus()).thenReturn(BatchStatus.FAILED);
 
-        obsJobListener.afterJob(jobExecution);
+        jobListener.afterJob(jobExecution);
 
-        verify(obsIncrementalUpdater, never()).updateMarker(anyString());
+        verify(incrementalUpdater, never()).updateMarker(anyString());
     }
 }

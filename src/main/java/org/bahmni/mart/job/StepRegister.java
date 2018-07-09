@@ -3,7 +3,7 @@ package org.bahmni.mart.job;
 import org.bahmni.mart.config.job.JobDefinition;
 import org.bahmni.mart.config.stepconfigurer.StepConfigurerContract;
 import org.bahmni.mart.exports.DummyStep;
-import org.bahmni.mart.table.listener.ObsJobListener;
+import org.bahmni.mart.table.listener.JobListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.job.builder.FlowBuilder;
@@ -19,7 +19,7 @@ public abstract class StepRegister {
     private JobBuilderFactory jobBuilderFactory;
 
     @Autowired
-    private ObsJobListener obsJobListener;
+    private JobListener jobListener;
 
     @Autowired
     private DummyStep dummyStep;
@@ -36,7 +36,7 @@ public abstract class StepRegister {
     private FlowBuilder<FlowJobBuilder> getFlowBuilder(String jobName) {
         return jobBuilderFactory.get(jobName)
                 .incrementer(new RunIdIncrementer()).preventRestart()
-                .listener(obsJobListener)
+                .listener(jobListener)
                 .flow(dummyStep.getStep());
     }
 }

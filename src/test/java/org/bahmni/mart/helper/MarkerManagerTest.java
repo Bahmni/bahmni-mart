@@ -88,7 +88,7 @@ public class MarkerManagerTest {
 
     @Test
     public void shouldUpdateMarkerTableWithGivenEventRecordIdForGivenJob() {
-        markerManager.updateMarker("obs", "123");
+        markerManager.updateMarker("obs", 123);
 
         verify(martJdbcTemplate).execute("UPDATE markers SET event_record_id = 123 WHERE job_name = 'obs'");
     }
@@ -97,7 +97,7 @@ public class MarkerManagerTest {
     public void shouldLogErrorWhenMarkersTableIsNotPresent() {
         doThrow(BadSqlGrammarException.class).when(martJdbcTemplate).execute(anyString());
 
-        markerManager.updateMarker("obs", "123");
+        markerManager.updateMarker("obs", 123);
 
         verify(logger).error("Failed to update event_record_id for obs, markers table is not present");
     }
