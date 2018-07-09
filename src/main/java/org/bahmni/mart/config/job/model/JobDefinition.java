@@ -16,6 +16,7 @@ public class JobDefinition {
     private boolean ignoreAllFreeTextConcepts;
     private List<CodeConfig> codeConfigs;
     private List<GroupedJobConfig> groupedJobConfigs;
+    private IncrementalUpdateConfig incrementalUpdateConfig;
 
 
     public int getChunkSizeToRead() {
@@ -96,5 +97,9 @@ public class JobDefinition {
 
     public List<GroupedJobConfig> getGroupedJobConfigs() {
         return groupedJobConfigs;
+    }
+
+    public IncrementalUpdateConfig getIncrementalUpdateConfig() {
+        return incrementalUpdateConfig;
     }
 }

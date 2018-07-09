@@ -1,9 +1,10 @@
 package org.bahmni.mart.exports.template;
 
+import org.bahmni.mart.config.job.model.CodeConfig;
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
-import org.bahmni.mart.config.job.model.CodeConfig;
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.listener.TableGeneratorJobListener;
@@ -43,6 +44,9 @@ public class SimpleJobTemplateTest {
     private Job job;
 
     @Mock
+    private IncrementalUpdateConfig incrementalUpdateConfig;
+
+    @Mock
     private CodesProcessor codesProcessor;
 
     @Mock
@@ -71,6 +75,8 @@ public class SimpleJobTemplateTest {
         codeConfigs = Arrays.asList(codeConfig);
         when(jobDefinition.getCodeConfigs()).thenReturn(codeConfigs);
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
+        when(incrementalUpdateConfig.getUpdateOn()).thenReturn("patient_id");
         mockStatic(JobDefinitionValidator.class);
         mockStatic(JobDefinitionUtil.class);
 
@@ -100,6 +106,8 @@ public class SimpleJobTemplateTest {
         verify(listener, times(1)).setCodesProcessor(codesProcessor);
         verify(spyJobTemplate,times(1)).setPreProcessor(codesProcessor);
         verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig, never()).getUpdateOn();
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
     }
@@ -113,6 +121,8 @@ public class SimpleJobTemplateTest {
         verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
         verify(codesProcessor, never()).setUpCodesData();
         verify(spyJobTemplate,never()).setPreProcessor(codesProcessor);
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig, never()).getUpdateOn();
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
     }
@@ -132,5 +142,20 @@ public class SimpleJobTemplateTest {
         JobDefinitionUtil.getReaderSQLByIgnoringColumns(Collections.emptyList(), readerSql);
         verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
         verify(customSqlIncrementalUpdater, times(1)).updateReaderSql(readerSql, JOB_NAME, updateOn);
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig).getUpdateOn();
+    }
+
+    @Test
+    public void shouldNotUpdateReaderSqlIfIncrementalUpdateConfigIsNotPresent() {
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
+
+        spyJobTemplate.buildJob(jobDefinition);
+
+        verify(spyJobTemplate).buildJob(jobDefinition, listener, readerSql);
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig, never()).getUpdateOn();
+        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(anyString());
+        verify(customSqlIncrementalUpdater, never()).updateReaderSql(anyString(), anyString(), anyString());
     }
 }
