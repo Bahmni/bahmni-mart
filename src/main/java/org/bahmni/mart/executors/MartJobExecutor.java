@@ -1,10 +1,11 @@
 package org.bahmni.mart.executors;
 
 import org.bahmni.mart.config.group.GroupedJob;
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
+import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.job.JobContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,9 @@ public class MartJobExecutor implements MartExecutor {
     @Autowired
     private GroupedJob groupedJob;
 
+    @Autowired
+    private MarkerManager markerManager;
+
     @Override
     public void execute() {
 
@@ -46,6 +50,7 @@ public class MartJobExecutor implements MartExecutor {
         validateJobDefinitions(allJobDefinitions);
 
         allJobDefinitions = groupedJob.getJobDefinitionsBySkippingGroupedTypeJobs(allJobDefinitions);
+        markerManager.insertMarkers(allJobDefinitions);
 
         List<Job> jobs = allJobDefinitions.stream().map(jobDefinition -> jobContext.getJob(jobDefinition))
                 .filter(Objects::nonNull).collect(Collectors.toList());

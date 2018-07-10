@@ -88,6 +88,23 @@ public class TableRecordWriterTest {
     }
 
     @Test
+    public void shouldNotDeleteVoidedRecordsIfJobDefinitionIsNull() throws Exception {
+        tableRecordWriter.setJobDefinition(null);
+
+        String sql = "";
+        when(tableRecordHolderFreeMarkerEvaluator.evaluate(anyString(), any(TableRecordHolder.class))).thenReturn(sql);
+
+        tableRecordWriter.write(Arrays.asList(items));
+
+        verify(martJdbcTemplate, times(1)).execute(sql);
+        verify(tableRecordHolderFreeMarkerEvaluator, times(1)).evaluate(anyString(), any(TableRecordHolder.class));
+        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(JOB_NAME);
+        verify(jobDefinition, never()).getName();
+        verify(jobDefinition, never()).getIncrementalUpdateConfig();
+        verify(customSqlIncrementalUpdater, never()).deleteVoidedRecords(any(), any(), any());
+    }
+
+    @Test
     public void shouldDeleteVoidedRecordsBeforeInsertNewData() throws Exception {
         when(customSqlIncrementalUpdater.isMetaDataChanged(anyString())).thenReturn(false);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);

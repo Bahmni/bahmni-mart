@@ -5,6 +5,7 @@ import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
+import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.job.JobContext;
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,9 +58,10 @@ public class MartJobExecutorTest {
     @Mock
     private Job groupJob;
 
-    private JobDefinition jobDefinition = new JobDefinition();
+    @Mock
+    private MarkerManager markerManager;
 
-    private JobDefinition groupedTypeJobDefinition = new JobDefinition();
+    private JobDefinition jobDefinition = new JobDefinition();
 
     private JobDefinition groupedJobDefinition = new JobDefinition();
 
@@ -74,6 +76,7 @@ public class MartJobExecutorTest {
         setValuesForMemberFields(martJobExecutor, "jobLauncher", jobLauncher);
         setValuesForMemberFields(martJobExecutor, "jobContext", jobContext);
         setValuesForMemberFields(martJobExecutor, "groupedJob", groupedJob);
+        setValuesForMemberFields(martJobExecutor, "markerManager", markerManager);
 
         mockStatic(JobDefinitionValidator.class);
 
@@ -98,6 +101,7 @@ public class MartJobExecutorTest {
         verifyStatic(times(1));
         JobDefinitionValidator.validate(anyListOf(JobDefinition.class));
 
+        verify(markerManager).insertMarkers(anyListOf(JobDefinition.class));
         verify(jobContext, times(1)).getJob(jobDefinition);
         verify(jobContext, times(1)).getJob(groupedJobDefinition);
         verify(job, times(1)).getName();
@@ -120,6 +124,7 @@ public class MartJobExecutorTest {
 
         verifyStatic(times(1));
         JobDefinitionValidator.validate(anyListOf(JobDefinition.class));
+        verify(markerManager).insertMarkers(anyListOf(JobDefinition.class));
     }
 
     @Test

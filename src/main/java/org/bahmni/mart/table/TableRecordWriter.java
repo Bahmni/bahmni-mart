@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 @Component
 @Scope(value = "prototype")
 public class TableRecordWriter implements ItemWriter<Map<String, Object>> {
@@ -50,7 +52,7 @@ public class TableRecordWriter implements ItemWriter<Map<String, Object>> {
     public void write(List<? extends Map<String, Object>> items) throws Exception {
         List<Map<String, Object>> records = new ArrayList<>(items);
 
-        if (!customSqlIncrementalUpdater.isMetaDataChanged(jobDefinition.getName()))
+        if (!(isNull(jobDefinition) || customSqlIncrementalUpdater.isMetaDataChanged(jobDefinition.getName())))
             deleteVoidedRecords(records);
 
         insertRecords(records);

@@ -1,5 +1,7 @@
 package org.bahmni.mart.helper;
 
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,23 @@ public class MarkerManager {
             martJdbcTemplate.execute(String.format(UPDATE_QUERY, eventRecordId, jobName));
         } catch (BadSqlGrammarException e) {
             logger.error(String.format(ERROR_INFO, jobName));
+        }
+    }
+
+    private void insertMarker(String jobName, IncrementalUpdateConfig incrementalUpdateConfig) {
+        String eventCategory = incrementalUpdateConfig.getEventCategory();
+        String tableName = incrementalUpdateConfig.getOpenmrsTableName();
+        martJdbcTemplate.execute(String.format("INSERT INTO markers (job_name, event_record_id, category," +
+                        " table_name) VALUES ('%s', 0, '%s', '%s');",
+                jobName, eventCategory, tableName));
+    }
+
+    public void insertMarkers(List<JobDefinition> allJobDefinitions) {
+        for (JobDefinition jobDefinition : allJobDefinitions) {
+            Optional<Map<String, Object>> result = getJobMarkerMap(jobDefinition.getName());
+
+            if (!isNull(jobDefinition.getIncrementalUpdateConfig()) && !result.isPresent())
+                insertMarker(jobDefinition.getName(), jobDefinition.getIncrementalUpdateConfig());
         }
     }
 }

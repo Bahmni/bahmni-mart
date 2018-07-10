@@ -1,5 +1,7 @@
 package org.bahmni.mart.helper;
 
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +12,7 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +23,7 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,46 +35,57 @@ public class MarkerManagerTest {
     @Mock
     private JdbcTemplate martJdbcTemplate;
 
+    @Mock
+    private JobDefinition existingJobDefinition;
+
+    @Mock
+    private IncrementalUpdateConfig incrementalUpdateConfigForExist;
+
+    @Mock
+    private IncrementalUpdateConfig incrementalUpdateConfigForNonExist;
+
+    @Mock
+    private JobDefinition nonExistsJobDefinition;
+
     private MarkerManager markerManager;
 
     @Mock
     private Logger logger;
+
+    private static final String MARKERS_QUERY = "SELECT * FROM markers";
+    private Map<String, Object> obsMarkerMap;
+    private List<Map<String, Object>> markerMapList;
 
     @Before
     public void setUp() throws Exception {
         markerManager = new MarkerManager();
         setValuesForMemberFields(markerManager, "martJdbcTemplate", martJdbcTemplate);
         setValueForFinalStaticField(MarkerManager.class, "logger", logger);
+
+        markerMapList = new ArrayList<>();
+        obsMarkerMap = new HashMap<>();
+        obsMarkerMap.put("job_name", "Obs");
+        markerMapList.add(obsMarkerMap);
+
+        when(martJdbcTemplate.queryForList(MARKERS_QUERY)).thenReturn(markerMapList);
     }
 
     @Test
     public void shouldQueryForMarkersWhenMarkerMapListIsNull() {
-        String markersQuery = "SELECT * FROM markers";
-        List<Map<String, Object>> markerMapList = new ArrayList<>();
-        Map<String, Object> obsMarkerMap = new HashMap<>();
-        obsMarkerMap.put("job_name", "Obs");
-        markerMapList.add(obsMarkerMap);
-        when(martJdbcTemplate.queryForList(markersQuery)).thenReturn(markerMapList);
-
         Optional<Map<String, Object>> actualObsMarkerMap = markerManager.getJobMarkerMap("Obs");
 
-        verify(martJdbcTemplate).queryForList(markersQuery);
+        verify(martJdbcTemplate).queryForList(MARKERS_QUERY);
         assertTrue(actualObsMarkerMap.isPresent());
         assertEquals(obsMarkerMap, actualObsMarkerMap.get());
     }
 
     @Test
     public void shouldNotQueryForMarkersWhenMarkerMapListIsNotNull() throws Exception {
-        String markersQuery = "SELECT * FROM markers";
-        List<Map<String, Object>> markerMapList = new ArrayList<>();
-        Map<String, Object> obsMarkerMap = new HashMap<>();
-        obsMarkerMap.put("job_name", "Obs");
-        markerMapList.add(obsMarkerMap);
         setValuesForMemberFields(markerManager, "markerMapList", markerMapList);
 
         Optional<Map<String, Object>> actualObsMarkerMap = markerManager.getJobMarkerMap("Obs");
 
-        verify(martJdbcTemplate, times(0)).queryForList(markersQuery);
+        verify(martJdbcTemplate, times(0)).queryForList(MARKERS_QUERY);
         assertTrue(actualObsMarkerMap.isPresent());
         assertEquals(obsMarkerMap, actualObsMarkerMap.get());
     }
@@ -100,5 +115,30 @@ public class MarkerManagerTest {
         markerManager.updateMarker("obs", 123);
 
         verify(logger).error("Failed to update event_record_id for obs, markers table is not present");
+    }
+
+    @Test
+    public void shouldInsertMarkerRecordsForGivenJobDefinitions() {
+        when(existingJobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfigForExist);
+        when(existingJobDefinition.getName()).thenReturn("Obs");
+        when(nonExistsJobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfigForNonExist);
+        String nonExistJobName = "non exist job";
+        when(nonExistsJobDefinition.getName()).thenReturn(nonExistJobName);
+        String category = "category";
+        when(incrementalUpdateConfigForNonExist.getEventCategory()).thenReturn(category);
+        String tableName = "tableName";
+        when(incrementalUpdateConfigForNonExist.getOpenmrsTableName()).thenReturn(tableName);
+
+        markerManager.insertMarkers(Arrays.asList(existingJobDefinition, nonExistsJobDefinition));
+
+        verify(martJdbcTemplate, times(1)).queryForList(MARKERS_QUERY);
+        verify(existingJobDefinition).getName();
+        verify(existingJobDefinition).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfigForNonExist).getEventCategory();
+        verify(incrementalUpdateConfigForNonExist).getOpenmrsTableName();
+        verify(nonExistsJobDefinition, atLeastOnce()).getName();
+        verify(nonExistsJobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
+        verify(martJdbcTemplate).execute(String.format("INSERT INTO markers (job_name, event_record_id," +
+                " category, table_name) VALUES ('%s', 0, '%s', '%s');", nonExistJobName, category, tableName));
     }
 }

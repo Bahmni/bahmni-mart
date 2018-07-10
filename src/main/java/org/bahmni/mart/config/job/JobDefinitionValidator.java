@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class JobDefinitionValidator {
 
@@ -37,7 +36,7 @@ public class JobDefinitionValidator {
     }
 
     private static boolean isValidIncrementalUpdateConfig(IncrementalUpdateConfig incrementalUpdateConfig) {
-        return isNull(incrementalUpdateConfig) || isNotEmpty(incrementalUpdateConfig.getUpdateOn());
+        return isNull(incrementalUpdateConfig) || incrementalUpdateConfig.isValid();
     }
 
     private static boolean verifyAllJobNamesShouldBeUnique(List<JobDefinition> jobDefinitions) {

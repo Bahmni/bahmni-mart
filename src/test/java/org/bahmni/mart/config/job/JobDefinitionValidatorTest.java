@@ -160,10 +160,25 @@ public class JobDefinitionValidatorTest {
         when(jobDefinition.getTableName()).thenReturn("table1");
         when(jobDefinition.getReaderSql()).thenReturn("select * from table;");
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
-        when(incrementalUpdateConfig.getUpdateOn()).thenReturn(null);
+        when(incrementalUpdateConfig.isValid()).thenReturn(false);
 
         assertFalse(JobDefinitionValidator.validate(Arrays.asList(jobDefinition)));
         verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig).isValid();
+    }
+
+    @Test
+    public void shouldGiveTrueIfItHasValidIncrementalUpdateConfig() {
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        when(jobDefinition.getName()).thenReturn("test1");
+        when(jobDefinition.getTableName()).thenReturn("table1");
+        when(jobDefinition.getReaderSql()).thenReturn("select * from table;");
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
+        when(incrementalUpdateConfig.isValid()).thenReturn(true);
+
+        assertTrue(JobDefinitionValidator.validate(Arrays.asList(jobDefinition)));
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig).isValid();
     }
 
     @Test
