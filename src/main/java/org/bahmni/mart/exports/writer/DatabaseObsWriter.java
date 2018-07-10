@@ -1,5 +1,7 @@
-package org.bahmni.mart.exports;
+package org.bahmni.mart.exports.writer;
 
+import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.ObsRecordExtractorForTable;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
@@ -17,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Objects.isNull;
 import static org.bahmni.mart.helper.DuplicateObsResolver.getUniqueObsItems;
 
 @Component

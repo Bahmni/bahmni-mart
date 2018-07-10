@@ -11,7 +11,7 @@ import org.bahmni.mart.helper.OrderConceptUtil;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.TableDataProcessor;
 import org.bahmni.mart.table.TableGeneratorStep;
-import org.bahmni.mart.table.TableRecordWriter;
+import org.bahmni.mart.exports.writer.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

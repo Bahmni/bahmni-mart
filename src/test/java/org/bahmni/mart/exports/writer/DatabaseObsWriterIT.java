@@ -1,4 +1,4 @@
-package org.bahmni.mart.exports;
+package org.bahmni.mart.exports.writer;
 
 import org.bahmni.mart.AbstractBaseBatchIT;
 import org.bahmni.mart.form.domain.BahmniForm;

@@ -1,10 +1,12 @@
-package org.bahmni.mart.table;
+package org.bahmni.mart.exports.writer;
 
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.writer.TableRecordWriter;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
+import org.bahmni.mart.table.TableRecordHolder;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;

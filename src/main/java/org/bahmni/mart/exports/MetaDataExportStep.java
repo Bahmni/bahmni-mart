@@ -1,8 +1,8 @@
 package org.bahmni.mart.exports;
 
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.writer.TableRecordWriter;
 import org.bahmni.mart.table.TableDataProcessor;
-import org.bahmni.mart.table.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;

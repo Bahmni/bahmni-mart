@@ -3,6 +3,7 @@ package org.bahmni.mart.exports;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.exports.writer.DatabaseObsWriter;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;

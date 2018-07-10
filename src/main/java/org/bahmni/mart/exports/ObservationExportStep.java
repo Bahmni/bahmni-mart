@@ -2,12 +2,12 @@ package org.bahmni.mart.exports;
 
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.exports.writer.DatabaseObsWriter;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.helper.incrementalupdate.ObsIncrementalUpdater;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
@@ -43,9 +43,6 @@ public class ObservationExportStep {
 
     @Autowired
     private ObjectFactory<DatabaseObsWriter> databaseObsWriterObjectFactory;
-
-    @Autowired
-    private FormTableMetadataGenerator formTableMetadataGenerator;
 
     @Autowired
     private ObsIncrementalUpdater obsIncrementalUpdater;
