@@ -2,6 +2,9 @@ package org.bahmni.mart.helper;
 
 import java.util.HashMap;
 
+import static org.apache.commons.lang3.StringUtils.lowerCase;
+import static org.apache.commons.lang3.StringUtils.startsWith;
+
 public class Constants {
 
     private static HashMap<String, String> postgresDataTypeMap = new HashMap<String, String>() {
@@ -19,12 +22,14 @@ public class Constants {
             put("varchar", "text");
             put("complex", "text");
             put("double","double precision");
-            put("int4","integer");
+            put("int","integer");
         }
     };
 
     public static String getPostgresDataTypeFor(String key) {
-        return postgresDataTypeMap.getOrDefault((key != null) ? key.toLowerCase() : null, key);
+        if (startsWith(lowerCase(key),"int"))
+            key = "int";
+        return postgresDataTypeMap.getOrDefault((key != null) ? lowerCase(key) : null, key);
     }
 
 }

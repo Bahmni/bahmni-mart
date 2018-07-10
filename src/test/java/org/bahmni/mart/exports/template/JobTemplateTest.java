@@ -2,6 +2,7 @@ package org.bahmni.mart.exports.template;
 
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.table.TableRecordWriter;
+import org.bahmni.mart.table.domain.TableData;
 import org.bahmni.mart.table.listener.AbstractJobListener;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,13 @@ public class JobTemplateTest {
     private AbstractJobListener jobListener;
 
     @Mock
+    private TableRecordWriter tableRecordWriter;
+
+    @Mock
     private ObjectFactory<TableRecordWriter> recordWriterObjectFactory;
+
+    @Mock
+    private TableData tableData;
 
     private JobTemplate jobTemplate;
 
@@ -59,6 +66,7 @@ public class JobTemplateTest {
         jobDefinition.setChunkSizeToRead(100);
         String readerSql = "select * from table";
         jobDefinition.setReaderSql(readerSql);
+        when(jobListener.getTableDataForMart(testJobName)).thenReturn(tableData);
 
         Job expectedJob = setUpStepBuilder(setUpJobBuilder(testJobName));
         Job actualJob = jobTemplate.buildJob(jobDefinition, jobListener, readerSql);
@@ -68,6 +76,8 @@ public class JobTemplateTest {
         verify(stepBuilderFactory, times(1)).get(String.format("%s Step", testJobName));
         verify(jobListener, times(1)).getTableDataForMart(testJobName);
         verify(recordWriterObjectFactory, times(1)).getObject();
+        verify(tableRecordWriter).setJobDefinition(jobDefinition);
+        verify(tableRecordWriter).setTableData(tableData);
     }
 
     private FlowJobBuilder setUpJobBuilder(String testJobName) {
@@ -90,8 +100,7 @@ public class JobTemplateTest {
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
-        TableRecordWriter tableWriter = mock(TableRecordWriter.class);
-        when(recordWriterObjectFactory.getObject()).thenReturn(tableWriter);
+        when(recordWriterObjectFactory.getObject()).thenReturn(tableRecordWriter);
         Job expectedJob = mock(Job.class);
         when(flowJobBuilder.build()).thenReturn(expectedJob);
         return expectedJob;

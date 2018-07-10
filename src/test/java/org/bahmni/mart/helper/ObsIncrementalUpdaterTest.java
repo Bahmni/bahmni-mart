@@ -93,7 +93,7 @@ public class ObsIncrementalUpdaterTest {
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", 20);
         updateOn = "id";
         queryForEventObjects = "SELECT DISTINCT substring_index(substring_index(object, '/', -1), '?', 1) as uuid " +
-                "FROM event_records WHERE id BETWEEN %s AND %s AND category = '%s'";
+                "FROM event_records WHERE id > %s AND id <= %s AND category = '%s'";
         queryForIds = format("SELECT %s_id FROM %s WHERE uuid in ('%s','%s')",
                 tableName, tableName,
                 "2c2ca648-3fae-4719-a164-3b603b7d6d41",

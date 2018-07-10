@@ -52,7 +52,7 @@ public class JobTemplate {
                 .<Map<String, Object>, Map<String, Object>>chunk(jobConfiguration.getChunkSizeToRead())
                 .reader(getReader(readerSql))
                 .processor(getProcessor(jobConfiguration, listener))
-                .writer(getWriter())
+                .writer(getWriter(jobConfiguration))
                 .build();
     }
 
@@ -66,9 +66,10 @@ public class JobTemplate {
         return tableDataProcessor;
     }
 
-    private TableRecordWriter getWriter() {
+    private TableRecordWriter getWriter(JobDefinition jobDefinition) {
         TableRecordWriter writer = recordWriterObjectFactory.getObject();
         writer.setTableData(tableDataForMart);
+        writer.setJobDefinition(jobDefinition);
         return writer;
     }
 

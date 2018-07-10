@@ -27,7 +27,7 @@ public abstract class AbstractIncrementalUpdater {
     private static final String CATEGORY = "category";
     private static final String TABLE_NAME = "table_name";
     private static final String QUERY_FOR_UUID_EXTRACTION = "SELECT DISTINCT substring_index(substring_index(object, " +
-            "'/', -1), '?', 1) as uuid FROM event_records WHERE id BETWEEN %s AND %s AND category = '%s'";
+            "'/', -1), '?', 1) as uuid FROM event_records WHERE id > %s AND id <= %s AND category = '%s'";
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
     private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
     private static final String NON_EXISTED_ID = "-1";
