@@ -40,6 +40,8 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
 
     private boolean isAddMoreMultiSelectEnabled = true;
 
+    private Set<String> processedEncounterIds = new HashSet<>();
+
     @Override
     public void write(List<? extends List<Obs>> items) throws Exception {
         TableData tableData = formTableMetadataGenerator.getTableData(form);
@@ -74,10 +76,16 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
     private void deleteVoidedRecords(List<? extends List<Obs>> items, TableData tableData) {
         Set<String> encounterIds = new HashSet<>();
         items.forEach(item -> item.forEach(obs -> encounterIds.add(obs.getEncounterId())));
+        encounterIds.removeAll(processedEncounterIds);
         obsIncrementalUpdater.deleteVoidedRecords(encounterIds, tableData.getName(), "encounter_id");
+        processedEncounterIds = new HashSet<>(encounterIds);
     }
 
     public void setAddMoreMultiSelectEnabled(boolean addMoreMultiSelectEnabled) {
         this.isAddMoreMultiSelectEnabled = addMoreMultiSelectEnabled;
+    }
+
+    public Set<String> getProcessedEncounterIds() {
+        return processedEncounterIds;
     }
 }
