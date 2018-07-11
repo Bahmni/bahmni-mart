@@ -33,6 +33,11 @@
         "typeTableJoiningId": "patient_identifier_type_id",
         "valueColumnName": "identifier",
         "primaryKey": "patient_id"
+      },
+      "incrementalUpdateConfig": {
+        "updateOn": "patient_id",
+        "eventCategory": "patient",
+        "openmrsTableName": "person"
       }
     }
   ]

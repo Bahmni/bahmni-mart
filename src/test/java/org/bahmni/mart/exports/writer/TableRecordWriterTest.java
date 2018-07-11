@@ -3,8 +3,9 @@ package org.bahmni.mart.exports.writer;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.exports.updatestrategy.CustomSqlIncrementalUpdateStrategy;
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
+import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.table.TableRecordHolder;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -43,6 +44,9 @@ public class TableRecordWriterTest {
     private CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater;
 
     @Mock
+    private IncrementalStrategyContext incrementalStrategyContext;
+
+    @Mock
     private JobDefinition jobDefinition;
 
     @Mock
@@ -67,12 +71,14 @@ public class TableRecordWriterTest {
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
         tableRecordWriter.setTableData(tableData);
         tableRecordWriter.setJobDefinition(jobDefinition);
+        when(jobDefinition.getType()).thenReturn("customSql");
 
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
         setValuesForSuperClassMemberFields(tableRecordWriter, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(tableRecordWriter, "tableRecordHolderFreeMarkerEvaluator",
                 tableRecordHolderFreeMarkerEvaluator);
-        setValuesForMemberFields(tableRecordWriter, "customSqlIncrementalUpdater", customSqlIncrementalUpdater);
+        setValuesForMemberFields(tableRecordWriter, "incrementalStrategyContext", incrementalStrategyContext);
+        when(incrementalStrategyContext.getStrategy(anyString())).thenReturn(customSqlIncrementalUpdater);
 
         when(customSqlIncrementalUpdater.isMetaDataChanged(anyString())).thenReturn(true);
     }
@@ -89,6 +95,8 @@ public class TableRecordWriterTest {
         verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(JOB_NAME);
         verify(jobDefinition).getName();
         verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(jobDefinition).getType();
+        verify(incrementalStrategyContext).getStrategy("customSql");
         verify(customSqlIncrementalUpdater, never()).deleteVoidedRecords(any(), any(), any());
     }
 
@@ -107,10 +115,12 @@ public class TableRecordWriterTest {
         verify(jobDefinition, never()).getName();
         verify(jobDefinition, never()).getIncrementalUpdateConfig();
         verify(customSqlIncrementalUpdater, never()).deleteVoidedRecords(any(), any(), any());
+        verify(jobDefinition, never()).getType();
+        verify(incrementalStrategyContext, never()).getStrategy("customSql");
     }
 
     @Test
-    public void shouldDeleteVoidedRecordsBeforeInsertNewData() throws Exception {
+    public void shouldDeleteVoidedRecordsBeforeInsertNewData() {
         when(customSqlIncrementalUpdater.isMetaDataChanged(anyString())).thenReturn(false);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
         when(incrementalUpdateConfig.getUpdateOn()).thenReturn("program_id");
@@ -140,5 +150,7 @@ public class TableRecordWriterTest {
         verify(incrementalUpdateConfig,atLeastOnce()).getUpdateOn();
         HashSet<String> voidedIds = new HashSet<>(Arrays.asList("123", "124", "128"));
         verify(customSqlIncrementalUpdater).deleteVoidedRecords(voidedIds, "program", "program_id");
+        verify(jobDefinition).getType();
+        verify(incrementalStrategyContext).getStrategy("customSql");
     }
 }

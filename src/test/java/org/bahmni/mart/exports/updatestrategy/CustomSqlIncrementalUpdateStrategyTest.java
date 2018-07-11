@@ -1,9 +1,9 @@
 package org.bahmni.mart.exports.updatestrategy;
 
-import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -18,6 +18,7 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberField
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -82,7 +83,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         assertTrue(status);
         verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
         verify(jobDefinition).getName();
-        verify(jobDefinition).getTableName();
+        verify(jobDefinition, atLeastOnce()).getTableName();
         verify(spyCustomSqlIncrementalUpdater).getExistingTableData(tableName);
         verifyStatic();
         JobDefinitionUtil.getReaderSQL(jobDefinition);
@@ -98,7 +99,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         assertFalse(status);
         verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
         verify(jobDefinition).getName();
-        verify(jobDefinition).getTableName();
+        verify(jobDefinition, atLeastOnce()).getTableName();
         verify(spyCustomSqlIncrementalUpdater).getExistingTableData(tableName);
         verifyStatic();
         JobDefinitionUtil.getReaderSQL(jobDefinition);

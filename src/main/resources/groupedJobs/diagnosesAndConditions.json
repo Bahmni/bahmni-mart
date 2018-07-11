@@ -2,7 +2,12 @@
   "jobs": [
     {
       "name": "Diagnoses Data",
-      "type": "diagnoses"
+      "type": "diagnoses",
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      }
     },
     {
       "name": "Conditions",

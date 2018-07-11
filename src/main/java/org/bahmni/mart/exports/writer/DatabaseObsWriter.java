@@ -1,10 +1,10 @@
 package org.bahmni.mart.exports.writer;
 
 import org.bahmni.mart.exports.ObsRecordExtractorForTable;
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.item.ItemWriter;
@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Objects.isNull;
 import static org.bahmni.mart.helper.DuplicateObsResolver.getUniqueObsItems;
 
 @Component
@@ -29,7 +30,7 @@ public class DatabaseObsWriter extends BaseWriter implements ItemWriter<List<Obs
     private FreeMarkerEvaluator<ObsRecordExtractorForTable> freeMarkerEvaluatorForTableRecords;
 
     @Autowired
-    private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
+    private IncrementalStrategyContext incrementalStrategyContext;
 
     private BahmniForm form;
 
@@ -38,7 +39,9 @@ public class DatabaseObsWriter extends BaseWriter implements ItemWriter<List<Obs
     @Override
     public void write(List<? extends List<Obs>> items) {
         TableData tableData = formTableMetadataGenerator.getTableData(form);
-        deletedVoidedRecords(items, obsIncrementalUpdater, form.getFormName().getName(), tableData);
+        if (!isNull(jobDefinition))
+            deletedVoidedRecords(items, incrementalStrategyContext.getStrategy(jobDefinition.getType()),
+                form.getFormName().getName(), tableData);
         insertRecords(items, tableData);
     }
 

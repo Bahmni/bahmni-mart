@@ -11,7 +11,7 @@ public class ObsIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrat
     private FormTableMetadataGenerator formTableMetadataGenerator;
 
     @Override
-    protected boolean getMetaDataChangeStatus(String actualTableName) {
+    public boolean getMetaDataChangeStatus(String actualTableName) {
         TableData currentTableData = formTableMetadataGenerator.getTableDataByName(actualTableName);
         TableData existingTableData = getExistingTableData(actualTableName);
         return !currentTableData.equals(existingTableData);

@@ -1,7 +1,7 @@
 package org.bahmni.mart.exports.writer;
 
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.exports.updatestrategy.CustomSqlIncrementalUpdateStrategy;
 import org.bahmni.mart.table.TableMetadataGenerator;
 import org.bahmni.mart.table.TableRecordHolder;
 import org.bahmni.mart.table.domain.TableData;
@@ -30,7 +30,7 @@ public class TableRecordWriter extends BaseWriter implements ItemWriter<Map<Stri
     public TableMetadataGenerator tableMetadataGenerator;
 
     @Autowired
-    private CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater;
+    private IncrementalStrategyContext incrementalStrategyContext;
 
     private TableData tableData;
 
@@ -42,7 +42,8 @@ public class TableRecordWriter extends BaseWriter implements ItemWriter<Map<Stri
     public void write(List<? extends Map<String, Object>> items) {
         List<Map<String, Object>> records = new ArrayList<>(items);
         if (!isNull(jobDefinition))
-            deletedVoidedRecords(records, customSqlIncrementalUpdater, jobDefinition.getName(), tableData);
+            deletedVoidedRecords(records, incrementalStrategyContext.getStrategy(jobDefinition.getType()),
+                    jobDefinition.getName(), tableData);
         insertRecords(records);
     }
 

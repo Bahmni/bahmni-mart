@@ -30,12 +30,15 @@ public class EAVJobListener extends AbstractJobListener {
 
     @Override
     public TableData getTableDataForMart(String jobName) {
+        return getTableDataForMart(jobDefinitionReader.getJobDefinitionByName(jobName));
+    }
 
+    @Override
+    public TableData getTableDataForMart(JobDefinition jobDefinition) {
         if (tableData != null) {
             return tableData;
         }
         tableData = new TableData();
-        JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         tableData.setName(jobDefinition.getTableName());
         tableData.addAllColumns(getColumns(jobDefinition));
 

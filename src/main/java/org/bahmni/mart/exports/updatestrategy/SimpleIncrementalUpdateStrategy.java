@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SimpleIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrategy {
     @Override
-    protected boolean getMetaDataChangeStatus(String actualTableName) {
+    public boolean getMetaDataChangeStatus(String actualTableName) {
         return true;
     }
 }

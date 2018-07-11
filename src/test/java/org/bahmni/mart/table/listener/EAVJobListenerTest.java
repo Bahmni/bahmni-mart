@@ -109,6 +109,16 @@ public class EAVJobListenerTest {
     }
 
     @Test
+    public void shouldGetTableDataForGivenJobDefinition() throws Exception {
+        setUpMocks("select name from attributeTable;", Collections.emptyList());
+
+        TableData tableData = eavJobListener.getTableDataForMart(jobDefinition);
+
+        verify(jobDefinitionReader, never()).getJobDefinitionByName(anyString());
+        assertEquals(3, tableData.getColumns().size());
+    }
+
+    @Test
     public void shouldCallCreateTablesWithOutIgnoreColumns() throws Exception {
         String sql = "select name from attributeTable;";
         String jobName = "jobName";
@@ -134,12 +144,6 @@ public class EAVJobListenerTest {
     private void setUpMocks(String sql, List<String> ignoreColumns) throws Exception {
         String attributeTable = "attributeTable";
         String primaryKey = "primaryKey";
-
-        TableColumn primaryColumn = new TableColumn("primaryKey", "integer", true, null);
-        TableColumn localNameColumn = new TableColumn("givenLocalName", "text", false, null);
-        TableColumn familyNameColumn = new TableColumn("familyName", "text", false, null);
-        TableData tableData = new TableData();
-        tableData.addAllColumns(Arrays.asList(primaryColumn, localNameColumn, familyNameColumn));
 
         when(jobDefinitionReader.getJobDefinitionByName(anyString())).thenReturn(jobDefinition);
         when(jobDefinition.getEavAttributes()).thenReturn(eavAttributes);

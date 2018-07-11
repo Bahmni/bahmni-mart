@@ -1,6 +1,7 @@
 package org.bahmni.mart.table.listener;
 
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.core.JobExecution;
@@ -37,6 +38,8 @@ public abstract class AbstractJobListener extends JobListener {
     }
 
     public abstract TableData getTableDataForMart(String jobName);
+
+    public abstract TableData getTableDataForMart(JobDefinition jobDefinition);
 
     protected abstract void logError(Exception e);
 

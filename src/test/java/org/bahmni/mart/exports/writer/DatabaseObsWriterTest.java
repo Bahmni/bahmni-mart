@@ -2,6 +2,7 @@ package org.bahmni.mart.exports.writer;
 
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
@@ -47,6 +48,9 @@ public class DatabaseObsWriterTest {
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
     @Mock
+    private IncrementalStrategyContext incrementalStrategyContext;
+
+    @Mock
     private JobDefinition jobDefinition;
 
     @Mock
@@ -60,15 +64,17 @@ public class DatabaseObsWriterTest {
         setValuesForSuperClassMemberFields(databaseObsWriter, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(databaseObsWriter, "freeMarkerEvaluatorForTableRecords",
                 freeMarkerEvaluatorForTableRecords);
-        setValuesForMemberFields(databaseObsWriter, "obsIncrementalUpdater", obsIncrementalUpdater);
+        setValuesForMemberFields(databaseObsWriter, "incrementalStrategyContext", incrementalStrategyContext);
 
         databaseObsWriter.setJobDefinition(jobDefinition);
+        when(jobDefinition.getType()).thenReturn("Obs");
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
+        when(incrementalStrategyContext.getStrategy(anyString())).thenReturn(obsIncrementalUpdater);
         when(incrementalUpdateConfig.getUpdateOn()).thenReturn("encounter_id");
     }
 
     @Test
-    public void shouldCallDeleteSqlCommandOnExistingTableToRemoveVoidedRecords() throws Exception {
+    public void shouldCallDeleteSqlCommandOnExistingTableToRemoveVoidedRecords() {
         BahmniForm bahmniForm = new BahmniForm();
         Concept formName = new Concept(1, "test", 1);
         formName.setDataType("N/A");
@@ -115,6 +121,8 @@ public class DatabaseObsWriterTest {
 
         verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig).getUpdateOn();
+        verify(jobDefinition).getType();
+        verify(incrementalStrategyContext).getStrategy("Obs");
         verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName());
         HashSet<String> encounterIds = new HashSet<>(Arrays.asList("56", "560"));
         verify(obsIncrementalUpdater).deleteVoidedRecords(encounterIds,"test","encounter_id");
@@ -169,5 +177,7 @@ public class DatabaseObsWriterTest {
         verify(incrementalUpdateConfig, never()).getUpdateOn();
         verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName());
         verify(obsIncrementalUpdater, never()).deleteVoidedRecords(anySet(),anyString(),anyString());
+        verify(jobDefinition).getType();
+        verify(incrementalStrategyContext).getStrategy("Obs");
     }
 }

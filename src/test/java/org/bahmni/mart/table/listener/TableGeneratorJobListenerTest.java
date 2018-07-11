@@ -137,6 +137,27 @@ public class TableGeneratorJobListenerTest {
     }
 
     @Test
+    public void shouldGetTableDataForMartForGivenJobDefinition() {
+        String tableName = "test table";
+        when(jobDefinition.getTableName()).thenReturn(tableName);
+        when(jobDefinition.getReaderSql()).thenReturn("dummy SQL");
+
+        TableData tableData = new TableData();
+        tableData.addColumn(new TableColumn("test", "char", false, null));
+        when(openMRSJdbcTemplate.query(anyString(), any(TableDataExtractor.class))).thenReturn(tableData);
+
+        TableData actualData = tableGeneratorJobListener.getTableDataForMart(jobDefinition);
+
+        List<TableColumn> columns = actualData.getColumns();
+
+        verify(jobDefinitionReader, never()).getJobDefinitionByName(anyString());
+        verify(openMRSJdbcTemplate, times(1)).query(anyString(), any(TableDataExtractor.class));
+        assertEquals(tableName, actualData.getName());
+        assertEquals(1, columns.size());
+        assertEquals("text", columns.get(0).getType());
+    }
+
+    @Test
     public void shouldThrowInvalidJobConfigurationExceptionIfSqqIsNotPresentForAJobDefinition() {
         String jobName = "testJob";
         when(jobDefinitionReader.getJobDefinitionByName(jobName)).thenReturn(jobDefinition);

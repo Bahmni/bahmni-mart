@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
-public abstract class AbstractIncrementalUpdateStrategy {
+public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUpdateStrategy {
 
     private static final String EVENT_RECORD_ID = "event_record_id";
     private static final String CATEGORY = "category";
@@ -53,6 +53,7 @@ public abstract class AbstractIncrementalUpdateStrategy {
 
     private Integer maxEventRecordId;
 
+    @Override
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
         Optional<Map<String, Object>> optionalMarkerMap = markerManager.getJobMarkerMap(jobName);
         if (!optionalMarkerMap.isPresent() || ZERO.equals(optionalMarkerMap.get().get(EVENT_RECORD_ID))) {
@@ -62,6 +63,7 @@ public abstract class AbstractIncrementalUpdateStrategy {
         return String.format(UPDATED_READER_SQL, readerSql, updateOn, joinedIds);
     }
 
+    @Override
     public void deleteVoidedRecords(Set<String> ids, String table, String column) {
         if (CollectionUtils.isEmpty(ids)) {
             return;
@@ -77,6 +79,7 @@ public abstract class AbstractIncrementalUpdateStrategy {
         markerManager.updateMarker(jobName, maxEventRecordId);
     }
 
+    @Override
     public boolean isMetaDataChanged(String formName) {
         String actualTableName = getProcessedName(formName);
         if (metaDataChangeMap.containsKey(actualTableName)) {
@@ -121,7 +124,8 @@ public abstract class AbstractIncrementalUpdateStrategy {
 
     protected abstract boolean getMetaDataChangeStatus(String actualTableName);
 
-    protected TableData getExistingTableData(String actualTableName) {
+    @Override
+    public TableData getExistingTableData(String actualTableName) {
         String updatedTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(actualTableName);
         String sql = String.format("SELECT * FROM %s", updatedTableName);
         try {

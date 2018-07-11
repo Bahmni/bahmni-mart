@@ -38,13 +38,18 @@ public class TableGeneratorJobListener extends AbstractJobListener {
             codesProcessor.setUpCodesData();
     }
 
+    //TODO: Use TableDataGenerator TO GET getTableDataForMart
+
     @Override
     public TableData getTableDataForMart(String jobName) {
+        return getTableDataForMart(jobDefinitionReader.getJobDefinitionByName(jobName));
+    }
 
+    @Override
+    public TableData getTableDataForMart(JobDefinition jobDefinition) {
         if (tableData != null) {
             return tableData;
         }
-        JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
 
         tableData = getTableData(jobDefinition, getSql(jobDefinition));
 
