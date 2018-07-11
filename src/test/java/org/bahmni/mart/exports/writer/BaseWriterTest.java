@@ -2,7 +2,7 @@ package org.bahmni.mart.exports.writer;
 
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.helper.incrementalupdate.AbstractIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.AbstractIncrementalUpdateStrategy;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class BaseWriterTest {
     }
 
     @Mock
-    private AbstractIncrementalUpdater incrementalUpdater;
+    private AbstractIncrementalUpdateStrategy incrementalUpdater;
 
     @Mock
     private TableData tableData;

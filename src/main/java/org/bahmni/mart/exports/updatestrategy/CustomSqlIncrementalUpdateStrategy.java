@@ -1,4 +1,4 @@
-package org.bahmni.mart.helper.incrementalupdate;
+package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
@@ -12,7 +12,7 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQL;
 
 
 @Component
-public class CustomSqlIncrementalUpdater extends AbstractIncrementalUpdater {
+public class CustomSqlIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrategy {
 
     @Autowired
     private JobDefinitionReader jobDefinitionReader;

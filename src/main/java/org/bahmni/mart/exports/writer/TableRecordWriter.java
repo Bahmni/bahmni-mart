@@ -1,7 +1,7 @@
 package org.bahmni.mart.exports.writer;
 
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.CustomSqlIncrementalUpdateStrategy;
 import org.bahmni.mart.table.TableMetadataGenerator;
 import org.bahmni.mart.table.TableRecordHolder;
 import org.bahmni.mart.table.domain.TableData;
@@ -30,7 +30,7 @@ public class TableRecordWriter extends BaseWriter implements ItemWriter<Map<Stri
     public TableMetadataGenerator tableMetadataGenerator;
 
     @Autowired
-    private CustomSqlIncrementalUpdater customSqlIncrementalUpdater;
+    private CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater;
 
     private TableData tableData;
 

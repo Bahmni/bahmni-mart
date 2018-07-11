@@ -1,7 +1,7 @@
 package org.bahmni.mart.table.listener;
 
 import org.bahmni.mart.CommonTestHelper;
-import org.bahmni.mart.helper.incrementalupdate.SimpleIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.SimpleIncrementalUpdateStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +26,7 @@ public class JobListenerTest {
     private JobInstance jobInstance;
 
     @Mock
-    private SimpleIncrementalUpdater incrementalUpdater;
+    private SimpleIncrementalUpdateStrategy incrementalUpdater;
 
     private JobListener jobListener;
 

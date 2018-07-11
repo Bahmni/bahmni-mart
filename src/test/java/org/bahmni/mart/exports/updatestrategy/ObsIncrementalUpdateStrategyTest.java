@@ -1,6 +1,7 @@
-package org.bahmni.mart.helper;
+package org.bahmni.mart.exports.updatestrategy;
 
-import org.bahmni.mart.helper.incrementalupdate.ObsIncrementalUpdater;
+import org.bahmni.mart.helper.MarkerManager;
+import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableColumn;
@@ -44,9 +45,9 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 @PrepareForTest(SpecialCharacterResolver.class)
 @RunWith(PowerMockRunner.class)
-public class ObsIncrementalUpdaterTest {
+public class ObsIncrementalUpdateStrategyTest {
 
-    private ObsIncrementalUpdater obsIncrementalUpdater;
+    private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
     private String jobName;
 
     @Mock
@@ -78,7 +79,7 @@ public class ObsIncrementalUpdaterTest {
 
     @Before
     public void setUp() throws Exception {
-        obsIncrementalUpdater = new ObsIncrementalUpdater();
+        obsIncrementalUpdater = new ObsIncrementalUpdateStrategy();
         jobName = "JobName";
         category = "CategoryName";
         tableName = "encounter";

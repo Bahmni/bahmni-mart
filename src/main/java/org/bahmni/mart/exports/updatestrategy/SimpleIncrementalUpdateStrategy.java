@@ -1,9 +1,9 @@
-package org.bahmni.mart.helper.incrementalupdate;
+package org.bahmni.mart.exports.updatestrategy;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class SimpleIncrementalUpdater extends AbstractIncrementalUpdater {
+public class SimpleIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrategy {
     @Override
     protected boolean getMetaDataChangeStatus(String actualTableName) {
         return true;

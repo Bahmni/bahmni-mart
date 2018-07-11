@@ -4,7 +4,7 @@ import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.CustomSqlIncrementalUpdateStrategy;
 import org.bahmni.mart.table.TableRecordHolder;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class TableRecordWriterTest {
     private FreeMarkerEvaluator<TableRecordHolder> tableRecordHolderFreeMarkerEvaluator;
 
     @Mock
-    private CustomSqlIncrementalUpdater customSqlIncrementalUpdater;
+    private CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater;
 
     @Mock
     private JobDefinition jobDefinition;

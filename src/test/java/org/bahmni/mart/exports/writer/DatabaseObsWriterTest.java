@@ -6,7 +6,7 @@ import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.incrementalupdate.ObsIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class DatabaseObsWriterTest {
     private FreeMarkerEvaluator freeMarkerEvaluatorForTableRecords;
 
     @Mock
-    private ObsIncrementalUpdater obsIncrementalUpdater;
+    private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
     @Mock
     private JobDefinition jobDefinition;

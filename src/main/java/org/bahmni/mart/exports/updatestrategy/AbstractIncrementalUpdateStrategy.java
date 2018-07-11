@@ -1,4 +1,4 @@
-package org.bahmni.mart.helper.incrementalupdate;
+package org.bahmni.mart.exports.updatestrategy;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.bahmni.mart.helper.MarkerManager;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.isNull;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
-public abstract class AbstractIncrementalUpdater {
+public abstract class AbstractIncrementalUpdateStrategy {
 
     private static final String EVENT_RECORD_ID = "event_record_id";
     private static final String CATEGORY = "category";

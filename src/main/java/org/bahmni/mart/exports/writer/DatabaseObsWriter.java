@@ -4,7 +4,7 @@ import org.bahmni.mart.exports.ObsRecordExtractorForTable;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.incrementalupdate.ObsIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.item.ItemWriter;
@@ -29,7 +29,7 @@ public class DatabaseObsWriter extends BaseWriter implements ItemWriter<List<Obs
     private FreeMarkerEvaluator<ObsRecordExtractorForTable> freeMarkerEvaluatorForTableRecords;
 
     @Autowired
-    private ObsIncrementalUpdater obsIncrementalUpdater;
+    private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
     private BahmniForm form;
 

@@ -3,7 +3,7 @@ package org.bahmni.mart.exports.template;
 import org.bahmni.mart.config.job.model.CodeConfig;
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.CustomSqlIncrementalUpdateStrategy;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.listener.TableGeneratorJobListener;
 import org.springframework.batch.core.Job;
@@ -26,7 +26,7 @@ public class SimpleJobTemplate extends JobTemplate {
     private TableGeneratorJobListener tableGeneratorJobListener;
 
     @Autowired
-    private CustomSqlIncrementalUpdater customSqlIncrementalUpdater;
+    private CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater;
 
     @Autowired
     private CodesProcessor codesProcessor;

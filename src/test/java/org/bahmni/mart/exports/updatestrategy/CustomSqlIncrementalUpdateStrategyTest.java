@@ -1,4 +1,4 @@
-package org.bahmni.mart.helper.incrementalupdate;
+package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
@@ -26,11 +26,11 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
-// NOT WRITING MORE TESTS AS COMMON METHODS ARE COVERED IN ObsIncrementalUpdaterTest.class
+// NOT WRITING MORE TESTS AS COMMON METHODS ARE COVERED IN ObsIncrementalUpdateStrategyTest.class
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(JobDefinitionUtil.class)
-public class CustomSqlIncrementalUpdaterTest {
+public class CustomSqlIncrementalUpdateStrategyTest {
 
     @Mock
     private JobDefinitionReader jobDefinitionReader;
@@ -47,7 +47,7 @@ public class CustomSqlIncrementalUpdaterTest {
     @Mock
     private TableDataGenerator tableDataGenerator;
 
-    private CustomSqlIncrementalUpdater spyCustomSqlIncrementalUpdater;
+    private CustomSqlIncrementalUpdateStrategy spyCustomSqlIncrementalUpdater;
     private String tableName;
     private String readerSql;
     private String processedJobName;
@@ -57,7 +57,7 @@ public class CustomSqlIncrementalUpdaterTest {
     public void setUp() throws Exception {
         mockStatic(JobDefinitionUtil.class);
 
-        CustomSqlIncrementalUpdater customSqlIncrementalUpdater = new CustomSqlIncrementalUpdater();
+        CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater = new CustomSqlIncrementalUpdateStrategy();
         setValuesForMemberFields(customSqlIncrementalUpdater, "jobDefinitionReader", jobDefinitionReader);
         setValuesForSuperClassMemberFields(customSqlIncrementalUpdater, "tableDataGenerator", tableDataGenerator);
         spyCustomSqlIncrementalUpdater = spy(customSqlIncrementalUpdater);

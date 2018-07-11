@@ -5,7 +5,7 @@ import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
-import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.CustomSqlIncrementalUpdateStrategy;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.listener.TableGeneratorJobListener;
 import org.junit.Before;
@@ -50,7 +50,7 @@ public class SimpleJobTemplateTest {
     private CodesProcessor codesProcessor;
 
     @Mock
-    private CustomSqlIncrementalUpdater customSqlIncrementalUpdater;
+    private CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater;
 
     @Mock
     private JobDefinition jobDefinition;

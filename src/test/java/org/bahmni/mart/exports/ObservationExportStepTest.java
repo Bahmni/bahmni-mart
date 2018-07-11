@@ -3,13 +3,12 @@ package org.bahmni.mart.exports;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.exports.writer.DatabaseObsWriter;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.incrementalupdate.ObsIncrementalUpdater;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,10 +56,7 @@ public class ObservationExportStepTest {
     private ObjectFactory<DatabaseObsWriter> obsWriterObjectFactory;
 
     @Mock
-    private ObsIncrementalUpdater obsIncrementalUpdater;
-
-    @Mock
-    private FormTableMetadataGenerator formTableMetadataGenerator;
+    private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
     private ObservationExportStep observationExportStep = new ObservationExportStep();
 

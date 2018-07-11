@@ -1,4 +1,4 @@
-package org.bahmni.mart.helper.incrementalupdate;
+package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ObsIncrementalUpdater extends AbstractIncrementalUpdater {
+public class ObsIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrategy {
     @Autowired
     private FormTableMetadataGenerator formTableMetadataGenerator;
 

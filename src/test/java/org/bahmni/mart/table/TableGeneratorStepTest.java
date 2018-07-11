@@ -1,7 +1,7 @@
 package org.bahmni.mart.table;
 
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.helper.incrementalupdate.ObsIncrementalUpdater;
+import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -34,7 +34,7 @@ public class TableGeneratorStepTest {
     private FreeMarkerEvaluator<TableData> freeMarkerEvaluatorForTables;
 
     @Mock
-    private ObsIncrementalUpdater obsIncrementalUpdater;
+    private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
     @Before
     public void setUp() throws Exception {
