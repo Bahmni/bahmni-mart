@@ -21,16 +21,4 @@
             );
         </sql>
     </changeSet>
-
-    <changeSet id="290620181630" author="Prasanna, Raju">
-        <comment>Adding marker information for obs data job</comment>
-        <sql>
-            INSERT INTO markers(job_name, event_record_id, category, table_name)
-            VALUES('Obs Data', 0, 'Encounter', 'encounter'),
-            ('Bacteriology Data', 0, 'Encounter', 'encounter'),
-            ('Registration Second Page', 0, 'Encounter', 'encounter'),
-            ('Disposition Data', 0, 'Encounter', 'encounter'),
-            ('Diagnoses Data', 0, 'Encounter', 'encounter');
-        </sql>
-    </changeSet>
 </databaseChangeLog>

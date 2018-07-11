@@ -77,7 +77,12 @@
     {
       "name": "Bacteriology Data",
       "conceptReferenceSource": "",
-      "type": "bacteriology"
+      "type": "bacteriology",
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      }
     },
     {
       "name": "MetaData Dictionary",
@@ -87,6 +92,11 @@
     {
       "name": "Obs Data",
       "type": "obs",
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      },
       "separateTableConfig": {
         "enableForAddMoreAndMultiSelect": true,
         "separateTables": [
@@ -105,12 +115,22 @@
       "separateTableConfig": {
         "enableForAddMoreAndMultiSelect": true,
         "separateTables": []
+      },
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
       }
     },
     {
       "name": "Disposition Data",
       "type": "disposition",
-      "columnsToIgnore": []
+      "columnsToIgnore": [],
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      }
     }
   ],
   "procedures":[
