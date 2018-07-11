@@ -8,7 +8,12 @@
       "name": "Conditions",
       "type": "customSql",
       "readerSql": "SELECT condition_id, previous_condition_id, patient_id, status, coalesce(condition_non_coded, cv.concept_full_name) AS condition_name, CASE WHEN condition_non_coded IS NULL THEN TRUE ELSE FALSE END AS is_coded_condition_name, onset_date, additional_detail, end_date, end_reason, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name, conditions.date_created FROM conditions INNER JOIN concept_view cv ON cv.concept_id = conditions.concept_id AND conditions.voided = 0 AND cv.retired = 0 INNER JOIN users ON users.user_id = conditions.creator INNER JOIN person_name pn ON pn.person_id = users.person_id",
-      "tableName": "conditions_default"
+      "tableName": "conditions_default",
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      }
     }
   ]
 }

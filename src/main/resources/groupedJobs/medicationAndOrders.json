@@ -4,7 +4,12 @@
       "name": "Medication Data",
       "type": "customSql",
       "sourceFilePath": "classpath:readerSql/drugOrder.sql",
-      "tableName": "medication_data_default"
+      "tableName": "medication_data_default",
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      }
     },
     {
       "name": "Orders Data",
