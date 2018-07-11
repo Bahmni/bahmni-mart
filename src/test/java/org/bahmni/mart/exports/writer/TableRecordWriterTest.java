@@ -3,7 +3,6 @@ package org.bahmni.mart.exports.writer;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.exports.writer.TableRecordWriter;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.helper.incrementalupdate.CustomSqlIncrementalUpdater;
 import org.bahmni.mart.table.TableRecordHolder;
@@ -21,8 +20,10 @@ import java.util.HashSet;
 import java.util.Map;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -66,7 +67,9 @@ public class TableRecordWriterTest {
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
         tableRecordWriter.setTableData(tableData);
         tableRecordWriter.setJobDefinition(jobDefinition);
-        setValuesForMemberFields(tableRecordWriter, "martJdbcTemplate", martJdbcTemplate);
+
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
+        setValuesForSuperClassMemberFields(tableRecordWriter, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(tableRecordWriter, "tableRecordHolderFreeMarkerEvaluator",
                 tableRecordHolderFreeMarkerEvaluator);
         setValuesForMemberFields(tableRecordWriter, "customSqlIncrementalUpdater", customSqlIncrementalUpdater);
@@ -75,7 +78,7 @@ public class TableRecordWriterTest {
     }
 
     @Test
-    public void shouldExecuteEvaluatedInsertSql() throws Exception {
+    public void shouldExecuteEvaluatedInsertSql() {
         String sql = "";
         when(tableRecordHolderFreeMarkerEvaluator.evaluate(anyString(), any(TableRecordHolder.class))).thenReturn(sql);
 
@@ -83,14 +86,14 @@ public class TableRecordWriterTest {
 
         verify(martJdbcTemplate, times(1)).execute(sql);
         verify(tableRecordHolderFreeMarkerEvaluator, times(1)).evaluate(anyString(), any(TableRecordHolder.class));
-        verify(customSqlIncrementalUpdater).isMetaDataChanged(JOB_NAME);
+        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(JOB_NAME);
         verify(jobDefinition).getName();
-        verify(jobDefinition, never()).getIncrementalUpdateConfig();
+        verify(jobDefinition).getIncrementalUpdateConfig();
         verify(customSqlIncrementalUpdater, never()).deleteVoidedRecords(any(), any(), any());
     }
 
     @Test
-    public void shouldNotDeleteVoidedRecordsIfJobDefinitionIsNull() throws Exception {
+    public void shouldNotDeleteVoidedRecordsIfJobDefinitionIsNull() {
         tableRecordWriter.setJobDefinition(null);
 
         String sql = "";
@@ -133,8 +136,8 @@ public class TableRecordWriterTest {
         verify(tableRecordHolderFreeMarkerEvaluator, times(1)).evaluate(anyString(), any(TableRecordHolder.class));
         verify(customSqlIncrementalUpdater).isMetaDataChanged(JOB_NAME);
         verify(jobDefinition).getName();
-        verify(jobDefinition).getIncrementalUpdateConfig();
-        verify(incrementalUpdateConfig).getUpdateOn();
+        verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig,atLeastOnce()).getUpdateOn();
         HashSet<String> voidedIds = new HashSet<>(Arrays.asList("123", "124", "128"));
         verify(customSqlIncrementalUpdater).deleteVoidedRecords(voidedIds, "program", "program_id");
     }

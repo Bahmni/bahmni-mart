@@ -1,5 +1,7 @@
 package org.bahmni.mart.exports.writer;
 
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
@@ -19,8 +21,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,15 +46,25 @@ public class DatabaseObsWriterTest {
     @Mock
     private ObsIncrementalUpdater obsIncrementalUpdater;
 
+    @Mock
+    private JobDefinition jobDefinition;
+
+    @Mock
+    private IncrementalUpdateConfig incrementalUpdateConfig;
+
     @Before
     public void setUp() throws Exception {
         databaseObsWriter = new DatabaseObsWriter();
         setValuesForMemberFields(databaseObsWriter, "formTableMetadataGenerator",
                 formTableMetadataGenerator);
-        setValuesForMemberFields(databaseObsWriter, "martJdbcTemplate", martJdbcTemplate);
+        setValuesForSuperClassMemberFields(databaseObsWriter, "martJdbcTemplate", martJdbcTemplate);
         setValuesForMemberFields(databaseObsWriter, "freeMarkerEvaluatorForTableRecords",
                 freeMarkerEvaluatorForTableRecords);
         setValuesForMemberFields(databaseObsWriter, "obsIncrementalUpdater", obsIncrementalUpdater);
+
+        databaseObsWriter.setJobDefinition(jobDefinition);
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
+        when(incrementalUpdateConfig.getUpdateOn()).thenReturn("encounter_id");
     }
 
     @Test
@@ -98,6 +112,9 @@ public class DatabaseObsWriterTest {
 
         databaseObsWriter.write(items);
 
+
+        verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig).getUpdateOn();
         verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName());
         HashSet<String> encounterIds = new HashSet<>(Arrays.asList("56", "560"));
         verify(obsIncrementalUpdater).deleteVoidedRecords(encounterIds,"test","encounter_id");
@@ -148,6 +165,8 @@ public class DatabaseObsWriterTest {
 
         databaseObsWriter.write(items);
 
+        verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
+        verify(incrementalUpdateConfig, never()).getUpdateOn();
         verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName());
         verify(obsIncrementalUpdater, never()).deleteVoidedRecords(anySet(),anyString(),anyString());
     }

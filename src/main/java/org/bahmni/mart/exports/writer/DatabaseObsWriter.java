@@ -1,6 +1,5 @@
 package org.bahmni.mart.exports.writer;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.ObsRecordExtractorForTable;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
@@ -10,28 +9,21 @@ import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Objects.isNull;
 import static org.bahmni.mart.helper.DuplicateObsResolver.getUniqueObsItems;
 
 @Component
 @Scope(value = "prototype")
-public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
+public class DatabaseObsWriter extends BaseWriter implements ItemWriter<List<Obs>> {
 
     @Autowired
     private FormTableMetadataGenerator formTableMetadataGenerator;
-
-    @Qualifier("martJdbcTemplate")
-    @Autowired
-    private JdbcTemplate martJdbcTemplate;
 
     @Autowired
     private FreeMarkerEvaluator<ObsRecordExtractorForTable> freeMarkerEvaluatorForTableRecords;
@@ -44,11 +36,9 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
     private boolean isAddMoreMultiSelectEnabled = true;
 
     @Override
-    public void write(List<? extends List<Obs>> items) throws Exception {
+    public void write(List<? extends List<Obs>> items) {
         TableData tableData = formTableMetadataGenerator.getTableData(form);
-        if (!obsIncrementalUpdater.isMetaDataChanged(form.getFormName().getName())) {
-            deleteVoidedRecords(items, tableData);
-        }
+        deletedVoidedRecords(items, obsIncrementalUpdater, form.getFormName().getName(), tableData);
         insertRecords(items, tableData);
     }
 
@@ -74,13 +64,16 @@ public class DatabaseObsWriter implements ItemWriter<List<Obs>> {
         return extractor;
     }
 
-    private void deleteVoidedRecords(List<? extends List<Obs>> items, TableData tableData) {
-        Set<String> encounterIds = new HashSet<>();
-        items.forEach(item -> item.forEach(obs -> encounterIds.add(obs.getEncounterId())));
-        obsIncrementalUpdater.deleteVoidedRecords(encounterIds, tableData.getName(), "encounter_id");
-    }
-
     public void setAddMoreMultiSelectEnabled(boolean addMoreMultiSelectEnabled) {
         this.isAddMoreMultiSelectEnabled = addMoreMultiSelectEnabled;
+    }
+
+    @Override
+    protected Set<String> getVoidedIds(List<?> items) {
+        HashSet<String> encounterIds = new HashSet<>();
+        ((List<? extends List<Obs>>) items)
+                .forEach(item -> item.forEach(obs -> encounterIds.add(obs.getEncounterId())));
+
+        return encounterIds;
     }
 }

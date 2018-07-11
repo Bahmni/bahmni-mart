@@ -79,6 +79,7 @@ public class ObservationExportStep {
 
     private DatabaseObsWriter getWriter() {
         DatabaseObsWriter writer = databaseObsWriterObjectFactory.getObject();
+        writer.setJobDefinition(jobDefinition);
         writer.setForm(this.form);
         writer.setAddMoreMultiSelectEnabled(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition));
         return writer;
