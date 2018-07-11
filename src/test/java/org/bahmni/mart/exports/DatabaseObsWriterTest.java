@@ -52,7 +52,7 @@ public class DatabaseObsWriterTest {
     private ObsIncrementalUpdater obsIncrementalUpdater;
 
     @Captor
-    ArgumentCaptor<Set> captor;
+    private ArgumentCaptor<Set> captor;
 
     @Before
     public void setUp() throws Exception {
