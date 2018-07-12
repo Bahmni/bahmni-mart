@@ -11,8 +11,30 @@
       "chunkSizeToRead": "500"
     },
     {
+      "name": "Appointments",
+      "type": "appointments",
+      "chunkSizeToRead": "500",
+      "groupedJobConfigs": [
+        {
+          "tableName": "appointment_service_default",
+          "columnsToIgnore": [
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bed Management",
+      "type": "bedManagement",
+      "chunkSizeToRead": "500"
+    },
+    {
       "name": "Location",
       "type": "location",
+      "chunkSizeToRead": "500"
+    },
+    {
+      "name": "Operation Theater",
+      "type": "operationTheater",
       "chunkSizeToRead": "500"
     },
     {
@@ -135,6 +157,10 @@
   ],
   "procedures":[
     {
+      "name":"Discharge Date Procedure",
+      "sourceFilePath":"classpath:procedureSql/dischargeDateProc.sql"
+    },
+    {
       "name":"Age Group Procedure",
       "sourceFilePath":"classpath:procedureSql/ageGroupProc.sql"
     }
@@ -149,6 +175,10 @@
       "sourceFilePath": "classpath:viewSql/patientVisitsEncountersView.sql"
     },
     {
+      "name": "appointment_admin_panel_view",
+      "sql": "SELECT * FROM appointment_service_default LEFT OUTER JOIN service_availability_default USING (appointment_service_id, service_name)"
+    },
+    {
       "name": "patient_details_view",
       "sourceFilePath": "classpath:viewSql/patientDetailsView.sql"
     },
@@ -157,12 +187,36 @@
       "sourceFilePath": "classpath:viewSql/patientInformationView.sql"
     },
     {
+      "name":"bed_management_view",
+      "sourceFilePath":"classpath:viewSql/bedManagementView.sql"
+    },
+    {
+      "name":"bed_management_locations_view",
+      "sourceFilePath":"classpath:viewSql/locationWiseDischarge.sql"
+    },
+    {
+      "name": "patient_bed_view",
+      "sourceFilePath": "classpath:viewSql/patientBedView.sql"
+    },
+    {
+      "name": "patient_operation_theater_view",
+      "sourceFilePath": "classpath:viewSql/patientOperationTheaterView.sql"
+    },
+    {
+      "name": "patient_appointment_view",
+      "sourceFilePath": "classpath:viewSql/patientAppointmentView.sql"
+    },
+    {
       "name": "patient_program_medication_view",
       "sourceFilePath": "classpath:viewSql/patientProgramMedicationView.sql"
     },
     {
       "name": "patient_diagnosis_condition_view",
       "sourceFilePath": "classpath:viewSql/patientDiagnosisConditionView.sql"
+    },
+    {
+      "name": "patient_bed_tags_history_view",
+      "sourceFilePath": "classpath:viewSql/patientBedTagView.sql"
     }
   ]
 }
