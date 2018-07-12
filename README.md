@@ -62,13 +62,13 @@ To run all chesks present in bahmni mart run the following command
 To install bahmni-mart follow the steps given below
 * Download Bahmni-mart playbook from Github
     ```bash
-    wget -O /tmp/bahmni-mart-playbook.zip https://github.com/bahmni-msf/bahmni-mart-playbook/archive/master.zip && unzip -o /tmp/bahmni-mart-playbook.zip -d /tmp && sudo rm -rf /var/www/bahmni-mart-playbook && sudo mv /tmp/bahmni-mart-playbook-master /var/www/bahmni-mart-playbook && rm -rf /tmp/bahmni-mart-playbook.zip
+    wget -O /tmp/bahmni-mart-playbook.zip https://github.com/bahmni-msf/bahmni-mart-playbook/archive/master.zip && unzip -o /tmp/bahmni-mart-playbook.zip -d /tmp && sudo rm -rf /etc/bahmni-mart-playbook && sudo mv /tmp/bahmni-mart-playbook-master /etc/bahmni-mart-playbook && rm -rf /tmp/bahmni-mart-playbook.zip
     ```
-* Update **/var/www/bahmni-mart-playbook/inventories/bahmni-mart** inventory file as part your requirement
-* Update the values presents in **/var/www/bahmni-mart-playbook/setup.yml** inventory file as part your requirement
+* Update **/etc/bahmni-mart-playbook/inventories/bahmni-mart** inventory file as part your requirement
+* Update the values presents in **/etc/bahmni-mart-playbook/setup.yml** inventory file as part your requirement
 * Install **Bahmni-mart** application
     ```bash
-    ansible-playbook -i /var/www/bahmni-mart-playbook/inventories/bahmni-mart /var/www/bahmni-mart-playbook/all.yml --extra-vars '@/var/www/bahmni-mart-playbook/setup.yml'
+    ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml'
     ```
 * Update **bahmni-mart** config. The config will be present in **/var/www/bahmni_config/bahmni-mart/bahmni-mart.json** 
 
