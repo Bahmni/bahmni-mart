@@ -7,12 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.Objects.isNull;
 
 public abstract class BaseWriter {
+
+    private Set<String> processedIds = new HashSet<>();
 
     @Qualifier("martJdbcTemplate")
     @Autowired
@@ -25,8 +28,12 @@ public abstract class BaseWriter {
     }
 
     private void deleteVoidedRecords(List<?> items, TableData tableData, IncrementalUpdateStrategy incrementalUpdater) {
-        incrementalUpdater.deleteVoidedRecords(getVoidedIds(items), tableData.getName(),
+        Set<String> voidedIds = getVoidedIds(items);
+        voidedIds.removeAll(processedIds);
+
+        incrementalUpdater.deleteVoidedRecords(voidedIds, tableData.getName(),
                 jobDefinition.getIncrementalUpdateConfig().getUpdateOn());
+        processedIds = new HashSet<>(voidedIds);
     }
 
     protected abstract Set<String> getVoidedIds(List<?> items);
@@ -42,5 +49,9 @@ public abstract class BaseWriter {
                                    String keyName) {
         return !isNull(jobDefinition) && !isNull(jobDefinition.getIncrementalUpdateConfig()) &&
                 !incrementalUpdater.isMetaDataChanged(keyName);
+    }
+
+    public Set<String> getProcessedIds() {
+        return processedIds;
     }
 }

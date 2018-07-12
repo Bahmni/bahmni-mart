@@ -11,9 +11,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -29,7 +32,7 @@ public class BaseWriterTest {
 
         @Override
         protected Set<String> getVoidedIds(List<?> items) {
-            return null;
+            return new HashSet<>(Arrays.asList("3", "4", "5"));
         }
 
     }
@@ -103,6 +106,25 @@ public class BaseWriterTest {
 
         verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
         verify(incrementalUpdater).isMetaDataChanged(KEY_NAME);
-        verify(incrementalUpdater).deleteVoidedRecords(anySet(), eq(tableName), eq(updateOn));
+        verify(incrementalUpdater)
+                .deleteVoidedRecords(eq(new HashSet<>(Arrays.asList("3", "4", "5"))), eq(tableName), eq(updateOn));
+    }
+
+    @Test
+    public void shouldNotDeleteRecordsFromPreviousChunkWhenSameIdIsPresentAcrossChunks() throws Exception {
+        String tableName = "tableName";
+        String updateOn = "updateOn";
+
+        when(tableData.getName()).thenReturn(tableName);
+        when(incrementalUpdateConfig.getUpdateOn()).thenReturn(updateOn);
+
+        setValuesForSuperClassMemberFields(baseWriter, "processedIds", new HashSet<>(Arrays.asList("1", "2", "3")));
+
+        baseWriter.deletedVoidedRecords(items, incrementalUpdater, KEY_NAME, tableData);
+        verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
+        verify(incrementalUpdater).isMetaDataChanged(KEY_NAME);
+        HashSet<String> expectedProcessedIds = new HashSet<>(Arrays.asList("4", "5"));
+        verify(incrementalUpdater).deleteVoidedRecords(eq(expectedProcessedIds), eq(tableName), eq(updateOn));
+        assertEquals(expectedProcessedIds, baseWriter.getProcessedIds());
     }
 }
