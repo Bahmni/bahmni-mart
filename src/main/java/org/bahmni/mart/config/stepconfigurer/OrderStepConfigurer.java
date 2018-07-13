@@ -93,7 +93,9 @@ public class OrderStepConfigurer implements StepConfigurerContract {
 
     private List<String> getOrderables() {
         if (orderableConceptNames == null) {
-            orderableConceptNames = conceptService.getChildConcepts(ALL_ORDERABLES).stream()
+            JobDefinition ordersJobDefinition = jobDefinitionReader.getJobDefinitionByName("Orders Data");
+            orderableConceptNames = conceptService.getChildConcepts(ALL_ORDERABLES,
+                    ordersJobDefinition.getLocale()).stream()
                     .map(Concept::getName).collect(Collectors.toList());
         }
         return orderableConceptNames;

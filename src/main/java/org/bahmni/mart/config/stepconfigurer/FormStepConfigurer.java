@@ -18,7 +18,7 @@ public class FormStepConfigurer extends StepConfigurer {
     @Override
     protected List<BahmniForm> getAllForms() {
         JobDefinition jobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE);
-        List<Concept> allFormConcepts = conceptService.getChildConcepts(ALL_FORMS);
+        List<Concept> allFormConcepts = conceptService.getChildConcepts(ALL_FORMS, jobDefinition.getLocale());
         return formListProcessor.retrieveAllForms(allFormConcepts, jobDefinition);
     }
 }

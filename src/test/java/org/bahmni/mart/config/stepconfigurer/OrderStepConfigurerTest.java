@@ -86,11 +86,12 @@ public class OrderStepConfigurerTest {
     private String orderables = "All Orderables";
 
     private String orderable = "Lab Samples";
-
+    private String locale;
 
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         orderStepConfigurer = new OrderStepConfigurer();
+        locale = "locale";
         setValuesForMemberFields(orderStepConfigurer, "conceptService", conceptService);
         setValuesForMemberFields(orderStepConfigurer, "tableGeneratorStep", tableGeneratorStep);
         setValuesForMemberFields(orderStepConfigurer, "orderConceptUtil", orderConceptUtil);
@@ -102,13 +103,14 @@ public class OrderStepConfigurerTest {
         setValueForFinalStaticField(OrderStepConfigurer.class, "logger", logger);
 
         mockStatic(BatchUtils.class);
+        when(jobDefinition.getLocale()).thenReturn(locale);
     }
 
     @Test
     public void shouldGenerateOrderablesTableData() throws InvalidOrderTypeException, NoSamplesFoundException {
         int orderTypeId = 1;
         String sql = "sql";
-        when(conceptService.getChildConcepts(orderables)).thenReturn(Collections.singletonList(concept));
+        when(conceptService.getChildConcepts(orderables, locale)).thenReturn(Collections.singletonList(concept));
         when(concept.getName()).thenReturn(orderable);
         when(orderConceptUtil.getOrderTypeId(orderable)).thenReturn(orderTypeId);
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(sql);
@@ -119,7 +121,7 @@ public class OrderStepConfigurerTest {
 
         orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(conceptService, times(1)).getChildConcepts(orderables);
+        verify(conceptService, times(1)).getChildConcepts(orderables, locale);
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
         verify(tableDataGenerator, times(1)).getTableData(orderable, sql);
@@ -142,8 +144,8 @@ public class OrderStepConfigurerTest {
 
         orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(conceptService, never()).getChildConcepts(orderables);
-
+        verify(conceptService, never()).getChildConcepts(orderables, locale);
+        verify(jobDefinitionReader).getJobDefinitionByName("Orders Data");
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
         verify(tableDataGenerator, times(1)).getTableData(orderable, sql);
     }
@@ -162,13 +164,17 @@ public class OrderStepConfigurerTest {
     public void shouldLogExceptionMessageWhenThereAreNoSamplesForAnOrderable()
             throws InvalidOrderTypeException, NoSamplesFoundException {
         String exceptionMessage = "No samples found exception";
-        when(conceptService.getChildConcepts(orderables)).thenReturn(Collections.singletonList(concept));
+
+        when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
+        when(conceptService.getChildConcepts(orderables, locale)).thenReturn(Collections.singletonList(concept));
         when(concept.getName()).thenReturn(orderable);
         when(orderConceptUtil.getOrderTypeId(orderable)).thenThrow(new NoSamplesFoundException(exceptionMessage));
 
         orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(conceptService, times(1)).getChildConcepts(orderables);
+        verify(conceptService, times(1)).getChildConcepts(orderables, locale);
+        verify(jobDefinitionReader).getJobDefinitionByName("Orders Data");
+        verify(jobDefinition).getLocale();
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
         verify(logger, times(1)).info(exceptionMessage);
@@ -178,13 +184,17 @@ public class OrderStepConfigurerTest {
     public void shouldLogExceptionMessageWhenThereIsNoOrderTypeFoundForASample()
             throws InvalidOrderTypeException, NoSamplesFoundException {
         String exceptionMessage = "Invalid order type exception";
-        when(conceptService.getChildConcepts(orderables)).thenReturn(Collections.singletonList(concept));
+        when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
+        when(conceptService.getChildConcepts(orderables, locale)).thenReturn(Collections.singletonList(concept));
         when(concept.getName()).thenReturn(orderable);
         when(orderConceptUtil.getOrderTypeId(orderable)).thenThrow(new InvalidOrderTypeException(exceptionMessage));
 
         orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(conceptService, times(1)).getChildConcepts(orderables);
+        verify(conceptService, times(1)).getChildConcepts(orderables, locale);
+        verify(jobDefinitionReader).getJobDefinitionByName("Orders Data");
+        verify(jobDefinition).getLocale();
+
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
         verify(logger, times(1)).info(exceptionMessage);
@@ -193,13 +203,16 @@ public class OrderStepConfigurerTest {
     @Test
     public void shouldLogErrorMessageWhenAnyExceptionIsThrownWhileCreatingTables()
             throws InvalidOrderTypeException, NoSamplesFoundException {
-        when(conceptService.getChildConcepts(orderables)).thenReturn(Collections.singletonList(concept));
+        when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
+        when(conceptService.getChildConcepts(orderables, locale)).thenReturn(Collections.singletonList(concept));
         when(concept.getName()).thenReturn(orderable);
         when(orderConceptUtil.getOrderTypeId(orderable)).thenThrow(Exception.class);
 
         orderStepConfigurer.generateTableData(jobDefinition);
 
-        verify(conceptService, times(1)).getChildConcepts(orderables);
+        verify(conceptService, times(1)).getChildConcepts(orderables, locale);
+        verify(jobDefinitionReader).getJobDefinitionByName("Orders Data");
+        verify(jobDefinition).getLocale();
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
         verify(logger, times(1))
@@ -217,7 +230,7 @@ public class OrderStepConfigurerTest {
         TaskletStep expectedBaseExportStep = mock(TaskletStep.class);
         FlowBuilder completeDataExport = mock(FlowBuilder.class);
 
-        when(conceptService.getChildConcepts(orderables)).thenReturn(Collections.singletonList(concept));
+        when(conceptService.getChildConcepts(orderables, locale)).thenReturn(Collections.singletonList(concept));
         when(concept.getName()).thenReturn(orderable);
 
         when(stepBuilderFactory.get(orderable)).thenReturn(stepBuilder);
@@ -238,7 +251,7 @@ public class OrderStepConfigurerTest {
 
         orderStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 
-        verify(conceptService, times(1)).getChildConcepts(orderables);
+        verify(conceptService, times(1)).getChildConcepts(orderables, locale);
         verify(concept, times(1)).getName();
         verify(stepBuilderFactory, times(1)).get(orderable);
         verify(jobDefinition, times(1)).getChunkSizeToRead();
@@ -265,7 +278,8 @@ public class OrderStepConfigurerTest {
         SimpleStepBuilder simpleStepBuilder = mock(SimpleStepBuilder.class);
         FlowBuilder completeDataExport = mock(FlowBuilder.class);
 
-        when(conceptService.getChildConcepts(orderables)).thenReturn(Collections.singletonList(concept));
+        when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
+        when(conceptService.getChildConcepts(orderables, locale)).thenReturn(Collections.singletonList(concept));
         when(concept.getName()).thenReturn(orderable);
 
         when(stepBuilderFactory.get(orderable)).thenReturn(stepBuilder);
@@ -275,7 +289,9 @@ public class OrderStepConfigurerTest {
 
         orderStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 
-        verify(conceptService, times(1)).getChildConcepts(orderables);
+        verify(conceptService, times(1)).getChildConcepts(orderables, locale);
+        verify(jobDefinitionReader).getJobDefinitionByName("Orders Data");
+        verify(jobDefinition).getLocale();
         verify(concept, times(1)).getName();
         verify(stepBuilderFactory, times(1)).get(orderable);
         verify(jobDefinition, times(1)).getChunkSizeToRead();
@@ -294,7 +310,8 @@ public class OrderStepConfigurerTest {
         SimpleStepBuilder simpleStepBuilder = mock(SimpleStepBuilder.class);
         FlowBuilder completeDataExport = mock(FlowBuilder.class);
 
-        when(conceptService.getChildConcepts(orderables)).thenReturn(Collections.singletonList(concept));
+        when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
+        when(conceptService.getChildConcepts(orderables, locale)).thenReturn(Collections.singletonList(concept));
         when(concept.getName()).thenReturn(orderable);
 
         when(stepBuilderFactory.get(orderable)).thenReturn(stepBuilder);
@@ -304,7 +321,9 @@ public class OrderStepConfigurerTest {
 
         orderStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 
-        verify(conceptService, times(1)).getChildConcepts(orderables);
+        verify(conceptService, times(1)).getChildConcepts(orderables, locale);
+        verify(jobDefinitionReader).getJobDefinitionByName("Orders Data");
+        verify(jobDefinition).getLocale();
         verify(concept, times(1)).getName();
         verify(stepBuilderFactory, times(1)).get(orderable);
         verify(jobDefinition, times(1)).getChunkSizeToRead();

@@ -74,10 +74,12 @@ public class ConceptServiceTest {
     @Test
     public void shouldGetChildConcepts() {
         String parentVideoConcept = "Patient Videos";
+        String locale = "locale";
 
-        conceptService.getChildConcepts(parentVideoConcept);
+        conceptService.getChildConcepts(parentVideoConcept, locale);
 
         verify(mapSqlParameterSource, times(1)).addValue("parentConceptName", parentVideoConcept);
+        verify(mapSqlParameterSource, times(1)).addValue("locale", locale);
         verify(namedParameterJdbcTemplate, times(1))
                 .query(eq("conceptListSQL"), eq(mapSqlParameterSource), any(BeanPropertyRowMapper.class));
     }

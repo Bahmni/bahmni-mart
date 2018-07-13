@@ -84,6 +84,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
         params.put("obsId", obsId);
         params.put("parentObsId", parentObsId);
         params.put("conceptReferenceSource", jobDefinition.getConceptReferenceSource());
+        params.put("locale", jobDefinition.getLocale());
         return getObs(params, formObsSql);
     }
 
@@ -110,6 +111,7 @@ public class ObservationProcessor implements ItemProcessor<Map<String, Object>, 
             params.put("leafConceptIds", leafConcepts);
             params.put("parentObsId", parentObsId);
             params.put("conceptReferenceSource", jobDefinition.getConceptReferenceSource());
+            params.put("locale", jobDefinition.getLocale());
             return getObs(params, leafObsSql);
         }
         return new ArrayList<>();

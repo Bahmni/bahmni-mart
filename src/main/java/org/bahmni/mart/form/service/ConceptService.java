@@ -42,9 +42,10 @@ public class ConceptService {
         return getConcepts(conceptDetailsSql, parameters);
     }
 
-    public List<Concept> getChildConcepts(String parentConceptName) {
+    public List<Concept> getChildConcepts(String parentConceptName, String locale) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("parentConceptName", parentConceptName);
+        parameters.addValue("locale", locale);
         return getConcepts(conceptListSql, parameters);
     }
 

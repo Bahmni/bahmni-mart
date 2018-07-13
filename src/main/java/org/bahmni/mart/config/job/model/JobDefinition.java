@@ -17,6 +17,7 @@ public class JobDefinition {
     private List<CodeConfig> codeConfigs;
     private List<GroupedJobConfig> groupedJobConfigs;
     private IncrementalUpdateConfig incrementalUpdateConfig;
+    private String locale;
 
 
     public int getChunkSizeToRead() {
@@ -101,5 +102,9 @@ public class JobDefinition {
 
     public IncrementalUpdateConfig getIncrementalUpdateConfig() {
         return incrementalUpdateConfig;
+    }
+
+    public String getLocale() {
+        return locale;
     }
 }

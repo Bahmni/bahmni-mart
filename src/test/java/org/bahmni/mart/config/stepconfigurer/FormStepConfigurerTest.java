@@ -30,7 +30,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,12 +60,16 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     @Mock
     private Step fstgStep;
 
+    @Mock
+    private JobDefinition jobDefinition;
+
     @Before
     public void setUp() throws Exception {
         mockStatic(JobDefinitionUtil.class);
 
         formStepConfigurer = new FormStepConfigurer();
         setUp(formStepConfigurer);
+        when(jobDefinition.getLocale()).thenReturn("locale");
     }
 
     @Test
@@ -83,11 +86,13 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     public void shouldGenerateMetaDataForForms() {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
+        when(JobDefinitionUtil.getJobDefinitionByType(any(), any())).thenReturn(jobDefinition);
 
-        formStepConfigurer.generateTableData(mock(JobDefinition.class));
+        formStepConfigurer.generateTableData(jobDefinition);
 
         verify(formTableMetadataGenerator).addMetadataForForm(bahmniForms.get(BAHMNI_FORM));
         verify(formTableMetadataGenerator).addMetadataForForm(bahmniForms.get(FSTG_FORM));
+        verify(jobDefinition).getLocale();
     }
 
     @Test
@@ -96,7 +101,6 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         setUpBahmniFormsAndSteps(bahmniForms);
         setValuesForSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
 
-        JobDefinition jobDefinition = mock(JobDefinition.class);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(true);
 
         formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
@@ -120,7 +124,6 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
                 .thenReturn(tableDataList.get(BAHMNI_FORM));
         when(formTableMetadataGenerator.getTableData(bahmniForms.get(FSTG_FORM)))
                 .thenReturn(tableDataList.get(FSTG_FORM));
-        JobDefinition jobDefinition = mock(JobDefinition.class);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
 
         formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
@@ -143,14 +146,13 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         List<Concept> allConcepts = Collections.singletonList(new Concept(1, "concept", 1));
         List<BahmniForm> forms = Collections.singletonList(new BahmniForm());
         String allObservationTemplates = "All Observation Templates";
-        JobDefinition obsJobDefinition = mock(JobDefinition.class);
-        when(obsJobDefinition.getType()).thenReturn("obs");
-        when(obsJobDefinition.getColumnsToIgnore()).thenReturn(ignoreConcepts);
-        List<JobDefinition> jobDefinitions = Collections.singletonList(obsJobDefinition);
+        when(jobDefinition.getType()).thenReturn("obs");
+        when(jobDefinition.getColumnsToIgnore()).thenReturn(ignoreConcepts);
+        List<JobDefinition> jobDefinitions = Collections.singletonList(jobDefinition);
         when(jobDefinitionReader.getJobDefinitions()).thenReturn(jobDefinitions);
-        when(getJobDefinitionByType(jobDefinitions, "obs")).thenReturn(obsJobDefinition);
-        when(conceptService.getChildConcepts(allObservationTemplates)).thenReturn(allConcepts);
-        when(formListProcessor.retrieveAllForms(allConcepts, obsJobDefinition)).thenReturn(forms);
+        when(getJobDefinitionByType(jobDefinitions, "obs")).thenReturn(jobDefinition);
+        when(conceptService.getChildConcepts(allObservationTemplates, "locale")).thenReturn(allConcepts);
+        when(formListProcessor.retrieveAllForms(allConcepts, jobDefinition)).thenReturn(forms);
 
         List<BahmniForm> actual = formStepConfigurer.getAllForms();
 
@@ -160,8 +162,8 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         verify(jobDefinitionReader, times(1)).getJobDefinitions();
         verifyStatic(times(1));
         getJobDefinitionByType(jobDefinitions, "obs");
-        verify(conceptService, times(1)).getChildConcepts(allObservationTemplates);
-        verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, obsJobDefinition);
+        verify(conceptService, times(1)).getChildConcepts(allObservationTemplates, "locale");
+        verify(formListProcessor, times(1)).retrieveAllForms(allConcepts, jobDefinition);
     }
 
     @Test
@@ -170,7 +172,6 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
         setValuesForSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
-        JobDefinition jobDefinition = mock(JobDefinition.class);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
         when(formTableMetadataGenerator.getTableData(any())).thenReturn(null);
 

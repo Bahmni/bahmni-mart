@@ -213,6 +213,8 @@ public class ObservationProcessorTest {
         when(formFieldTransformer.transformFormToFieldIds(form)).thenReturn(fieldIds);
 
         when(jobDefinition.getType()).thenReturn("obs");
+        String locale = "test locale";
+        when(jobDefinition.getLocale()).thenReturn(locale);
         String conceptReferenceSource = "BAHMNI-INTERNAL";
         when(jobDefinition.getConceptReferenceSource()).thenReturn(conceptReferenceSource);
 
@@ -226,7 +228,7 @@ public class ObservationProcessorTest {
         assertEquals("[1]", childrenParams.get("childObsIds").toString());
         assertEquals("2", childrenParams.get("parentObsId").toString());
         assertEquals(conceptReferenceSource, childrenParams.get("conceptReferenceSource"));
-
+        assertEquals(locale, childrenParams.get("locale"));
 
         verify(namedParameterJdbcTemplate, times(1)).query(eq("get..some..child"),
                 captor.capture(), any(BeanPropertyRowMapper.class));
@@ -234,5 +236,6 @@ public class ObservationProcessorTest {
         assertEquals(conceptReferenceSource, childParams.get("conceptReferenceSource"));
         assertEquals(1, childParams.get("obsId"));
         assertEquals(2, childParams.get("parentObsId"));
+        assertEquals(locale, childParams.get("locale"));
     }
 }

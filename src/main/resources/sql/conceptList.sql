@@ -1,6 +1,6 @@
 SELECT
   conceptSet.concept_id                                          AS id,
-  cn.concept_full_name                                           AS name,
+  coalesce(concept_locale.name, cn.concept_full_name)            AS name,
   cdt.name                                                       AS dataType,
   conceptSet.is_set                                              AS isset,
   COALESCE(cv.code, cn.concept_full_name, cn.concept_short_name) AS title
@@ -12,5 +12,13 @@ FROM concept_view parentConcept
     ON (cv.concept_id = conceptSet.concept_id AND cv.concept_map_type_name = 'SAME-AS' AND
         cv.concept_reference_source_name = 'EndTB-Export')
   LEFT OUTER JOIN concept_view cn ON (cn.concept_id = conceptSet.concept_id)
-WHERE parentConcept.concept_full_name = :parentConceptName AND parentConcept.retired IS FALSE
+  LEFT OUTER JOIN concept_name concept_locale
+    ON concept_locale.concept_id = conceptSet.concept_id AND concept_locale.locale = :locale
+       AND concept_name_type = 'FULLY_SPECIFIED' AND concept_locale.voided IS FALSE
+  LEFT OUTER JOIN concept_name parent_concept_locale ON parent_concept_locale.concept_id = parentConcept.concept_id AND
+                                                        parent_concept_locale.locale = :locale AND
+                                                        parent_concept_locale.concept_name_type = 'FULLY_SPECIFIED' AND
+                                                        parent_concept_locale.voided IS FALSE
+WHERE (parent_concept_locale.name = :parentConceptName OR parentConcept.concept_full_name = :parentConceptName) AND
+      parentConcept.retired IS FALSE
 ORDER BY setMembers.sort_weight;

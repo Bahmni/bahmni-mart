@@ -1,6 +1,8 @@
 package org.bahmni.mart.helper;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
 import org.bahmni.mart.form.domain.Concept;
@@ -30,8 +32,13 @@ public class OrderConceptUtil {
     @Qualifier("openmrsNamedJdbcTemplate")
     private NamedParameterJdbcTemplate openMRSJDBCTemplate;
 
+    @Autowired
+    private JobDefinitionReader jobDefinitionReader;
+
     public int getOrderTypeId(String conceptName) throws NoSamplesFoundException, InvalidOrderTypeException {
-        List<Integer> sampleConceptIds = conceptService.getChildConcepts(conceptName).stream()
+        JobDefinition ordersJobDefinition = jobDefinitionReader.getJobDefinitionByName("Orders Data");
+        List<Integer> sampleConceptIds = conceptService.getChildConcepts(conceptName,
+                ordersJobDefinition.getLocale()).stream()
                 .map(Concept::getId).collect(Collectors.toList());
         if (sampleConceptIds.isEmpty()) {
             throw new NoSamplesFoundException(String.format("No samples found for the orderable %s", conceptName));

@@ -54,9 +54,11 @@ public class BahmniFormFactoryTest {
 
     private List<String> separateTableNames;
     private List<String> ignoreConceptsNames;
+    private String locale;
 
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
+        locale = "locale";
 
         separateTableNames = Arrays.asList("Operation Notes Template",
                 "Discharge Summary, Surgeries and Procedures", "Other Notes", "BP", "Notes");
@@ -94,6 +96,7 @@ public class BahmniFormFactoryTest {
                 .thenReturn(new HashSet<>(separateTableConcepts));
         when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition))
                 .thenReturn(new HashSet<>(ignoreConcepts));
+        when(jobDefinition.getLocale()).thenReturn(locale);
     }
 
     @Test
@@ -110,9 +113,9 @@ public class BahmniFormFactoryTest {
 
     @Test
     public void shouldCreateAForm() {
-        when(conceptService.getChildConcepts("History and Examination"))
+        when(conceptService.getChildConcepts("History and Examination", locale))
                 .thenReturn(historyAndExaminationConcepts);
-        when(conceptService.getChildConcepts("Chief Complaint Data"))
+        when(conceptService.getChildConcepts("Chief Complaint Data", locale))
                 .thenReturn(chiefComplaintDataConcepts);
 
         BahmniForm historyAndExamination = bahmniFormFactory.createForm(
@@ -133,6 +136,7 @@ public class BahmniFormFactoryTest {
         assertEquals("BP", historyAndExaminationChildren.get(0).getFormName().getName());
         verify(ignoreColumnsConfigHelper, times(1)).getIgnoreConceptsForJob(jobDefinition);
         verify(separateTableConfigHelper, times(1)).getSeparateTableConceptsForJob(jobDefinition);
+        verify(jobDefinition).getLocale();
     }
 
     @Test
@@ -143,7 +147,7 @@ public class BahmniFormFactoryTest {
         Concept hasTakenCourse = new Concept(1112, "Has patient taken course", 0);
         hasTakenCourse.setParent(healthEducation);
         videoConcept.setParent(healthEducation);
-        when(conceptService.getChildConcepts("Health Education"))
+        when(conceptService.getChildConcepts("Health Education", locale))
                 .thenReturn(Arrays.asList(hasTakenCourse, videoConcept));
         HashSet<Concept> ignoreConcepts = new HashSet<>();
         ignoreConcepts.add(videoConcept);
@@ -158,6 +162,7 @@ public class BahmniFormFactoryTest {
         assertEquals(hasTakenCourse, bahmniForm.getFields().get(0));
         verify(ignoreColumnsConfigHelper, times(1)).getIgnoreConceptsForJob(jobDefinition);
         verify(separateTableConfigHelper, times(1)).getSeparateTableConceptsForJob(jobDefinition);
+        verify(jobDefinition).getLocale();
     }
 
     @Test
@@ -168,13 +173,13 @@ public class BahmniFormFactoryTest {
         List<Concept> operationNotesTemplate = new ArrayList<>();
         operationNotesTemplate.add(new Concept(3366, "Notes Templates", 0));
 
-        when(conceptService.getChildConcepts("History and Examination"))
+        when(conceptService.getChildConcepts("History and Examination", locale))
                 .thenReturn(historyAndExaminationConcepts);
-        when(conceptService.getChildConcepts("Chief Complaint Data"))
+        when(conceptService.getChildConcepts("Chief Complaint Data", locale))
                 .thenReturn(chiefComplaintDataConcepts);
-        when(conceptService.getChildConcepts("Operation Notes Template"))
+        when(conceptService.getChildConcepts("Operation Notes Template", locale))
                 .thenReturn(operationNotesTemplate);
-        when(conceptService.getChildConcepts("BP")).thenReturn(new ArrayList<>());
+        when(conceptService.getChildConcepts("BP", locale)).thenReturn(new ArrayList<>());
 
         BahmniForm historyAndExamination = bahmniFormFactory.createForm(
                 new Concept(1189, "History and Examination", 1),
@@ -187,11 +192,12 @@ public class BahmniFormFactoryTest {
         assertEquals("Operation Notes Template", historyAndExamination.getChildren().get(1).getFormName().getName());
         assertEquals(1, historyAndExamination.getChildren().get(1).getFields().size());
         assertEquals(1, historyAndExamination.getChildren().get(2).getFields().size());
-        verify(conceptService, times(1)).getChildConcepts("History and Examination");
-        verify(conceptService, times(1)).getChildConcepts("Chief Complaint Data");
-        verify(conceptService, times(1)).getChildConcepts("Operation Notes Template");
-        verify(conceptService, times(1)).getChildConcepts("BP");
+        verify(conceptService, times(1)).getChildConcepts("History and Examination", locale);
+        verify(conceptService, times(1)).getChildConcepts("Chief Complaint Data", locale);
+        verify(conceptService, times(1)).getChildConcepts("Operation Notes Template", locale);
+        verify(conceptService, times(1)).getChildConcepts("BP", locale);
         verify(ignoreColumnsConfigHelper, times(1)).getIgnoreConceptsForJob(jobDefinition);
         verify(separateTableConfigHelper, times(1)).getSeparateTableConceptsForJob(jobDefinition);
+        verify(jobDefinition).getLocale();
     }
 }

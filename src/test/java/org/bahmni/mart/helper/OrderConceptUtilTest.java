@@ -1,6 +1,8 @@
 package org.bahmni.mart.helper;
 
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
 import org.bahmni.mart.form.domain.Concept;
@@ -23,6 +25,7 @@ import java.util.Collections;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,32 +54,46 @@ public class OrderConceptUtilTest {
     @Mock
     private NamedParameterJdbcTemplate openMRSJDBCTemplate;
 
+    @Mock
+    private JobDefinitionReader jobDefinitionReader;
+
+    @Mock
+    private JobDefinition jobDefinition;
+
+    private String locale;
+
     @Before
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
         orderConceptUtil = new OrderConceptUtil();
+        locale = "locale";
         setValuesForMemberFields(orderConceptUtil, "conceptService", conceptService);
         setValuesForMemberFields(orderConceptUtil, "openMRSJDBCTemplate", openMRSJDBCTemplate);
+        setValuesForMemberFields(orderConceptUtil, "jobDefinitionReader", jobDefinitionReader);
         mockStatic(BatchUtils.class);
         when(concept.getId()).thenReturn(1);
         when(BatchUtils.convertResourceOutputToString(any(Resource.class))).thenReturn("sql");
+        when(jobDefinition.getLocale()).thenReturn(locale);
+        when(jobDefinitionReader.getJobDefinitionByName(anyString())).thenReturn(jobDefinition);
     }
 
     @Test
     public void shouldThrowNoOrderablesFoundExceptionWhenThereAreNoSamplesForAGivenConcept()
             throws InvalidOrderTypeException, NoSamplesFoundException {
-        when(conceptService.getChildConcepts(conceptName)).thenReturn(Collections.emptyList());
+        when(conceptService.getChildConcepts(conceptName, locale)).thenReturn(Collections.emptyList());
         expectedException.expect(NoSamplesFoundException.class);
         expectedException.expectMessage("No samples found for the orderable Lab Samples");
 
         orderConceptUtil.getOrderTypeId(conceptName);
 
-        verify(conceptService, times(1)).getChildConcepts(conceptName);
+        verify(conceptService, times(1)).getChildConcepts(conceptName, locale);
+        verify(jobDefinitionReader).getJobDefinitionByName(anyString());
+        verify(jobDefinition).getLocale();
     }
 
     @Test
     public void shouldThrowInvalidOrderTypeExceptionWhenThereIsNoOrderTypeForAGivenConcept()
             throws InvalidOrderTypeException, NoSamplesFoundException {
-        when(conceptService.getChildConcepts(conceptName)).thenReturn(Collections.singletonList(concept));
+        when(conceptService.getChildConcepts(conceptName, locale)).thenReturn(Collections.singletonList(concept));
         when(openMRSJDBCTemplate
                 .query(eq("sql"), any(MapSqlParameterSource.class), any(BeanPropertyRowMapper.class)))
                 .thenReturn(Collections.emptyList());
@@ -86,18 +103,20 @@ public class OrderConceptUtilTest {
 
         orderConceptUtil.getOrderTypeId(conceptName);
 
-        verify(conceptService, times(1)).getChildConcepts(conceptName);
+        verify(conceptService, times(1)).getChildConcepts(conceptName, locale);
         verify(concept, times(1)).getId();
         verifyStatic();
         BatchUtils.convertResourceOutputToString(any(Resource.class));
         verify(openMRSJDBCTemplate, times(1))
                 .query(eq("sql"), any(MapSqlParameterSource.class), any(BeanPropertyRowMapper.class));
+        verify(jobDefinitionReader).getJobDefinitionByName(anyString());
+        verify(jobDefinition).getLocale();
     }
 
     @Test
     public void shouldReturnOrderTypeIdForAnOrderable() throws InvalidOrderTypeException, NoSamplesFoundException {
 
-        when(conceptService.getChildConcepts(conceptName)).thenReturn(Collections.singletonList(concept));
+        when(conceptService.getChildConcepts(conceptName, locale)).thenReturn(Collections.singletonList(concept));
         int expectedOrderTypeId = 50;
         when(openMRSJDBCTemplate
                 .query(eq("sql"), any(MapSqlParameterSource.class), any(BeanPropertyRowMapper.class)))
@@ -105,7 +124,7 @@ public class OrderConceptUtilTest {
 
         int actualOrderTypeId = orderConceptUtil.getOrderTypeId(conceptName);
 
-        verify(conceptService, times(1)).getChildConcepts(conceptName);
+        verify(conceptService, times(1)).getChildConcepts(conceptName, locale);
         verify(concept, times(1)).getId();
         verifyStatic();
         BatchUtils.convertResourceOutputToString(any(Resource.class));
@@ -113,6 +132,8 @@ public class OrderConceptUtilTest {
                 .query(eq("sql"), any(MapSqlParameterSource.class), any(BeanPropertyRowMapper.class));
 
         Assert.assertEquals(expectedOrderTypeId, actualOrderTypeId);
+        verify(jobDefinitionReader).getJobDefinitionByName(anyString());
+        verify(jobDefinition).getLocale();
     }
 
 }
