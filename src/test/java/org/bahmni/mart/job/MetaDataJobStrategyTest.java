@@ -39,7 +39,7 @@ public class MetaDataJobStrategyTest extends StepRegisterTestHelper {
     public void shouldReturnAJob() {
         assertEquals(expectedJob, metaDataJobStrategy.getJob(jobDefinition));
 
-        verify(metaDataStepConfigurer, times(1)).createTables();
+        verify(metaDataStepConfigurer, times(1)).createTables(jobDefinition);
         verify(metaDataStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
     }
 

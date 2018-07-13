@@ -50,6 +50,9 @@ public class MetaDataStepConfigurerTest {
     private MetaDataExportStep metaDataExportStep;
 
     @Mock
+    private JobDefinition jobDefinition;
+
+    @Mock
     private JdbcTemplate openmrsJDBCTemplate;
 
     @Mock
@@ -77,16 +80,15 @@ public class MetaDataStepConfigurerTest {
     @Test
     public void shouldCallCreateTables() {
 
-        metaDataStepConfigurer.createTables();
+        metaDataStepConfigurer.createTables(jobDefinition);
 
-        verify(tableGeneratorStep, times(1)).createTables(Arrays.asList(tableData));
+        verify(tableGeneratorStep, times(1)).createTables(Arrays.asList(tableData), jobDefinition);
     }
 
     @Test
     public void shouldGenerateTableDataForGivenJobDefinition() {
         mockStatic(BatchUtils.class);
         String sql = "some sql";
-        JobDefinition jobDefinition = mock(JobDefinition.class);
         String conceptReferenceSource = "source";
         when(jobDefinition.getConceptReferenceSource()).thenReturn(conceptReferenceSource);
         when(convertResourceOutputToString(metaDataSqlResource)).thenReturn(sql);

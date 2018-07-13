@@ -1,11 +1,12 @@
 package org.bahmni.mart.exports.template;
 
+import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.config.job.model.CodeConfig;
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.config.job.JobDefinitionUtil;
-import org.bahmni.mart.config.job.JobDefinitionValidator;
 import org.bahmni.mart.exports.updatestrategy.CustomSqlIncrementalUpdateStrategy;
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.listener.TableGeneratorJobListener;
 import org.junit.Before;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -53,12 +55,17 @@ public class SimpleJobTemplateTest {
     private CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater;
 
     @Mock
+    private IncrementalStrategyContext incrementalStrategyContext;
+
+    @Mock
     private JobDefinition jobDefinition;
 
     private SimpleJobTemplate spyJobTemplate;
     private String readerSql;
     private List<CodeConfig> codeConfigs;
     private static final String JOB_NAME = "testJob";
+    private static final String TABLE_NAME = "tableName";
+    private static final String JOB_TYPE = "jobType";
 
 
     @Before
@@ -66,7 +73,7 @@ public class SimpleJobTemplateTest {
         SimpleJobTemplate simpleJobTemplate = new SimpleJobTemplate();
         setValuesForMemberFields(simpleJobTemplate, "codesProcessor", codesProcessor);
         setValuesForMemberFields(simpleJobTemplate, "tableGeneratorJobListener", listener);
-        setValuesForMemberFields(simpleJobTemplate, "customSqlIncrementalUpdater", customSqlIncrementalUpdater);
+        setValuesForSuperClassMemberFields(simpleJobTemplate, "incrementalStrategyContext", incrementalStrategyContext);
 
         spyJobTemplate = spy(simpleJobTemplate);
 
@@ -75,12 +82,15 @@ public class SimpleJobTemplateTest {
         codeConfigs = Arrays.asList(codeConfig);
         when(jobDefinition.getCodeConfigs()).thenReturn(codeConfigs);
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
+        when(jobDefinition.getTableName()).thenReturn(TABLE_NAME);
+        when(jobDefinition.getType()).thenReturn(JOB_TYPE);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
         when(incrementalUpdateConfig.getUpdateOn()).thenReturn("patient_id");
         mockStatic(JobDefinitionValidator.class);
         mockStatic(JobDefinitionUtil.class);
 
-        when(customSqlIncrementalUpdater.isMetaDataChanged(JOB_NAME)).thenReturn(true);
+        when(incrementalStrategyContext.getStrategy(anyString())).thenReturn(customSqlIncrementalUpdater);
+        when(customSqlIncrementalUpdater.isMetaDataChanged(anyString(), anyString())).thenReturn(true);
         doReturn(job).when((JobTemplate) spyJobTemplate).buildJob(jobDefinition, listener, readerSql);
         when(JobDefinitionUtil.getReaderSQL(jobDefinition)).thenReturn(readerSql);
         when(JobDefinitionUtil.getReaderSQLByIgnoringColumns(any(), anyString())).thenReturn(readerSql);
@@ -93,7 +103,11 @@ public class SimpleJobTemplateTest {
         verify(spyJobTemplate, times(1)).buildJob(jobDefinition, listener, readerSql);
         verifyStatic(times(1));
         JobDefinitionUtil.getReaderSQLByIgnoringColumns(Collections.emptyList(), readerSql);
-        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
+        verify(jobDefinition).getCodeConfigs();
+        verify(jobDefinition).getType();
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(TABLE_NAME, JOB_NAME);
     }
 
     @Test
@@ -104,10 +118,13 @@ public class SimpleJobTemplateTest {
 
         verify(codesProcessor, times(1)).setCodeConfigs(codeConfigs);
         verify(listener, times(1)).setCodesProcessor(codesProcessor);
-        verify(spyJobTemplate,times(1)).setPreProcessor(codesProcessor);
-        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
+        verify(spyJobTemplate, times(1)).setPreProcessor(codesProcessor);
+        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(jobDefinition).getType();
+        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
         verify(incrementalUpdateConfig, never()).getUpdateOn();
+        verify(customSqlIncrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
     }
@@ -118,18 +135,22 @@ public class SimpleJobTemplateTest {
 
         spyJobTemplate.buildJob(jobDefinition);
 
-        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
+        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verify(codesProcessor, never()).setUpCodesData();
-        verify(spyJobTemplate,never()).setPreProcessor(codesProcessor);
+        verify(spyJobTemplate, never()).setPreProcessor(codesProcessor);
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig, never()).getUpdateOn();
+        verify(jobDefinition).getType();
+        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(customSqlIncrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
+
     }
 
     @Test
     public void shouldUpdateReaderSqlIfMetadataIsSame() {
-        when(customSqlIncrementalUpdater.isMetaDataChanged(JOB_NAME)).thenReturn(false);
+        when(customSqlIncrementalUpdater.isMetaDataChanged(TABLE_NAME, JOB_NAME)).thenReturn(false);
         String updatedReaderSql = String.format("SELECT * FROM (%s) result where patient_id in (1, 2, 3)", readerSql);
         doReturn(job).when((JobTemplate) spyJobTemplate).buildJob(jobDefinition, listener, updatedReaderSql);
         String updateOn = "patient_id";
@@ -140,10 +161,11 @@ public class SimpleJobTemplateTest {
         verify(spyJobTemplate, times(1)).buildJob(jobDefinition, listener, updatedReaderSql);
         verifyStatic(times(1));
         JobDefinitionUtil.getReaderSQLByIgnoringColumns(Collections.emptyList(), readerSql);
-        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(JOB_NAME);
+        verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verify(customSqlIncrementalUpdater, times(1)).updateReaderSql(readerSql, JOB_NAME, updateOn);
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig).getUpdateOn();
+        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
     }
 
     @Test
@@ -155,7 +177,7 @@ public class SimpleJobTemplateTest {
         verify(spyJobTemplate).buildJob(jobDefinition, listener, readerSql);
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig, never()).getUpdateOn();
-        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(anyString());
+        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(anyString(), anyString());
         verify(customSqlIncrementalUpdater, never()).updateReaderSql(anyString(), anyString(), anyString());
     }
 }

@@ -18,7 +18,7 @@ SELECT
     </#list>
 FROM ${input.eavAttributes.attributeTableName} as value_table INNER JOIN  ${input.eavAttributes.attributeTypeTableName} as type_table
 WHERE value_table.${input.eavAttributes.valueTableJoiningId} = type_table.${input.eavAttributes.typeTableJoiningId}
-GROUP BY ${primary_key} ;
+GROUP BY ${primary_key}
 </@compress>
 
 <#function getConceptName conceptId>

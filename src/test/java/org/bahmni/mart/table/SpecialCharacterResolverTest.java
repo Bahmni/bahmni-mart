@@ -133,5 +133,13 @@ public class SpecialCharacterResolverTest {
         String actualTableName = SpecialCharacterResolver.getActualTableName(updatedTableName);
         assertEquals(expectedTableName, actualTableName);
     }
+
+    @Test
+    public void shouldReturnSameNameIfActualTableForGivenUpdatedTableNameIsNotPresent() {
+        String tableName = "test table";
+
+        String actualTableName = SpecialCharacterResolver.getActualTableName(tableName);
+        assertEquals(tableName, actualTableName);
+    }
 }
 

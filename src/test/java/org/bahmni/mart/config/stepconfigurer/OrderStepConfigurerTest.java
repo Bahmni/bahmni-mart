@@ -153,9 +153,9 @@ public class OrderStepConfigurerTest {
         List<TableData> orderablesTableData = Collections.singletonList(mock(TableData.class));
         setValuesForMemberFields(orderStepConfigurer, "orderablesTableData", orderablesTableData);
 
-        orderStepConfigurer.createTables();
+        orderStepConfigurer.createTables(jobDefinition);
 
-        verify(tableGeneratorStep).createTables(orderablesTableData);
+        verify(tableGeneratorStep).createTables(orderablesTableData, jobDefinition);
     }
 
     @Test

@@ -39,7 +39,7 @@ public class DispositionJobStrategyTest extends StepRegisterTestHelper {
     public void shouldReturnAJob() {
         assertEquals(expectedJob, dispositionJobStrategy.getJob(jobDefinition));
 
-        verify(dispositionStepConfigurer, times(1)).createTables();
+        verify(dispositionStepConfigurer, times(1)).createTables(jobDefinition);
         verify(dispositionStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
     }
 }

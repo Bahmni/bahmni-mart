@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface IncrementalUpdateStrategy {
 
-    boolean isMetaDataChanged(String keyName);
+    boolean isMetaDataChanged(String tableName, String jobName);
 
     String updateReaderSql(String readerSql, String jobName, String updateOn);
 

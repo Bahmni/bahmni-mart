@@ -30,6 +30,7 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberField
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -167,8 +168,8 @@ public class EAVJobListenerTest {
     public void shouldStopJobWhenTableCreationFails() {
         JobExecution jobExecution = mock(JobExecution.class);
         JobInstance jobInstance = mock(JobInstance.class);
-        doThrow(new BadSqlGrammarException("", "select from table",
-                new SQLException())).when(tableGeneratorStep).createTables(any());
+        doThrow(new BadSqlGrammarException("", "select from table", new SQLException()))
+                .when(tableGeneratorStep).createTables(anyListOf(TableData.class), any(JobDefinition.class));
 
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
 

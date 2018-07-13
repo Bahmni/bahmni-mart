@@ -1,8 +1,8 @@
 package org.bahmni.mart.table.listener;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.TableDataExtractor;
@@ -90,7 +90,7 @@ public class TableGeneratorJobListenerTest {
 
         verify(jobExecution, times(1)).getJobInstance();
         verify(jobInstance, times(1)).getJobName();
-        verify(tableGeneratorStep, times(1)).createTables(any());
+        verify(tableGeneratorStep, times(1)).createTables(Arrays.asList(new TableData()), jobDefinition);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class TableGeneratorJobListenerTest {
 
 
         doThrow(new BadSqlGrammarException("", "select from table",
-                new SQLException())).when(tableGeneratorStep).createTables(any());
+                new SQLException())).when(tableGeneratorStep).createTables(any(), any());
 
         when(jobExecution.getJobInstance()).thenReturn(jobInstance);
         when(jobDefinitionReader.getJobDefinitionByName(anyString())).thenReturn(jobDefinition);
@@ -109,6 +109,7 @@ public class TableGeneratorJobListenerTest {
         tableGeneratorJobListener.beforeJob(jobExecution);
 
         verify(jobExecution, times(1)).stop();
+        verify(tableGeneratorStep, times(1)).createTables(Arrays.asList(new TableData()), jobDefinition);
     }
 
     @Test

@@ -20,8 +20,8 @@ public class EavIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrat
     private JobDefinitionReader jobDefinitionReader;
 
     @Override
-    public boolean getMetaDataChangeStatus(String jobName) {
-        JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByProcessedName(jobName);
+    protected boolean getMetaDataChangeStatus(String actualTableName, String jobName) {
+        JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         if (isEmpty(jobDefinition.getName()) || isNull(jobDefinition.getIncrementalUpdateConfig()))
             return true;
 

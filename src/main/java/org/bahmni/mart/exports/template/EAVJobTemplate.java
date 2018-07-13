@@ -39,9 +39,11 @@ public class EAVJobTemplate extends JobTemplate {
         return buildJob(jobConfiguration, eavJobListener, getReaderSql(jobConfiguration));
     }
 
-    private String getReaderSql(JobDefinition jobConfiguration) {
-        TableData tableData = eavJobListener.getTableDataForMart(jobConfiguration.getName());
-        return freeMarkerEvaluator.evaluate("attribute.ftl",
-                new EAV(tableData, jobConfiguration.getEavAttributes()));
+    private String getReaderSql(JobDefinition jobDefinition) {
+        TableData tableData = eavJobListener.getTableDataForMart(jobDefinition.getName());
+        String readerSql = freeMarkerEvaluator.evaluate("attribute.ftl",
+                new EAV(tableData, jobDefinition.getEavAttributes()));
+
+        return getUpdatedReaderSql(jobDefinition, readerSql);
     }
 }

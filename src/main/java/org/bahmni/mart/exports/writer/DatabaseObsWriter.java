@@ -40,8 +40,7 @@ public class DatabaseObsWriter extends BaseWriter implements ItemWriter<List<Obs
     public void write(List<? extends List<Obs>> items) {
         TableData tableData = formTableMetadataGenerator.getTableData(form);
         if (!isNull(jobDefinition))
-            deletedVoidedRecords(items, incrementalStrategyContext.getStrategy(jobDefinition.getType()),
-                form.getFormName().getName(), tableData);
+            deletedVoidedRecords(items, incrementalStrategyContext.getStrategy(jobDefinition.getType()), tableData);
         insertRecords(items, tableData);
     }
 

@@ -34,7 +34,8 @@ public abstract class AbstractJobListener extends JobListener {
     }
 
     private void createTable(String jobName) {
-        tableGeneratorStep.createTables(Arrays.asList(getTableDataForMart(jobName)));
+        tableGeneratorStep.createTables(Arrays.asList(getTableDataForMart(jobName)),
+                jobDefinitionReader.getJobDefinitionByName(jobName));
     }
 
     public abstract TableData getTableDataForMart(String jobName);

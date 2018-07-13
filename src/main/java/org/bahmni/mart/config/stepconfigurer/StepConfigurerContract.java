@@ -8,7 +8,7 @@ public interface StepConfigurerContract {
 
     void generateTableData(JobDefinition jobDefinition);
 
-    void createTables();
+    void createTables(JobDefinition jobDefinition);
 
     void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition);
 

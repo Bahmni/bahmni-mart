@@ -1,9 +1,11 @@
 package org.bahmni.mart.table;
 
 import org.bahmni.mart.AbstractBaseBatchIT;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.table.domain.ForeignKey;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,17 +31,27 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    private JobDefinition jobDefinition;
 
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        jobDefinition = new JobDefinition();
+        jobDefinition.setType("something");
+        jobDefinition.setName("first stage validation");
+    }
 
     @Test
     public void shouldCreateTableWithTableData() {
-        TableData tableData = new TableData("tablename");
+        String tableName = "tablename";
+        TableData tableData = new TableData(tableName);
 
         tableData.addColumn(new TableColumn("column_one", "Integer", false, null));
         tableData.addColumn(new TableColumn("column_two", "Integer", false, null));
         tableData.addColumn(new TableColumn("column_three", "Integer", false, null));
 
-        tableGeneratorStep.createTables(Arrays.asList(tableData));
+        tableGeneratorStep.createTables(Arrays.asList(tableData), jobDefinition);
         martJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
                 "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='public';")
@@ -62,7 +74,7 @@ public class TableGeneratorStepIT extends AbstractBaseBatchIT {
         ForeignKey foreignKey = new ForeignKey("foreignkeycolumn", "foreignkeytable");
         tableData.addColumn(new TableColumn("column_three", "Integer", false, foreignKey));
 
-        tableGeneratorStep.createTables(Arrays.asList(referenceTableData, tableData));
+        tableGeneratorStep.createTables(Arrays.asList(referenceTableData, tableData), jobDefinition);
         martJdbcTemplate.queryForList("SELECT * FROM \"tablename\"");
         List<Object> tableDataColumns = martJdbcTemplate.queryForList("SELECT column_name FROM " +
                 "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'tablename' AND TABLE_SCHEMA='public';")

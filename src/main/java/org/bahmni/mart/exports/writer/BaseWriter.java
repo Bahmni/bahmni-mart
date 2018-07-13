@@ -39,16 +39,15 @@ public abstract class BaseWriter {
     protected abstract Set<String> getVoidedIds(List<?> items);
 
     protected void deletedVoidedRecords(List<?> items, IncrementalUpdateStrategy incrementalUpdater,
-                                        String keyName, TableData tableData) {
-        if (isMetadataSame(incrementalUpdater, jobDefinition, keyName)) {
+                                        TableData tableData) {
+        if (isMetadataSame(incrementalUpdater, tableData.getName())) {
             deleteVoidedRecords(items, tableData, incrementalUpdater);
         }
     }
 
-    private boolean isMetadataSame(IncrementalUpdateStrategy incrementalUpdater, JobDefinition jobDefinition,
-                                   String keyName) {
+    private boolean isMetadataSame(IncrementalUpdateStrategy incrementalUpdater, String tableName) {
         return !isNull(jobDefinition) && !isNull(jobDefinition.getIncrementalUpdateConfig()) &&
-                !incrementalUpdater.isMetaDataChanged(keyName);
+                !incrementalUpdater.isMetaDataChanged(tableName, jobDefinition.getName());
     }
 
     public Set<String> getProcessedIds() {

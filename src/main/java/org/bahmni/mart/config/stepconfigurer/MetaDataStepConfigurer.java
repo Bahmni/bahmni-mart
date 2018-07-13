@@ -52,8 +52,8 @@ public class MetaDataStepConfigurer implements StepConfigurerContract {
     }
 
     @Override
-    public void createTables() {
-        tableGeneratorStep.createTables(Arrays.asList(tableData));
+    public void createTables(JobDefinition jobDefinition) {
+        tableGeneratorStep.createTables(Arrays.asList(tableData), jobDefinition);
     }
 
     @Override

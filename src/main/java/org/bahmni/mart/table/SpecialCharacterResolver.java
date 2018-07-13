@@ -8,6 +8,8 @@ import org.bahmni.mart.table.domain.TableData;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+
 public class SpecialCharacterResolver {
 
     private static final String ALPHA_NUMERIC_UNDERSCORE_REGEX = "[^a-zA-Z0-9_]+";
@@ -117,6 +119,7 @@ public class SpecialCharacterResolver {
     }
 
     public static String getActualTableName(String updatedTableName) {
-        return String.valueOf(updatedToActualTableNames.get(updatedTableName));
+        Object actualTableName = updatedToActualTableNames.get(updatedTableName);
+        return isNull(actualTableName) ? updatedTableName : String.valueOf(actualTableName);
     }
 }

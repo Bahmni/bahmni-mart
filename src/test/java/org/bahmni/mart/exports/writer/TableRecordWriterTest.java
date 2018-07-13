@@ -50,11 +50,15 @@ public class TableRecordWriterTest {
     private JobDefinition jobDefinition;
 
     @Mock
+    private TableData tableData;
+
+    @Mock
     private IncrementalUpdateConfig incrementalUpdateConfig;
 
     private TableRecordWriter tableRecordWriter;
     private Map<String, Object> items;
     private static final String JOB_NAME = "jobName";
+    private static final String TABLE_NAME = "tableName";
 
 
     @Before
@@ -66,8 +70,8 @@ public class TableRecordWriterTest {
                 put("program_id", 123);
             }
         };
-        TableData tableData = new TableData();
-        tableData.setName("program");
+        when(tableData.getName()).thenReturn(TABLE_NAME);
+
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
         tableRecordWriter.setTableData(tableData);
         tableRecordWriter.setJobDefinition(jobDefinition);
@@ -80,7 +84,7 @@ public class TableRecordWriterTest {
         setValuesForMemberFields(tableRecordWriter, "incrementalStrategyContext", incrementalStrategyContext);
         when(incrementalStrategyContext.getStrategy(anyString())).thenReturn(customSqlIncrementalUpdater);
 
-        when(customSqlIncrementalUpdater.isMetaDataChanged(anyString())).thenReturn(true);
+        when(customSqlIncrementalUpdater.isMetaDataChanged(anyString(), anyString())).thenReturn(true);
     }
 
     @Test
@@ -92,8 +96,7 @@ public class TableRecordWriterTest {
 
         verify(martJdbcTemplate, times(1)).execute(sql);
         verify(tableRecordHolderFreeMarkerEvaluator, times(1)).evaluate(anyString(), any(TableRecordHolder.class));
-        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(JOB_NAME);
-        verify(jobDefinition).getName();
+        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(anyString(), anyString());
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(jobDefinition).getType();
         verify(incrementalStrategyContext).getStrategy("customSql");
@@ -111,7 +114,7 @@ public class TableRecordWriterTest {
 
         verify(martJdbcTemplate, times(1)).execute(sql);
         verify(tableRecordHolderFreeMarkerEvaluator, times(1)).evaluate(anyString(), any(TableRecordHolder.class));
-        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(JOB_NAME);
+        verify(customSqlIncrementalUpdater, never()).isMetaDataChanged(anyString(), anyString());
         verify(jobDefinition, never()).getName();
         verify(jobDefinition, never()).getIncrementalUpdateConfig();
         verify(customSqlIncrementalUpdater, never()).deleteVoidedRecords(any(), any(), any());
@@ -121,7 +124,7 @@ public class TableRecordWriterTest {
 
     @Test
     public void shouldDeleteVoidedRecordsBeforeInsertNewData() {
-        when(customSqlIncrementalUpdater.isMetaDataChanged(anyString())).thenReturn(false);
+        when(customSqlIncrementalUpdater.isMetaDataChanged(anyString(), anyString())).thenReturn(false);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
         when(incrementalUpdateConfig.getUpdateOn()).thenReturn("program_id");
 
@@ -144,12 +147,11 @@ public class TableRecordWriterTest {
 
         verify(martJdbcTemplate, times(1)).execute(sql);
         verify(tableRecordHolderFreeMarkerEvaluator, times(1)).evaluate(anyString(), any(TableRecordHolder.class));
-        verify(customSqlIncrementalUpdater).isMetaDataChanged(JOB_NAME);
-        verify(jobDefinition).getName();
+        verify(customSqlIncrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig,atLeastOnce()).getUpdateOn();
         HashSet<String> voidedIds = new HashSet<>(Arrays.asList("123", "124", "128"));
-        verify(customSqlIncrementalUpdater).deleteVoidedRecords(voidedIds, "program", "program_id");
+        verify(customSqlIncrementalUpdater).deleteVoidedRecords(voidedIds, TABLE_NAME, "program_id");
         verify(jobDefinition).getType();
         verify(incrementalStrategyContext).getStrategy("customSql");
     }

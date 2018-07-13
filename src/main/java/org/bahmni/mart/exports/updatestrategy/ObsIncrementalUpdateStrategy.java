@@ -5,15 +5,17 @@ import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static org.bahmni.mart.table.SpecialCharacterResolver.getActualTableName;
+
 @Component
 public class ObsIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrategy {
     @Autowired
     private FormTableMetadataGenerator formTableMetadataGenerator;
 
     @Override
-    public boolean getMetaDataChangeStatus(String actualTableName) {
-        TableData currentTableData = formTableMetadataGenerator.getTableDataByName(actualTableName);
-        TableData existingTableData = getExistingTableData(actualTableName);
+    public boolean getMetaDataChangeStatus(String processedName, String jobName) {
+        TableData currentTableData = formTableMetadataGenerator.getTableDataByName(getActualTableName(processedName));
+        TableData existingTableData = getExistingTableData(processedName);
         return !currentTableData.equals(existingTableData);
     }
 }

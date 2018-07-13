@@ -42,8 +42,7 @@ public class TableRecordWriter extends BaseWriter implements ItemWriter<Map<Stri
     public void write(List<? extends Map<String, Object>> items) {
         List<Map<String, Object>> records = new ArrayList<>(items);
         if (!isNull(jobDefinition))
-            deletedVoidedRecords(records, incrementalStrategyContext.getStrategy(jobDefinition.getType()),
-                    jobDefinition.getName(), tableData);
+            deletedVoidedRecords(records, incrementalStrategyContext.getStrategy(jobDefinition.getType()), tableData);
         insertRecords(records);
     }
 

@@ -87,8 +87,8 @@ public class OrderStepConfigurer implements StepConfigurerContract {
     }
 
     @Override
-    public void createTables() {
-        tableGeneratorStep.createTables(orderablesTableData);
+    public void createTables(JobDefinition jobDefinition) {
+        tableGeneratorStep.createTables(orderablesTableData, jobDefinition);
     }
 
     private List<String> getOrderables() {

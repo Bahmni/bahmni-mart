@@ -74,9 +74,9 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         List<TableData> tableDataList = new ArrayList<>();
         when(formTableMetadataGenerator.getTableDataList()).thenReturn(tableDataList);
 
-        formStepConfigurer.createTables();
+        formStepConfigurer.createTables(jobDefinition);
 
-        verify(tableGeneratorStep, times(1)).createTablesForObs(tableDataList);
+        verify(tableGeneratorStep, times(1)).createTables(tableDataList, jobDefinition);
     }
 
     @Test

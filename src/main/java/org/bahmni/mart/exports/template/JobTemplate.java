@@ -1,6 +1,9 @@
 package org.bahmni.mart.exports.template;
 
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
+import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
 import org.bahmni.mart.table.PreProcessor;
 import org.bahmni.mart.table.TableDataProcessor;
 import org.bahmni.mart.exports.writer.TableRecordWriter;
@@ -20,6 +23,8 @@ import org.springframework.jdbc.core.ColumnMapRowMapper;
 import javax.sql.DataSource;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+
 public class JobTemplate {
 
     @Autowired
@@ -30,6 +35,9 @@ public class JobTemplate {
 
     @Autowired
     private ObjectFactory<TableRecordWriter> recordWriterObjectFactory;
+
+    @Autowired
+    private IncrementalStrategyContext incrementalStrategyContext;
 
     @Autowired
     @Qualifier("openmrsDb")
@@ -83,5 +91,19 @@ public class JobTemplate {
 
     protected void setPreProcessor(PreProcessor preProcessor) {
         this.preProcessor = preProcessor;
+    }
+
+    protected String getUpdatedReaderSql(JobDefinition jobDefinition, String readerSql) {
+        IncrementalUpdateConfig incrementalUpdateConfig = jobDefinition.getIncrementalUpdateConfig();
+
+        if (isNull(incrementalUpdateConfig))
+            return readerSql;
+
+        IncrementalUpdateStrategy strategyContext = incrementalStrategyContext.getStrategy(jobDefinition.getType());
+        boolean metaDataChanged = strategyContext
+                .isMetaDataChanged(jobDefinition.getTableName(), jobDefinition.getName());
+
+        return metaDataChanged ? readerSql : strategyContext.updateReaderSql(readerSql, jobDefinition.getName(),
+                incrementalUpdateConfig.getUpdateOn());
     }
 }

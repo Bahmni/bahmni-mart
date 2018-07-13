@@ -39,9 +39,8 @@ public class EavIncrementalUpdateStrategyTest {
     private EAVJobListener eavJobListener;
 
     private EavIncrementalUpdateStrategy spyEavIncrementalUpdateStrategy;
-    private String tableName;
-    private String processedJobName;
-
+    private static final String TABLE_NAME = "table name";
+    private static final String JOB_NAME = "job name";
 
     @Before
     public void setUp() throws Exception {
@@ -50,56 +49,53 @@ public class EavIncrementalUpdateStrategyTest {
         setValuesForMemberFields(eavIncrementalUpdateStrategy, "eavJobListener", eavJobListener);
         this.spyEavIncrementalUpdateStrategy = spy(eavIncrementalUpdateStrategy);
 
-        processedJobName = "processedJobName";
-        String jobName = "job name";
-        when(jobDefinition.getName()).thenReturn(jobName);
-        tableName = "table name";
-        when(jobDefinition.getTableName()).thenReturn(tableName);
+        when(jobDefinition.getName()).thenReturn(JOB_NAME);
+        when(jobDefinition.getTableName()).thenReturn(TABLE_NAME);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(new IncrementalUpdateConfig());
-        when(jobDefinitionReader.getJobDefinitionByProcessedName(processedJobName)).thenReturn(jobDefinition);
-        when(eavJobListener.getTableDataForMart(jobName)).thenReturn(tableData);
+        when(jobDefinitionReader.getJobDefinitionByName(JOB_NAME)).thenReturn(jobDefinition);
+        when(eavJobListener.getTableDataForMart(JOB_NAME)).thenReturn(tableData);
     }
 
     @Test
     public void shouldReturnTrueIfMetadataChanged() {
-        doReturn(existingTableData).when(spyEavIncrementalUpdateStrategy).getExistingTableData(tableName);
+        doReturn(existingTableData).when(spyEavIncrementalUpdateStrategy).getExistingTableData(TABLE_NAME);
 
-        boolean status = spyEavIncrementalUpdateStrategy.getMetaDataChangeStatus(processedJobName);
+        boolean status = spyEavIncrementalUpdateStrategy.getMetaDataChangeStatus(TABLE_NAME, JOB_NAME);
 
         assertTrue(status);
-        verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
+        verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
         verify(jobDefinition, atLeastOnce()).getName();
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(jobDefinition, atLeastOnce()).getTableName();
         verify(eavJobListener).getTableDataForMart("job name");
-        verify(spyEavIncrementalUpdateStrategy).getExistingTableData(tableName);
+        verify(spyEavIncrementalUpdateStrategy).getExistingTableData(TABLE_NAME);
     }
 
     @Test
     public void shouldReturnTrueIfJobDefinitionNameIsEmpty() {
         when(jobDefinition.getName()).thenReturn(null);
 
-        boolean status = spyEavIncrementalUpdateStrategy.getMetaDataChangeStatus(processedJobName);
+        boolean status = spyEavIncrementalUpdateStrategy.getMetaDataChangeStatus(TABLE_NAME, JOB_NAME);
 
         assertTrue(status);
-        verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
+        verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
         verify(jobDefinition).getName();
         verify(jobDefinition, never()).getIncrementalUpdateConfig();
         verify(eavJobListener, never()).getTableDataForMart("job name");
-        verify(spyEavIncrementalUpdateStrategy, never()).getExistingTableData(tableName);
+        verify(spyEavIncrementalUpdateStrategy, never()).getExistingTableData(TABLE_NAME);
     }
 
     @Test
     public void shouldReturnTrueIfIncrementalConfigIsEmpty() {
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
 
-        boolean status = spyEavIncrementalUpdateStrategy.getMetaDataChangeStatus(processedJobName);
+        boolean status = spyEavIncrementalUpdateStrategy.getMetaDataChangeStatus(TABLE_NAME, JOB_NAME);
 
         assertTrue(status);
-        verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
+        verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
         verify(jobDefinition).getName();
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(eavJobListener, never()).getTableDataForMart("job name");
-        verify(spyEavIncrementalUpdateStrategy, never()).getExistingTableData(tableName);
+        verify(spyEavIncrementalUpdateStrategy, never()).getExistingTableData(TABLE_NAME);
     }
 }

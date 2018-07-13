@@ -18,7 +18,6 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberField
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -32,6 +31,9 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(JobDefinitionUtil.class)
 public class CustomSqlIncrementalUpdateStrategyTest {
+
+    private static final String JOB_NAME = "job name";
+    private static final String TABLE_NAME = "table name";
 
     @Mock
     private JobDefinitionReader jobDefinitionReader;
@@ -49,9 +51,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
     private TableDataGenerator tableDataGenerator;
 
     private CustomSqlIncrementalUpdateStrategy spyCustomSqlIncrementalUpdater;
-    private String tableName;
     private String readerSql;
-    private String processedJobName;
 
 
     @Before
@@ -63,60 +63,58 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         setValuesForSuperClassMemberFields(customSqlIncrementalUpdater, "tableDataGenerator", tableDataGenerator);
         spyCustomSqlIncrementalUpdater = spy(customSqlIncrementalUpdater);
 
-        processedJobName = "processedJobName";
-        when(jobDefinition.getName()).thenReturn("job name");
-        tableName = "table name";
-        when(jobDefinition.getTableName()).thenReturn(tableName);
+        when(jobDefinition.getName()).thenReturn(JOB_NAME);
+        when(jobDefinition.getTableName()).thenReturn(TABLE_NAME);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(new IncrementalUpdateConfig());
         readerSql = "select * from table";
         when(JobDefinitionUtil.getReaderSQL(jobDefinition)).thenReturn(readerSql);
-        when(tableDataGenerator.getTableData(tableName, readerSql)).thenReturn(tableData);
-        when(jobDefinitionReader.getJobDefinitionByProcessedName(processedJobName)).thenReturn(jobDefinition);
+        when(tableDataGenerator.getTableData(TABLE_NAME, readerSql)).thenReturn(tableData);
+        when(jobDefinitionReader.getJobDefinitionByName(JOB_NAME)).thenReturn(jobDefinition);
     }
 
     @Test
     public void shouldReturnTrueIfMetadataChanged() {
-        doReturn(existingTableData).when(spyCustomSqlIncrementalUpdater).getExistingTableData(tableName);
+        doReturn(existingTableData).when(spyCustomSqlIncrementalUpdater).getExistingTableData(TABLE_NAME);
 
-        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(processedJobName);
+        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(TABLE_NAME, JOB_NAME);
 
         assertTrue(status);
-        verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
+        verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
         verify(jobDefinition).getName();
-        verify(jobDefinition, atLeastOnce()).getTableName();
-        verify(spyCustomSqlIncrementalUpdater).getExistingTableData(tableName);
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(spyCustomSqlIncrementalUpdater).getExistingTableData(TABLE_NAME);
         verifyStatic();
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator).getTableData(tableName, readerSql);
+        verify(tableDataGenerator).getTableData(TABLE_NAME, readerSql);
     }
 
     @Test
     public void shouldReturnFalseIfMetadataIsSame() {
-        doReturn(tableData).when(spyCustomSqlIncrementalUpdater).getExistingTableData(tableName);
+        doReturn(tableData).when(spyCustomSqlIncrementalUpdater).getExistingTableData(TABLE_NAME);
 
-        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(processedJobName);
+        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(TABLE_NAME, JOB_NAME);
 
         assertFalse(status);
-        verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
+        verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
         verify(jobDefinition).getName();
-        verify(jobDefinition, atLeastOnce()).getTableName();
-        verify(spyCustomSqlIncrementalUpdater).getExistingTableData(tableName);
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(spyCustomSqlIncrementalUpdater).getExistingTableData(TABLE_NAME);
         verifyStatic();
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator).getTableData(tableName, readerSql);
+        verify(tableDataGenerator).getTableData(TABLE_NAME, readerSql);
     }
 
     @Test
     public void shouldReturnTrueIfJobDefinitionNameIsEmpty() {
         when(jobDefinition.getName()).thenReturn("");
 
-        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(processedJobName);
+        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(TABLE_NAME, JOB_NAME);
 
         assertTrue(status);
-        verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
+        verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
         verify(jobDefinition).getName();
-        verify(jobDefinition, never()).getTableName();
-        verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(tableName);
+        verify(jobDefinition, never()).getIncrementalUpdateConfig();
+        verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(TABLE_NAME);
         verifyStatic(never());
         JobDefinitionUtil.getReaderSQL(jobDefinition);
         verify(tableDataGenerator, never()).getTableData(any(), any());
@@ -126,13 +124,13 @@ public class CustomSqlIncrementalUpdateStrategyTest {
     public void shouldReturnTrueIfIncrementalUpdateConfigIsNull() {
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
 
-        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(processedJobName);
+        boolean status = spyCustomSqlIncrementalUpdater.getMetaDataChangeStatus(TABLE_NAME, JOB_NAME);
 
         assertTrue(status);
-        verify(jobDefinitionReader).getJobDefinitionByProcessedName(processedJobName);
+        verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
         verify(jobDefinition).getName();
-        verify(jobDefinition, never()).getTableName();
-        verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(tableName);
+        verify(jobDefinition).getIncrementalUpdateConfig();
+        verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(TABLE_NAME);
         verifyStatic(never());
         JobDefinitionUtil.getReaderSQL(jobDefinition);
         verify(tableDataGenerator, never()).getTableData(any(), any());

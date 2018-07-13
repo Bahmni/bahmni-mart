@@ -39,7 +39,7 @@ public class OrderJobStrategyTest extends StepRegisterTestHelper {
     public void shouldReturnAJob() {
         assertEquals(expectedJob, orderJobStrategy.getJob(jobDefinition));
 
-        verify(orderStepConfigurer, times(1)).createTables();
+        verify(orderStepConfigurer, times(1)).createTables(jobDefinition);
         verify(orderStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
     }
 

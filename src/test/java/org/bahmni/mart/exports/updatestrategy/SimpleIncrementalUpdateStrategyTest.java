@@ -11,6 +11,6 @@ public class SimpleIncrementalUpdateStrategyTest {
     @Test
     public void shouldGiveTrueAsMetadataChangeStatus() {
         SimpleIncrementalUpdateStrategy simpleIncrementalUpdater = new SimpleIncrementalUpdateStrategy();
-        assertTrue(simpleIncrementalUpdater.getMetaDataChangeStatus("table name"));
+        assertTrue(simpleIncrementalUpdater.getMetaDataChangeStatus("table name", "job name"));
     }
 }

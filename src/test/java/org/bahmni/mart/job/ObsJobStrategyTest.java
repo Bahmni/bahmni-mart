@@ -39,7 +39,7 @@ public class ObsJobStrategyTest extends StepRegisterTestHelper {
     public void shouldReturnAJob() {
         assertEquals(expectedJob, obsJobStrategy.getJob(jobDefinition));
 
-        verify(formStepConfigurer, times(1)).createTables();
+        verify(formStepConfigurer, times(1)).createTables(jobDefinition);
         verify(formStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
     }
 

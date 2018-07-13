@@ -48,7 +48,7 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 public class ObsIncrementalUpdateStrategyTest {
 
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
-    private String jobName;
+    private static final String JOB_NAME = "JobName";
 
     @Mock
     private JdbcTemplate openmrsJdbcTemplate;
@@ -80,7 +80,6 @@ public class ObsIncrementalUpdateStrategyTest {
     @Before
     public void setUp() throws Exception {
         obsIncrementalUpdater = new ObsIncrementalUpdateStrategy();
-        jobName = "JobName";
         category = "CategoryName";
         tableName = "encounter";
         readerSql = "SELECT id, name FROM test";
@@ -106,11 +105,11 @@ public class ObsIncrementalUpdateStrategyTest {
 
     @Test
     public void shouldReturnSameReaderSqlWhenThereIsNoMarkerMapForGivenJob() {
-        when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.empty());
+        when(markerManager.getJobMarkerMap(JOB_NAME)).thenReturn(Optional.empty());
 
-        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, JOB_NAME, updateOn);
 
-        verify(markerManager).getJobMarkerMap(jobName);
+        verify(markerManager).getJobMarkerMap(JOB_NAME);
         assertEquals(readerSql, updatedReaderSql);
     }
 
@@ -118,11 +117,11 @@ public class ObsIncrementalUpdateStrategyTest {
     public void shouldReturnSameReaderSqlWhenEventRecordIdForGivenJobIsZero() {
         Map markerMap = mock(Map.class);
         when(markerMap.get("event_record_id")).thenReturn(0);
-        when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
+        when(markerManager.getJobMarkerMap(JOB_NAME)).thenReturn(Optional.of(markerMap));
 
-        String actualUpdatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        String actualUpdatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, JOB_NAME, updateOn);
 
-        verify(markerManager).getJobMarkerMap(jobName);
+        verify(markerManager).getJobMarkerMap(JOB_NAME);
         verify(markerMap).get("event_record_id");
         assertEquals(readerSql, actualUpdatedReaderSql);
     }
@@ -132,11 +131,11 @@ public class ObsIncrementalUpdateStrategyTest {
         Map markerMap = mock(Map.class);
         when(markerMap.get("event_record_id")).thenReturn("10");
         when(markerMap.get("category")).thenReturn(category);
-        when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
+        when(markerManager.getJobMarkerMap(JOB_NAME)).thenReturn(Optional.of(markerMap));
 
-        obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        obsIncrementalUpdater.updateReaderSql(readerSql, JOB_NAME, updateOn);
 
-        verify(markerManager).getJobMarkerMap(jobName);
+        verify(markerManager).getJobMarkerMap(JOB_NAME);
         verify(markerMap, times(2)).get("event_record_id");
         verify(markerMap).get("category");
         verify(openmrsJdbcTemplate).queryForList(format(queryForEventObjects, "10", "20", category),
@@ -148,7 +147,7 @@ public class ObsIncrementalUpdateStrategyTest {
         setUpForMarkerMap();
         setUpForUuids();
 
-        obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        obsIncrementalUpdater.updateReaderSql(readerSql, JOB_NAME, updateOn);
 
         verify(openmrsJdbcTemplate).queryForList(format(queryForEventObjects, "10", "20", category), String.class);
         verify(openmrsJdbcTemplate).queryForList(queryForIds, String.class);
@@ -164,7 +163,7 @@ public class ObsIncrementalUpdateStrategyTest {
         String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (1,2)", readerSql,
                 updateOn);
 
-        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, JOB_NAME, updateOn);
 
         assertEquals(expectedUpdatedReaderSql, updatedReaderSql);
     }
@@ -177,7 +176,7 @@ public class ObsIncrementalUpdateStrategyTest {
         String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (-1)", readerSql,
                 updateOn);
 
-        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, jobName, updateOn);
+        String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(readerSql, JOB_NAME, updateOn);
 
         assertEquals(expectedUpdatedReaderSql, updatedReaderSql);
     }
@@ -234,7 +233,7 @@ public class ObsIncrementalUpdateStrategyTest {
     public void shouldNotQueryForMaxEventRecordIdWhenTheSameFieldIsNotNull() throws Exception {
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId", 123);
 
-        obsIncrementalUpdater.updateMarker("jobName");
+        obsIncrementalUpdater.updateMarker("JOB_NAME");
 
         verify(openmrsJdbcTemplate, never()).queryForObject(queryForMaxEventRecordId, String.class);
     }
@@ -242,7 +241,7 @@ public class ObsIncrementalUpdateStrategyTest {
     @Test
     public void shouldReturnTrueWhenThereIsMetaDataChange() {
         String formName = "form, name@one";
-        String actualTableName = getProcessedName(formName);
+        String actualTableName = "form,_name@one";
         TableData tableData = new TableData(actualTableName);
         List<TableColumn> tableColumns = new ArrayList<>();
         tableColumns.add(new TableColumn("id_form_name_one", "integer", true, null));
@@ -250,19 +249,22 @@ public class ObsIncrementalUpdateStrategyTest {
         tableData.setColumns(tableColumns);
 
         String updatedTableName = "form_name_one";
+        when(SpecialCharacterResolver.getActualTableName(anyString())).thenReturn(actualTableName);
         when(getUpdatedTableNameIfExist(actualTableName)).thenReturn(updatedTableName);
         when(tableDataGenerator.getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one"))
                 .thenReturn(new TableData());
         when(formTableMetadataGenerator.getTableDataByName(actualTableName))
                 .thenReturn(tableData);
 
-        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName);
+        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME);
 
         assertTrue(metaDataChanged);
         verifyStatic();
         getUpdatedTableNameIfExist(actualTableName);
 
         verify(tableDataGenerator).getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one");
+        verifyStatic();
+        SpecialCharacterResolver.getActualTableName(actualTableName);
         verify(formTableMetadataGenerator).getTableDataByName(actualTableName);
         assertFalse(metaDataChangeMap.isEmpty());
         verify(metaDataChangeMap).put("form,_name@one", true);
@@ -271,7 +273,7 @@ public class ObsIncrementalUpdateStrategyTest {
     @Test
     public void shouldReturnFalseWhenThereIsNoMetaDataChange() {
         String formName = "form, name@one";
-        String actualTableName = getProcessedName(formName);
+        String actualTableName = "form,_name@one";
         TableData tableData = new TableData(actualTableName);
         List<TableColumn> tableColumns = new ArrayList<>();
         tableColumns.add(new TableColumn("id_form_name_one", "integer", true, null));
@@ -280,16 +282,19 @@ public class ObsIncrementalUpdateStrategyTest {
 
         String updatedTableName = "form_name_one";
         when(getUpdatedTableNameIfExist(actualTableName)).thenReturn(updatedTableName);
+        when(SpecialCharacterResolver.getActualTableName(anyString())).thenReturn(actualTableName);
         when(tableDataGenerator.getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one"))
                 .thenReturn(tableData);
         when(formTableMetadataGenerator.getTableDataByName(actualTableName))
                 .thenReturn(tableData);
 
-        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName);
+        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME);
 
         assertFalse(metaDataChanged);
         verifyStatic();
         getUpdatedTableNameIfExist(actualTableName);
+        verifyStatic();
+        SpecialCharacterResolver.getActualTableName(actualTableName);
 
         verify(tableDataGenerator).getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one");
         verify(formTableMetadataGenerator).getTableDataByName(actualTableName);
@@ -303,7 +308,7 @@ public class ObsIncrementalUpdateStrategyTest {
         String actualTableName = getProcessedName(formName);
         metaDataChangeMap.put(actualTableName, true);
 
-        assertTrue(obsIncrementalUpdater.isMetaDataChanged(formName));
+        assertTrue(obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME));
 
         verify(metaDataChangeMap).get(actualTableName);
         verifyStatic(never());
@@ -316,17 +321,20 @@ public class ObsIncrementalUpdateStrategyTest {
     @Test
     public void shouldNotThrowBadSalGrammarExceptionWhenTheTableIsNotPresent() {
         String formName = "table, name";
-        String actualTableName = getProcessedName(formName);
+        String actualTableName = "table,_name";
+        when(SpecialCharacterResolver.getActualTableName(anyString())).thenReturn(actualTableName);
         when(formTableMetadataGenerator.getTableDataByName(actualTableName)).thenReturn(new TableData(actualTableName));
         when(getUpdatedTableNameIfExist(actualTableName)).thenReturn("table_name");
         when(tableDataGenerator.getTableDataFromMart("table_name", "SELECT * FROM table_name"))
                 .thenThrow(BadSqlGrammarException.class);
 
-        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName);
+        boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME);
 
         assertTrue(metaDataChanged);
         verifyStatic();
         getUpdatedTableNameIfExist(actualTableName);
+        verifyStatic();
+        SpecialCharacterResolver.getActualTableName(actualTableName);
         verify(tableDataGenerator).getTableDataFromMart("table_name", "SELECT * FROM table_name");
     }
 
@@ -335,7 +343,7 @@ public class ObsIncrementalUpdateStrategyTest {
         when(markerMap.get("event_record_id")).thenReturn("10");
         when(markerMap.get("category")).thenReturn(category);
         when(markerMap.get("table_name")).thenReturn(tableName);
-        when(markerManager.getJobMarkerMap(jobName)).thenReturn(Optional.of(markerMap));
+        when(markerManager.getJobMarkerMap(JOB_NAME)).thenReturn(Optional.of(markerMap));
     }
 
     private void setUpForUuids() {

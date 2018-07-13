@@ -80,13 +80,12 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
     }
 
     @Override
-    public boolean isMetaDataChanged(String formName) {
-        String actualTableName = getProcessedName(formName);
+    public boolean isMetaDataChanged(String tableName, String jobName) {
+        String actualTableName = getProcessedName(tableName);
         if (metaDataChangeMap.containsKey(actualTableName)) {
             return metaDataChangeMap.get(actualTableName);
         }
-        boolean metaDataChanged = getMetaDataChangeStatus(actualTableName);
-
+        boolean metaDataChanged = getMetaDataChangeStatus(actualTableName, jobName);
         metaDataChangeMap.put(actualTableName, metaDataChanged);
         return metaDataChanged;
     }
@@ -122,7 +121,7 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
         maxEventRecordId = openmrsJdbcTemplate.queryForObject(QUERY_FOR_MAX_EVENT_RECORD_ID, Integer.class);
     }
 
-    protected abstract boolean getMetaDataChangeStatus(String actualTableName);
+    protected abstract boolean getMetaDataChangeStatus(String actualTableName, String jobName);
 
     @Override
     public TableData getExistingTableData(String actualTableName) {

@@ -1,6 +1,7 @@
 package org.bahmni.mart.exports.writer;
 
 import org.bahmni.mart.AbstractBaseBatchIT;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
@@ -29,6 +30,8 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldWriteObsToDB() throws Exception {
+        JobDefinition jobDefinition = new JobDefinition();
+
         BahmniForm bahmniForm = new BahmniForm();
         Concept formName = new Concept(1, "test", 1);
         formName.setDataType("N/A");
@@ -92,7 +95,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
 
         formTableMetadataGenerator.addMetadataForForm(bahmniForm);
         databaseObsWriter.setForm(bahmniForm);
-        tableGeneratorStep.createTables(formTableMetadataGenerator.getTableDataList());
+        tableGeneratorStep.createTables(formTableMetadataGenerator.getTableDataList(), jobDefinition);
 
         databaseObsWriter.write(items);
 

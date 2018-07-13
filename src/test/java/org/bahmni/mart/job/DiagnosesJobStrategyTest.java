@@ -39,7 +39,7 @@ public class DiagnosesJobStrategyTest extends StepRegisterTestHelper {
     public void shouldReturnAJob() {
         assertEquals(expectedJob, diagnosesJobStrategy.getJob(jobDefinition));
 
-        verify(diagnosesStepConfigurer, times(1)).createTables();
+        verify(diagnosesStepConfigurer, times(1)).createTables(jobDefinition);
         verify(diagnosesStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
     }
 

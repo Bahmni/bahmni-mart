@@ -18,14 +18,13 @@ public class CustomSqlIncrementalUpdateStrategy extends AbstractIncrementalUpdat
     private JobDefinitionReader jobDefinitionReader;
 
     @Override
-    public boolean getMetaDataChangeStatus(String jobName) {
-        JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByProcessedName(jobName);
+    public boolean getMetaDataChangeStatus(String tableName, String jobName) {
+        JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         if (isEmpty(jobDefinition.getName()) || isNull(jobDefinition.getIncrementalUpdateConfig()))
             return true;
 
-        TableData tableData = tableDataGenerator.getTableData(jobDefinition.getTableName(),
-                getReaderSQL(jobDefinition));
+        TableData tableData = tableDataGenerator.getTableData(tableName, getReaderSQL(jobDefinition));
 
-        return !tableData.equals(getExistingTableData(jobDefinition.getTableName()));
+        return !tableData.equals(getExistingTableData(tableName));
     }
 }

@@ -30,6 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -56,12 +57,19 @@ public class ObservationExportStepTest {
     private ObjectFactory<DatabaseObsWriter> obsWriterObjectFactory;
 
     @Mock
+    private JobDefinition jobDefinition;
+
+    @Mock
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
-    private ObservationExportStep observationExportStep = new ObservationExportStep();
+    private ObservationExportStep observationExportStep;
+    private static final String JOB_NAME = "job Name";
 
     @Before
     public void setUp() throws Exception {
+        observationExportStep = new ObservationExportStep();
+        observationExportStep.setJobDefinition(jobDefinition);
+
         PowerMockito.mockStatic(BatchUtils.class);
         setValuesForMemberFields(observationExportStep,
                 "dataSource", dataSource);
@@ -73,8 +81,8 @@ public class ObservationExportStepTest {
                 "databaseObsWriterObjectFactory", obsWriterObjectFactory);
         setValuesForMemberFields(observationExportStep, "obsIncrementalUpdater", obsIncrementalUpdater);
         BatchUtils.stepNumber = 0;
-        when(obsIncrementalUpdater.isMetaDataChanged(any())).thenReturn(true);
-
+        when(obsIncrementalUpdater.isMetaDataChanged(any(), anyString())).thenReturn(true);
+        when(jobDefinition.getName()).thenReturn(JOB_NAME);
     }
 
     @Test
@@ -133,17 +141,15 @@ public class ObservationExportStepTest {
         String formName = "FormOne";
         BahmniForm form = mock(BahmniForm.class);
         setUpStepConfig(formName, form);
-        JobDefinition jobDefinition = new JobDefinition();
-        String jobName = "job Name";
-        jobDefinition.setName(jobName);
         observationExportStep.setJobDefinition(jobDefinition);
-        when(obsIncrementalUpdater.isMetaDataChanged(formName)).thenReturn(false);
+        when(obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME)).thenReturn(false);
 
         observationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Step-1 " + formName);
-        verify(obsIncrementalUpdater).isMetaDataChanged(formName);
-        verify(obsIncrementalUpdater).updateReaderSql("some sql", jobName, "encounter_id");
+        verify(obsIncrementalUpdater).isMetaDataChanged(formName, JOB_NAME);
+        verify(jobDefinition, atLeastOnce()).getName();
+        verify(obsIncrementalUpdater).updateReaderSql("some sql", JOB_NAME, "encounter_id");
     }
 
     @Test
@@ -151,12 +157,13 @@ public class ObservationExportStepTest {
         String formName = "FormTwo";
         BahmniForm form = mock(BahmniForm.class);
         setUpStepConfig(formName, form);
-        when(obsIncrementalUpdater.isMetaDataChanged(formName)).thenReturn(true);
+        when(obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME)).thenReturn(true);
 
         observationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Step-1 " + formName);
-        verify(obsIncrementalUpdater).isMetaDataChanged(formName);
+        verify(jobDefinition).getName();
+        verify(obsIncrementalUpdater).isMetaDataChanged(formName, JOB_NAME);
         verify(obsIncrementalUpdater, never()).updateReaderSql(anyString(), anyString(), anyString());
     }
 

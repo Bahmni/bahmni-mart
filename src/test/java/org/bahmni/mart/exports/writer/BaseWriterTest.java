@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -25,8 +25,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
 public class BaseWriterTest {
+
+    private static final String TABLE_NAME = "tableName";
+    private static final String JOB_NAME = "jobName";
 
     private class SampleBaseWriter extends BaseWriter {
 
@@ -51,23 +54,24 @@ public class BaseWriterTest {
 
     private List<Object> items = Arrays.asList();
     private BaseWriter baseWriter;
-    private static final String KEY_NAME = "keyName";
 
     @Before
     public void setUp() {
         baseWriter = new SampleBaseWriter();
         baseWriter.setJobDefinition(jobDefinition);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
-        when(incrementalUpdater.isMetaDataChanged(anyString())).thenReturn(false);
+        when(incrementalUpdater.isMetaDataChanged(anyString(), anyString())).thenReturn(false);
+        when(tableData.getName()).thenReturn(TABLE_NAME);
+        when(jobDefinition.getName()).thenReturn(JOB_NAME);
     }
 
     @Test
     public void shouldNotDeleteVoidedRecordsIfJobDefinitionIsNull() {
         baseWriter.setJobDefinition(null);
 
-        baseWriter.deletedVoidedRecords(items, incrementalUpdater, KEY_NAME, tableData);
+        baseWriter.deletedVoidedRecords(items, incrementalUpdater, tableData);
 
-        verify(incrementalUpdater, never()).isMetaDataChanged(KEY_NAME);
+        verify(incrementalUpdater, never()).isMetaDataChanged(anyString(), anyString());
         verify(incrementalUpdater, never()).deleteVoidedRecords(anySet(), anyString(), anyString());
     }
 
@@ -76,55 +80,50 @@ public class BaseWriterTest {
         baseWriter.setJobDefinition(jobDefinition);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
 
-        baseWriter.deletedVoidedRecords(items, incrementalUpdater, KEY_NAME, tableData);
+        baseWriter.deletedVoidedRecords(items, incrementalUpdater, tableData);
 
-        verify(incrementalUpdater, never()).isMetaDataChanged(KEY_NAME);
+        verify(incrementalUpdater, never()).isMetaDataChanged(anyString(), anyString());
         verify(incrementalUpdater, never()).deleteVoidedRecords(anySet(), anyString(), anyString());
         verify(jobDefinition).getIncrementalUpdateConfig();
     }
 
     @Test
     public void shouldNotDeleteVoidedRecordsIfMetadataIsChanged() {
-        when(incrementalUpdater.isMetaDataChanged(anyString())).thenReturn(true);
+        when(incrementalUpdater.isMetaDataChanged(anyString(), anyString())).thenReturn(true);
 
-        baseWriter.deletedVoidedRecords(items, incrementalUpdater, KEY_NAME, tableData);
+        baseWriter.deletedVoidedRecords(items, incrementalUpdater, tableData);
 
         verify(jobDefinition).getIncrementalUpdateConfig();
-        verify(incrementalUpdater).isMetaDataChanged(KEY_NAME);
+        verify(incrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verify(incrementalUpdater, never()).deleteVoidedRecords(anySet(), anyString(), anyString());
     }
 
     @Test
     public void shouldDeleteVoidedRecords() {
-        String tableName = "tableName";
         String updateOn = "updateOn";
-
-        when(tableData.getName()).thenReturn(tableName);
         when(incrementalUpdateConfig.getUpdateOn()).thenReturn(updateOn);
 
-        baseWriter.deletedVoidedRecords(items, incrementalUpdater, KEY_NAME, tableData);
+        baseWriter.deletedVoidedRecords(items, incrementalUpdater, tableData);
 
         verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
-        verify(incrementalUpdater).isMetaDataChanged(KEY_NAME);
+        verify(incrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verify(incrementalUpdater)
-                .deleteVoidedRecords(eq(new HashSet<>(Arrays.asList("3", "4", "5"))), eq(tableName), eq(updateOn));
+                .deleteVoidedRecords(eq(new HashSet<>(Arrays.asList("3", "4", "5"))), eq(TABLE_NAME), eq(updateOn));
     }
 
     @Test
     public void shouldNotDeleteRecordsFromPreviousChunkWhenSameIdIsPresentAcrossChunks() throws Exception {
-        String tableName = "tableName";
         String updateOn = "updateOn";
 
-        when(tableData.getName()).thenReturn(tableName);
         when(incrementalUpdateConfig.getUpdateOn()).thenReturn(updateOn);
 
         setValuesForSuperClassMemberFields(baseWriter, "processedIds", new HashSet<>(Arrays.asList("1", "2", "3")));
 
-        baseWriter.deletedVoidedRecords(items, incrementalUpdater, KEY_NAME, tableData);
+        baseWriter.deletedVoidedRecords(items, incrementalUpdater, tableData);
         verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
-        verify(incrementalUpdater).isMetaDataChanged(KEY_NAME);
+        verify(incrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         HashSet<String> expectedProcessedIds = new HashSet<>(Arrays.asList("4", "5"));
-        verify(incrementalUpdater).deleteVoidedRecords(eq(expectedProcessedIds), eq(tableName), eq(updateOn));
+        verify(incrementalUpdater).deleteVoidedRecords(eq(expectedProcessedIds), eq(TABLE_NAME), eq(updateOn));
         assertEquals(expectedProcessedIds, baseWriter.getProcessedIds());
     }
 }

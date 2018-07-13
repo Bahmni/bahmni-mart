@@ -3,11 +3,11 @@ package org.bahmni.mart.exports.writer;
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
+import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 public class DatabaseObsWriterTest {
 
     private DatabaseObsWriter databaseObsWriter;
+    private static final String JOB_NAME = "jobName";
 
     @Mock
     private FormTableMetadataGenerator formTableMetadataGenerator;
@@ -68,6 +69,7 @@ public class DatabaseObsWriterTest {
 
         databaseObsWriter.setJobDefinition(jobDefinition);
         when(jobDefinition.getType()).thenReturn("Obs");
+        when(jobDefinition.getName()).thenReturn(JOB_NAME);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
         when(incrementalStrategyContext.getStrategy(anyString())).thenReturn(obsIncrementalUpdater);
         when(incrementalUpdateConfig.getUpdateOn()).thenReturn("encounter_id");
@@ -113,7 +115,7 @@ public class DatabaseObsWriterTest {
         items.add(obsList2);
 
         databaseObsWriter.setForm(bahmniForm);
-        when(obsIncrementalUpdater.isMetaDataChanged(formName.getName())).thenReturn(false);
+        when(obsIncrementalUpdater.isMetaDataChanged(anyString(), anyString())).thenReturn(false);
         when(formTableMetadataGenerator.getTableData(bahmniForm)).thenReturn(new TableData("test"));
 
         databaseObsWriter.write(items);
@@ -122,10 +124,12 @@ public class DatabaseObsWriterTest {
         verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig).getUpdateOn();
         verify(jobDefinition).getType();
+        verify(jobDefinition).getName();
         verify(incrementalStrategyContext).getStrategy("Obs");
-        verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName());
+        verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName(), JOB_NAME);
         HashSet<String> encounterIds = new HashSet<>(Arrays.asList("56", "560"));
-        verify(obsIncrementalUpdater).deleteVoidedRecords(encounterIds,"test","encounter_id");
+        verify(obsIncrementalUpdater).deleteVoidedRecords(encounterIds, "test", "encounter_id");
+        verify(jobDefinition).getName();
     }
 
     @Test
@@ -168,16 +172,17 @@ public class DatabaseObsWriterTest {
         items.add(obsList2);
 
         databaseObsWriter.setForm(bahmniForm);
-        when(obsIncrementalUpdater.isMetaDataChanged(formName.getName())).thenReturn(true);
+        when(obsIncrementalUpdater.isMetaDataChanged(anyString(), anyString())).thenReturn(true);
         when(formTableMetadataGenerator.getTableData(bahmniForm)).thenReturn(new TableData("test"));
 
         databaseObsWriter.write(items);
 
         verify(jobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig, never()).getUpdateOn();
-        verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName());
-        verify(obsIncrementalUpdater, never()).deleteVoidedRecords(anySet(),anyString(),anyString());
+        verify(obsIncrementalUpdater).isMetaDataChanged(formName.getName(), JOB_NAME);
+        verify(obsIncrementalUpdater, never()).deleteVoidedRecords(anySet(), anyString(), anyString());
         verify(jobDefinition).getType();
+        verify(jobDefinition).getName();
         verify(incrementalStrategyContext).getStrategy("Obs");
     }
 }

@@ -39,7 +39,7 @@ public class BacteriologyJobStrategyTest extends StepRegisterTestHelper {
     public void shouldReturnAJob() {
         assertEquals(expectedJob, bacteriologyJobStrategy.getJob(jobDefinition));
 
-        verify(bacteriologyStepConfigurer, times(1)).createTables();
+        verify(bacteriologyStepConfigurer, times(1)).createTables(jobDefinition);
         verify(bacteriologyStepConfigurer, times(1)).registerSteps(jobFlowBuilder,
                 jobDefinition);
 

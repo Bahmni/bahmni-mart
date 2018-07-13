@@ -38,7 +38,7 @@ public class REGJobStrategyTest extends StepRegisterTestHelper {
     public void shouldReturnAJob() {
         assertEquals(expectedJob, regJobStrategy.getJob(jobDefinition));
 
-        verify(regStepConfigurer, times(1)).createTables();
+        verify(regStepConfigurer, times(1)).createTables(jobDefinition);
         verify(regStepConfigurer, times(1)).registerSteps(jobFlowBuilder, jobDefinition);
     }
 }
