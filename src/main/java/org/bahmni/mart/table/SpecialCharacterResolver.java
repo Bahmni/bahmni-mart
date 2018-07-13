@@ -12,7 +12,7 @@ import static java.util.Objects.isNull;
 
 public class SpecialCharacterResolver {
 
-    private static final String ALPHA_NUMERIC_UNDERSCORE_REGEX = "[^a-zA-Z0-9_]+";
+    private static final String ALPHA_NUMERIC_UNDERSCORE_REGEX = "[^\\p{L}0-9_]+";
 
     private static Map<String, DualHashBidiMap> tableToColumnsMap = new HashMap<>();
     private static DualHashBidiMap updatedToActualTableNames = new DualHashBidiMap();

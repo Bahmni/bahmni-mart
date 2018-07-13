@@ -141,5 +141,15 @@ public class SpecialCharacterResolverTest {
         String actualTableName = SpecialCharacterResolver.getActualTableName(tableName);
         assertEquals(tableName, actualTableName);
     }
+
+    @Test
+    public void shouldNotRemoveCharactersOfOtherLanguages() throws Exception {
+        String actualTableName = "première étape de validation";
+        TableData tableData = new TableData(actualTableName);
+        SpecialCharacterResolver.resolveTableData(tableData);
+
+        String updatedTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(actualTableName);
+        assertEquals("première_étape_de_validation", updatedTableName);
+    }
 }
 
