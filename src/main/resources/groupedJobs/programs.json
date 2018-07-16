@@ -16,7 +16,12 @@
       "name": "Patient program data",
       "type": "customSql",
       "readerSql": "SELECT pp.patient_id, pp.program_id, pp.patient_program_id, pp.date_enrolled, FORMAT((DATEDIFF(pp.date_enrolled, p.birthdate) / 365), 0) AS age_during_enrollment, pp.date_completed, FORMAT((DATEDIFF(pp.date_completed, p.birthdate) / 365), 0) AS age_during_completion, pp.location_id, l.name AS location_name, cn_outcome.concept_full_name AS program_outcome, pp.creator AS creator_id, creator_details.name AS creator_name, pp.date_created, pp.date_changed, pp.changed_by AS changed_by_id, changer_details.name AS changed_by_name FROM patient_program pp INNER JOIN person p ON p.person_id = pp.patient_id INNER JOIN (SELECT users.user_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS name FROM users INNER JOIN person_name pn ON users.person_id = pn.person_id) creator_details ON creator_details.user_id = pp.creator LEFT OUTER JOIN (SELECT users.user_id, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS name FROM users INNER JOIN person_name pn ON users.person_id = pn.person_id) changer_details ON changer_details.user_id = pp.changed_by LEFT OUTER JOIN concept_view cn_outcome ON cn_outcome.concept_id = pp.outcome_concept_id AND cn_outcome.retired = FALSE LEFT OUTER JOIN location l ON l.location_id = pp.location_id AND l.retired = FALSE",
-      "tableName": "patient_program_data_default"
+      "tableName": "patient_program_data_default",
+      "incrementalUpdateConfig": {
+        "updateOn": "patient_program_id",
+        "eventCategory": "programenrollment",
+        "openmrsTableName": "patient_program"
+      }
     },
     {
       "name": "Program Workflow",
@@ -41,6 +46,11 @@
         "typeTableJoiningId": "program_attribute_type_id",
         "valueColumnName": "value_reference",
         "primaryKey": "patient_program_id"
+      },
+      "incrementalUpdateConfig": {
+        "updateOn": "patient_program_id",
+        "eventCategory": "programenrollment",
+        "openmrsTableName": "patient_program"
       }
     }
   ]
