@@ -64,8 +64,8 @@ To install bahmni-mart follow the steps given below
     ```bash
     wget -O /tmp/bahmni-mart-playbook.zip https://github.com/bahmni-msf/bahmni-mart-playbook/archive/master.zip && unzip -o /tmp/bahmni-mart-playbook.zip -d /tmp && sudo rm -rf /etc/bahmni-mart-playbook && sudo mv /tmp/bahmni-mart-playbook-master /etc/bahmni-mart-playbook && rm -rf /tmp/bahmni-mart-playbook.zip
     ```
-* Update **/etc/bahmni-mart-playbook/inventories/bahmni-mart** inventory file as part your requirement
-* Update the values presents in **/etc/bahmni-mart-playbook/setup.yml** inventory file as part your requirement
+* Update **/etc/bahmni-mart-playbook/inventories/bahmni-mart** inventory file as per your requirement
+* Update the values presents in **/etc/bahmni-mart-playbook/setup.yml** inventory file as per your requirement
 * Install **Bahmni-mart** application
     ```bash
     ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml'
@@ -79,8 +79,8 @@ You can access **Bahmni-mart** and other application from browser also.
 
 |Application | URL | Comment | 
 |:-----------|:------|:---------|
-|Bahmni mart  |http://<HOST NAME>/dashboard/#/tasks/definitions/launch/create-bahmni-mart| Only if bahmni-mart-scdf is installed|
-|Metabase|http://<HOST NAME>:9003|Only if metabase is installed|
+|Bahmni mart  |http://\<HOST NAME>/dashboard/#/tasks/definitions/launch/create-bahmni-mart| Only if bahmni-mart-scdf is installed|
+|Metabase|http://\<HOST NAME>:9003|Only if metabase is installed|
 
 ---
 ### Commands to Remember
