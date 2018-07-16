@@ -33,6 +33,10 @@ public class IncrementalStrategyContext {
         incrementalStrategies = new HashMap<>();
         incrementalStrategies.put(JobType.CUSTOMSQL.toString(), customSqlIncrementalUpdateStrategy);
         incrementalStrategies.put(JobType.OBS.toString(), obsIncrementalUpdateStrategy);
+        incrementalStrategies.put(JobType.BACTERIOLOGY.toString(), obsIncrementalUpdateStrategy);
+        incrementalStrategies.put(JobType.DIAGNOSES.toString(), obsIncrementalUpdateStrategy);
+        incrementalStrategies.put(JobType.DISPOSITION.toString(), obsIncrementalUpdateStrategy);
+        incrementalStrategies.put(JobType.REG.toString(), obsIncrementalUpdateStrategy);
         incrementalStrategies.put(JobType.EAV.toString(), eavIncrementalUpdateStrategy);
     }
 
