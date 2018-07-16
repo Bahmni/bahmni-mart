@@ -1,6 +1,7 @@
 package org.bahmni.mart.exports.updatestrategy;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -23,11 +26,13 @@ import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
 public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUpdateStrategy {
 
+    private static final String UUID_REGEXP = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+    private static final Pattern UUID_PATTERN = Pattern.compile(UUID_REGEXP);
     private static final String EVENT_RECORD_ID = "event_record_id";
     private static final String CATEGORY = "category";
     private static final String TABLE_NAME = "table_name";
-    private static final String QUERY_FOR_UUID_EXTRACTION = "SELECT DISTINCT substring_index(substring_index(object, " +
-            "'/', -1), '?', 1) as uuid FROM event_records WHERE id > %s AND id <= %s AND category = '%s'";
+    private static final String QUERY_FOR_URL_EXTRACTION = "SELECT DISTINCT object FROM event_records" +
+            " WHERE id > %s AND id <= %s AND category = '%s'";
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
     private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
     private static final String NON_EXISTED_ID = "-1";
@@ -95,19 +100,21 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
         String category = (String) markerMap.get(CATEGORY);
         String tableName = (String) markerMap.get(TABLE_NAME);
         List<String> uuids = getEventRecordUuids(eventRecordId, category);
-        if (uuids.isEmpty()) {
-            return NON_EXISTED_ID;
-        }
-
-        return getIdListFor(tableName, uuids).stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+        return uuids.isEmpty() ? NON_EXISTED_ID : getIdListFor(tableName, uuids).stream()
+                .map(String::valueOf).collect(Collectors.joining(","));
     }
 
     private List<String> getEventRecordUuids(String eventRecordId, String category) {
-        String queryForEventRecordObjects = String.format(QUERY_FOR_UUID_EXTRACTION, eventRecordId,
+        String queryForEventRecordObjectUrls = String.format(QUERY_FOR_URL_EXTRACTION, eventRecordId,
                 maxEventRecordId, category);
-        return openmrsJdbcTemplate.queryForList(queryForEventRecordObjects, String.class);
+
+        return openmrsJdbcTemplate.queryForList(queryForEventRecordObjectUrls, String.class).stream().map(this::getUuid)
+                .filter(StringUtils::isNotEmpty).collect(Collectors.toList());
+    }
+
+    private String getUuid(String url) {
+        Matcher matcher = UUID_PATTERN.matcher(url);
+        return matcher.find() ? matcher.group(0) : null;
     }
 
     private List<String> getIdListFor(String tableName, List<String> uuids) {
