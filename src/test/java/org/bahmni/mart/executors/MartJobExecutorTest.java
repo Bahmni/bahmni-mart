@@ -1,12 +1,13 @@
 package org.bahmni.mart.executors;
 
 import org.bahmni.mart.config.group.GroupedJob;
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.job.JobContext;
+import org.bahmni.mart.notification.MailSender;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,22 +18,28 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 
 import java.util.Arrays;
-import java.util.Collections;
 
+import static java.util.Collections.singletonList;
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
+import static org.springframework.batch.core.BatchStatus.COMPLETED;
+import static org.springframework.batch.core.BatchStatus.FAILED;
 
 @PrepareForTest(JobDefinitionValidator.class)
 @RunWith(PowerMockRunner.class)
@@ -61,6 +68,9 @@ public class MartJobExecutorTest {
     @Mock
     private MarkerManager markerManager;
 
+    @Mock
+    private MailSender mailSender;
+
     private JobDefinition jobDefinition = new JobDefinition();
 
     private JobDefinition groupedJobDefinition = new JobDefinition();
@@ -77,10 +87,11 @@ public class MartJobExecutorTest {
         setValuesForMemberFields(martJobExecutor, "jobContext", jobContext);
         setValuesForMemberFields(martJobExecutor, "groupedJob", groupedJob);
         setValuesForMemberFields(martJobExecutor, "markerManager", markerManager);
+        setValuesForMemberFields(martJobExecutor, "mailSender", mailSender);
 
         mockStatic(JobDefinitionValidator.class);
 
-        when(jobDefinitionReader.getJobDefinitions()).thenReturn(Collections.singletonList(jobDefinition));
+        when(jobDefinitionReader.getJobDefinitions()).thenReturn(singletonList(jobDefinition));
         when(groupedJob.getJobDefinitionsBySkippingGroupedTypeJobs(anyListOf(JobDefinition.class)))
                 .thenReturn(Arrays.asList(jobDefinition, groupedJobDefinition, null));
 
@@ -137,6 +148,37 @@ public class MartJobExecutorTest {
         martJobExecutor.execute();
 
         verify(log, times(2)).warn(any(String.class), any(Exception.class));
+
+    }
+
+    @Test
+    public void shouldCallMailServiceToSendMailForFailedJobs() throws Exception {
+        JobExecution jobExecutionOfJob = mock(JobExecution.class);
+        JobInstance jobInstance = mock(JobInstance.class);
+        when(jobLauncher.run(eq(job), any(JobParameters.class))).thenReturn(jobExecutionOfJob);
+        when(jobExecutionOfJob.getStatus()).thenReturn(COMPLETED);
+        when(jobExecutionOfJob.getJobInstance()).thenReturn(jobInstance);
+        when(jobInstance.getJobName()).thenReturn("Completed Obs");
+
+        JobExecution jobExecutionOfGroupJob = mock(JobExecution.class);
+        JobInstance groupJobInstance = mock(JobInstance.class);
+        when(jobLauncher.run(eq(groupJob), any(JobParameters.class))).thenReturn(jobExecutionOfGroupJob);
+        when(jobExecutionOfGroupJob.getStatus()).thenReturn(FAILED);
+        when(jobExecutionOfGroupJob.getJobInstance()).thenReturn(groupJobInstance);
+        when(groupJobInstance.getJobName()).thenReturn("Failed Obs");
+
+        martJobExecutor.execute();
+
+        verify(jobLauncher).run(eq(job), any(JobParameters.class));
+        verify(jobLauncher).run(eq(groupJob), any(JobParameters.class));
+        verify(jobExecutionOfJob).getStatus();
+        verify(jobExecutionOfJob, never()).getJobInstance();
+        verify(jobInstance, never()).getJobName();
+        verify(jobExecutionOfGroupJob).getStatus();
+        verify(jobExecutionOfGroupJob).getJobInstance();
+        verify(groupJobInstance).getJobName();
+        verify(jobExecutionOfGroupJob.getJobInstance()).getJobName();
+        verify(mailSender).sendMail(singletonList("Failed Obs"));
 
     }
 }

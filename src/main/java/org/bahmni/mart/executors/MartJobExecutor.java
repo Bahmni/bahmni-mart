@@ -7,19 +7,24 @@ import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.job.JobContext;
+import org.bahmni.mart.notification.MailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static org.springframework.batch.core.BatchStatus.COMPLETED;
 
 @Component
 @Order(value = MartExecutionOrder.JOB)
@@ -42,6 +47,11 @@ public class MartJobExecutor implements MartExecutor {
     @Autowired
     private MarkerManager markerManager;
 
+    private List<JobExecution> jobsExecutions = new ArrayList<>();
+
+    @Autowired
+    private MailSender mailSender;
+
     @Override
     public void execute() {
 
@@ -56,6 +66,15 @@ public class MartJobExecutor implements MartExecutor {
                 .filter(Objects::nonNull).collect(Collectors.toList());
 
         launchJobs(jobs);
+        mailSender.sendMail(getFailedJobs());
+    }
+
+    private List<String> getFailedJobs() {
+        return jobsExecutions.stream()
+                .filter(Objects::nonNull)
+                .filter(jobExecution -> !COMPLETED.equals(jobExecution.getStatus()))
+                .map(jobExecution -> jobExecution.getJobInstance().getJobName())
+                .collect(Collectors.toList());
     }
 
     private void validateJobDefinitions(List<JobDefinition> jobDefinitions) {
@@ -64,12 +83,13 @@ public class MartJobExecutor implements MartExecutor {
     }
 
     private void launchJobs(List<Job> jobs) {
-
         jobs.forEach(job -> {
             try {
                 JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                 jobParametersBuilder.addDate(job.getName(), new Date());
-                jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                JobExecution jobExecution = jobLauncher.run(job, jobParametersBuilder.toJobParameters());
+                jobsExecutions.add(jobExecution);
+
             } catch (Exception e) {
                 log.warn(e.getMessage(), e);
             }
