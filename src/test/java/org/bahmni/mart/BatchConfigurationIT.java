@@ -34,6 +34,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        batchConfiguration.setShouldRunBatchJob(true);
         expectedPatientList = new HashMap<>();
         expectedPatientList.put("124", "Test");
         expectedPatientList.put("125", "Unknown");
