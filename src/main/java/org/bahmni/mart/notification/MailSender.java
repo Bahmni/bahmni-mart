@@ -33,7 +33,7 @@ public class MailSender {
             Runtime.getRuntime().exec(new String[]{"bash", "-c", sendMailCommand});
         } catch (IOException e) {
             String joinedFailedJobs = String.join("\n", failedJobs);
-            logger.info(String.format("Can't send the mail for following failed jobs %s", joinedFailedJobs));
+            logger.info(String.format("Can't send the mail for following failed jobs\n%s", joinedFailedJobs));
         }
     }
 

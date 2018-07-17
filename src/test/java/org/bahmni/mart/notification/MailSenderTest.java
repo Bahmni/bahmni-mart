@@ -1,13 +1,14 @@
 package org.bahmni.mart.notification;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,31 +18,33 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @PrepareForTest(MailSender.class)
 @RunWith(PowerMockRunner.class)
 public class MailSenderTest {
 
-    private MailSender mailSender;
+    @Mock
     private Runtime runtime;
-    private String sendMailCommand;
+
+    @Mock
     private Logger logger;
+
+    private MailSender mailSender;
+    private String sendMailCommand;
+
 
     @Before
     public void setUp() throws Exception {
         mailSender = new MailSender();
         mockStatic(Runtime.class);
-        runtime = Runtime.getRuntime();
         when(Runtime.getRuntime()).thenReturn(runtime);
+
         String body = "\"Subject: Notification regarding jobs\nFrom: abc@gmail.com\n" +
                 "These following jobs failed during execution -\nobs\norders\n\"";
         String recipients = "recipientOne@gmail.com, recipientTwo@gmail.com";
         sendMailCommand = String.format("echo %s | sendmail -v %s", body, recipients);
-        logger = mock(Logger.class);
 
         setValueForFinalStaticField(MailSender.class, "logger", logger);
         setValuesForMemberFields(mailSender, "subject", "Notification regarding jobs");
@@ -49,10 +52,10 @@ public class MailSenderTest {
         setValuesForMemberFields(mailSender, "recipients", recipients);
     }
 
-    @Ignore
     @Test
     public void shouldLogErrorWhileExecutingSendmailCommand() throws Exception {
         List<String> namesOfJobs = Arrays.asList("obs", "orders");
+        when(runtime.exec(any(String[].class))).thenThrow(IOException.class);
 
         mailSender.sendMail(namesOfJobs);
 
@@ -65,8 +68,7 @@ public class MailSenderTest {
 
         mailSender.sendMail(namesOfJobs);
 
-        verifyStatic();
-        runtime.exec(new String[]{"bash", "-c", sendMailCommand});
+        verify(runtime).exec(new String[]{"bash", "-c", sendMailCommand});
     }
 
 
@@ -76,8 +78,7 @@ public class MailSenderTest {
 
         mailSender.sendMail(namesOfJobs);
 
-        verifyStatic(never());
-        runtime.exec(new String[]{"bash", "-c", sendMailCommand});
+        verify(runtime, never()).exec(new String[]{"bash", "-c", sendMailCommand});
     }
 
     @Test
@@ -88,8 +89,8 @@ public class MailSenderTest {
 
         mailSender.sendMail(namesOfJobs);
 
-        verifyStatic(never());
-        runtime.exec(any(String[].class));
+
+        verify(runtime, never()).exec(any(String[].class));
     }
 
     @Test
@@ -100,8 +101,7 @@ public class MailSenderTest {
 
         mailSender.sendMail(namesOfJobs);
 
-        verifyStatic(never());
-        runtime.exec(any(String[].class));
+        verify(runtime, never()).exec(any(String[].class));
     }
 
 }
