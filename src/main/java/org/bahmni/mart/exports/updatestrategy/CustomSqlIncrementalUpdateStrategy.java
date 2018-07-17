@@ -4,6 +4,7 @@ import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Component;
 
 import static java.util.Objects.isNull;
@@ -22,9 +23,11 @@ public class CustomSqlIncrementalUpdateStrategy extends AbstractIncrementalUpdat
         JobDefinition jobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
         if (isEmpty(jobDefinition.getName()) || isNull(jobDefinition.getIncrementalUpdateConfig()))
             return true;
-
-        TableData tableData = tableDataGenerator.getTableData(tableName, getReaderSQL(jobDefinition));
-
-        return !tableData.equals(getExistingTableData(tableName));
+        try {
+            TableData tableData = tableDataGenerator.getTableData(tableName, getReaderSQL(jobDefinition));
+            return !tableData.equals(getExistingTableData(tableName));
+        } catch (BadSqlGrammarException exception) {
+            return false;
+        }
     }
 }

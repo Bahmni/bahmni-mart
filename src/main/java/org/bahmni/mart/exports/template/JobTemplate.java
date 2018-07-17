@@ -18,6 +18,7 @@ import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 
 import javax.sql.DataSource;
@@ -69,9 +70,13 @@ public class JobTemplate {
         if (preProcessor != null) {
             tableDataProcessor.setPreProcessor(preProcessor);
         }
-        tableDataForMart = listener.getTableDataForMart(jobConfiguration.getName());
-        tableDataProcessor.setTableData(tableDataForMart);
-        return tableDataProcessor;
+        try {
+            tableDataForMart = listener.getTableDataForMart(jobConfiguration.getName());
+            tableDataProcessor.setTableData(tableDataForMart);
+            return tableDataProcessor;
+        } catch (BadSqlGrammarException e) {
+            return tableDataProcessor;
+        }
     }
 
     private TableRecordWriter getWriter(JobDefinition jobDefinition) {
