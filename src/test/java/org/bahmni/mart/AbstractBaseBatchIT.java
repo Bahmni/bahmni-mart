@@ -37,6 +37,15 @@ public abstract class AbstractBaseBatchIT {
                 "                table_name        TEXT NOT NULL\n);");
 
         martJdbcTemplate.execute("INSERT INTO markers VALUES('Obs Data', 0, 'Encounter', 'encounter');");
+
+        martJdbcTemplate.execute(
+                "CREATE TABLE if NOT EXISTS patient_program_data_default (\n" +
+                        "                   patient_program_id INTEGER,\n" +
+                        "                   patient_id INTEGER\n);");
+        martJdbcTemplate.execute("INSERT INTO patient_program_data_default VALUES (1, 124);");
+        martJdbcTemplate.execute("INSERT INTO patient_program_data_default VALUES (2, 125);");
+        martJdbcTemplate.execute("INSERT INTO markers VALUES('Patient program data', 1, 'programenrollment', " +
+                                                                "'patient_program');");
     }
 
 

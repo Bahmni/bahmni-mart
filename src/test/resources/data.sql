@@ -320,3 +320,15 @@ INSERT INTO obs (obs_id, person_id, concept_id, encounter_id, order_id, obs_date
 INSERT INTO obs (obs_id, person_id, concept_id, encounter_id, order_id, obs_datetime, location_id, obs_group_id, accession_number, value_group_id, value_coded, value_coded_name_id, value_drug, value_datetime, value_numeric, value_modifier, value_text, value_complex, comments, creator, date_created, voided, voided_by, date_voided, void_reason, uuid, previous_version, form_namespace_and_path, status, interpretation) VALUES (649013, 1040, 1215, 58638, null, '2018-07-04 15:46:32', 8, 649012, null, null, 845, null, null, null, null, null, null, null, null, 8, '2018-07-04 15:46:32', 0, null, null, null, '29fac8bc-f640-4401-9ee6-9bd8cbab6353', null, null, 'FINAL', null);
 
 --End of test data for Obs job
+
+-- Data for IncrementalUpdateForCustomSqlJob
+-- Update already inserted data
+UPDATE patient_program SET patient_id = 126 WHERE patient_program_id = 1;
+
+INSERT INTO event_records (object, title, category, tags) VALUE ('/openmrs/ws/rest/v1/programenrollment/d0ec40b7-8348-40ed-8284-fd58686c27ef?v=full', 'Progam Enrollment', 'programenrollment', 'programenrollment');
+
+-- Newly inserted data
+INSERT INTO patient_program (patient_program_id,patient_id, program_id, date_enrolled, date_completed, location_id, outcome_concept_id, creator, date_created, changed_by, date_changed, voided, voided_by, date_voided, void_reason, uuid) VALUES (3, 127, 1, '2015-01-22 00:00:00', null, null, null, 22, '2016-11-09 15:28:30', null, null, 0, null, null, null, '80ef40b7-8ab8-123d-1234-fd58686cabef');
+
+INSERT INTO event_records (object, title, category, tags) VALUE ('/openmrs/ws/rest/v1/programenrollment/80ef40b7-8ab8-123d-1234-fd58686cabef?v=full', 'Progam Enrollment', 'programenrollment', 'programenrollment');
+-- End of test data for IncrementalUpdateForCustomSqlJob

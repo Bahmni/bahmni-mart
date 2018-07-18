@@ -3,29 +3,36 @@ package org.bahmni.mart;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class BatchConfigurationIT extends AbstractBaseBatchIT {
+
     @Autowired
     private BatchConfiguration batchConfiguration;
+
+    @Qualifier("openmrsJdbcTemplate")
+    @Autowired
+    private JdbcTemplate openmrsJdbcTemplate;
 
     private Map<String, String> expectedPatientList;
 
@@ -191,11 +198,13 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldUpdateEventRecordIdInMarkerTable() {
-        assertEquals("0", getEventRecordId());
+        String maxEventRecordId = getMaxEventRecordId();
+        String jobName = "Obs Data";
+        assertEquals("0", getEventRecordIdForJob(jobName));
 
         batchConfiguration.run();
 
-        assertEquals("1", getEventRecordId());
+        assertEquals(maxEventRecordId, getEventRecordIdForJob(jobName));
         List<Map<String, Object>> healthEducationData = martJdbcTemplate.queryForList("SELECT * FROM health_education");
         assertNotNull(healthEducationData);
         assertEquals(1, healthEducationData.size());
@@ -225,6 +234,47 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals("Single", healthEducationData.get(1).get("he_marital_status"));
         assertEquals("True", healthEducationData.get(1).get("he_pregnancy_status"));
 
+    }
+
+    @Test
+    public void shouldApplyIncrementalUpdateForCustomSqlJob() {
+        String maxEventRecordId = getMaxEventRecordId();
+
+        batchConfiguration.run();
+
+        String jobName = "Patient program data";
+        assertEquals(maxEventRecordId, getEventRecordIdForJob(jobName));
+        List<Map<String, Object>> actualPatientProgramData =
+                martJdbcTemplate.queryForList("SELECT * FROM patient_program_data_default");
+        assertEquals(3, actualPatientProgramData.size());
+        List<Map<String, Object>> expectedPatientProgramData = getExpectedPatientProgramTableData();
+        assertTrue(expectedPatientProgramData.containsAll(actualPatientProgramData));
+    }
+
+    private String getMaxEventRecordId() {
+        return openmrsJdbcTemplate.queryForObject("SELECT MAX(id) FROM event_records", String.class);
+    }
+
+    private List<Map<String, Object>> getExpectedPatientProgramTableData() {
+        HashMap<String, Object> oldRow = new HashMap<String, Object>() {
+            {
+                put("patient_program_id", 2);
+                put("patient_id", 125);
+            }
+        };
+        HashMap<String, Object> editedRow = new HashMap<String, Object>() {
+            {
+                put("patient_program_id", 1);
+                put("patient_id", 126);
+            }
+        };
+        HashMap<String, Object> newlyInsertedRow = new HashMap<String, Object>() {
+            {
+                put("patient_program_id", 3);
+                put("patient_id", 127);
+            }
+        };
+        return Arrays.asList(oldRow, editedRow, newlyInsertedRow);
     }
 
     private void verifyObsRecords() {
@@ -554,8 +604,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertFalse(tableNames.contains("specimen_sample_source"));
     }
 
-    private String getEventRecordId() {
-        return martJdbcTemplate.queryForObject("SELECT event_record_id FROM markers where job_name = " +
-                "'Obs Data'", String.class);
+    private String getEventRecordIdForJob(String jobName) {
+        return martJdbcTemplate.queryForObject(String.format(
+                "SELECT event_record_id FROM markers WHERE job_name = '%s'", jobName), String.class);
     }
 }

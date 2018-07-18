@@ -35,6 +35,17 @@
       "columnsToIgnore": ["creator", "date"]
     },
     {
+      "name": "Patient program data",
+      "type": "customSql",
+      "readerSql": "SELECT patient_program_id, patient_id FROM patient_program",
+      "tableName": "patient_program_data_default",
+      "incrementalUpdateConfig": {
+        "updateOn": "patient_program_id",
+        "eventCategory": "programenrollment",
+        "openmrsTableName": "patient_program"
+      }
+    },
+    {
       "name": "Patient Details",
       "type": "customSql",
       "sourceFilePath": "classpath:readerSql/reader.sql",
