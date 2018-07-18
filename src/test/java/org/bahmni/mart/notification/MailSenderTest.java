@@ -68,6 +68,7 @@ public class MailSenderTest {
 
         mailSender.sendMail(namesOfJobs);
 
+        verify(logger).info("Sending mail for following failed jobs\nobs\norders\n");
         verify(runtime).exec(new String[]{"bash", "-c", sendMailCommand});
     }
 
