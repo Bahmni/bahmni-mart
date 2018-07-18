@@ -14,13 +14,13 @@ public class MailSender {
 
     private static final Logger logger = LoggerFactory.getLogger(MailSender.class);
 
-    @Value("${bahmni-mart.mail.subject}")
+    @Value("${bahmni-mart.mail.subject:}")
     private String subject;
 
-    @Value("${bahmni-mart.mail.from}")
+    @Value("${bahmni-mart.mail.from:}")
     private String from;
 
-    @Value("${bahmni-mart.mail.recipients}")
+    @Value("${bahmni-mart.mail.recipients:}")
     private String recipients;
 
     public void sendMail(List<String> failedJobs) {
