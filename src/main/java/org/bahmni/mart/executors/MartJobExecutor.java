@@ -7,7 +7,6 @@ import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.job.JobContext;
-import org.bahmni.mart.notification.MailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -47,10 +46,7 @@ public class MartJobExecutor implements MartExecutor {
     @Autowired
     private MarkerManager markerManager;
 
-    private List<JobExecution> jobsExecutions = new ArrayList<>();
-
-    @Autowired
-    private MailSender mailSender;
+    private List<String> failedJobs = new ArrayList<>();
 
     @Override
     public void execute() {
@@ -66,15 +62,11 @@ public class MartJobExecutor implements MartExecutor {
                 .filter(Objects::nonNull).collect(Collectors.toList());
 
         launchJobs(jobs);
-        mailSender.sendMail(getFailedJobs());
     }
 
-    private List<String> getFailedJobs() {
-        return jobsExecutions.stream()
-                .filter(Objects::nonNull)
-                .filter(jobExecution -> !COMPLETED.equals(jobExecution.getStatus()))
-                .map(jobExecution -> jobExecution.getJobInstance().getJobName())
-                .collect(Collectors.toList());
+    @Override
+    public List<String> getFailedJobs() {
+        return failedJobs;
     }
 
     private void validateJobDefinitions(List<JobDefinition> jobDefinitions) {
@@ -88,11 +80,19 @@ public class MartJobExecutor implements MartExecutor {
                 JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
                 jobParametersBuilder.addDate(job.getName(), new Date());
                 JobExecution jobExecution = jobLauncher.run(job, jobParametersBuilder.toJobParameters());
-                jobsExecutions.add(jobExecution);
-
+                addToFailedJobs(jobExecution);
             } catch (Exception e) {
                 log.warn(e.getMessage(), e);
             }
         });
+    }
+
+    private void addToFailedJobs(JobExecution jobExecution) {
+        if (Objects.isNull(jobExecution)) {
+            return;
+        }
+        if (!COMPLETED.equals(jobExecution.getStatus())) {
+            failedJobs.add(jobExecution.getJobInstance().getJobName());
+        }
     }
 }

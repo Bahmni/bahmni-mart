@@ -1,7 +1,6 @@
 package org.bahmni.mart.config.procedure;
 
 import org.bahmni.mart.config.view.ViewExecutor;
-import org.bahmni.mart.exception.BatchResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -26,15 +26,22 @@ public class ProcedureExecutor {
     @Autowired
     private JdbcTemplate martJdbcTemplate;
 
+    private List<String> listOfFailedProcedure = new ArrayList<>();
+
     public void execute(List<ProcedureDefinition> procedureDefinitions) {
         procedureDefinitions.forEach(procedureDefinition -> {
             try {
                 logger.info(String.format("Executing the procedure '%s'.", procedureDefinition.getName()));
                 martJdbcTemplate.execute(getUpdatedProcedureSQL(procedureDefinition.getSourceFilePath()));
-            } catch (BatchResourceException | SQLException e) {
+            } catch (Exception e) {
+                listOfFailedProcedure.add(procedureDefinition.getName());
                 logger.error(String.format("Unable to execute the procedure %s", procedureDefinition.getName()), e);
             }
         });
+    }
+
+    public List<String> getFailedProcedures() {
+        return listOfFailedProcedure;
     }
 
     private String getUpdatedProcedureSQL(String sourceFilePath) throws SQLException {

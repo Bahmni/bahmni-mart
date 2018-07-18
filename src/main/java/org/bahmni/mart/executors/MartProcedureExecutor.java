@@ -24,4 +24,9 @@ public class MartProcedureExecutor implements MartExecutor {
         List<ProcedureDefinition> procedures = martJSONReader.getProcedureDefinitions();
         procedureExecutor.execute(procedures);
     }
+
+    @Override
+    public List<String> getFailedJobs() {
+        return procedureExecutor.getFailedProcedures();
+    }
 }

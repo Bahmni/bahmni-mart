@@ -9,9 +9,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.singletonList;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,12 +43,20 @@ public class MartProcedureExecutorTest {
 
     @Test
     public void shouldExecuteProcedures() {
-        List<ProcedureDefinition> procedureDefinitions = Collections.singletonList(procedureDefinition);
+        List<ProcedureDefinition> procedureDefinitions = singletonList(procedureDefinition);
         when(martJSONReader.getProcedureDefinitions()).thenReturn(procedureDefinitions);
 
         martProcedureExecutor.execute();
 
         verify(procedureExecutor, times(1)).execute(procedureDefinitions);
+    }
 
+    @Test
+    public void shouldReturnFailedJobsAfterExecutingProcedures() {
+        when(procedureExecutor.getFailedProcedures()).thenReturn(EMPTY_LIST);
+
+        martProcedureExecutor.getFailedJobs();
+
+        verify(procedureExecutor).getFailedProcedures();
     }
 }

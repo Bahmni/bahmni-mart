@@ -15,11 +15,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 
+import static java.util.Collections.singletonList;
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.SQLFileLoader.loadResource;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,5 +108,18 @@ public class ProcedureExecutorTest {
         procedureExecutor.execute(Arrays.asList(procedureDefinition));
 
         verify(jdbcTemplate, times(1)).execute("");
+    }
+
+    @Test
+    public void shouldGiveListOfFailedProcedures() {
+        ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
+        when(procedureDefinition.getName()).thenReturn("Test Procedure");
+        doThrow(Exception.class).when(jdbcTemplate).execute(anyString());
+
+        procedureExecutor.execute(singletonList(procedureDefinition));
+
+        List<String> actualFailedProcedures = procedureExecutor.getFailedProcedures();
+
+        assertTrue(singletonList("Test Procedure").containsAll(actualFailedProcedures));
     }
 }

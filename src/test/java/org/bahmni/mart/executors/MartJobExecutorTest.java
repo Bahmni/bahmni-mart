@@ -7,7 +7,6 @@ import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidJobConfiguration;
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.job.JobContext;
-import org.bahmni.mart.notification.MailSender;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,6 +27,7 @@ import java.util.Arrays;
 import static java.util.Collections.singletonList;
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
@@ -68,9 +68,6 @@ public class MartJobExecutorTest {
     @Mock
     private MarkerManager markerManager;
 
-    @Mock
-    private MailSender mailSender;
-
     private JobDefinition jobDefinition = new JobDefinition();
 
     private JobDefinition groupedJobDefinition = new JobDefinition();
@@ -87,7 +84,6 @@ public class MartJobExecutorTest {
         setValuesForMemberFields(martJobExecutor, "jobContext", jobContext);
         setValuesForMemberFields(martJobExecutor, "groupedJob", groupedJob);
         setValuesForMemberFields(martJobExecutor, "markerManager", markerManager);
-        setValuesForMemberFields(martJobExecutor, "mailSender", mailSender);
 
         mockStatic(JobDefinitionValidator.class);
 
@@ -152,7 +148,7 @@ public class MartJobExecutorTest {
     }
 
     @Test
-    public void shouldCallMailServiceToSendMailForFailedJobs() throws Exception {
+    public void shouldGiveListOfFailedJobs() throws Exception {
         JobExecution jobExecutionOfJob = mock(JobExecution.class);
         JobInstance jobInstance = mock(JobInstance.class);
         when(jobLauncher.run(eq(job), any(JobParameters.class))).thenReturn(jobExecutionOfJob);
@@ -178,7 +174,7 @@ public class MartJobExecutorTest {
         verify(jobExecutionOfGroupJob).getJobInstance();
         verify(groupJobInstance).getJobName();
         verify(jobExecutionOfGroupJob.getJobInstance()).getJobName();
-        verify(mailSender).sendMail(singletonList("Failed Obs"));
 
+        assertTrue(singletonList("Failed Obs").containsAll(martJobExecutor.getFailedJobs()));
     }
 }

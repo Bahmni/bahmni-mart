@@ -15,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.EMPTY_LIST;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -79,7 +80,6 @@ public class MartViewExecutorTest {
         verify(viewExecutor, times(1)).execute(viewDefinitions);
 
         assertEquals(1, viewDefinitions.size());
-
     }
 
     @Test
@@ -98,7 +98,14 @@ public class MartViewExecutorTest {
         verify(viewExecutor, times(1)).execute(viewDefinitions);
 
         assertEquals(2, viewDefinitions.size());
+    }
 
+    @Test
+    public void shouldReturnFailedJobsAfterExecutingProcedures() {
+        when(viewExecutor.getFailedViews()).thenReturn(EMPTY_LIST);
 
+        martViewExecutor.getFailedJobs();
+
+        verify(viewExecutor).getFailedViews();
     }
 }

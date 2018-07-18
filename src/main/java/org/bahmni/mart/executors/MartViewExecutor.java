@@ -40,4 +40,9 @@ public class MartViewExecutor implements MartExecutor {
         }
         viewExecutor.execute(viewDefinitions);
     }
+
+    @Override
+    public List<String> getFailedJobs() {
+        return viewExecutor.getFailedViews();
+    }
 }

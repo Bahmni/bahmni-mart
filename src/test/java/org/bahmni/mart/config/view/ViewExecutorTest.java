@@ -13,7 +13,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.config.job.SQLFileLoader.loadResource;
 import static org.mockito.Matchers.any;
@@ -122,7 +125,28 @@ public class ViewExecutorTest {
 
         viewExecutor.execute(Arrays.asList(viewDefinition));
 
-        verify(martJdbcTemplate,times(1)).execute("drop view if exists invalid_view;" +
+        verify(martJdbcTemplate, times(1)).execute("drop view if exists invalid_view;" +
                 "create view invalid_view as ");
+    }
+
+    @Test
+    public void shouldGiveFailedViews() {
+        ViewDefinition viewDefinitionOne = new ViewDefinition();
+        viewDefinitionOne.setName("view1");
+        viewDefinitionOne.setSql("select * from patient");
+
+        ViewDefinition viewDefinitionTwo = new ViewDefinition();
+        viewDefinitionTwo.setName("view2");
+        viewDefinitionTwo.setSql("select * from program");
+
+        doThrow(Exception.class).when(martJdbcTemplate).execute("drop view if exists view1;create view view1 as " +
+                viewDefinitionOne.getSql());
+
+        viewExecutor.execute(Arrays.asList(viewDefinitionOne, viewDefinitionTwo));
+        List<String> actualFailedViews = viewExecutor.getFailedViews();
+
+        List<String> expectedFailedViews = Collections.singletonList("view1");
+        assertTrue(expectedFailedViews.containsAll(actualFailedViews));
+
     }
 }
