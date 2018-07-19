@@ -129,7 +129,12 @@
       "name": "Orders Data",
       "type": "orders",
       "chunkSizeToRead": 500,
-      "columnsToIgnore": ["visit_id"]
+      "columnsToIgnore": ["visit_id"],
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      }
     },
     {
       "name": "Registration Second Page",

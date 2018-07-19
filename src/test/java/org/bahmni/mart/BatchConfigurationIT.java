@@ -49,7 +49,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         martJdbcTemplate.execute(getSqlFromResource("testDataSet/customSqlIncrementalUpdateData.sql"));
         martJdbcTemplate.execute(getSqlFromResource("testDataSet/eavIncrementalUpdateData.sql"));
         martJdbcTemplate.execute(getSqlFromResource("testDataSet/IncrementalUpdateData.sql"));
-
+        martJdbcTemplate.execute(getSqlFromResource("testDataSet/ordersIncrementalUpdate.sql"));
 
         batchConfiguration.setShouldRunBatchJob(true);
         expectedPatientList = new HashMap<>();
@@ -229,7 +229,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldApplyIncrementalUpdateForObsData() throws IOException {
-
         batchConfiguration.run();
 
         List<Map<String, Object>> healthEducationData = martJdbcTemplate.queryForList("SELECT * FROM health_education");
@@ -269,7 +268,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldApplyIncrementalUpdateForEavJob() {
-
         String maxEventRecordId = getMaxEventRecordId();
 
         batchConfiguration.run();
@@ -282,6 +280,65 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(3, actualPatientProgramData.size());
         List<Map<String, Object>> expectedPatientProgramData = getExpectedTestPersonAttributeTableData();
         assertTrue(expectedPatientProgramData.containsAll(actualPatientProgramData));
+    }
+
+    @Test
+    public void shouldApplyIncrementalUpdateForOrdersJob() throws Exception {
+        String maxEventRecordId = getMaxEventRecordId();
+
+        batchConfiguration.run();
+
+        String jobName = "Orders Data";
+        assertEquals(maxEventRecordId, getEventRecordIdForJob(jobName));
+
+        List<Map<String, Object>> actualOrdersData =
+                martJdbcTemplate.queryForList("SELECT * FROM radiology_orders ORDER BY test_name");
+        assertEquals(2, actualOrdersData.size());
+        List<Map<String, Object>> expectedOrdersData = getOrdersData();
+        verifyOrdersIncrementalData(expectedOrdersData, actualOrdersData);
+    }
+
+    private void verifyOrdersIncrementalData(List<Map<String, Object>> expectedOrdersData,
+                                             List<Map<String, Object>> actualOrdersData) {
+        for (int index = 0; index < actualOrdersData.size(); index++) {
+            Map<String, Object> actualOrdersDataRow = actualOrdersData.get(index);
+            for (String key : actualOrdersDataRow.keySet()) {
+                Map<String, Object> expectedOrderDataRow = expectedOrdersData.get(index);
+                assertEquals(String.valueOf(expectedOrderDataRow.get(key)),
+                        String.valueOf(actualOrdersDataRow.get(key)));
+            }
+        }
+    }
+
+    private List<Map<String, Object>> getOrdersData() {
+        HashMap<String, Object> row1 = new HashMap<String, Object>() {
+            {
+                put("patient_id", 133);
+                put("date_created", "2018-07-18 05:47:21.0");
+                put("encounter_id", 14);
+                put("encounter_type_id", 1);
+                put("encounter_type_name", "Consultation");
+                put("visit_type", "Clinic");
+                put("visit_type_id", 4);
+                put("type_of_test", "All_Tests_and_Panels");
+                put("panel_name", "Anaemia Panel");
+                put("test_name", "MCH");
+            }
+        };
+        HashMap<String, Object> row2 = new HashMap<String, Object>() {
+            {
+                put("patient_id", 133);
+                put("date_created", "2018-07-19 06:54:41.0");
+                put("encounter_id", 18);
+                put("encounter_type_id", 1);
+                put("encounter_type_name", "Consultation");
+                put("visit_type", "Clinic");
+                put("visit_type_id", 4);
+                put("type_of_test", "Radiology Orders");
+                put("panel_name", "Radiology Test");
+            }
+        };
+        return Arrays.asList(row1, row2);
     }
 
     private String getSqlFromResource(String resourceName) throws IOException {

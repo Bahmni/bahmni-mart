@@ -364,3 +364,37 @@ INSERT INTO person_attribute (person_id, value, person_attribute_type_id, date_c
 
 INSERT INTO event_records (object, title, category, tags) VALUE ('/openmrs/ws/rest/v1/patient/7e8888a4-e42f-1185-8c3e-08002718d519?v=full', 'Patient', 'patient', 'patient');
 -- End of test data for IncrementalUpdateForEavJob
+
+-- Data for Incremental update for Orders data
+
+INSERT INTO concept_class (concept_class_id, name, description, creator, date_created, retired, retired_by, date_retired, retire_reason, uuid, date_changed, changed_by) VALUES (27, 'Radiology', 'Lab Tests', 1, '2004-03-02 00:00:00', 0, null, null, null, '33a6291c-8a92-11e4-977f-0800371c1b75', null, null);
+
+-- Radiology Orders
+INSERT INTO concept (concept_id, retired, short_name, description, form_text, datatype_id, class_id, is_set, creator, date_created, version, changed_by, date_changed, retired_by, date_retired, retire_reason, uuid) VALUES (4, 0, null, null, null, 2, 11, 1, 8, '2015-05-19 11:18:40', null, 8, '2018-04-12 09:05:35', null, null, null, '75377d9b-1bad-4055-abb9-b6c1d34bf1b9');
+--Radiology Test
+INSERT INTO concept (concept_id, retired, short_name, description, form_text, datatype_id, class_id, is_set, creator, date_created, version, changed_by, date_changed, retired_by, date_retired, retire_reason, uuid) VALUES (7020, 0, null, null, null, 2, 27, 1, 8, '2015-05-19 11:18:40', null, 8, '2018-04-12 09:05:35', null, null, null, '75377d9b-1bad-4055-abb9-b6c1z34bf1b9');
+-- X-Ray
+INSERT INTO concept (concept_id, retired, short_name, description, form_text, datatype_id, class_id, is_set, creator, date_created, version, changed_by, date_changed, retired_by, date_retired, retire_reason, uuid) VALUES (7021, 0, null, null, null, 2, 27, 0, 8, '2015-05-19 11:18:40', null, 8, '2018-04-12 09:05:35', null, null, null, '75377d9f-1bad-4055-abb9-b6c1z34bf1b9');
+
+INSERT INTO concept_set (concept_set_id, concept_id, concept_set, sort_weight, creator, date_created, uuid) VALUES (11999, 4, 1858, 5, 1, '2016-03-07 12:10:38', '2ab7981d-0df6-4eb5-a5e9-95ae36a6267c');
+INSERT INTO concept_set (concept_set_id, concept_id, concept_set, sort_weight, creator, date_created, uuid) VALUES (119100, 7020, 4, 4, 1, '2016-03-07 12:10:38', '2ab7981d-0df6-4e5b-a5e9-95ae36a9261c');
+INSERT INTO concept_set (concept_set_id, concept_id, concept_set, sort_weight, creator, date_created, uuid) VALUES (119101, 7021, 7020, 4, 1, '2016-03-07 12:10:38', '2ab7981f-0df6-4e5b-a5e9-95ae36a9261c');
+
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10169, 4, 'Radiology Orders', 'en', 1, 8, '2018-02-12 07:47:55', 'FULLY_SPECIFIED', 0, null, null, null, '74a7d907-ca61-4ae8-a937-6iduck8c806e', null, null);
+INSERT INTO concept_name (concept_name_id, concept_id, name, locale, locale_preferred, creator, date_created, concept_name_type, voided, voided_by, date_voided, void_reason, uuid, date_changed, changed_by) VALUES (10170, 7020, 'Radiology Test', 'en', 1, 8, '2018-02-12 07:47:55', 'FULLY_SPECIFIED', 0, null, null, null, '74a7d907-ca61-4at8-a937-6iduck8c806e', null, null);
+
+-- Order type
+INSERT INTO order_type (order_type_id, name, description, creator, date_created, retired, retired_by, date_retired, retire_reason, uuid, java_class_name, parent, changed_by, date_changed) VALUES (2, 'Radiology Order', 'An order for laboratory tests', 8, '2014-09-18 14:18:05', 0, null, null, null, '8189b409-3f10-11e4-adec-0800371c1b75', 'org.openmrs.Order', null, null, null);
+
+-- Order type map
+INSERT INTO  order_type_class_map (order_type_id, concept_class_id) VALUES (2, 27);
+
+INSERT INTO encounter (encounter_id, encounter_type, patient_id, location_id, form_id, encounter_datetime, creator, date_created, voided, voided_by, date_voided, void_reason, changed_by, date_changed, visit_id, uuid) VALUES (18, 1, 133, 7, null, '2018-07-19 05:53:09', 4, '2018-07-19 05:53:09', 0, null, null, null, null, null, 13, 'c0046218-263a-4f63-aa49-8d9f37b111c4');
+
+INSERT INTO visit (visit_id, patient_id, visit_type_id, date_started, date_stopped, indication_concept_id, location_id, creator, date_created, changed_by, date_changed, voided, voided_by, date_voided, void_reason, uuid) VALUES (13, 133, 4, '2018-07-19 05:51:08', null, null, 2, 4, '2018-07-19 05:51:08', null, null, 0, null, null, null, 'b1561a4b-0474-405f-b05b-be4324b7efcf');
+
+INSERT INTO orders (order_id, order_type_id, concept_id, orderer, encounter_id, instructions, date_activated, auto_expire_date, date_stopped, order_reason, order_reason_non_coded, creator, date_created, voided, voided_by, date_voided, void_reason, patient_id, accession_number, uuid, urgency, order_number, previous_order_id, order_action, comment_to_fulfiller, care_setting, scheduled_date, order_group_id, sort_weight) VALUES (3, 2, 7020, 18, 18, NULL, '2018-07-19 06:54:41', '2018-07-19 07:54:41', NULL, NULL, NULL, 8, '2018-07-19 06:54:41', 0, NULL, NULL, NULL, 133, NULL, '01fa3dae-d5ce-4c82-925b-e31b40afe4e3', 'ROUTINE', 'ORD-786', NULL, 'NEW', NULL, 1, NULL, NULL, NULL);
+
+INSERT INTO event_records ( uuid, title, timestamp, uri, object, category, date_created, tags) VALUES ( '72b6fbd8-5afa-41b7-82f1-8219f04ef975', 'Encounter', '2018-07-19 17:05:27', null, '/openmrs/ws/rest/v1/bahmnicore/bahmniencounter/c0046218-263a-4f63-aa49-8d9f37b111c4?includeAll=true', 'Encounter', '2018-07-19 17:05:27', 'Encounter');
+
+-- End of test data for Orders test data
