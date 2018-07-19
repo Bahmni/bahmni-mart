@@ -10,8 +10,8 @@ import javax.sql.DataSource;
 
 @Configuration
 public class ITContextConfiguration {
-    @Bean(name = "customITContext")
-    public PlatformTransactionManager customITContext(@Qualifier("openmrsDb") DataSource openmrsDb) {
+    @Bean(name = "customOpenmrsITContext")
+    public PlatformTransactionManager customOpenmrsITContext(@Qualifier("openmrsDb") DataSource openmrsDb) {
         return new DataSourceTransactionManager(openmrsDb);
     }
 }

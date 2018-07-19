@@ -22,7 +22,7 @@ public class MarkerManager {
     private static final Logger logger = LoggerFactory.getLogger(MarkerManager.class);
     private static final String MARKER_QUERY = "SELECT * FROM markers";
     private static final String UPDATE_QUERY = "UPDATE markers SET event_record_id = %s WHERE job_name = '%s'";
-    public static final String ERROR_INFO = "Failed to update event_record_id for %s, markers table is not present";
+    private static final String ERROR_INFO = "Failed to update event_record_id for %s, markers table is not present";
 
     @Autowired
     @Qualifier("martJdbcTemplate")

@@ -1,5 +1,7 @@
 package org.bahmni.mart;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,23 +9,27 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.jdbc.SqlGroup;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
@@ -41,6 +47,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        martJdbcTemplate.execute(getSqlFromResource("testDataSet/customSqlIncrementalUpdateData.sql"));
+        martJdbcTemplate.execute(getSqlFromResource("testDataSet/eavIncrementalUpdateData.sql"));
+
         batchConfiguration.setShouldRunBatchJob(true);
         expectedPatientList = new HashMap<>();
         expectedPatientList.put("124", "Test");
@@ -64,9 +73,16 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         expectedFormGenericData.put("obs_datetime", "2015-01-22 00:00:00.0");
     }
 
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+        batchConfiguration.setShouldRunBatchJob(false);
+    }
+
     @Test
     @Sql(scripts = {"classpath:testDataSet/insertPatientDataWithDiagnoses.sql"},
-            config = @SqlConfig(transactionManager = "customITContext"))
+            config = @SqlConfig(transactionManager = "customOpenmrsITContext"))
     public void shouldCreateTablesAndViewsBasedOnConfiguration() {
         batchConfiguration.run();
 
@@ -191,7 +207,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         List<Map<String, Object>> procRecords = martJdbcTemplate.queryForList(
                 "SELECT patient_id,getAllergyStatus(patient_id) AS allergy_status FROM " +
-                    "\"patient_allergy_status_test_default\"");
+                        "\"patient_allergy_status_test_default\"");
 
         verifyRecords(procRecords);
     }
@@ -214,8 +230,13 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    @Sql(scripts = {"classpath:testDataSet/IncrementalUpdateData.sql"},
-            config = @SqlConfig(transactionManager = "customITContext"))
+    @SqlGroup({
+            @Sql(scripts = {"classpath:testDataSet/IncrementalUpdateData.sql"},
+                    config = @SqlConfig(transactionManager = "customOpenmrsITContext")),
+            @Sql(scripts = {"classpath:testDataSet/rollBackIncrementalUpdateData.sql"},
+                    config = @SqlConfig(transactionManager = "customOpenmrsITContext"),
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    })
     public void shouldApplyIncrementalUpdateForObsData() {
         martJdbcTemplate.execute("UPDATE markers SET event_record_id = 1 WHERE job_name='Obs Data'");
 
@@ -249,6 +270,63 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(3, actualPatientProgramData.size());
         List<Map<String, Object>> expectedPatientProgramData = getExpectedPatientProgramTableData();
         assertTrue(expectedPatientProgramData.containsAll(actualPatientProgramData));
+    }
+
+    @Test
+    public void shouldApplyIncrementalUpdateForEavJob() {
+
+        String maxEventRecordId = getMaxEventRecordId();
+
+        batchConfiguration.run();
+
+        String jobName = "Test Person Attributes";
+        assertEquals(maxEventRecordId, getEventRecordIdForJob(jobName));
+
+        List<Map<String, Object>> actualPatientProgramData =
+                martJdbcTemplate.queryForList("SELECT * FROM test_person_attributes");
+        assertEquals(3, actualPatientProgramData.size());
+        List<Map<String, Object>> expectedPatientProgramData = getExpectedTestPersonAttributeTableData();
+        assertTrue(expectedPatientProgramData.containsAll(actualPatientProgramData));
+    }
+
+    private String getSqlFromResource(String resourceName) throws IOException {
+        URL resource = this.getClass().getClassLoader().getResource(resourceName);
+
+        return FileUtils.readFileToString(new File(resource.getFile()));
+    }
+
+    private List<Map<String, Object>> getExpectedTestPersonAttributeTableData() {
+        HashMap<String, Object> oldRow = new HashMap<String, Object>() {
+            {
+                put("person_id", 124);
+                put("givenNameLocal", "Superman");
+                put("familyNameLocal", "Superhero");
+                put("middleNameLocal", null);
+                put("phoneNumber2", "000000000");
+                put("viber", null);
+            }
+        };
+        HashMap<String, Object> editedRow = new HashMap<String, Object>() {
+            {
+                put("person_id", 125);
+                put("givenNameLocal", "Hulk");
+                put("familyNameLocal", null);
+                put("middleNameLocal", null);
+                put("phoneNumber2", null);
+                put("viber", null);
+            }
+        };
+        HashMap<String, Object> newlyInsertedRow = new HashMap<String, Object>() {
+            {
+                put("person_id", 126);
+                put("givenNameLocal", null);
+                put("familyNameLocal", "Captain America");
+                put("middleNameLocal", null);
+                put("phoneNumber2", null);
+                put("viber", null);
+            }
+        };
+        return Arrays.asList(oldRow, editedRow, newlyInsertedRow);
     }
 
     private String getMaxEventRecordId() {

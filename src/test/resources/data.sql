@@ -170,6 +170,11 @@ INSERT INTO patient (patient_id, creator, date_created, changed_by, date_changed
 INSERT INTO patient (patient_id, creator, date_created, changed_by, date_changed, voided, voided_by, date_voided, void_reason) VALUES (132, 13, '2016-11-10 15:32:32', NULL, NULL, 0, NULL, NULL, NULL);
 INSERT INTO patient (patient_id, creator, date_created, changed_by, date_changed, voided, voided_by, date_voided, void_reason, allergy_status) VALUES (133, 22, '2016-11-10 15:46:22', 132, '2017-09-13 13:07:22', 0, NULL, NULL, NULL, 'Unknown');
 
+INSERT INTO person (person_id, date_created, uuid) VALUES (124, '2016-11-09 17:07:05', '7e8f78a4-e42f-1185-8c3e-08002718d519');
+INSERT INTO person (person_id, date_created, uuid) VALUES (125, '2016-11-09 07:07:05', '7e8878a4-e42f-1185-8c3e-08002718d519');
+INSERT INTO person (person_id, date_created, uuid) VALUES (126, '2016-11-09 13:07:05', '7e8888a4-e42f-1185-8c3e-08002718d519');
+
+
 -- Start of test data for BatchConfigurationIT.shouldCreateOrderLabSamplesTableByIgnoringVisitId()
 
 --lab test
@@ -332,3 +337,15 @@ INSERT INTO patient_program (patient_program_id,patient_id, program_id, date_enr
 
 INSERT INTO event_records (object, title, category, tags) VALUE ('/openmrs/ws/rest/v1/programenrollment/80ef40b7-8ab8-123d-1234-fd58686cabef?v=full', 'Progam Enrollment', 'programenrollment', 'programenrollment');
 -- End of test data for IncrementalUpdateForCustomSqlJob
+
+-- Data for IncrementalUpdateForEavJob
+-- Update already inserted data
+INSERT INTO person_attribute (person_id, value, person_attribute_type_id, date_created, uuid) VALUES (125, 'Hulk', 1, '2018-07-04 5:16:12', '976cccaf-748e-4aa7-89de-cd4b840f5e49');
+
+INSERT INTO event_records (object, title, category, tags) VALUE ('/openmrs/ws/rest/v1/patient/7e8878a4-e42f-1185-8c3e-08002718d519?v=full', 'Patient', 'patient', 'patient');
+
+-- Newly inserted data
+INSERT INTO person_attribute (person_id, value, person_attribute_type_id, date_created, uuid) VALUES (126, 'Captain America', 2, '2018-08-04 23:16:12', 'c71ca806-5a16-41a6-9ab1-9a3e4cbcbf51');
+
+INSERT INTO event_records (object, title, category, tags) VALUE ('/openmrs/ws/rest/v1/patient/7e8888a4-e42f-1185-8c3e-08002718d519?v=full', 'Patient', 'patient', 'patient');
+-- End of test data for IncrementalUpdateForEavJob

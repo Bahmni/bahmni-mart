@@ -46,6 +46,25 @@
       }
     },
     {
+      "name": "Test Person Attributes",
+      "type": "eav",
+      "chunkSizeToRead": "500",
+      "tableName": "test_person_attributes",
+      "eavAttributes": {
+        "attributeTypeTableName": "person_attribute_type",
+        "attributeTableName": "person_attribute",
+        "valueTableJoiningId": "person_attribute_type_id",
+        "typeTableJoiningId": "person_attribute_type_id",
+        "valueColumnName": "value",
+        "primaryKey": "person_id"
+      },
+      "incrementalUpdateConfig": {
+        "updateOn": "person_id",
+        "eventCategory": "patient",
+        "openmrsTableName": "person"
+      }
+    },
+    {
       "name": "Patient Details",
       "type": "customSql",
       "sourceFilePath": "classpath:readerSql/reader.sql",
