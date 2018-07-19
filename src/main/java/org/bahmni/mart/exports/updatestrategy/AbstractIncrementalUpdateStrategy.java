@@ -98,9 +98,20 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
     private String getJoinedIds(Map<String, Object> markerMap) {
         String eventRecordId = String.valueOf(markerMap.get(EVENT_RECORD_ID));
         String category = (String) markerMap.get(CATEGORY);
-        String tableName = (String) markerMap.get(TABLE_NAME);
-        List<String> uuids = getEventRecordUuids(eventRecordId, category);
-        return uuids.isEmpty() ? NON_EXISTED_ID : getIdListFor(tableName, uuids).stream()
+        return getIds((String) markerMap.get(TABLE_NAME), getEventRecordUuids(eventRecordId, category));
+    }
+
+    private String getIds(String tableName, List<String> uuids) {
+        if (uuids.isEmpty()) {
+            return NON_EXISTED_ID;
+        } else {
+            String commaSeparatedIDs = getCommaSeparatedIDs(tableName, uuids);
+            return StringUtils.isEmpty(commaSeparatedIDs) ? NON_EXISTED_ID : commaSeparatedIDs;
+        }
+    }
+
+    private String getCommaSeparatedIDs(String tableName, List<String> uuids) {
+        return getIdListFor(tableName, uuids).stream()
                 .map(String::valueOf).collect(Collectors.joining(","));
     }
 
