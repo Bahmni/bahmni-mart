@@ -1,6 +1,5 @@
 package org.bahmni.mart;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
-import org.springframework.test.context.jdbc.SqlGroup;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +48,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         super.setUp();
         martJdbcTemplate.execute(getSqlFromResource("testDataSet/customSqlIncrementalUpdateData.sql"));
         martJdbcTemplate.execute(getSqlFromResource("testDataSet/eavIncrementalUpdateData.sql"));
+        martJdbcTemplate.execute(getSqlFromResource("testDataSet/IncrementalUpdateData.sql"));
+
 
         batchConfiguration.setShouldRunBatchJob(true);
         expectedPatientList = new HashMap<>();
@@ -217,47 +217,38 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     public void shouldUpdateEventRecordIdInMarkerTable() {
         String maxEventRecordId = getMaxEventRecordId();
         String jobName = "Obs Data";
-        assertTrue(CollectionUtils.isEmpty(martJdbcTemplate.queryForList(String.format("SELECT * FROM markers " +
-                "WHERE job_name='%s'", jobName))));
-
 
         batchConfiguration.run();
 
         assertEquals(maxEventRecordId, getEventRecordIdForJob(jobName));
         List<Map<String, Object>> healthEducationData = martJdbcTemplate.queryForList("SELECT * FROM health_education");
         assertNotNull(healthEducationData);
-        assertEquals(1, healthEducationData.size());
-        assertEquals(58638, healthEducationData.get(0).get("encounter_id"));
-        assertEquals("Single", healthEducationData.get(0).get("he_marital_status"));
-        assertEquals("No formal education", healthEducationData.get(0).get("he_highest_education_level"));
+        assertEquals(3, healthEducationData.size());
     }
 
     @Test
-    @SqlGroup({
-            @Sql(scripts = {"classpath:testDataSet/IncrementalUpdateData.sql"},
-                    config = @SqlConfig(transactionManager = "customOpenmrsITContext")),
-            @Sql(scripts = {"classpath:testDataSet/rollBackIncrementalUpdateData.sql"},
-                    config = @SqlConfig(transactionManager = "customOpenmrsITContext"),
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    })
-    public void shouldApplyIncrementalUpdateForObsData() {
-        martJdbcTemplate.execute("UPDATE markers SET event_record_id = 1 WHERE job_name='Obs Data'");
+    public void shouldApplyIncrementalUpdateForObsData() throws IOException {
 
         batchConfiguration.run();
 
         List<Map<String, Object>> healthEducationData = martJdbcTemplate.queryForList("SELECT * FROM health_education");
 
         assertNotNull(healthEducationData);
-        assertEquals(2, healthEducationData.size());
-        assertEquals(58638, healthEducationData.get(0).get("encounter_id"));
+        assertEquals(3, healthEducationData.size());
+
+        assertEquals(58658, healthEducationData.get(0).get("encounter_id"));
         assertEquals("Married", healthEducationData.get(0).get("he_marital_status"));
         assertEquals("No formal education", healthEducationData.get(0).get("he_highest_education_level"));
-        assertEquals("True", healthEducationData.get(0).get("he_pregnancy_status"));
+        assertEquals("False", healthEducationData.get(0).get("he_pregnancy_status"));
 
-        assertEquals(58639, healthEducationData.get(1).get("encounter_id"));
-        assertEquals("Single", healthEducationData.get(1).get("he_marital_status"));
+        assertEquals(58638, healthEducationData.get(1).get("encounter_id"));
+        assertEquals("Married", healthEducationData.get(1).get("he_marital_status"));
+        assertEquals("No formal education", healthEducationData.get(1).get("he_highest_education_level"));
         assertEquals("True", healthEducationData.get(1).get("he_pregnancy_status"));
 
+        assertEquals(58639, healthEducationData.get(2).get("encounter_id"));
+        assertEquals("Single", healthEducationData.get(2).get("he_marital_status"));
+        assertEquals("True", healthEducationData.get(2).get("he_pregnancy_status"));
     }
 
     @Test
