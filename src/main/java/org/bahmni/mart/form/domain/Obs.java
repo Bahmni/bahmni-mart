@@ -9,6 +9,7 @@ public class Obs {
     private String value;
     private String parentName;
     private String obsDateTime;
+    private String dateCreated;
     private String locationId;
     private String locationName;
     private String programId;
@@ -91,6 +92,14 @@ public class Obs {
 
     public void setObsDateTime(String obsDateTime) {
         this.obsDateTime = obsDateTime;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public void setLocationId(String locationId) {

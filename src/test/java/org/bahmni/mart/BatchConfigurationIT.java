@@ -72,6 +72,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         expectedFormGenericData.put("location_id", 8);
         expectedFormGenericData.put("location_name", null);
         expectedFormGenericData.put("obs_datetime", "2015-01-22 00:00:00.0");
+        expectedFormGenericData.put("date_created", "2016-11-09 15:40:12.0");
     }
 
     @Override
@@ -385,6 +386,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(expectedFormGenericData.get("location_id"), formDetails.get("location_id"));
         assertEquals(expectedFormGenericData.get("location_name"), formDetails.get("location_name"));
         assertEquals(expectedFormGenericData.get("obs_datetime"), formDetails.get("obs_datetime"));
+        assertEquals(expectedFormGenericData.get("date_created"), formDetails.get("date_created"));
     }
 
     private void verifyCodedPatientRecords(List<Map<String, Object>> records) {
@@ -442,7 +444,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         Set<String> regViewColumns = regView.get(0).keySet();
         List<String> regViewExpectedCoulumns = Arrays.asList("reg_fee_information_registration_fee",
                 "reg_nutritional_temp_height", "reg_nutritional_weight", "patient_id", "encounter_id",
-                "obs_datetime", "location_id", "location_name", "program_id", "program_name"
+                "obs_datetime", "date_created", "location_id", "location_name", "program_id", "program_name"
         );
 
         assertEquals(2, columnNamesView.size());
@@ -452,7 +454,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 containsInAnyOrder(columnNamesViewFromFile.toArray()));
         assertEquals(10, view.size());
         assertEquals(10, viewFromFile.size());
-        assertEquals(10, regViewColumns.size());
+        assertEquals(11, regViewColumns.size());
         assertThat(regViewExpectedCoulumns, containsInAnyOrder(regViewColumns.toArray()));
         assertEquals(1, regView.size());
         verifyRecords(view);
@@ -473,22 +475,23 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         tableMap.put("first_stage_validation",
                 Arrays.asList("id_first_stage_validation", "patient_id", "encounter_id",
-                        "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+                        "obs_datetime", "date_created", "location_id", "location_name", "program_id", "program_name"));
 
         tableMap.put("fstg_medical_files",
                 Arrays.asList("id_fstg_medical_files", "id_first_stage_validation", "patient_id", "encounter_id",
-                        "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+                        "obs_datetime", "date_created", "location_id", "location_name", "program_id", "program_name"));
 
         tableMap.put("fstg_specialty_determined_by_mlo",
                 Arrays.asList("id_fstg_specialty_determined_by_mlo", "patient_id", "encounter_id",
-                        "fstg_specialty_determined_by_mlo", "obs_datetime", "location_id",
+                        "fstg_specialty_determined_by_mlo", "obs_datetime", "date_created", "location_id",
                         "location_name", "program_id", "program_name", "id_fstg_medical_files"));
 
         tableMap.put("follow_up_validation", Arrays.asList("id_follow_up_validation", "patient_id", "encounter_id",
-                "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+                "obs_datetime", "date_created", "location_id", "location_name", "program_id", "program_name"));
 
         tableMap.put("stage", Arrays.asList("id_stage", "patient_id", "encounter_id", "id_fstg_medical_files",
-                "stage", "id_follow_up_validation", "obs_datetime", "location_id", "location_name", "program_id",
+                "stage", "id_follow_up_validation", "obs_datetime", "date_created", "location_id", "location_name",
+                "program_id",
                 "program_name"));
 
         tableMap.put("person_attributes", Arrays.asList("person_id", "givennamelocal", "familynamelocal",
@@ -496,12 +499,12 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
         tableMap.put("bacteriology_concept_set", Arrays.asList("id_bacteriology_concept_set", "patient_id",
                 "encounter_id", "specimen_sample_source", "specimen_id",
-                "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+                "obs_datetime", "date_created", "location_id", "location_name", "program_id", "program_name"));
 
         tableMap.put("visit_diagnoses", Arrays.asList("id_visit_diagnoses", "patient_id", "encounter_id",
                 "non_coded_diagnosis", "coded_diagnosis", "diagnosis_certainty", "diagnosis_order",
                 "bahmni_initial_diagnosis", "bahmni_diagnosis_revised", "bahmni_diagnosis_status",
-                "obs_datetime", "location_id", "location_name", "program_id", "program_name"));
+                "obs_datetime", "date_created", "location_id", "location_name", "program_id", "program_name"));
 
         for (String tableName : tableMap.keySet()) {
             String sql = String.format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' " +
@@ -644,8 +647,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         Map<String, Object> firstRow = bacteriologyRows.get(0);
         Map<String, Object> secondRow = bacteriologyRows.get(1);
 
-        assertEquals(10, firstRow.size());
-        assertEquals(10, secondRow.size());
+        assertEquals(11, firstRow.size());
+        assertEquals(11, secondRow.size());
 
         assertEquals(1, firstRow.get("specimen_sample_source"));
         assertEquals(2, secondRow.get("specimen_sample_source"));
@@ -656,6 +659,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
             assertEquals(124, row.get("patient_id"));
             assertEquals(22, row.get("encounter_id"));
             assertEquals("2015-01-22 00:00:00.0", row.get("obs_datetime"));
+            assertEquals("2016-11-09 15:40:12.0", row.get("date_created"));
             assertEquals(8, row.get("location_id"));
             assertNull(row.get("location_name"));
             assertEquals(1, row.get("program_id"));

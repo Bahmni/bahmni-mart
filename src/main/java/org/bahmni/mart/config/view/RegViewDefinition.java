@@ -49,7 +49,7 @@ public class RegViewDefinition {
 
     private String createSql(List<String> tableNames) {
         List<String> excludedColumns = Arrays.asList("patient_id", "encounter_id", "location_id", "location_name",
-                "obs_datetime", "program_id", "program_name");
+                "obs_datetime","date_created", "program_id", "program_name");
 
         String sql = format("SELECT %s %s FROM %s", createCoalesceQueries(excludedColumns, tableNames),
                 getSelectClause(getTablesMetaData(tableNames), excludedColumns), tableNames.get(0));

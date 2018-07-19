@@ -9,6 +9,7 @@ SELECT
   coalesce(fr_obs_con.name, obs_con.concept_full_name)            AS conceptName,
   coalesce(par_fr_obs_con.name, parent_obs_con.concept_full_name) AS parentConceptName,
   o.obs_datetime                                                  AS obsDateTime,
+  o.date_created                                                  AS dateCreated,
   o.location_id                                                   AS locationId,
   l.name                                                          AS locationName,
   p.program_id                                                    AS programId,

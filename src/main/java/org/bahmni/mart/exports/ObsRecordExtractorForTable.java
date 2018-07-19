@@ -110,6 +110,8 @@ public class ObsRecordExtractorForTable {
               return obs.getPatientId();
           case "obs_datetime":
               return obs.getObsDateTime();
+          case "date_created":
+              return obs.getDateCreated();
           case "location_id":
               return obs.getLocationId();
           case "location_name":
