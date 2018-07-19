@@ -31,13 +31,14 @@ public class BatchConfiguration extends DefaultBatchConfigurer implements Comman
 
     @Override
     public void run(String... args) {
-        List<String> listOfFailedJobs = new ArrayList<>();
-        if (shouldRunBatchJob) {
-            martExecutors.forEach(martExecutor -> {
-                martExecutor.execute();
-                listOfFailedJobs.addAll(martExecutor.getFailedJobs());
-            });
-            mailSender.sendMail(listOfFailedJobs);
+        if (!shouldRunBatchJob) {
+            return;
         }
+        List<String> listOfFailedJobs = new ArrayList<>();
+        martExecutors.forEach(martExecutor -> {
+            martExecutor.execute();
+            listOfFailedJobs.addAll(martExecutor.getFailedJobs());
+        });
+        mailSender.sendMail(listOfFailedJobs);
     }
 }
