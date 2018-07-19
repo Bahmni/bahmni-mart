@@ -32,7 +32,7 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
     private static final String CATEGORY = "category";
     private static final String TABLE_NAME = "table_name";
     private static final String QUERY_FOR_URL_EXTRACTION = "SELECT DISTINCT object FROM event_records" +
-            " WHERE id > %s AND id <= %s AND category = '%s'";
+            " WHERE id > %s AND id <= %s AND binary category = '%s'";
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
     private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
     private static final String NON_EXISTED_ID = "-1";

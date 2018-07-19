@@ -73,7 +73,7 @@ public class ObsIncrementalUpdateStrategyTest {
     private static final String CATEGORY = "CategoryName";
     private static final String TABLE_NAME = "encounter";
     private static final String QUERY_FOR_EVENT_URLS = "SELECT DISTINCT object " +
-            "FROM event_records WHERE id > %s AND id <= %s AND category = '%s'";
+            "FROM event_records WHERE id > %s AND id <= %s AND binary category = '%s'";
     private static final String QUERY_FOR_IDS = format("SELECT %s_id FROM %s WHERE uuid in ('%s','%s')",
             TABLE_NAME, TABLE_NAME, "99b885e9-c49c-4b5a-aa4c-e8a8fb93484d", "55527d10-5789-46e1-af16-59082938f11c");
     private static final String queryForMaxEventRecordId = "SELECT MAX(id) FROM event_records";
