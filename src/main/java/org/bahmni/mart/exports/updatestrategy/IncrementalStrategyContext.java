@@ -23,6 +23,9 @@ public class IncrementalStrategyContext {
     private EavIncrementalUpdateStrategy eavIncrementalUpdateStrategy;
 
     @Autowired
+    private OrdersIncrementalUpdateStrategy ordersIncrementalUpdateStrategy;
+
+    @Autowired
     private SimpleIncrementalUpdateStrategy simpleIncrementalUpdateStrategy;
 
 
@@ -38,6 +41,7 @@ public class IncrementalStrategyContext {
         incrementalStrategies.put(JobType.DISPOSITION.toString(), obsIncrementalUpdateStrategy);
         incrementalStrategies.put(JobType.REG.toString(), obsIncrementalUpdateStrategy);
         incrementalStrategies.put(JobType.EAV.toString(), eavIncrementalUpdateStrategy);
+        incrementalStrategies.put(JobType.ORDERS.toString(), ordersIncrementalUpdateStrategy);
     }
 
     public IncrementalUpdateStrategy getStrategy(String jobType) {

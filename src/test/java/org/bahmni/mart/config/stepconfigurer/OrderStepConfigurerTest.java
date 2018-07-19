@@ -1,16 +1,18 @@
 package org.bahmni.mart.config.stepconfigurer;
 
 import org.bahmni.mart.BatchUtils;
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
+import org.bahmni.mart.exports.updatestrategy.OrdersIncrementalUpdateStrategy;
+import org.bahmni.mart.exports.writer.TableRecordWriter;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
 import org.bahmni.mart.helper.OrderConceptUtil;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.TableGeneratorStep;
-import org.bahmni.mart.exports.writer.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,14 +29,21 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.ObjectFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
+import static org.bahmni.mart.BatchUtils.constructSqlWithParameter;
+import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -81,6 +90,9 @@ public class OrderStepConfigurerTest {
     @Mock
     private JobDefinitionReader jobDefinitionReader;
 
+    @Mock
+    private OrdersIncrementalUpdateStrategy ordersIncrementalUpdateStrategy;
+
     private OrderStepConfigurer orderStepConfigurer;
 
     private String orderables = "All Orderables";
@@ -98,12 +110,15 @@ public class OrderStepConfigurerTest {
         setValuesForMemberFields(orderStepConfigurer, "tableDataGenerator", tableDataGenerator);
         setValuesForMemberFields(orderStepConfigurer, "stepBuilderFactory", stepBuilderFactory);
         setValuesForMemberFields(orderStepConfigurer, "jobDefinitionReader", jobDefinitionReader);
+        setValuesForMemberFields(orderStepConfigurer,
+                "ordersIncrementalUpdateStrategy", ordersIncrementalUpdateStrategy);
         setValuesForMemberFields(orderStepConfigurer, "recordWriterObjectFactory",
                 recordWriterObjectFactory);
         setValueForFinalStaticField(OrderStepConfigurer.class, "logger", logger);
 
         mockStatic(BatchUtils.class);
         when(jobDefinition.getLocale()).thenReturn(locale);
+        when(ordersIncrementalUpdateStrategy.isMetaDataChanged(any(), any())).thenReturn(true);
     }
 
     @Test
@@ -152,12 +167,13 @@ public class OrderStepConfigurerTest {
 
     @Test
     public void shouldCreateAllOrderableTables() throws NoSuchFieldException, IllegalAccessException {
-        List<TableData> orderablesTableData = Collections.singletonList(mock(TableData.class));
+        Map<String, TableData> orderablesTableData = new HashMap<>();
+        orderablesTableData.put("tableName", mock(TableData.class));
         setValuesForMemberFields(orderStepConfigurer, "orderablesTableData", orderablesTableData);
 
         orderStepConfigurer.createTables(jobDefinition);
 
-        verify(tableGeneratorStep).createTables(orderablesTableData, jobDefinition);
+        verify(tableGeneratorStep).createTables(new ArrayList<>(orderablesTableData.values()), jobDefinition);
     }
 
     @Test
@@ -333,5 +349,84 @@ public class OrderStepConfigurerTest {
         verify(completeDataExport, times(0)).next(any(Step.class));
         verifyStatic(times(1));
         Optional.empty();
+    }
+
+    @Test
+    public void shouldReturnTableDataWhenTheGivenNameMatchesTableName() throws Exception {
+        String tableName = "table_name";
+        TableData tableDataOne = new TableData(tableName);
+        TableData tableDataTwo = new TableData("other");
+        Map<String, TableData> tableDataMap = new HashMap<>();
+        tableDataMap.put("table_name", tableDataOne);
+        tableDataMap.put("other", tableDataTwo);
+        setValuesForMemberFields(orderStepConfigurer, "orderablesTableData", tableDataMap);
+
+        TableData actualTableData = orderStepConfigurer.getTableData(tableName);
+
+        assertEquals(tableDataOne, actualTableData);
+    }
+
+    @Test
+    public void shouldReturnEmptyTableDataInstanceWhenTableNameDoesNotMatch() throws Exception {
+        setValuesForMemberFields(orderStepConfigurer, "orderablesTableData", new HashMap<>());
+
+        TableData actualTableData = orderStepConfigurer.getTableData("non_existant_table");
+
+        assertNull(actualTableData);
+    }
+
+    @Test
+    public void shouldUpdateReaderSqlWhenThereIsNoMetaDataChange() throws Exception {
+        String tableName = "orders_data";
+        String jobName = "Orders Data";
+        String readerSql = "select * from orders";
+        String updateOn = "encounter_id";
+        setValuesForMemberFields(orderStepConfigurer, "orderableConceptNames", Arrays.asList("Orders data"));
+        Map orderablesTableData = mock(Map.class);
+        setValuesForMemberFields(orderStepConfigurer, "orderablesTableData", orderablesTableData);
+        when(orderablesTableData.get(anyString())).thenReturn(mock(TableData.class));
+
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        IncrementalUpdateConfig incrementalUpdateConfig = mock(IncrementalUpdateConfig.class);
+        when(jobDefinitionReader.getJobDefinitionByName(jobName)).thenReturn(jobDefinition);
+        when(jobDefinition.getName()).thenReturn(jobName);
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
+        when(jobDefinition.getColumnsToIgnore()).thenReturn(new ArrayList<>());
+        when(incrementalUpdateConfig.getUpdateOn()).thenReturn(updateOn);
+
+        when(convertResourceOutputToString(any())).thenReturn(readerSql);
+        when(constructSqlWithParameter(anyString(), anyString(), anyString())).thenReturn(readerSql);
+        when(ordersIncrementalUpdateStrategy.isMetaDataChanged(tableName, jobName)).thenReturn(false);
+
+        orderStepConfigurer.generateTableData(jobDefinition);
+
+        verify(jobDefinitionReader).getJobDefinitionByName(jobName);
+        verify(ordersIncrementalUpdateStrategy).isMetaDataChanged(tableName, jobName);
+        verify(ordersIncrementalUpdateStrategy).updateReaderSql(readerSql, jobName, updateOn);
+    }
+
+    @Test
+    public void shouldNotUpdateReaderSqlWhenThereIsMetaDataChange() throws Exception {
+        String tableName = "orders_data";
+        String jobName = "Orders Data";
+        String readerSql = "select * from orders";
+        setValuesForMemberFields(orderStepConfigurer, "orderableConceptNames", Arrays.asList("Orders data"));
+        Map orderablesTableData = mock(Map.class);
+        setValuesForMemberFields(orderStepConfigurer, "orderablesTableData", orderablesTableData);
+        when(orderablesTableData.get(anyString())).thenReturn(mock(TableData.class));
+
+        JobDefinition jobDefinition = mock(JobDefinition.class);
+        IncrementalUpdateConfig incrementalUpdateConfig = mock(IncrementalUpdateConfig.class);
+        when(jobDefinitionReader.getJobDefinitionByName(jobName)).thenReturn(jobDefinition);
+        when(jobDefinition.getName()).thenReturn(jobName);
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfig);
+        when(jobDefinition.getColumnsToIgnore()).thenReturn(new ArrayList<>());
+
+        when(convertResourceOutputToString(any())).thenReturn(readerSql);
+        when(constructSqlWithParameter(anyString(), anyString(), anyString())).thenReturn(readerSql);
+
+        orderStepConfigurer.generateTableData(jobDefinition);
+        verify(jobDefinitionReader).getJobDefinitionByName(jobName);
+        verify(ordersIncrementalUpdateStrategy).isMetaDataChanged(tableName, jobName);
     }
 }

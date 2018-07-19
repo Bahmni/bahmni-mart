@@ -13,7 +13,12 @@
     },
     {
       "name": "Orders Data",
-      "type": "orders"
+      "type": "orders",
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      }
     }
   ]
 }

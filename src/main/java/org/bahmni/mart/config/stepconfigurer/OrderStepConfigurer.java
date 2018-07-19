@@ -1,17 +1,17 @@
 package org.bahmni.mart.config.stepconfigurer;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
-import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exception.InvalidOrderTypeException;
 import org.bahmni.mart.exception.NoSamplesFoundException;
+import org.bahmni.mart.exports.updatestrategy.OrdersIncrementalUpdateStrategy;
+import org.bahmni.mart.exports.writer.TableRecordWriter;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
 import org.bahmni.mart.helper.OrderConceptUtil;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.TableDataProcessor;
 import org.bahmni.mart.table.TableGeneratorStep;
-import org.bahmni.mart.exports.writer.TableRecordWriter;
 import org.bahmni.mart.table.domain.TableData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +36,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.bahmni.mart.BatchUtils.constructSqlWithParameter;
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
+import static org.bahmni.mart.config.job.JobDefinitionUtil.getReaderSQLByIgnoringColumns;
+import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
 @Component
 public class OrderStepConfigurer implements StepConfigurerContract {
@@ -48,6 +51,7 @@ public class OrderStepConfigurer implements StepConfigurerContract {
     private static final Logger logger = LoggerFactory.getLogger(OrderStepConfigurer.class);
 
     private static final String ALL_ORDERABLES = "All Orderables";
+    private static final String ORDERS_JOB_NAME = "Orders Data";
     private static final int PAGE_SIZE = 200000;
 
     @Autowired
@@ -74,26 +78,31 @@ public class OrderStepConfigurer implements StepConfigurerContract {
     @Autowired
     private JobDefinitionReader jobDefinitionReader;
 
+    @Autowired
+    private OrdersIncrementalUpdateStrategy ordersIncrementalUpdateStrategy;
+
     @Value("classpath:sql/orders.sql")
     private Resource ordersSQLResource;
 
     private List<String> orderableConceptNames;
 
-    private List<TableData> orderablesTableData;
+    private Map<String, TableData> orderablesTableData = new HashMap<>();
 
     @Override
     public void generateTableData(JobDefinition jobDefinition) {
-        orderablesTableData = getOrderablesTableData(getOrderables());
+        List<String> orderables = getOrderables();
+        generateOrderablesTableData(orderables);
     }
 
     @Override
     public void createTables(JobDefinition jobDefinition) {
-        tableGeneratorStep.createTables(orderablesTableData, jobDefinition);
+        List<TableData> tableDataList = new ArrayList<>(orderablesTableData.values());
+        tableGeneratorStep.createTables(tableDataList, jobDefinition);
     }
 
     private List<String> getOrderables() {
         if (orderableConceptNames == null) {
-            JobDefinition ordersJobDefinition = jobDefinitionReader.getJobDefinitionByName("Orders Data");
+            JobDefinition ordersJobDefinition = jobDefinitionReader.getJobDefinitionByName(ORDERS_JOB_NAME);
             orderableConceptNames = conceptService.getChildConcepts(ALL_ORDERABLES,
                     ordersJobDefinition.getLocale()).stream()
                     .map(Concept::getName).collect(Collectors.toList());
@@ -101,13 +110,12 @@ public class OrderStepConfigurer implements StepConfigurerContract {
         return orderableConceptNames;
     }
 
-    private List<TableData> getOrderablesTableData(List<String> orderableNames) {
-        List<TableData> tableData = new ArrayList<>();
-
+    private void generateOrderablesTableData(List<String> orderableNames) {
         orderableNames.forEach(orderable -> {
             try {
                 String orderSQL = getOrderReaderSQL(orderable);
-                tableData.add(tableDataGenerator.getTableData(orderable, orderSQL));
+                TableData tableData = tableDataGenerator.getTableData(orderable, orderSQL);
+                orderablesTableData.put(tableData.getName(), tableData);
             } catch (NoSamplesFoundException | InvalidOrderTypeException e) {
                 logger.info(e.getMessage());
             } catch (Exception e) {
@@ -116,15 +124,23 @@ public class OrderStepConfigurer implements StepConfigurerContract {
             }
         });
 
-        return tableData;
     }
 
     private String getOrderReaderSQL(String orderable) throws NoSamplesFoundException, InvalidOrderTypeException {
         int orderTypeId = orderConceptUtil.getOrderTypeId(orderable);
         String orderSQL = convertResourceOutputToString(ordersSQLResource);
         orderSQL = constructSqlWithParameter(orderSQL, "orderTypeId", Integer.toString(orderTypeId));
-        JobDefinition ordersJobDefinition = jobDefinitionReader.getJobDefinitionByName("Orders Data");
-        return JobDefinitionUtil.getReaderSQLByIgnoringColumns(ordersJobDefinition.getColumnsToIgnore(), orderSQL);
+
+        JobDefinition ordersJobDefinition = jobDefinitionReader.getJobDefinitionByName(ORDERS_JOB_NAME);
+        String readerSql = getReaderSQLByIgnoringColumns(ordersJobDefinition.getColumnsToIgnore(), orderSQL);
+
+        if (Objects.nonNull(getTableData(getProcessedName(orderable))) &&
+                !ordersIncrementalUpdateStrategy.isMetaDataChanged(getProcessedName(orderable), ORDERS_JOB_NAME)) {
+            String updateOn = ordersJobDefinition.getIncrementalUpdateConfig().getUpdateOn();
+            readerSql = ordersIncrementalUpdateStrategy.updateReaderSql(readerSql, ORDERS_JOB_NAME, updateOn);
+        }
+
+        return readerSql;
     }
 
     @Override
@@ -135,6 +151,10 @@ public class OrderStepConfigurer implements StepConfigurerContract {
                 completeDataExport.next(optionalStep.get());
             }
         }
+    }
+
+    public TableData getTableData(String tableName) {
+        return orderablesTableData.get(tableName);
     }
 
     private Optional<Step> getAnOrderableStep(String orderable, JobDefinition jobDefinition) {
@@ -185,18 +205,19 @@ public class OrderStepConfigurer implements StepConfigurerContract {
     private TableDataProcessor orderDataProcessor(String orderable)
             throws InvalidOrderTypeException, NoSamplesFoundException {
         TableDataProcessor tableDataProcessor = new TableDataProcessor();
-        tableDataProcessor.setTableData(getTableData(orderable));
+        tableDataProcessor.setTableData(getOrdersTableData(orderable));
         return tableDataProcessor;
     }
 
-    private TableData getTableData(String orderable) throws NoSamplesFoundException, InvalidOrderTypeException {
+    private TableData getOrdersTableData(String orderable) throws NoSamplesFoundException, InvalidOrderTypeException {
         return tableDataGenerator.getTableData(orderable, getOrderReaderSQL(orderable));
     }
 
     private TableRecordWriter ordersDataWriter(String orderable)
             throws InvalidOrderTypeException, NoSamplesFoundException {
         TableRecordWriter writer = recordWriterObjectFactory.getObject();
-        writer.setTableData(getTableData(orderable));
+        writer.setTableData(getOrdersTableData(orderable));
+        writer.setJobDefinition(jobDefinitionReader.getJobDefinitionByName(ORDERS_JOB_NAME));
         return writer;
     }
 }
