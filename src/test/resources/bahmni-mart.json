@@ -89,12 +89,19 @@
     {
       "name": "Obs Data",
       "type": "obs",
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      },
       "separateTableConfig": {
         "enableForAddMoreAndMultiSelect": true,
-      "separateTables": [
-        "FSTG, Medical Files", "FSTG, Specialty determined by MLO",
-        "Stage"
-      ]},
+        "separateTables": [
+          "FSTG, Medical Files",
+          "FSTG, Specialty determined by MLO",
+          "Stage"
+        ]
+      },
       "conceptReferenceSource": "",
       "columnsToIgnore": [
         "MH, Name of MLO"

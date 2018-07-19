@@ -20,24 +20,24 @@ public abstract class AbstractBaseBatchIT {
 
     @Before
     public void setUp() throws Exception {
-        martJdbcTemplate.execute("DROP SCHEMA IF EXISTS PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
-        addMarkersInfo();
+        truncatePublicSchema();
+        addMarkersTable();
     }
 
     @After
     public void tearDown() throws Exception {
-        martJdbcTemplate.execute("DROP SCHEMA IF EXISTS PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
+        truncatePublicSchema();
     }
 
-    private void addMarkersInfo() {
+    private void truncatePublicSchema() {
+        martJdbcTemplate.execute("DROP SCHEMA IF EXISTS PUBLIC CASCADE; CREATE SCHEMA PUBLIC;");
+    }
+    
+    private void addMarkersTable() {
         martJdbcTemplate.execute("CREATE TABLE IF NOT EXISTS markers (\n" +
                 "                job_name          TEXT PRIMARY KEY,\n" +
                 "                event_record_id   INTEGER NOT NULL,\n" +
                 "                category          TEXT NOT NULL,\n" +
                 "                table_name        TEXT NOT NULL\n);");
-
-        martJdbcTemplate.execute("INSERT INTO markers VALUES('Obs Data', 0, 'Encounter', 'encounter');");
     }
-
-
 }

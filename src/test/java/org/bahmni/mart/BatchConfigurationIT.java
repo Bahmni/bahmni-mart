@@ -1,5 +1,6 @@
 package org.bahmni.mart;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -216,7 +217,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     public void shouldUpdateEventRecordIdInMarkerTable() {
         String maxEventRecordId = getMaxEventRecordId();
         String jobName = "Obs Data";
-        assertEquals("0", getEventRecordIdForJob(jobName));
+        assertTrue(CollectionUtils.isEmpty(martJdbcTemplate.queryForList(String.format("SELECT * FROM markers " +
+                "WHERE job_name='%s'", jobName))));
+
 
         batchConfiguration.run();
 
