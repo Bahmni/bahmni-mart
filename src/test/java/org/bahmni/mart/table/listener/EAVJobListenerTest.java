@@ -78,7 +78,7 @@ public class EAVJobListenerTest {
 
     @Test
     public void shouldCallCreateTablesWithAllTableColumnsWhenIgnoredColumnIsNull() throws Exception {
-        String sql = "select name from attributeTable;";
+        String sql = "select name from attributeTable where retired = false;";
         String jobName = "JobName";
         setUpMocks(sql, null);
 
@@ -94,7 +94,7 @@ public class EAVJobListenerTest {
 
     @Test
     public void shouldCallCreateTablesWithAllTableColumnsWhenIgnoredColumnIsEmpty() throws Exception {
-        String sql = "select name from attributeTable;";
+        String sql = "select name from attributeTable where retired = false;";
         String jobName = "JobName";
 
         setUpMocks(sql, Collections.emptyList());
@@ -111,7 +111,7 @@ public class EAVJobListenerTest {
 
     @Test
     public void shouldGetTableDataForGivenJobDefinition() throws Exception {
-        setUpMocks("select name from attributeTable;", Collections.emptyList());
+        setUpMocks("select name from attributeTable where retired = false;", Collections.emptyList());
 
         TableData tableData = eavJobListener.getTableDataForMart(jobDefinition);
 
@@ -121,7 +121,7 @@ public class EAVJobListenerTest {
 
     @Test
     public void shouldCallCreateTablesWithOutIgnoreColumns() throws Exception {
-        String sql = "select name from attributeTable;";
+        String sql = "select name from attributeTable where retired = false;";
         String jobName = "jobName";
         setUpMocks(sql, Arrays.asList("givenLocalName"));
 

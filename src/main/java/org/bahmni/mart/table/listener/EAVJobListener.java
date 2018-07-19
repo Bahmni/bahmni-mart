@@ -83,7 +83,7 @@ public class EAVJobListener extends AbstractJobListener {
     }
 
     private List<String> getPivotColumns(String tableName) {
-        String sql = String.format("select name from %s;", tableName);
+        String sql = String.format("select name from %s where retired = false;", tableName);
         return openMRSJdbcTemplate.queryForList(sql, String.class);
     }
 
