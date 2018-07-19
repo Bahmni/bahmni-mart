@@ -132,15 +132,15 @@ public class ObsIncrementalUpdateStrategyTest {
 
     @Test
     public void shouldUpdateReaderSqlWithNonExistIdIfJoinedIdsEmpty() {
-        String queryForEventRecordObjectUrls = String.format(QUERY_FOR_EVENT_URLS, eventRecordedForJob,
+        String queryForEventRecordObjectUrls = format(QUERY_FOR_EVENT_URLS, eventRecordedForJob,
                 MAX_EVENT_RECORD_ID, CATEGORY);
         String wrongUuid = "99b885e9-c49c-4b5a-aa4c-e8a8fb93484d";
         when(openmrsJdbcTemplate.queryForList(queryForEventRecordObjectUrls, String.class))
                 .thenReturn(Arrays.asList(wrongUuid));
-        String queryForIDs = String.format("SELECT %s_id FROM %s WHERE uuid in ('%s')",
+        String queryForIDs = format("SELECT %s_id FROM %s WHERE uuid in ('%s')",
                                 TABLE_NAME, TABLE_NAME, wrongUuid);
         when(openmrsJdbcTemplate.queryForList(queryForIDs, String.class)).thenReturn(Arrays.asList(""));
-        String expectedUpdatedReaderSql = String.format(UPDATED_READER_SQL, READER_SQL, UPDATE_ON, "-1");
+        String expectedUpdatedReaderSql = format(UPDATED_READER_SQL, READER_SQL, UPDATE_ON, "-1");
 
         String actualUpdateReaderSql = obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
 
