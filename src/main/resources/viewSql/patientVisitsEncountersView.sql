@@ -1,9 +1,6 @@
 SELECT
   pd.person_id,
   pd.gender,
-  pd.birthdate,
-  EXTRACT(YEAR FROM (SELECT age( pvd.visit_start_date, pd.birthdate))) AS age_at_visit,
-  age_group(pvd.visit_start_date, pd.birthdate) AS age_group_at_visit,
   pd.birthtime,
   pd.birthdate_estimated,
   pvd.visit_id,

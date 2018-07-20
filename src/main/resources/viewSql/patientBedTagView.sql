@@ -5,8 +5,6 @@ FROM (
          bpa.encounter_id,
          bpa.bed_number,
          bpa.location,
-         EXTRACT(YEAR FROM (SELECT age( bpa.date_started, pd.birthdate))) AS age_at_bed_assignment,
-         age_group(bpa.date_started, pd.birthdate) AS age_group_at_bed_assignment,
          CASE WHEN ped.encounter_type_name = 'TRANSFER'
            THEN 'MOVEMENT'
          ELSE ped.encounter_type_name END AS action,

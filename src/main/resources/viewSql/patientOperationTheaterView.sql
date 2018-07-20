@@ -1,9 +1,6 @@
 SELECT
   pd.person_id AS patient_id,
   pd.gender,
-  pd.birthdate               AS birth_date,
-   EXTRACT(YEAR FROM (SELECT age( sb.block_starttime, pd.birthdate))) AS age_at_surgery,
-  age_group(sb.block_starttime, pd.birthdate) AS age_group_at_surgery,
   pd.dead,
   pa.*,
   sa.surgical_block_id,
@@ -20,7 +17,6 @@ SELECT
   sa.status                  AS surgery_status,
   sa.actual_start_datetime   AS surgery_actual_start_time,
   sa.actual_end_datetime     AS surgery_actual_end_time,
-  sa.notes                   AS surgery_notes,
   sa.date_created            AS surgery_date_created,
   sa.date_changed            AS surgery_date_changed,
   sa.creator_name            AS surgery_creator_name,

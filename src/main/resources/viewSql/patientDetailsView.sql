@@ -1,7 +1,6 @@
 select
   pd.person_id AS patient_id,
   gender,
-  birthdate,
   birthtime,
   birthdate_estimated,
   dead,

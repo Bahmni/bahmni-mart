@@ -1,9 +1,6 @@
 SELECT
   pd.person_id AS patient_id,
   pd.gender,
-  pd.birthdate               AS birth_date,
-  EXTRACT(YEAR FROM (SELECT age( pap.appointment_start_time, pd.birthdate))) AS age_at_appointment,
-  age_group(pap.appointment_start_time, pd.birthdate) As age_group_at_appointment,
   pd.dead,
   pa.*,
   pap.appointment_id,

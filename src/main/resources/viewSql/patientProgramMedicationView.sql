@@ -6,9 +6,6 @@ SELECT
   ppd.date_completed,
   ppd.program_outcome,
   pd.gender,
-  pd.birthdate            AS birth_date,
-  EXTRACT(YEAR FROM (SELECT age( md.start_date, pd.birthdate))) AS age_at_medication,
-  age_group(md.start_date, pd.birthdate) AS age_group_at_medication,
   pd.dead,
   pa.*,
   md.patient_program_id,
@@ -30,7 +27,6 @@ SELECT
   md.duration_units,
   md.quantity,
   md.quantity_units,
-  md.additional_instructions,
   md.dispense             AS is_dispensed,
   md.visit_id,
   md.visit_type

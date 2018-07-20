@@ -1,9 +1,6 @@
 SELECT
   pd.person_id AS patient_id,
   pd.gender,
-  pd.birthdate               AS birth_date,
-  EXTRACT(YEAR FROM (SELECT age( c.onset_date, pd.birthdate))) AS age_at_condition,
-  age_group(c.onset_date, pd.birthdate) AS age_group_at_condition,
   pd.dead,
   pa.*,
   c.condition_id,
