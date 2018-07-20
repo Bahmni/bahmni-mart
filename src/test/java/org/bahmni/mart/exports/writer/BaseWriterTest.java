@@ -124,6 +124,6 @@ public class BaseWriterTest {
         verify(incrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         HashSet<String> expectedProcessedIds = new HashSet<>(Arrays.asList("4", "5"));
         verify(incrementalUpdater).deleteVoidedRecords(eq(expectedProcessedIds), eq(TABLE_NAME), eq(updateOn));
-        assertEquals(expectedProcessedIds, baseWriter.getProcessedIds());
+        assertEquals(new HashSet<>(Arrays.asList("1", "2", "3", "4", "5")), baseWriter.getProcessedIds());
     }
 }

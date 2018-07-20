@@ -29,11 +29,13 @@ public abstract class BaseWriter {
 
     private void deleteVoidedRecords(List<?> items, TableData tableData, IncrementalUpdateStrategy incrementalUpdater) {
         Set<String> voidedIds = getVoidedIds(items);
+        HashSet<String> strings = new HashSet<>(processedIds);
         voidedIds.removeAll(processedIds);
 
         incrementalUpdater.deleteVoidedRecords(voidedIds, tableData.getName(),
                 jobDefinition.getIncrementalUpdateConfig().getUpdateOn());
-        processedIds = new HashSet<>(voidedIds);
+        strings.addAll(voidedIds);
+        processedIds = new HashSet<>(strings);
     }
 
     protected abstract Set<String> getVoidedIds(List<?> items);
