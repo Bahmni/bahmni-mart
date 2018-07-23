@@ -16,3 +16,6 @@ mysql -h ${MYSQL_HOST} -P ${MYSQL_HOST_PORT} -u ${MYSQL_ROOT_USERNAME} -p ${MYSQ
 
 printf "\nSetting up test_analytics database\n"
 psql -h ${PSQL_HOST} -p ${PSQL_HOST_PORT} -U ${PSQL_ROOT_USERNAME} -W ${PSQL_DATABASE_NAME} -f ${PATH_OF_CURRENT_SCRIPT}/psqlTestSetup.sql
+
+printf "\nCreating bahmni_mart_scdf schema in test_analytics database\n"
+psql -h ${PSQL_HOST} -p ${PSQL_HOST_PORT} -U ${PSQL_ROOT_USERNAME} -W test_analytics -c "CREATE SCHEMA bahmni_mart_scdf;"
