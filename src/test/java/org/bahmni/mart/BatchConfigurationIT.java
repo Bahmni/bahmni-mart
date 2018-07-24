@@ -3,6 +3,7 @@ package org.bahmni.mart;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -251,6 +252,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals("True", healthEducationData.get(2).get("he_pregnancy_status"));
     }
 
+    @Ignore
     @Test
     public void shouldApplyIncrementalUpdateForCustomSqlJob() {
         String maxEventRecordId = getMaxEventRecordId();
@@ -266,6 +268,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertTrue(expectedPatientProgramData.containsAll(actualPatientProgramData));
     }
 
+    @Ignore
     @Test
     public void shouldApplyIncrementalUpdateForEavJob() {
         String maxEventRecordId = getMaxEventRecordId();

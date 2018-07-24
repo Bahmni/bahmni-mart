@@ -3,6 +3,8 @@ package org.bahmni.mart.config.stepconfigurer;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.exports.ObservationExportStep;
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
+import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.table.domain.ForeignKey;
@@ -30,6 +32,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +66,15 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     @Mock
     private JobDefinition jobDefinition;
 
+    @Mock
+    private IncrementalStrategyContext incrementalStrategyContext;
+
+    @Mock
+    private IncrementalUpdateStrategy incrementalUpdateStrategy;
+
+    @Mock
+    private TableData tableData;
+
     @Before
     public void setUp() throws Exception {
         mockStatic(JobDefinitionUtil.class);
@@ -70,6 +82,12 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         formStepConfigurer = new FormStepConfigurer();
         setUp(formStepConfigurer);
         when(jobDefinition.getLocale()).thenReturn("locale");
+
+        setValuesForSuperClassMemberFields(formStepConfigurer, "incrementalStrategyContext",
+                incrementalStrategyContext);
+        when(incrementalStrategyContext.getStrategy(anyString())).thenReturn(incrementalUpdateStrategy);
+        when(incrementalUpdateStrategy.isMetaDataChanged(anyString(), anyString())).thenReturn(true);
+        when(formTableMetadataGenerator.getTableData(any(BahmniForm.class))).thenReturn(tableData);
     }
 
     @Test

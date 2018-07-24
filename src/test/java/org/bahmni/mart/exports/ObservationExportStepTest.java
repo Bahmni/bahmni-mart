@@ -91,17 +91,17 @@ public class ObservationExportStepTest {
         Concept formName = mock(Concept.class);
 
         when(form.getFormName()).thenReturn(formName);
-        String formWithLenthyName = "moreThanHundredCharacterInTheFormNamemoreThanHundredC" +
-                "haracterInTheFormNamemoreThanHundredCharacterInTheFormName";
+        String formWithLenthyName = "moreThanHundredCharacterInTheFormNameMoreThanHundredCharacter" +
+                "InTheFormNameMoreThanHundredCharacterInTheFormName";
         when(formName.getName()).thenReturn("Form").thenReturn(formWithLenthyName);
 
         observationExportStep.setForm(form);
 
-        String stepName = observationExportStep.getStepName();
-        assertEquals("Step-1 Form", stepName);
-        stepName = observationExportStep.getStepName();
-        assertEquals("Step-2 moreThanHundredCharacterInTheFormNamemoreThanHundredCharacte" +
-                "rInTheFormNamemoreThanHundredChar", stepName);
+        String stepName = observationExportStep.getStepName("Insertion Step");
+        assertEquals("Insertion Step-1 Form", stepName);
+        stepName = observationExportStep.getStepName("Insertion Step");
+        assertEquals("Insertion Step-2 " +
+                "moreThanHundredCharacterInTheFormNameMoreThanHundredCharacterInTheFormNameMoreThanH", stepName);
 
     }
 
@@ -117,7 +117,7 @@ public class ObservationExportStepTest {
 
         when(form.getFormName()).thenReturn(formNameConcept);
         when(formNameConcept.getName()).thenReturn(formName);
-        when(stepBuilderFactory.get("Step-1 " + formName)).thenReturn(stepBuilder);
+        when(stepBuilderFactory.get("Insertion Step-1 " + formName)).thenReturn(stepBuilder);
         when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
         when(observationProcessorFactory.getObject()).thenReturn(new ObservationProcessor());
@@ -146,7 +146,7 @@ public class ObservationExportStepTest {
 
         observationExportStep.getStep();
 
-        verify(stepBuilderFactory).get("Step-1 " + formName);
+        verify(stepBuilderFactory).get("Insertion Step-1 " + formName);
         verify(obsIncrementalUpdater).isMetaDataChanged(formName, JOB_NAME);
         verify(jobDefinition, atLeastOnce()).getName();
         verify(obsIncrementalUpdater).updateReaderSql("some sql", JOB_NAME, "encounter_id");
@@ -161,7 +161,7 @@ public class ObservationExportStepTest {
 
         observationExportStep.getStep();
 
-        verify(stepBuilderFactory).get("Step-1 " + formName);
+        verify(stepBuilderFactory).get("Insertion Step-1 " + formName);
         verify(jobDefinition).getName();
         verify(obsIncrementalUpdater).isMetaDataChanged(formName, JOB_NAME);
         verify(obsIncrementalUpdater, never()).updateReaderSql(anyString(), anyString(), anyString());
@@ -175,13 +175,13 @@ public class ObservationExportStepTest {
 
         when(form.getFormName()).thenReturn(formNameConcept);
         when(formNameConcept.getName()).thenReturn(formName);
-        when(stepBuilderFactory.get("Step-1 " + formName)).thenReturn(stepBuilder);
+        when(stepBuilderFactory.get("Insertion Step-1 " + formName)).thenReturn(stepBuilder);
         when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
         when(observationProcessorFactory.getObject()).thenReturn(new ObservationProcessor());
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
-        when(freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form)).thenReturn("some sql");
+        when(freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form, false)).thenReturn("some sql");
     }
 }

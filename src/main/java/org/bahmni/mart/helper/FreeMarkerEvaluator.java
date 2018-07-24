@@ -21,11 +21,20 @@ public class FreeMarkerEvaluator<T> {
     private Configuration configuration;
 
     public String evaluate(String templateName, T input) {
+        return getString(templateName, input, false);
+    }
+
+    public String evaluate(String s, T input, boolean voided) {
+        return getString(s, input, voided);
+    }
+
+    private String getString(String templateName, T input, Boolean voided) {
         StringWriter stringWriter = new StringWriter();
         try {
             Template template = configuration.getTemplate(templateName);
             Map<String, Object> inputMap = new HashMap<>();
             inputMap.put("input", input);
+            inputMap.put("voided", voided);
             template.process(inputMap, stringWriter);
         } catch (Exception exception) {
             throw new BatchResourceException(
@@ -36,5 +45,4 @@ public class FreeMarkerEvaluator<T> {
         log.debug(String.format("The generated template for [%s]", input.toString()));
         return result;
     }
-
 }

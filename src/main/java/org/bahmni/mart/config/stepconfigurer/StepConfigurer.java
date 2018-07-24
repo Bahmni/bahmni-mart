@@ -1,8 +1,10 @@
 package org.bahmni.mart.config.stepconfigurer;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.ObservationExportStep;
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
+import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.service.ConceptService;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.isAddMoreMultiSelectEnabled;
 
 public abstract class StepConfigurer implements StepConfigurerContract {
@@ -35,6 +38,9 @@ public abstract class StepConfigurer implements StepConfigurerContract {
 
     @Autowired
     protected JobDefinitionReader jobDefinitionReader;
+
+    @Autowired
+    private IncrementalStrategyContext incrementalStrategyContext;
 
     @Autowired
     protected ConceptService conceptService;
@@ -57,12 +63,25 @@ public abstract class StepConfigurer implements StepConfigurerContract {
             ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
             observationExportStep.setJobDefinition(jobDefinition);
             observationExportStep.setForm(form);
-            completeDataExport.next(observationExportStep.getStep());
+            TableData tableData = formTableMetadataGenerator.getTableData(form);
+            addSteps(completeDataExport, jobDefinition, observationExportStep, tableData);
 
             if (!isAddMoreMultiSelectEnabled(jobDefinition)) {
-                revokeConstraints(formTableMetadataGenerator.getTableData(form));
+                revokeConstraints(tableData);
             }
         }
+    }
+
+    private void addSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition,
+                          ObservationExportStep observationExportStep, TableData tableData) {
+        if (nonNull(tableData) && isMetadataSame(jobDefinition, tableData))
+            completeDataExport.next(observationExportStep.getRemovalStep());
+        completeDataExport.next(observationExportStep.getStep());
+    }
+
+    private boolean isMetadataSame(JobDefinition jobDefinition, TableData tableData) {
+        IncrementalUpdateStrategy updateStrategy = incrementalStrategyContext.getStrategy(jobDefinition.getType());
+        return !updateStrategy.isMetaDataChanged(tableData.getName(), jobDefinition.getName());
     }
 
     private void revokeConstraints(TableData tableData) {

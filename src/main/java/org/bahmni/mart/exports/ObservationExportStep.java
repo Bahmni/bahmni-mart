@@ -1,13 +1,15 @@
 package org.bahmni.mart.exports;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.exports.writer.DatabaseObsWriter;
+import org.bahmni.mart.exports.writer.RemovalWriter;
 import org.bahmni.mart.form.ObservationProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
+import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
@@ -45,21 +47,38 @@ public class ObservationExportStep {
     private ObjectFactory<DatabaseObsWriter> databaseObsWriterObjectFactory;
 
     @Autowired
+    private ObjectFactory<RemovalWriter> removalWriterObjectFactory;
+
+    @Autowired
+    private FormTableMetadataGenerator formTableMetadataGenerator;
+
+    @Autowired
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
     private JobDefinition jobDefinition;
 
     public Step getStep() {
-        return stepBuilderFactory.get(getStepName())
+        return stepBuilderFactory.get(getStepName("Insertion Step"))
                 .<Map<String, Object>, List<Obs>>chunk(100)
-                .reader(obsReader())
+                .reader(obsReader(false))
                 .processor(observationProcessor())
                 .writer(getWriter())
                 .build();
     }
 
-    private JdbcCursorItemReader<Map<String, Object>> obsReader() {
-        String sql = freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form);
+    public Step getRemovalStep() {
+        return stepBuilderFactory.get(getStepName("Removal Step"))
+                .<Map<String, Object>, Map<String, Object>>chunk(100)
+                .reader(obsReader(true))
+                .writer(getRemovalWriter())
+                .build();
+    }
+
+    private JdbcCursorItemReader<Map<String, Object>> obsReader(boolean voided) {
+        return getReader(freeMarkerEvaluator.evaluate("obsWithParentSql.ftl", form, voided));
+    }
+
+    private JdbcCursorItemReader<Map<String, Object>> getReader(String sql) {
         if (!obsIncrementalUpdater.isMetaDataChanged(form.getFormName().getName(), jobDefinition.getName())) {
             sql = obsIncrementalUpdater.updateReaderSql(sql, jobDefinition.getName(), "encounter_id");
         }
@@ -85,13 +104,20 @@ public class ObservationExportStep {
         return writer;
     }
 
+    private RemovalWriter getRemovalWriter() {
+        RemovalWriter writer = removalWriterObjectFactory.getObject();
+        writer.setJobDefinition(jobDefinition);
+        writer.setTableData(formTableMetadataGenerator.getTableData(form));
+        return writer;
+    }
+
     public void setForm(BahmniForm form) {
         this.form = form;
     }
 
-    public String getStepName() {
+    public String getStepName(String prefix) {
         stepNumber++;
-        String formName = String.format("Step-%d %s", stepNumber, form.getFormName().getName());
+        String formName = String.format("%s-%d %s", prefix, stepNumber, form.getFormName().getName());
         return formName.substring(0, Math.min(formName.length(), 100));
     }
 
