@@ -68,7 +68,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(new IncrementalUpdateConfig());
         readerSql = "select * from table";
         when(JobDefinitionUtil.getReaderSQL(jobDefinition)).thenReturn(readerSql);
-        when(tableDataGenerator.getTableData(TABLE_NAME, readerSql)).thenReturn(tableData);
+        when(tableDataGenerator.getTableDataFromOpenmrs(TABLE_NAME, readerSql)).thenReturn(tableData);
         when(jobDefinitionReader.getJobDefinitionByName(JOB_NAME)).thenReturn(jobDefinition);
     }
 
@@ -85,7 +85,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         verify(spyCustomSqlIncrementalUpdater).getExistingTableData(TABLE_NAME);
         verifyStatic();
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator).getTableData(TABLE_NAME, readerSql);
+        verify(tableDataGenerator).getTableDataFromOpenmrs(TABLE_NAME, readerSql);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         verify(spyCustomSqlIncrementalUpdater).getExistingTableData(TABLE_NAME);
         verifyStatic();
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator).getTableData(TABLE_NAME, readerSql);
+        verify(tableDataGenerator).getTableDataFromOpenmrs(TABLE_NAME, readerSql);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(TABLE_NAME);
         verifyStatic(never());
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator, never()).getTableData(any(), any());
+        verify(tableDataGenerator, never()).getTableDataFromOpenmrs(any(), any());
     }
 
     @Test
@@ -133,6 +133,6 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(TABLE_NAME);
         verifyStatic(never());
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator, never()).getTableData(any(), any());
+        verify(tableDataGenerator, never()).getTableDataFromOpenmrs(any(), any());
     }
 }

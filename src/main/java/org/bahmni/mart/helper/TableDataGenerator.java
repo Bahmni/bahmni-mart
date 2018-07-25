@@ -22,7 +22,7 @@ public class TableDataGenerator {
     @Autowired
     private JdbcTemplate martJdbcTemplate;
 
-    public TableData getTableData(String tableName, String sql) {
+    public TableData getTableDataFromOpenmrs(String tableName, String sql) {
         return getTableDataFrom(openmrsJdbcTemplate, tableName, sql);
     }
 

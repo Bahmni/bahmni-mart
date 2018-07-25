@@ -55,7 +55,7 @@ public class TableDataGeneratorTest {
 
         when(openmrsJdbcTemplate.query(eq(sql + LIMIT), any(TableDataExtractor.class))).thenReturn(tableData);
 
-        TableData actualTableData = tableDataGenerator.getTableData(expectedTableName, sql);
+        TableData actualTableData = tableDataGenerator.getTableDataFromOpenmrs(expectedTableName, sql);
 
         assertEquals(tableData, actualTableData);
         assertEquals(expectedTableName, actualTableData.getName());

@@ -24,7 +24,7 @@ public class CustomSqlIncrementalUpdateStrategy extends AbstractIncrementalUpdat
         if (isEmpty(jobDefinition.getName()) || isNull(jobDefinition.getIncrementalUpdateConfig()))
             return true;
         try {
-            TableData tableData = tableDataGenerator.getTableData(tableName, getReaderSQL(jobDefinition));
+            TableData tableData = tableDataGenerator.getTableDataFromOpenmrs(tableName, getReaderSQL(jobDefinition));
             return !tableData.equals(getExistingTableData(tableName));
         } catch (BadSqlGrammarException exception) {
             return false;

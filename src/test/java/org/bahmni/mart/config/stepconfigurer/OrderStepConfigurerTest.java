@@ -130,7 +130,7 @@ public class OrderStepConfigurerTest {
         when(orderConceptUtil.getOrderTypeId(orderable)).thenReturn(orderTypeId);
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(sql);
         when(BatchUtils.constructSqlWithParameter(sql, "orderTypeId", "1")).thenReturn(sql);
-        when(tableDataGenerator.getTableData(orderable, sql)).thenReturn(tableData);
+        when(tableDataGenerator.getTableDataFromOpenmrs(orderable, sql)).thenReturn(tableData);
         when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
         when(jobDefinition.getColumnsToIgnore()).thenReturn(Collections.emptyList());
 
@@ -139,7 +139,7 @@ public class OrderStepConfigurerTest {
         verify(conceptService, times(1)).getChildConcepts(orderables, locale);
         verify(concept, times(1)).getName();
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
-        verify(tableDataGenerator, times(1)).getTableData(orderable, sql);
+        verify(tableDataGenerator, times(1)).getTableDataFromOpenmrs(orderable, sql);
     }
 
     @Test
@@ -151,7 +151,7 @@ public class OrderStepConfigurerTest {
         when(orderConceptUtil.getOrderTypeId(orderable)).thenReturn(orderTypeId);
         when(BatchUtils.convertResourceOutputToString(any())).thenReturn(sql);
         when(BatchUtils.constructSqlWithParameter(sql, "orderTypeId", "1")).thenReturn(sql);
-        when(tableDataGenerator.getTableData(orderable, sql)).thenReturn(tableData);
+        when(tableDataGenerator.getTableDataFromOpenmrs(orderable, sql)).thenReturn(tableData);
         when(jobDefinitionReader.getJobDefinitionByName("Orders Data")).thenReturn(jobDefinition);
         when(jobDefinition.getColumnsToIgnore()).thenReturn(Collections.emptyList());
 
@@ -162,7 +162,7 @@ public class OrderStepConfigurerTest {
         verify(conceptService, never()).getChildConcepts(orderables, locale);
         verify(jobDefinitionReader).getJobDefinitionByName("Orders Data");
         verify(orderConceptUtil, times(1)).getOrderTypeId(orderable);
-        verify(tableDataGenerator, times(1)).getTableData(orderable, sql);
+        verify(tableDataGenerator, times(1)).getTableDataFromOpenmrs(orderable, sql);
     }
 
     @Test
@@ -257,7 +257,7 @@ public class OrderStepConfigurerTest {
         when(BatchUtils.constructSqlWithParameter(sql, "orderTypeId", "1")).thenReturn(sql);
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
 
-        when(tableDataGenerator.getTableData(orderable, sql)).thenReturn(tableData);
+        when(tableDataGenerator.getTableDataFromOpenmrs(orderable, sql)).thenReturn(tableData);
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(recordWriterObjectFactory.getObject()).thenReturn(new TableRecordWriter());
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
@@ -278,7 +278,7 @@ public class OrderStepConfigurerTest {
         verifyStatic(times(3));
         BatchUtils.constructSqlWithParameter(sql, "orderTypeId", "1");
         verify(simpleStepBuilder, times(1)).reader(any());
-        verify(tableDataGenerator, times(2)).getTableData(orderable, sql);
+        verify(tableDataGenerator, times(2)).getTableDataFromOpenmrs(orderable, sql);
         verify(simpleStepBuilder, times(1)).processor(any());
         verify(recordWriterObjectFactory, times(1)).getObject();
         verify(simpleStepBuilder, times(1)).writer(any());

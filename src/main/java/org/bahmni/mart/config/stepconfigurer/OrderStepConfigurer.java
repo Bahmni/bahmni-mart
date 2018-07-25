@@ -114,7 +114,7 @@ public class OrderStepConfigurer implements StepConfigurerContract {
         orderableNames.forEach(orderable -> {
             try {
                 String orderSQL = getOrderReaderSQL(orderable);
-                TableData tableData = tableDataGenerator.getTableData(orderable, orderSQL);
+                TableData tableData = tableDataGenerator.getTableDataFromOpenmrs(orderable, orderSQL);
                 orderablesTableData.put(tableData.getName(), tableData);
             } catch (NoSamplesFoundException | InvalidOrderTypeException e) {
                 logger.info(e.getMessage());
@@ -210,7 +210,7 @@ public class OrderStepConfigurer implements StepConfigurerContract {
     }
 
     private TableData getOrdersTableData(String orderable) throws NoSamplesFoundException, InvalidOrderTypeException {
-        return tableDataGenerator.getTableData(orderable, getOrderReaderSQL(orderable));
+        return tableDataGenerator.getTableDataFromOpenmrs(orderable, getOrderReaderSQL(orderable));
     }
 
     private TableRecordWriter ordersDataWriter(String orderable)
