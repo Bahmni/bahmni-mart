@@ -121,8 +121,8 @@ public class SpecialCharacterResolverTest {
         String expectedTableName = "form,name@one";
         TableData tableData = new TableData(expectedTableName);
         List<TableColumn> tableColumns = new ArrayList<>();
-        tableColumns.add(new TableColumn("id_formnameone","integer",true,null));
-        tableColumns.add(new TableColumn("field","int",false,null));
+        tableColumns.add(new TableColumn("id_formnameone", "integer", true, null));
+        tableColumns.add(new TableColumn("field", "int", false, null));
         tableData.setColumns(tableColumns);
 
         SpecialCharacterResolver.resolveTableData(tableData);
@@ -150,6 +150,33 @@ public class SpecialCharacterResolverTest {
 
         String updatedTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(actualTableName);
         assertEquals("première_étape_de_validation", updatedTableName);
+    }
+
+    @Test
+    public void shouldResolveBiggerSimilarColumnNames() {
+        TableData tableData = new TableData("job_with_bigger_similar_column_names");
+        tableData.setColumns(Arrays.asList(
+                new TableColumn("analytics_bahmni_mart_database_table_with_bigger_similar_column_name" +
+                        "_for_patient_program_id", "text", false, null),
+                new TableColumn("analytics_bahmni_mart_database_table_with_bigger_similar_column_name_for_patient_id",
+                        "text", false, null),
+                new TableColumn("analytics_bahmni_mart_database_table_with_bigger_similar_column_name_for_program_id",
+                        "text", false, null),
+                new TableColumn("special@characters$column_name_for_location_id",
+                        "text", false, null)
+        ));
+
+        List<String> expectedColumnNames = Arrays.asList("analytics_bahmni_mart_database_table_with_bigger_similar_co",
+                "analytics_bahmni_mart_database_table_with_bigger_similar_co_1",
+                "analytics_bahmni_mart_database_table_with_bigger_similar_co_2",
+                "special_characters_column_name_for_location_id");
+
+        SpecialCharacterResolver.resolveTableData(tableData);
+
+        List<String> actualColumnNames = tableData.getColumns().stream().map(column -> column.getName())
+                .collect(Collectors.toList());
+
+        assertEquals(expectedColumnNames, actualColumnNames);
     }
 }
 

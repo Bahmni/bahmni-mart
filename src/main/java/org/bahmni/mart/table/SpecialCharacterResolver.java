@@ -13,6 +13,7 @@ import static java.util.Objects.isNull;
 public class SpecialCharacterResolver {
 
     private static final String ALPHA_NUMERIC_UNDERSCORE_REGEX = "[^\\p{L}0-9_]+";
+    private static final int MAX_COLUMN_NAME_LENGTH = 59;
 
     private static Map<String, DualHashBidiMap> tableToColumnsMap = new HashMap<>();
     private static DualHashBidiMap updatedToActualTableNames = new DualHashBidiMap();
@@ -49,7 +50,7 @@ public class SpecialCharacterResolver {
         for (TableColumn tableColumn : tableData.getColumns()) {
 
             String actualColumnName = tableColumn.getName();
-            String updatedColumnName = getUpdatedStringName(updatedToActualColumnNamesMap, actualColumnName);
+            String updatedColumnName = getUpdatedTableColumnName(updatedToActualColumnNamesMap, actualColumnName);
 
             updatedToActualColumnNamesMap.put(updatedColumnName, actualColumnName);
             tableColumn.setName(updatedColumnName);
@@ -58,6 +59,38 @@ public class SpecialCharacterResolver {
 
         }
         return updatedToActualColumnNamesMap;
+    }
+
+    private static String getUpdatedTableColumnName(DualHashBidiMap updatedToActualColumnNamesMap,
+                                                    String actualColumnName) {
+        String updatedColumnName = getUpdatedStringName(updatedToActualColumnNamesMap, actualColumnName);
+        if (updatedColumnName.length() > MAX_COLUMN_NAME_LENGTH) {
+            updatedColumnName = updatedColumnName.substring(0, MAX_COLUMN_NAME_LENGTH);
+        }
+        if (updatedToActualColumnNamesMap.containsKey(updatedColumnName)) {
+            updatedColumnName = resolveSameName(updatedColumnName, updatedToActualColumnNamesMap);
+        }
+        return updatedColumnName;
+    }
+
+    private static String resolveSameName(String updatedColumnName, DualHashBidiMap updatedToActualColumnNamesMap) {
+        long countOfNameExists = updatedToActualColumnNamesMap.keySet()
+                .stream()
+                .filter(columnKey -> isColumnNameExist((String) columnKey, updatedColumnName)).count();
+        return updatedColumnName.concat(String.format("_%d", countOfNameExists));
+    }
+
+    private static boolean isColumnNameExist(String columnKey, String updatedColumnName) {
+        if (!columnKey.startsWith(updatedColumnName)) {
+            return false;
+        }
+        String sameName = getSameName(columnKey, updatedColumnName.length());
+        return updatedColumnName.equals(sameName);
+    }
+
+    private static String getSameName(String columnKey, Integer fromIndex) {
+        int underscoreIndex = columnKey.indexOf("_", fromIndex);
+        return underscoreIndex == -1 ? columnKey : columnKey.substring(0, underscoreIndex);
     }
 
     private static void updateForeignKeyReferenceNames(TableColumn tableColumn) {

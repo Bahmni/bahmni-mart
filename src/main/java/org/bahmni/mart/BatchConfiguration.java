@@ -2,7 +2,6 @@ package org.bahmni.mart;
 
 import org.bahmni.mart.executors.MartExecutor;
 import org.bahmni.mart.notification.MailSender;
-import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration extends DefaultBatchConfigurer implements CommandLineRunner {
+public class BatchConfiguration implements CommandLineRunner {
 
     @Autowired
     private List<MartExecutor> martExecutors;
