@@ -19,8 +19,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.batch.core.BatchStatus.COMPLETED;
@@ -46,7 +48,7 @@ public class MartJobExecutor implements MartExecutor {
     @Autowired
     private MarkerManager markerManager;
 
-    private List<String> failedJobs = new ArrayList<>();
+    private Set<String> failedJobs = new HashSet<>();
 
     @Override
     public void execute() {
@@ -58,15 +60,22 @@ public class MartJobExecutor implements MartExecutor {
         allJobDefinitions = groupedJob.getJobDefinitionsBySkippingGroupedTypeJobs(allJobDefinitions);
         markerManager.insertMarkers(allJobDefinitions);
 
-        List<Job> jobs = allJobDefinitions.stream().map(jobDefinition -> jobContext.getJob(jobDefinition))
-                .filter(Objects::nonNull).collect(Collectors.toList());
+        List<Job> jobs = allJobDefinitions.stream().map(jobDefinition -> {
+            try {
+                return jobContext.getJob(jobDefinition);
+            } catch (Exception e) {
+                log.warn(e.getMessage(), e);
+                failedJobs.add(jobDefinition.getName());
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         launchJobs(jobs);
     }
 
     @Override
     public List<String> getFailedJobs() {
-        return failedJobs;
+        return new ArrayList<>(failedJobs);
     }
 
     private void validateJobDefinitions(List<JobDefinition> jobDefinitions) {

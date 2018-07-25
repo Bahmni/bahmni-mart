@@ -128,7 +128,7 @@ public class JobTemplate {
     }
 
     private Step loadData(JobDefinition jobConfiguration, String readerSql) {
-        return stepBuilderFactory.get(getStepName("Step", jobConfiguration.getName()))
+        return stepBuilderFactory.get(getStepName("Insertion Step", jobConfiguration.getName()))
                 .<Map<String, Object>, Map<String, Object>>chunk(jobConfiguration.getChunkSizeToRead())
                 .reader(getReader(readerSql))
                 .processor(getProcessor())

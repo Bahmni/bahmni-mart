@@ -159,7 +159,7 @@ public class JobTemplateTest {
 
         assertEquals(job, actualJob);
         verify(jobBuilderFactory, times(1)).get(TEST_JOB_NAME);
-        verify(stepBuilderFactory, times(1)).get(String.format("%s Step", TEST_JOB_NAME));
+        verify(stepBuilderFactory, times(1)).get(String.format("%s Insertion Step", TEST_JOB_NAME));
         verify(jobListener, times(1)).getTableDataForMart(TEST_JOB_NAME);
         verify(recordWriterObjectFactory, times(1)).getObject();
         verify(tableRecordWriter).setJobDefinition(jobDefinition);
@@ -196,7 +196,7 @@ public class JobTemplateTest {
         verify(jobBuilder).flow(any(Step.class));
         verify(jobFlowBuilder).next(any(Step.class));
 
-        verify(stepBuilderFactory).get(String.format("%s Step", TEST_JOB_NAME));
+        verify(stepBuilderFactory).get(String.format("%s Insertion Step", TEST_JOB_NAME));
         verify(stepBuilderFactory).get(String.format("%s Removal Step", TEST_JOB_NAME));
         verify(jobListener, times(1)).getTableDataForMart(TEST_JOB_NAME);
         verify(removalWriterObjectFactory, times(1)).getObject();
