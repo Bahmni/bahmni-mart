@@ -11,7 +11,8 @@ display_help(){
                 ii. sql - Take backup as sql dump file
             If you don't provide any format, by default it will use 'sql' format
         backup: To take unencrypted backup of bahmni-mart DB. The backup always will be 'sql' format
-        restore [FILE NAME]: To restore bahmni-mart db using encrypted sql dump file
+        restore FILE-NAME: To restore bahmni-mart db using unencrypted sql dump file
+        restore FILE-NAME -e: To restore bahmni-mart db using encrypted sql dump file
         metabase-backup: To take metabase db backup. (only if metabase is installed)
         metabase-restore [FILE NAME]: To restore metabase db using sql dump file. (only if metabase is installed)
         import-key: To import public key of others
@@ -38,7 +39,16 @@ metabase_backup(){
 }
 
 bahmni_mart_restore(){
-    sh /opt/bahmni-mart/bin/bahmni-mart-restore.sh $1
+    if [[ -z $1 ]]; then
+        echo "Please provide backup DB file location. For more information run bahmni-mart --help";
+        exit 1
+    fi
+
+    if [[ -z $2 || "$2" == "-e" ]]; then
+        sh /opt/bahmni-mart/bin/bahmni-mart-restore.sh $1 $2
+    else
+        display_help;
+    fi
 }
 
 import_key(){
@@ -62,7 +72,7 @@ elif [[ "$1" == "import-key" ]]; then
 elif [[ "$1" == "create-key" ]]; then
     create_new_key;
 elif [[ "$1" == "restore" ]]; then
-    bahmni_mart_restore $2;
+    bahmni_mart_restore $2 $3;
 elif [[ "$1" == "metabase-backup" ]]; then
     metabase_backup;
 elif [[ "$1" == "metabase-restore" ]]; then
