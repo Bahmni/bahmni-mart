@@ -5,6 +5,7 @@ import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.helper.TableDataGenerator;
+import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +30,7 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 // NOT WRITING MORE TESTS AS COMMON METHODS ARE COVERED IN ObsIncrementalUpdateStrategyTest.class
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(JobDefinitionUtil.class)
+@PrepareForTest({JobDefinitionUtil.class, SpecialCharacterResolver.class})
 public class CustomSqlIncrementalUpdateStrategyTest {
 
     private static final String JOB_NAME = "job name";
@@ -57,6 +58,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
     @Before
     public void setUp() throws Exception {
         mockStatic(JobDefinitionUtil.class);
+        mockStatic(SpecialCharacterResolver.class);
 
         CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdater = new CustomSqlIncrementalUpdateStrategy();
         setValuesForMemberFields(customSqlIncrementalUpdater, "jobDefinitionReader", jobDefinitionReader);
@@ -86,6 +88,8 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         verifyStatic();
         JobDefinitionUtil.getReaderSQL(jobDefinition);
         verify(tableDataGenerator).getTableDataFromOpenmrs(TABLE_NAME, readerSql);
+        verifyStatic();
+        SpecialCharacterResolver.resolveTableData(tableData);
     }
 
     @Test
@@ -102,6 +106,8 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         verifyStatic();
         JobDefinitionUtil.getReaderSQL(jobDefinition);
         verify(tableDataGenerator).getTableDataFromOpenmrs(TABLE_NAME, readerSql);
+        verifyStatic();
+        SpecialCharacterResolver.resolveTableData(tableData);
     }
 
     @Test

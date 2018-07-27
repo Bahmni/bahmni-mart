@@ -5,12 +5,14 @@ import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.stepconfigurer.OrderStepConfigurer;
 import org.bahmni.mart.helper.TableDataGenerator;
+import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
@@ -21,8 +23,10 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
-@RunWith(MockitoJUnitRunner.class)
+@PrepareForTest(SpecialCharacterResolver.class)
+@RunWith(PowerMockRunner.class)
 public class OrdersIncrementalUpdateStrategyTest {
 
     private OrdersIncrementalUpdateStrategy ordersIncrementalUpdateStrategy;
@@ -78,6 +82,8 @@ public class OrdersIncrementalUpdateStrategyTest {
         verify(orderStepConfigurer).getTableData(tableName);
         verify(tableDataGenerator).getTableDataFromMart(eq(tableName), anyString());
         assertFalse(metaDataChangeStatus);
+        verifyStatic();
+        SpecialCharacterResolver.resolveTableData(tableData);
     }
 
     @Test
@@ -93,5 +99,7 @@ public class OrdersIncrementalUpdateStrategyTest {
         verify(orderStepConfigurer).getTableData(tableName);
         verify(tableDataGenerator).getTableDataFromMart(eq(tableName), anyString());
         assertTrue(metaDataChangeStatus);
+        verifyStatic();
+        SpecialCharacterResolver.resolveTableData(tableData);
     }
 }

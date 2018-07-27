@@ -2,8 +2,9 @@ package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
-import org.bahmni.mart.table.listener.EAVJobListener;
+import org.bahmni.mart.table.listener.AbstractJobListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +15,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 public class EavIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrategy {
 
     @Autowired
-    private EAVJobListener eavJobListener;
-
-    @Autowired
     private JobDefinitionReader jobDefinitionReader;
 
     @Override
@@ -25,8 +23,13 @@ public class EavIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrat
         if (isEmpty(jobDefinition.getName()) || isNull(jobDefinition.getIncrementalUpdateConfig()))
             return true;
 
-        TableData tableData = eavJobListener.getTableDataForMart(jobDefinition.getName());
-
+        TableData tableData = listener.getTableDataForMart(jobDefinition.getName());
+        SpecialCharacterResolver.resolveTableData(tableData);
         return !tableData.equals(getExistingTableData(jobDefinition.getTableName()));
+    }
+
+    @Override
+    public void setListener(AbstractJobListener listener) {
+        this.listener = listener;
     }
 }

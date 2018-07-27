@@ -2,6 +2,7 @@ package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -25,6 +26,7 @@ public class CustomSqlIncrementalUpdateStrategy extends AbstractIncrementalUpdat
             return true;
         try {
             TableData tableData = tableDataGenerator.getTableDataFromOpenmrs(tableName, getReaderSQL(jobDefinition));
+            SpecialCharacterResolver.resolveTableData(tableData);
             return !tableData.equals(getExistingTableData(tableName));
         } catch (BadSqlGrammarException exception) {
             return false;

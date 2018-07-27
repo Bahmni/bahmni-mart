@@ -4,6 +4,8 @@ import org.bahmni.mart.config.job.model.CodeConfig;
 import org.bahmni.mart.config.job.model.EavAttributes;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionValidator;
+import org.bahmni.mart.exports.updatestrategy.EavIncrementalUpdateStrategy;
+import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.bahmni.mart.table.CodesProcessor;
 import org.bahmni.mart.table.domain.TableData;
@@ -21,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -55,16 +58,24 @@ public class EAVJobTemplateTest {
     private CodesProcessor codesProcessor;
 
     @Mock
+    private IncrementalStrategyContext incrementalStrategyContext;
+
+    @Mock
+    private EavIncrementalUpdateStrategy eavIncrementalUpdateStrategy;
+
+    @Mock
     private JobDefinition jobDefinition;
 
     private EAVJobTemplate spyEAVJobTemplate;
     private String jobName;
     private String readerSql;
     private List<CodeConfig> codeConfigs;
+    private static final String JOB_TYPE = "jobType";
 
     @Before
     public void setUp() throws Exception {
         EAVJobTemplate eavJobTemplate = new EAVJobTemplate();
+        setValuesForSuperClassMemberFields(eavJobTemplate, "incrementalStrategyContext", incrementalStrategyContext);
         setValuesForMemberFields(eavJobTemplate, "codesProcessor", codesProcessor);
         setValuesForMemberFields(eavJobTemplate, "eavJobListener", listener);
         setValuesForMemberFields(eavJobTemplate, "freeMarkerEvaluator", freeMarkerEvaluator);
@@ -78,6 +89,8 @@ public class EAVJobTemplateTest {
         when(jobDefinition.getCodeConfigs()).thenReturn(codeConfigs);
         when(jobDefinition.getEavAttributes()).thenReturn(eavAttributes);
         when(jobDefinition.getName()).thenReturn(jobName);
+        when(jobDefinition.getType()).thenReturn(JOB_TYPE);
+        when(incrementalStrategyContext.getStrategy(JOB_TYPE)).thenReturn(eavIncrementalUpdateStrategy);
         mockStatic(JobDefinitionValidator.class);
 
         doReturn(this.job).when((JobTemplate) spyEAVJobTemplate).buildJob(jobDefinition, listener, readerSql);
@@ -94,6 +107,9 @@ public class EAVJobTemplateTest {
         verify(listener, times(1)).getTableDataForMart(jobName);
         verify(freeMarkerEvaluator, times(1)).evaluate(eq("attribute.ftl"), any(EAV.class));
         verify(eavAttributes, times(1)).getAttributeTypeTableName();
+        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(eavIncrementalUpdateStrategy).setListener(listener);
+        verify(jobDefinition).getType();
     }
 
     @Test
@@ -107,6 +123,9 @@ public class EAVJobTemplateTest {
         verify(codesProcessor, times(1)).setCodeConfigs(codeConfigs);
         verify(listener, times(1)).setCodesProcessor(codesProcessor);
         verify(spyEAVJobTemplate, times(1)).setPreProcessor(codesProcessor);
+        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(eavIncrementalUpdateStrategy).setListener(listener);
+        verify(jobDefinition).getType();
     }
 
     @Test
@@ -120,5 +139,8 @@ public class EAVJobTemplateTest {
         verify(spyEAVJobTemplate, never()).setPreProcessor(codesProcessor);
         verify(listener, never()).setCodesProcessor(codesProcessor);
         verify(codesProcessor, never()).setUpCodesData();
+        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(eavIncrementalUpdateStrategy).setListener(listener);
+        verify(jobDefinition).getType();
     }
 }

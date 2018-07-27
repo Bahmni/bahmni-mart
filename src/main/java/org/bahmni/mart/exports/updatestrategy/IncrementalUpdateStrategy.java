@@ -1,6 +1,7 @@
 package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.table.domain.TableData;
+import org.bahmni.mart.table.listener.AbstractJobListener;
 
 import java.util.Set;
 
@@ -15,4 +16,6 @@ public interface IncrementalUpdateStrategy {
     void updateMarker(String jobName);
 
     TableData getExistingTableData(String actualTableName);
+
+    void setListener(AbstractJobListener listener);
 }

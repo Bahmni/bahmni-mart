@@ -52,7 +52,7 @@ public class JobTemplate {
     private ObjectFactory<TableRecordWriter> recordWriterObjectFactory;
 
     @Autowired
-    private IncrementalStrategyContext incrementalStrategyContext;
+    protected IncrementalStrategyContext incrementalStrategyContext;
 
     @Autowired
     private ObjectFactory<RemovalWriter> removalWriterObjectFactory;

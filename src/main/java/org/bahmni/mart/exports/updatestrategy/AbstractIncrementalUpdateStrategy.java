@@ -6,6 +6,7 @@ import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
+import org.bahmni.mart.table.listener.AbstractJobListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -57,6 +58,8 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
     private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
 
     private Integer maxEventRecordId;
+
+    protected AbstractJobListener listener;
 
     @Override
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
@@ -150,5 +153,10 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
         } catch (BadSqlGrammarException exception) {
             return NON_EXISTENT_TABLE_DATA;
         }
+    }
+
+    @Override
+    public void setListener(AbstractJobListener listener) {
+
     }
 }

@@ -290,6 +290,8 @@ public class ObsIncrementalUpdateStrategyTest {
         verify(tableDataGenerator).getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one");
         verifyStatic();
         SpecialCharacterResolver.getActualTableName(actualTableName);
+        verifyStatic();
+        SpecialCharacterResolver.resolveTableData(tableData);
         verify(formTableMetadataGenerator).getTableDataByName(actualTableName);
         assertFalse(metaDataChangeMap.isEmpty());
         verify(metaDataChangeMap).put("form,_name@one", true);
@@ -320,6 +322,8 @@ public class ObsIncrementalUpdateStrategyTest {
         getUpdatedTableNameIfExist(actualTableName);
         verifyStatic();
         SpecialCharacterResolver.getActualTableName(actualTableName);
+        verifyStatic();
+        SpecialCharacterResolver.resolveTableData(tableData);
 
         verify(tableDataGenerator).getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one");
         verify(formTableMetadataGenerator).getTableDataByName(actualTableName);

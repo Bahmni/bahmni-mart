@@ -30,6 +30,7 @@ public class EAVJobTemplate extends JobTemplate {
     private CodesProcessor codesProcessor;
 
     public Job buildJob(JobDefinition jobConfiguration) {
+        incrementalStrategyContext.getStrategy(jobConfiguration.getType()).setListener(eavJobListener);
         List<CodeConfig> codeConfigs = jobConfiguration.getCodeConfigs();
         if (isValid(codeConfigs)) {
             codesProcessor.setCodeConfigs(codeConfigs);

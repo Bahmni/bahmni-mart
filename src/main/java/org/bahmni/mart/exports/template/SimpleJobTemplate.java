@@ -26,6 +26,7 @@ public class SimpleJobTemplate extends JobTemplate {
     private CodesProcessor codesProcessor;
 
     public Job buildJob(JobDefinition jobConfiguration) {
+        incrementalStrategyContext.getStrategy(jobConfiguration.getType()).setListener(tableGeneratorJobListener);
         String readerSql = getReaderSql(jobConfiguration);
         List<CodeConfig> codeConfigs = jobConfiguration.getCodeConfigs();
         if (isValid(codeConfigs)) {

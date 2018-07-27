@@ -25,6 +25,7 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -104,9 +105,9 @@ public class SimpleJobTemplateTest {
         verifyStatic(times(1));
         JobDefinitionUtil.getReaderSQLByIgnoringColumns(Collections.emptyList(), readerSql);
         verify(jobDefinition).getCodeConfigs();
-        verify(jobDefinition).getType();
+        verify(jobDefinition, atLeastOnce()).getType();
         verify(jobDefinition).getIncrementalUpdateConfig();
-        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(incrementalStrategyContext, atLeastOnce()).getStrategy(JOB_TYPE);
         verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(TABLE_NAME, JOB_NAME);
     }
 
@@ -121,8 +122,8 @@ public class SimpleJobTemplateTest {
         verify(spyJobTemplate, times(1)).setPreProcessor(codesProcessor);
         verify(customSqlIncrementalUpdater, times(1)).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verify(jobDefinition).getIncrementalUpdateConfig();
-        verify(jobDefinition).getType();
-        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(jobDefinition, atLeastOnce()).getType();
+        verify(incrementalStrategyContext, atLeastOnce()).getStrategy(JOB_TYPE);
         verify(incrementalUpdateConfig, never()).getUpdateOn();
         verify(customSqlIncrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verifyStatic(times(1));
@@ -140,8 +141,8 @@ public class SimpleJobTemplateTest {
         verify(spyJobTemplate, never()).setPreProcessor(codesProcessor);
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig, never()).getUpdateOn();
-        verify(jobDefinition).getType();
-        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(jobDefinition, atLeastOnce()).getType();
+        verify(incrementalStrategyContext, atLeastOnce()).getStrategy(JOB_TYPE);
         verify(customSqlIncrementalUpdater).isMetaDataChanged(TABLE_NAME, JOB_NAME);
         verifyStatic(times(1));
         JobDefinitionValidator.isValid(codeConfigs);
@@ -165,7 +166,7 @@ public class SimpleJobTemplateTest {
         verify(customSqlIncrementalUpdater, times(1)).updateReaderSql(readerSql, JOB_NAME, updateOn);
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(incrementalUpdateConfig).getUpdateOn();
-        verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
+        verify(incrementalStrategyContext, atLeastOnce()).getStrategy(JOB_TYPE);
     }
 
     @Test

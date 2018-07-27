@@ -3,6 +3,7 @@ package org.bahmni.mart.exports.updatestrategy;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.stepconfigurer.OrderStepConfigurer;
+import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,8 @@ public class OrdersIncrementalUpdateStrategy extends AbstractIncrementalUpdateSt
 
         TableData currentTableData = orderStepConfigurer.getTableData(getActualTableName(actualTableName));
         TableData existingTableData = getExistingTableData(actualTableName);
+        SpecialCharacterResolver.resolveTableData(currentTableData);
+
         return !currentTableData.equals(existingTableData);
     }
 }
