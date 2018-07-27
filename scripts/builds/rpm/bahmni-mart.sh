@@ -3,14 +3,14 @@
 display_help(){
     printf "Usage:
     bahmni-mart [OPTIONS]
-    By default it will launch bahmni-mart application
+    By default bahmni-mart application is launched
     Options :
         backup -e: To take encrypted db backup of bahmni-mart DB
-            Currently there is 2 way to take backup using bahmni-mart
+            Currently there are two ways to take backup using bahmni-mart
                 i. csv - Take backup in Comma Separated Value(CSV) format
                 ii. sql - Take backup as sql dump file
-            If you don't provide any format, by default it will use 'sql' format
-        backup: To take unencrypted backup of bahmni-mart DB. The backup always will be 'sql' format
+            By default sql dump file will be selected
+        backup: To take unencrypted backup of bahmni-mart DB. The backup always will be in 'sql' format
         restore FILE-NAME: To restore bahmni-mart db using unencrypted sql dump file
         restore FILE-NAME -e: To restore bahmni-mart db using encrypted sql dump file
         metabase-backup: To take metabase db backup. (only if metabase is installed)
