@@ -5,7 +5,7 @@ SELECT
             ${column.name}
             <#assign primary_key = column.name>
         <#else >
-        MAX(if( name =  '${getProcessedName(column.name)}',
+        MAX(if( name =  '${getProcessedName(column.name)}' AND value_table.voided = 0,
                     if  (value_table.${getProcessedName(input.eavAttributes.valueColumnName)} REGEXP '^[[:digit:]]*$' AND
             ${getType('${getProcessedName(column.name)}', '${getProcessedName(input.eavAttributes.attributeTypeTableName)}',
             '${getProcessedName(input.typeColumnName)}')} REGEXP '^org.openmrs.Concept$' AND
