@@ -53,7 +53,7 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
     private MarkerManager markerManager;
 
     @Autowired
-    protected TableDataGenerator tableDataGenerator;
+    private TableDataGenerator tableDataGenerator;
 
     private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
 

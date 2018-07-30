@@ -7,6 +7,7 @@ import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
+import org.bahmni.mart.table.listener.AbstractJobListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +19,8 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -51,8 +53,10 @@ public class CustomSqlIncrementalUpdateStrategyTest {
     @Mock
     private TableDataGenerator tableDataGenerator;
 
+    @Mock
+    private AbstractJobListener listener;
+
     private CustomSqlIncrementalUpdateStrategy spyCustomSqlIncrementalUpdater;
-    private String readerSql;
 
 
     @Before
@@ -64,13 +68,15 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         setValuesForMemberFields(customSqlIncrementalUpdater, "jobDefinitionReader", jobDefinitionReader);
         setValuesForSuperClassMemberFields(customSqlIncrementalUpdater, "tableDataGenerator", tableDataGenerator);
         spyCustomSqlIncrementalUpdater = spy(customSqlIncrementalUpdater);
+        spyCustomSqlIncrementalUpdater.setListener(listener);
 
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
         when(jobDefinition.getTableName()).thenReturn(TABLE_NAME);
         when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(new IncrementalUpdateConfig());
-        readerSql = "select * from table";
+        String readerSql = "select * from table";
         when(JobDefinitionUtil.getReaderSQL(jobDefinition)).thenReturn(readerSql);
         when(tableDataGenerator.getTableDataFromOpenmrs(TABLE_NAME, readerSql)).thenReturn(tableData);
+        when(listener.getTableDataForMart(jobDefinition)).thenReturn(tableData);
         when(jobDefinitionReader.getJobDefinitionByName(JOB_NAME)).thenReturn(jobDefinition);
     }
 
@@ -82,12 +88,12 @@ public class CustomSqlIncrementalUpdateStrategyTest {
 
         assertTrue(status);
         verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
-        verify(jobDefinition).getName();
+        verify(jobDefinition, atLeastOnce()).getName();
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(spyCustomSqlIncrementalUpdater).getExistingTableData(TABLE_NAME);
-        verifyStatic();
+        verifyStatic(never());
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator).getTableDataFromOpenmrs(TABLE_NAME, readerSql);
+        verify(listener).getTableDataForMart(jobDefinition);
         verifyStatic();
         SpecialCharacterResolver.resolveTableData(tableData);
     }
@@ -100,12 +106,12 @@ public class CustomSqlIncrementalUpdateStrategyTest {
 
         assertFalse(status);
         verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
-        verify(jobDefinition).getName();
+        verify(jobDefinition, atLeastOnce()).getName();
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(spyCustomSqlIncrementalUpdater).getExistingTableData(TABLE_NAME);
-        verifyStatic();
+        verifyStatic(never());
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator).getTableDataFromOpenmrs(TABLE_NAME, readerSql);
+        verify(listener).getTableDataForMart(jobDefinition);
         verifyStatic();
         SpecialCharacterResolver.resolveTableData(tableData);
     }
@@ -118,12 +124,12 @@ public class CustomSqlIncrementalUpdateStrategyTest {
 
         assertTrue(status);
         verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
-        verify(jobDefinition).getName();
+        verify(jobDefinition, atLeastOnce()).getName();
         verify(jobDefinition, never()).getIncrementalUpdateConfig();
         verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(TABLE_NAME);
         verifyStatic(never());
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator, never()).getTableDataFromOpenmrs(any(), any());
+        verify(listener, never()).getTableDataForMart(anyString());
     }
 
     @Test
@@ -134,11 +140,11 @@ public class CustomSqlIncrementalUpdateStrategyTest {
 
         assertTrue(status);
         verify(jobDefinitionReader).getJobDefinitionByName(JOB_NAME);
-        verify(jobDefinition).getName();
+        verify(jobDefinition, atLeastOnce()).getName();
         verify(jobDefinition).getIncrementalUpdateConfig();
         verify(spyCustomSqlIncrementalUpdater, never()).getExistingTableData(TABLE_NAME);
         verifyStatic(never());
         JobDefinitionUtil.getReaderSQL(jobDefinition);
-        verify(tableDataGenerator, never()).getTableDataFromOpenmrs(any(), any());
+        verify(listener, never()).getTableDataForMart(anyString());
     }
 }
