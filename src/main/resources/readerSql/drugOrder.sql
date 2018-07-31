@@ -91,7 +91,9 @@ FROM
      LEFT JOIN obs ON obs.order_id = orders.order_id AND obs.voided = FALSE AND obs.concept_id = (SELECT concept_id
                                                                                                   FROM concept_name
                                                                                                   WHERE
-                                                                                                    name = "Dispensed")
+                                                                                                    name = "Dispensed" AND
+                                                                                                    concept_name_type = "FULLY_SPECIFIED" AND
+                                                                                                    locale = 'en')
      LEFT JOIN orders stopped_order ON stopped_order.patient_id = p.patient_id AND stopped_order.voided = 0 AND
                                        stopped_order.order_action = "DISCONTINUE" AND
                                        stopped_order.previous_order_id = orders.order_id
