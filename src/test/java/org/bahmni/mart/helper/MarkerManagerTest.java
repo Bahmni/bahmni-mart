@@ -11,13 +11,17 @@ import org.slf4j.Logger;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.bahmni.mart.CommonTestHelper.getPrivateMethod;
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
@@ -25,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +39,9 @@ public class MarkerManagerTest {
 
     @Mock
     private JdbcTemplate martJdbcTemplate;
+
+    @Mock
+    private JdbcTemplate openmrsJdbcTemplate;
 
     @Mock
     private JobDefinition existingJobDefinition;
@@ -60,6 +68,7 @@ public class MarkerManagerTest {
     public void setUp() throws Exception {
         markerManager = new MarkerManager();
         setValuesForMemberFields(markerManager, "martJdbcTemplate", martJdbcTemplate);
+        setValuesForMemberFields(markerManager, "openmrsJdbcTemplate", openmrsJdbcTemplate);
         setValueForFinalStaticField(MarkerManager.class, "logger", logger);
 
         markerMapList = new ArrayList<>();
@@ -68,6 +77,8 @@ public class MarkerManagerTest {
         markerMapList.add(obsMarkerMap);
 
         when(martJdbcTemplate.queryForList(MARKERS_QUERY)).thenReturn(markerMapList);
+        Method setValidEventCategories = getPrivateMethod(markerManager, "setValidEventCategories");
+        setValidEventCategories.invoke(markerManager);
     }
 
     @Test
@@ -75,6 +86,7 @@ public class MarkerManagerTest {
         Optional<Map<String, Object>> actualObsMarkerMap = markerManager.getJobMarkerMap("Obs");
 
         verify(martJdbcTemplate).queryForList(MARKERS_QUERY);
+        verify(openmrsJdbcTemplate).queryForList(anyString());
         assertTrue(actualObsMarkerMap.isPresent());
         assertEquals(obsMarkerMap, actualObsMarkerMap.get());
     }
@@ -85,6 +97,7 @@ public class MarkerManagerTest {
 
         Optional<Map<String, Object>> actualObsMarkerMap = markerManager.getJobMarkerMap("Obs");
 
+        verify(openmrsJdbcTemplate).queryForList(anyString());
         verify(martJdbcTemplate, times(0)).queryForList(MARKERS_QUERY);
         assertTrue(actualObsMarkerMap.isPresent());
         assertEquals(obsMarkerMap, actualObsMarkerMap.get());
@@ -118,7 +131,9 @@ public class MarkerManagerTest {
     }
 
     @Test
-    public void shouldInsertMarkerRecordsForGivenJobDefinitions() {
+    public void shouldInsertMarkerRecordsForGivenJobDefinitions() throws Exception {
+        setValuesForMemberFields(markerManager, "validEventCategories",
+                new HashSet<>(Collections.singletonList("category")));
         when(existingJobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfigForExist);
         when(existingJobDefinition.getName()).thenReturn("Obs");
         when(nonExistsJobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfigForNonExist);
@@ -140,5 +155,20 @@ public class MarkerManagerTest {
         verify(nonExistsJobDefinition, atLeastOnce()).getIncrementalUpdateConfig();
         verify(martJdbcTemplate).execute(String.format("INSERT INTO markers (job_name, event_record_id," +
                 " category, table_name) VALUES ('%s', 0, '%s', '%s');", nonExistJobName, category, tableName));
+        verify(logger, never()).warn(anyString());
+    }
+
+    @Test
+    public void shouldLogWarningMessageIfTheGivenCategoryIsNotPresentInOpeners() throws Exception {
+        when(nonExistsJobDefinition.getIncrementalUpdateConfig()).thenReturn(incrementalUpdateConfigForNonExist);
+        String nonExistJobName = "non exist";
+        when(nonExistsJobDefinition.getName()).thenReturn(nonExistJobName);
+        when(incrementalUpdateConfigForNonExist.getEventCategory()).thenReturn("wrongCategory");
+
+        markerManager.insertMarkers(Collections.singletonList(nonExistsJobDefinition));
+        verify(openmrsJdbcTemplate).queryForList(anyString());
+        verify(logger, times(1)).warn("wrongCategory event category configured in non exist" +
+                " job config is not present in event_records table in openmrs database");
+
     }
 }

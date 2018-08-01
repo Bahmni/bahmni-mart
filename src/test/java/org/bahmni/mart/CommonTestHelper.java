@@ -1,6 +1,7 @@
 package org.bahmni.mart;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class CommonTestHelper {
@@ -29,5 +30,11 @@ public class CommonTestHelper {
         modifiersField.setAccessible(true);
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         setField(null, valueForMemberField, field);
+    }
+
+    public static Method getPrivateMethod(Object classInstance, String methodName) throws NoSuchMethodException {
+        Method declaredMethod = classInstance.getClass().getDeclaredMethod(methodName);
+        declaredMethod.setAccessible(true);
+        return declaredMethod;
     }
 }
