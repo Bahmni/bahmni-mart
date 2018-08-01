@@ -3,7 +3,7 @@ SELECT
   o.person_id                                                            AS patientId,
   o.concept_id                                                           AS conceptId,
   o.obs_id                                                               AS id,
-  coalesce(DATE_FORMAT(o.value_datetime, '%d/%b/%Y'), o.value_numeric, o.value_text,
+  coalesce(DATE_FORMAT(o.value_datetime, '%d/%b/%Y %T'), o.value_numeric, o.value_text,
            vcc.code, value_concept_locale.name, cvn.concept_full_name,
            cvn.concept_short_name)                                       AS value,
   coalesce(obs_concept_locale.name, obs_con.concept_full_name)           AS conceptName,
