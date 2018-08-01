@@ -79,7 +79,7 @@ You can access **Bahmni-mart** and other application from browser also.
 
 |Application | URL | Comment | 
 |:-----------|:------|:---------|
-|Bahmni mart  |http://\<HOST NAME>/dashboard/#/tasks/definitions/launch/create-bahmni-mart| Only if bahmni-mart-scdf is installed|
+|Bahmni mart  |http://\<HOST NAME>:9393/dashboard/#/tasks/definitions/launch/create-bahmni-mart| Only if bahmni-mart-scdf is installed|
 |Metabase|http://\<HOST NAME>:9003|Only if metabase is installed|
 
 ---
@@ -91,3 +91,6 @@ You can access **Bahmni-mart** and other application from browser also.
 * ```docker start <CONTAINER NAME>``` (Start specific docker container)
 * ```curl -X POST <HOST NAME>:9393/tasks/executions\?name\=create-bahmni-mart``` (Once Spring Cloud Dataflow Server is up, you can launch task using UI. But if you want to do it from command line you can run this command. It will launch **create-bahmni-mart** task)
 * ```tail -100f /var/log/bahmni-mart/bahmmni-mart.log``` (Log of **create-bahmni-mart** task will be present in **/var/log/bahmni-mart/bahmni-mart.log** of your host machine. Use this command to get last 100 lines of the file)
+
+### Implementers Note
+For implementers note please check [here](https://docs.google.com/document/d/1NClHML9rabkS6KwXXUMOgLhJmo9kOvJkMTgewXLyPTo/edit?usp=sharing).
