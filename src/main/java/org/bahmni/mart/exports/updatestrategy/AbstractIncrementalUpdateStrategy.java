@@ -2,6 +2,8 @@ package org.bahmni.mart.exports.updatestrategy;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bahmni.mart.exports.model.EventInfo;
+import org.bahmni.mart.helper.EventManager;
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
@@ -18,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -27,13 +27,10 @@ import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 
 public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUpdateStrategy {
 
-    private static final String UUID_REGEXP = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
-    private static final Pattern UUID_PATTERN = Pattern.compile(UUID_REGEXP);
     private static final String EVENT_RECORD_ID = "event_record_id";
     private static final String CATEGORY = "category";
     private static final String TABLE_NAME = "table_name";
-    private static final String QUERY_FOR_URL_EXTRACTION = "SELECT DISTINCT object FROM event_records" +
-            " WHERE id > %s AND id <= %s AND binary category = '%s'";
+
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
     private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
     private static final String NON_EXISTED_ID = "-1";
@@ -54,6 +51,9 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
 
     @Autowired
     private TableDataGenerator tableDataGenerator;
+
+    @Autowired
+    private EventManager eventManager;
 
     private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
 
@@ -101,7 +101,8 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
     private String getJoinedIds(Map<String, Object> markerMap) {
         String eventRecordId = String.valueOf(markerMap.get(EVENT_RECORD_ID));
         String category = (String) markerMap.get(CATEGORY);
-        return getIds((String) markerMap.get(TABLE_NAME), getEventRecordUuids(eventRecordId, category));
+        EventInfo eventInfo = new EventInfo(eventRecordId, category, maxEventRecordId);
+        return getIds((String) markerMap.get(TABLE_NAME), eventManager.getEventRecordUuids(eventInfo));
     }
 
     private String getIds(String tableName, List<String> uuids) {
@@ -116,19 +117,6 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
     private String getCommaSeparatedIDs(String tableName, List<String> uuids) {
         return getIdListFor(tableName, uuids).stream()
                 .map(String::valueOf).collect(Collectors.joining(","));
-    }
-
-    private List<String> getEventRecordUuids(String eventRecordId, String category) {
-        String queryForEventRecordObjectUrls = String.format(QUERY_FOR_URL_EXTRACTION, eventRecordId,
-                maxEventRecordId, category);
-
-        return openmrsJdbcTemplate.queryForList(queryForEventRecordObjectUrls, String.class).stream().map(this::getUuid)
-                .filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-    }
-
-    private String getUuid(String url) {
-        Matcher matcher = UUID_PATTERN.matcher(url);
-        return matcher.find() ? matcher.group(0) : null;
     }
 
     private List<String> getIdListFor(String tableName, List<String> uuids) {

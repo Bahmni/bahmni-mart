@@ -1,5 +1,7 @@
 package org.bahmni.mart.exports.updatestrategy;
 
+import org.bahmni.mart.exports.model.EventInfo;
+import org.bahmni.mart.helper.EventManager;
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
@@ -34,6 +36,7 @@ import static org.bahmni.mart.table.SpecialCharacterResolver.getUpdatedTableName
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -65,19 +68,22 @@ public class ObsIncrementalUpdateStrategyTest {
     @Mock
     private Map markerMap;
 
+    @Mock
+    private EventManager eventManager;
+
     @Spy
     private Map<String, Boolean> metaDataChangeMap = new HashMap<>();
 
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
-    private static final String MAX_EVENT_RECORD_ID = "20";
+    private EventInfo eventInfo;
+
+    private static final Integer MAX_EVENT_RECORD_ID = 20;
     private static final String JOB_NAME = "JobName";
     private static final String READER_SQL = "SELECT id, name FROM test";
     private static final String UPDATE_ON = "id";
     private static final String CATEGORY = "CategoryName";
     private static final String TABLE_NAME = "encounter";
-    private static final String QUERY_FOR_EVENT_URLS = "SELECT DISTINCT object " +
-            "FROM event_records WHERE id > %s AND id <= %s AND binary category = '%s'";
     private static final String QUERY_FOR_IDS = format("SELECT %s_id FROM %s WHERE uuid in ('%s','%s')",
             TABLE_NAME, TABLE_NAME, "99b885e9-c49c-4b5a-aa4c-e8a8fb93484d", "55527d10-5789-46e1-af16-59082938f11c");
     private static final String queryForMaxEventRecordId = "SELECT MAX(id) FROM event_records";
@@ -88,16 +94,18 @@ public class ObsIncrementalUpdateStrategyTest {
     @Before
     public void setUp() throws Exception {
         obsIncrementalUpdater = new ObsIncrementalUpdateStrategy();
+        eventInfo = new EventInfo(eventRecordedForJob, CATEGORY, MAX_EVENT_RECORD_ID);
 
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "openmrsJdbcTemplate", openmrsJdbcTemplate);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "martJdbcTemplate", martJdbcTemplate);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "markerManager", markerManager);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "tableDataGenerator", tableDataGenerator);
+        setValuesForSuperClassMemberFields(obsIncrementalUpdater, "eventManager", eventManager);
         setValuesForMemberFields(obsIncrementalUpdater,
                 "formTableMetadataGenerator", formTableMetadataGenerator);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId",
-                                            Integer.parseInt(MAX_EVENT_RECORD_ID));
+                                            MAX_EVENT_RECORD_ID);
 
         mockStatic(SpecialCharacterResolver.class);
 
@@ -132,14 +140,13 @@ public class ObsIncrementalUpdateStrategyTest {
 
     @Test
     public void shouldUpdateReaderSqlWithNonExistIdIfJoinedIdsEmpty() {
-        String queryForEventRecordObjectUrls = format(QUERY_FOR_EVENT_URLS, eventRecordedForJob,
-                MAX_EVENT_RECORD_ID, CATEGORY);
         String wrongUuid = "99b885e9-c49c-4b5a-aa4c-e8a8fb93484d";
-        when(openmrsJdbcTemplate.queryForList(queryForEventRecordObjectUrls, String.class))
-                .thenReturn(Arrays.asList(wrongUuid));
+
+        when(eventManager.getEventRecordUuids(any(EventInfo.class))).thenReturn(Collections.singletonList(wrongUuid));
+
         String queryForIDs = format("SELECT %s_id FROM %s WHERE uuid in ('%s')",
                                 TABLE_NAME, TABLE_NAME, wrongUuid);
-        when(openmrsJdbcTemplate.queryForList(queryForIDs, String.class)).thenReturn(Arrays.asList(""));
+        when(openmrsJdbcTemplate.queryForList(queryForIDs, String.class)).thenReturn(Collections.singletonList(""));
         String expectedUpdatedReaderSql = format(UPDATED_READER_SQL, READER_SQL, UPDATE_ON, "-1");
 
         String actualUpdateReaderSql = obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
@@ -147,25 +154,21 @@ public class ObsIncrementalUpdateStrategyTest {
         verify(markerManager).getJobMarkerMap(JOB_NAME);
         verify(markerMap, times(2)).get("event_record_id");
         verify(markerMap).get("category");
-        verify(openmrsJdbcTemplate).queryForList(format(QUERY_FOR_EVENT_URLS, eventRecordedForJob,
-                MAX_EVENT_RECORD_ID, CATEGORY),
-                String.class);
-        verify(openmrsJdbcTemplate).queryForList(queryForIDs,
-                String.class);
+        verify(eventManager).getEventRecordUuids(new EventInfo(eventRecordedForJob, CATEGORY, MAX_EVENT_RECORD_ID));
+        verify(openmrsJdbcTemplate).queryForList(queryForIDs, String.class);
         assertEquals(expectedUpdatedReaderSql, actualUpdateReaderSql);
     }
 
     @Test
     public void shouldQueryFromEventRecordsTableWhenEventRecordIdIsNotZeroForGivenJob() {
 
-        String readerSql = obsIncrementalUpdater.updateReaderSql(this.READER_SQL, JOB_NAME, UPDATE_ON);
+        String readerSql = obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
 
         assertEquals("SELECT * FROM ( SELECT id, name FROM test ) result WHERE id IN (-1)", readerSql);
         verify(markerManager).getJobMarkerMap(JOB_NAME);
         verify(markerMap, times(2)).get("event_record_id");
         verify(markerMap).get("category");
-        verify(openmrsJdbcTemplate).queryForList(
-                format(QUERY_FOR_EVENT_URLS, eventRecordedForJob, MAX_EVENT_RECORD_ID, CATEGORY), String.class);
+        verify(eventManager).getEventRecordUuids(eventInfo);
     }
 
     @Test
@@ -174,8 +177,7 @@ public class ObsIncrementalUpdateStrategyTest {
 
         obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
 
-        verify(openmrsJdbcTemplate).queryForList(
-                format(QUERY_FOR_EVENT_URLS, eventRecordedForJob, MAX_EVENT_RECORD_ID, CATEGORY), String.class);
+        verify(eventManager).getEventRecordUuids(eventInfo);
         verify(openmrsJdbcTemplate).queryForList(QUERY_FOR_IDS, String.class);
     }
 
@@ -194,15 +196,14 @@ public class ObsIncrementalUpdateStrategyTest {
 
     @Test
     public void shouldUpdateReaderSqlWithNonExistedIdWhenUuidListIsEmpty() {
-        when(openmrsJdbcTemplate.queryForList(
-                format(QUERY_FOR_EVENT_URLS, eventRecordedForJob, MAX_EVENT_RECORD_ID, CATEGORY), String.class))
-                .thenReturn(new ArrayList<>());
+        when(eventManager.getEventRecordUuids(eventInfo)).thenReturn(new ArrayList<>());
         String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (-1)", READER_SQL,
                 UPDATE_ON);
 
         String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
 
         assertEquals(expectedUpdatedReaderSql, updatedReaderSql);
+        verify(eventManager).getEventRecordUuids(eventInfo);
     }
 
     @Test
@@ -368,11 +369,9 @@ public class ObsIncrementalUpdateStrategyTest {
     }
 
     private void setUpForUuids() {
-        List<String> eventRecordObjects = Arrays.asList(
-                "/openmrs/ws/rest/v1/appointment?uuid=99b885e9-c49c-4b5a-aa4c-e8a8fb93484d",
-                "/openmrs/ws/rest/v1/bahmnicore/bahmniencounter/55527d10-5789-46e1-af16-59082938f11c?includeAll=true");
-        when(openmrsJdbcTemplate.queryForList(
-                format(QUERY_FOR_EVENT_URLS, eventRecordedForJob, MAX_EVENT_RECORD_ID, CATEGORY), String.class))
-                .thenReturn(eventRecordObjects);
+        List<String> uuids = Arrays.asList("99b885e9-c49c-4b5a-aa4c-e8a8fb93484d",
+                "55527d10-5789-46e1-af16-59082938f11c");
+
+        when(eventManager.getEventRecordUuids(eventInfo)).thenReturn(uuids);
     }
 }
