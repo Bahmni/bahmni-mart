@@ -1,4 +1,5 @@
 {
+  "shouldOverRideConfig": true,
   "nutritionalValues": {
     "extensionPointId": "org.bahmni.registration.conceptSetGroup.observations",
     "type": "config",

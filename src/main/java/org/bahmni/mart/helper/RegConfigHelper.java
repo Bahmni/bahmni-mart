@@ -28,6 +28,11 @@ public class RegConfigHelper extends AbstractConfigParserHelper {
     private String implementationExtensionConfigFile;
 
     @Override
+    protected boolean shouldOverrideConfig(String defaultConfigFile) {
+        return shouldOverrideConfig(getConceptSet(defaultConfigFile));
+    }
+
+    @Override
     protected JsonObject getConceptSet(String filePath) {
         try {
             return (JsonObject) new JsonParser().parse(new FileReader(filePath));

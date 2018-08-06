@@ -133,45 +133,16 @@ public class SeparateTableConfigHelperTest {
     @Test
     public void shouldReturnListOfMultiSelectAndAddMoreConceptsEvenIfDefaultConfigFileIsMissing()
             throws Exception {
-        String jsonString = "{\n" +
-                "  \"config\": {\n" +
-                "    \"conceptSetUI\": {\n" +
-                "      \"All Observation Templates\": {\n" +
-                "        \"showPanelView\": false\n" +
-                "      },\n" +
-                "      \"Video\": {\n" +
-                "        \"allowAddMore\": true\n" +
-                "      },\n" +
-                "      \"FSTG, Specialty determined by MLO\":{\n" +
-                "        \"multiSelect\":true\n" +
-                "      },\n" +
-                "      \"Test Concept\":{\n" +
-                "        \"multiSelect\":true\n" +
-                "      },\n" +
-                "      \"OR, Operation performed\": {\n" +
-                "        \"allowAddMore\": true\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-
-        JsonElement jsonConfig = new JsonParser().parse(jsonString);
-
-        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "OR, Operation performed",
-                "Video", "Test Concept");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
 
         whenNew(FileReader.class).withArguments("conf/app.json").thenThrow(new FileNotFoundException());
-        whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
-        when(jsonParser.parse(fileReader)).thenReturn(jsonConfig);
 
         List<String> multiSelectAndAddMoreConceptNames = separateTableConfigHelper
                 .getAddMoreAndMultiSelectConceptNames();
 
-        assertEquals(4, multiSelectAndAddMoreConceptNames.size());
-        assertThat(multiSelectAndAddMoreConceptNames, containsInAnyOrder(expected.toArray()));
+        assertTrue(multiSelectAndAddMoreConceptNames.isEmpty());
     }
 
     @Test
@@ -204,7 +175,7 @@ public class SeparateTableConfigHelperTest {
                 "Test Concept", "Video");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenThrow(new FileNotFoundException());
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -220,6 +191,7 @@ public class SeparateTableConfigHelperTest {
     @Test
     public void shouldReturnUniqueListOfMultiSelectAndAddMore() throws Exception {
         String defaultJsonString = "{\n" +
+                "\"shouldOverRideConfig\": true," +
                 "  \"config\": {\n" +
                 "    \"conceptSetUI\": {\n" +
                 "      \"All Observation Templates\": {\n" +
@@ -279,7 +251,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -304,7 +276,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -329,7 +301,7 @@ public class SeparateTableConfigHelperTest {
 
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "conf/app.json");
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile", "conf/random/app.json");
-        
+
         whenNew(FileReader.class).withArguments("conf/app.json").thenReturn(fileReader);
         whenNew(FileReader.class).withArguments("conf/random/app.json").thenReturn(fileReader);
         whenNew(JsonParser.class).withNoArguments().thenReturn(jsonParser);
@@ -343,6 +315,7 @@ public class SeparateTableConfigHelperTest {
     @Test
     public void shouldGiveMorePriorityToImplementationConfigIfDifferentConfigIsPresentInBothFiles() throws Exception {
         String defaultJsonString = "{\n" +
+                "\"shouldOverRideConfig\": true," +
                 "  \"config\": {\n" +
                 "    \"conceptSetUI\": {\n" +
                 "      \"All Observation Templates\": {\n" +
@@ -503,6 +476,7 @@ public class SeparateTableConfigHelperTest {
     @Test
     public void shouldMergeBothConfigsAndGivePriorityToImplementationConfig() throws Exception {
         String defaultJsonString = "{\n" +
+                "\"shouldOverRideConfig\": true," +
                 "  \"config\": {\n" +
                 "    \"conceptSetUI\": {\n" +
                 "      \"All Observation Templates\": {\n" +

@@ -14,21 +14,40 @@ public abstract class AbstractConfigParserHelper {
 
     protected Set<Map.Entry<String, JsonElement>> getAllConcepts(String implementationConfigFile,
                                                                  String defaultConfigFile) {
-        return mergeJsonObjects(getConceptSet(implementationConfigFile), getConceptSet(defaultConfigFile));
+        JsonObject defaultConceptSet = getConceptSet(defaultConfigFile);
+        if (shouldOverrideConfig(defaultConfigFile))
+            return mergeJsonObjects(getConceptSet(implementationConfigFile), defaultConceptSet);
+        return mergeJsonObjects(new JsonObject(), defaultConceptSet);
+    }
+
+    protected abstract boolean shouldOverrideConfig(String defaultConfigFile);
+
+    protected boolean shouldOverrideConfig(JsonObject jsonObject) {
+        JsonElement shouldOverRideConfig = jsonObject.get("shouldOverRideConfig");
+        return !isNull(shouldOverRideConfig) && shouldOverRideConfig.getAsBoolean();
     }
 
     private static Set<Map.Entry<String, JsonElement>> mergeJsonObjects(JsonObject jsonObject1,
                                                                         JsonObject jsonObject2) {
-        Set<String> keys = getKeys(jsonObject1, jsonObject2);
 
+        return getEntries(jsonObject1, jsonObject2, getKeys(jsonObject1, jsonObject2));
+    }
+
+    private static Set<Map.Entry<String, JsonElement>> getEntries(JsonObject jsonObject1, JsonObject jsonObject2,
+                                                                  Set<String> keys) {
         HashMap<String, JsonElement> stringJsonElementHashMap = new HashMap<>();
 
         for (String key : keys) {
-            stringJsonElementHashMap.put(key, merge((JsonObject) jsonObject1.get(key),
-                    (JsonObject) jsonObject2.get(key)));
+            if (instanceOfJsonObject(jsonObject1.get(key)) && instanceOfJsonObject(jsonObject2.get(key)))
+                stringJsonElementHashMap.put(key, merge((JsonObject) jsonObject1.get(key),
+                        (JsonObject) jsonObject2.get(key)));
         }
 
         return stringJsonElementHashMap.entrySet();
+    }
+
+    private static boolean instanceOfJsonObject(JsonElement jsonElement) {
+        return isNull(jsonElement) || jsonElement instanceof JsonObject;
     }
 
     private static JsonObject merge(JsonObject firstPriority, JsonObject secondPriority) {
