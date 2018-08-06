@@ -69,6 +69,17 @@ public class SeparateTableConfigHelper extends AbstractConfigParserHelper {
     }
 
     @Override
+    protected boolean shouldOverrideConfig(String defaultConfigFile) {
+        try {
+            JsonObject jsonObject = (JsonObject) new JsonParser().parse(new FileReader(defaultConfigFile));
+            return shouldOverrideConfig(jsonObject);
+        } catch (FileNotFoundException | ClassCastException e) {
+            log.warn(e.getMessage(), e);
+            return false;
+        }
+    }
+
+    @Override
     protected JsonObject getConceptSet(String filePath) {
         try {
             JsonObject jsonConfig = (JsonObject) new JsonParser().parse(new FileReader(filePath));

@@ -57,15 +57,13 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    public void shouldReturnConceptNamesListWhenDefaultConfigFileIsNotPresentInTheGivenPath() throws Exception {
+    public void shouldReturnEmptyAsConceptNamesListWhenDefaultConfigFileIsNotPresentInTheGivenPath() throws Exception {
         setValuesForMemberFields(separateTableConfigHelper, "implementationConfigFile",
                 "src/test/resources/conf/implementationApp.json");
         setValuesForMemberFields(separateTableConfigHelper, "defaultConfigFile", "/src/notPresent.json");
 
         List<String> conceptNames = separateTableConfigHelper.getAddMoreAndMultiSelectConceptNames();
-        assertEquals(2, conceptNames.size());
-        List<String> expected = Arrays.asList("FSTG, Specialty determined by MLO", "MH, Name of MLO");
-        assertThat(conceptNames, containsInAnyOrder(expected.toArray()));
+        assertTrue(conceptNames.isEmpty());
     }
 
     @Test
