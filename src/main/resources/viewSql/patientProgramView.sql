@@ -1,7 +1,7 @@
 SELECT
   pd.person_id AS patient_id,
-  EXTRACT(YEAR FROM (SELECT age( ps.start_date, pd.birthdate))) AS age_at_program,
-  age_group(ps.start_date, pd.birthdate) AS age_group_at_program,
+  EXTRACT(YEAR FROM (SELECT age( ppd.date_enrolled, pd.birthdate))) AS age_at_program,
+  age_group(ppd.date_enrolled, pd.birthdate) AS age_group_at_program,
   pa.state_province,
   pd.gender,
   pd.birthdate,
