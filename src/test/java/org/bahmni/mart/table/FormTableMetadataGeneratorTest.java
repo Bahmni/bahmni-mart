@@ -38,7 +38,9 @@ public class FormTableMetadataGeneratorTest {
         TableData tableData = formTableMetadataGenerator.getTableData(form);
         assertEquals("formname", tableData.getName());
         assertTrue(tableData.getColumns().stream().map(TableColumn::getName).collect(Collectors.toList())
-                .containsAll(Arrays.asList("id_formname", "patient_id", "encounter_id", "field1", "field2")));
+                .containsAll(Arrays.asList("id_formname", "patient_id", "encounter_id", "obs_datetime", "date_created",
+                        "date_modified", "location_id", "location_name", "program_id", "program_name", "field1",
+                        "field2")));
     }
 
     @Test

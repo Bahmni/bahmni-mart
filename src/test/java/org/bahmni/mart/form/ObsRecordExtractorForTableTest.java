@@ -289,4 +289,71 @@ public class ObsRecordExtractorForTableTest {
         assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("patient_id"));
         assertEquals("123", obsRecordExtractorForTable.getRecordList().get(0).get("patient_id"));
     }
+
+    @Test
+    public void shouldGiveRecordsWithDateModifiedAsNullWhenDateCreatedIsEqualToMaxOfTheDateCreatedOfAllObs() {
+        obsRecordExtractorForTable = new ObsRecordExtractorForTable("tablename");
+        TableData tableData = new TableData();
+        tableData.setName("tableName");
+        TableColumn column1 = new TableColumn("obs_datetime", "text", true, null);
+        TableColumn column2 = new TableColumn("date_created", "text", true, null);
+        TableColumn column3 = new TableColumn("date_modified", "timestamp", true, null);
+        tableData.setColumns(Arrays.asList(column1, column2, column3));
+
+        Obs obs = new Obs();
+        obs.setDateCreated("2018-11-10 12:00:00");
+        obs.setObsDateTime("2018-11-10 12:00:00");
+        obs.setField(new Concept(121, "tableName", 1));
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column1)).thenReturn("obs_datetime");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column2)).thenReturn("date_created");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column3)).thenReturn("date_modified");
+        when(SpecialCharacterResolver.getActualTableName("tablename")).thenReturn("tablename");
+
+        obsRecordExtractorForTable.execute(Collections.singletonList(Collections.singletonList(obs)), tableData);
+
+        assertNotNull(obsRecordExtractorForTable.getRecordList());
+        assertThat(obsRecordExtractorForTable.getRecordList().size(), is(1));
+        assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("obs_datetime"));
+        assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("date_created"));
+        assertEquals("'2018-11-10 12:00:00'", obsRecordExtractorForTable.getRecordList().get(0).get("date_created"));
+        assertEquals("'2018-11-10 12:00:00'", obsRecordExtractorForTable.getRecordList().get(0).get("obs_datetime"));
+        assertNull(obsRecordExtractorForTable.getRecordList().get(0).get("date_modified"));
+    }
+
+    @Test
+    public void shouldGiveRecordsGivenTableDataWithDateModifiedAsMaxOfTheDateCreatedOfAllObs() {
+        obsRecordExtractorForTable = new ObsRecordExtractorForTable("tablename");
+        TableData tableData = new TableData();
+        tableData.setName("tableName");
+        TableColumn column1 = new TableColumn("obs_datetime", "text", true, null);
+        TableColumn column2 = new TableColumn("date_created", "text", true, null);
+        TableColumn column3 = new TableColumn("date_modified", "timestamp", true, null);
+        TableColumn column4 = new TableColumn("first", "integer", true, null);
+        tableData.setColumns(Arrays.asList(column1, column2, column3, column4));
+
+        Obs obs1 = new Obs();
+        obs1.setDateCreated("2018-11-10 12:00:00");
+        obs1.setObsDateTime("2018-11-10 12:00:00");
+        obs1.setField(new Concept(121, "tableName", 1));
+        Obs obs2 = new Obs();
+        obs2.setDateCreated("2018-11-10 12:01:00");
+        obs2.setObsDateTime("2018-11-10 12:00:00");
+        obs2.setField(new Concept(121, "first", 1));
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column1)).thenReturn("obs_datetime");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column2)).thenReturn("date_created");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, column3)).thenReturn("date_modified");
+        when(SpecialCharacterResolver.getActualTableName("tablename")).thenReturn("tablename");
+
+        obsRecordExtractorForTable.execute(Collections.singletonList(Arrays.asList(obs1, obs2)), tableData);
+
+        assertNotNull(obsRecordExtractorForTable.getRecordList());
+        assertThat(obsRecordExtractorForTable.getRecordList().size(), is(1));
+        assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("obs_datetime"));
+        assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("date_created"));
+        assertEquals("'2018-11-10 12:00:00'", obsRecordExtractorForTable.getRecordList().get(0).get("date_created"));
+        assertEquals("'2018-11-10 12:00:00'", obsRecordExtractorForTable.getRecordList().get(0).get("obs_datetime"));
+        assertEquals("'2018-11-10 12:01:00'", obsRecordExtractorForTable.getRecordList().get(0).get("date_modified"));
+    }
 }

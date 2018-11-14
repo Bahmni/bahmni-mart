@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
 
@@ -63,12 +64,22 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         obs2.setLocationId("1");
         obs2.setLocationName("test location 1");
         obs2.setObsDateTime("2018-12-2 09:07:32");
-        obs2.setDateCreated("2018-12-2 09:07:32");
+        obs2.setDateCreated("2018-12-3 09:07:32");
         obs2.setProgramId("1");
         obs2.setProgramName("test program 1");
 
+        Obs obs5 = new Obs(23, 2, formName, null);
+        obs5.setEncounterId("56");
+        obs5.setLocationId("1");
+        obs5.setLocationName("test location 1");
+        obs5.setObsDateTime("2018-12-2 09:07:32");
+        obs5.setDateCreated("2018-12-2 09:07:32");
+        obs5.setProgramId("1");
+        obs5.setProgramName("test program 1");
+
         obsList1.add(obs1);
         obsList1.add(obs2);
+        obsList1.add(obs5);
 
         ArrayList<Obs> obsList2 = new ArrayList<>();
         Obs obs3 = new Obs(3, 2, fieldOne, "40");
@@ -107,7 +118,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals(2, maps.size());
 
         Map<String, Object> actualObs1 = maps.get(0);
-        assertEquals(11, actualObs1.size());
+        assertEquals(12, actualObs1.size());
         assertEquals(1, actualObs1.get("id_test"));
         assertEquals(23, actualObs1.get("patient_id"));
         assertEquals(56, actualObs1.get("encounter_id"));
@@ -117,11 +128,12 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals("test location 1", actualObs1.get("location_name"));
         assertEquals("2018-12-2 09:07:32", actualObs1.get("obs_datetime"));
         assertEquals("2018-12-2 09:07:32", actualObs1.get("date_created"));
+        assertEquals("2018-12-03 09:07:32.0", actualObs1.get("date_modified").toString());
         assertEquals(1, actualObs1.get("program_id"));
         assertEquals("test program 1", actualObs1.get("program_name"));
 
         Map<String, Object> actualObs2 = maps.get(1);
-        assertEquals(11, actualObs2.size());
+        assertEquals(12, actualObs2.size());
         assertEquals(3, actualObs2.get("id_test"));
         assertEquals(3, actualObs2.get("patient_id"));
         assertEquals(560, actualObs2.get("encounter_id"));
@@ -132,6 +144,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals("test location 2", actualObs2.get("location_name"));
         assertEquals("2018-12-2 09:07:42", actualObs2.get("obs_datetime"));
         assertEquals("2018-12-2 09:07:42", actualObs2.get("date_created"));
+        assertNull(actualObs2.get("date_modified"));
         assertEquals(2, actualObs2.get("program_id"));
         assertEquals("test program 2", actualObs2.get("program_name"));
     }
