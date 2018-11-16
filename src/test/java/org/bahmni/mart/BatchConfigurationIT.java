@@ -443,8 +443,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(expectedFormGenericData.get("program_name"), formDetails.get("program_name"));
         assertEquals(expectedFormGenericData.get("location_id"), formDetails.get("location_id"));
         assertEquals(expectedFormGenericData.get("location_name"), formDetails.get("location_name"));
-        assertEquals(expectedFormGenericData.get("obs_datetime"), formDetails.get("obs_datetime"));
-        assertEquals(expectedFormGenericData.get("date_created"), formDetails.get("date_created"));
+        assertEquals(expectedFormGenericData.get("obs_datetime"), formDetails.get("obs_datetime").toString());
+        assertEquals(expectedFormGenericData.get("date_created"), formDetails.get("date_created").toString());
     }
 
     private void verifyCodedPatientRecords(List<Map<String, Object>> records) {
@@ -719,8 +719,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
             assertEquals(2820, row.get("id_bacteriology_concept_set"));
             assertEquals(124, row.get("patient_id"));
             assertEquals(22, row.get("encounter_id"));
-            assertEquals("2015-01-22 00:00:00.0", row.get("obs_datetime"));
-            assertEquals("2016-11-09 15:40:12.0", row.get("date_created"));
+            assertEquals("2015-01-22 00:00:00.0", row.get("obs_datetime").toString());
+            assertEquals("2016-11-09 15:40:12.0", row.get("date_created").toString());
             assertEquals(null, row.get("date_modified"));
             assertEquals(8, row.get("location_id"));
             assertNull(row.get("location_name"));
