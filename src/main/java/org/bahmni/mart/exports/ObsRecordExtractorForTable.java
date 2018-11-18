@@ -1,5 +1,6 @@
 package org.bahmni.mart.exports;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.table.SpecialCharacterResolver;
@@ -11,7 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.bahmni.mart.table.FormTableMetadataGenerator.addPrefixToName;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
+import static org.bahmni.mart.table.SpecialCharacterResolver.getActualTableName;
 
 
 public class ObsRecordExtractorForTable {
@@ -93,25 +96,64 @@ public class ObsRecordExtractorForTable {
     }
 
     private void mapAdditionalDetails(TableData tableData, List<Obs> record, Map<String, String> recordMap) {
-        Obs obs = record.get(0);
         for (TableColumn tableColumn : tableData.getColumns()) {
             String tableColumnName = tableColumn.getName();
             if (isNull(recordMap, tableColumnName)) {
-                replace(recordMap, tableColumnName, getValue(tableColumnName, obs), tableColumn.getType());
+                replace(recordMap, tableColumnName, getValue(tableColumnName, record), tableColumn.getType());
             }
         }
     }
 
-    private String getValue(String columnName, Obs obs) {
+    private String getDateModified(List<Obs> record) {
+        String dateModified = null;
+        String dateCreated = getDateCreated(record);
+        if (StringUtils.isEmpty(dateCreated)) {
+            return null;
+        }
+        for (Obs obs: record) {
+            if (obs.getDateCreated().compareTo(dateCreated) >= 1) {
+                dateModified = obs.getDateCreated();
+            }
+        }
+        return dateModified;
+    }
+
+    private String getDateCreated(List<Obs> record) {
+        Obs formObs = getFormObs(record);
+        return formObs == null ? record.get(0).getDateCreated() : formObs.getDateCreated();
+    }
+
+    private String getObsDateTime(List<Obs> record) {
+        Obs formObs = getFormObs(record);
+        return formObs == null ? record.get(0).getObsDateTime() : formObs.getObsDateTime();
+    }
+
+    private Obs getFormObs(List<Obs> record) {
+        for (Obs obs: record) {
+            String fieldName = obs.getField().getName();
+            String processedFieldName = getProcessedName(fieldName);
+            String processedRegPrefixFieldName = getProcessedName(addPrefixToName(fieldName, "reg"));
+            String actualTableName = getActualTableName(tableName);
+            if (actualTableName.equals(processedFieldName) || actualTableName.equals(processedRegPrefixFieldName)) {
+                return obs;
+            }
+        }
+        return null;
+    }
+
+    private String getValue(String columnName, List<Obs> record) {
+        Obs obs = record.get(0);
         switch (columnName) {
           case "encounter_id":
               return obs.getEncounterId();
           case "patient_id":
               return obs.getPatientId();
           case "obs_datetime":
-              return obs.getObsDateTime();
+              return getObsDateTime(record);
           case "date_created":
-              return obs.getDateCreated();
+              return getDateCreated(record);
+          case "date_modified":
+              return getDateModified(record);
           case "location_id":
               return obs.getLocationId();
           case "location_name":

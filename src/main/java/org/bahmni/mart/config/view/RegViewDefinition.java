@@ -22,6 +22,9 @@ public class RegViewDefinition {
     //TODO: Refactor This Class Suman
 
     private static final String REG = "Reg";
+    public static final String OBS_DATETIME = "obs_datetime";
+    public static final String DATE_CREATED = "date_created";
+    public static final String DATE_MODIFIED = "date_modified";
 
     @Autowired
     private RegConfigHelper regConfigHelper;
@@ -49,7 +52,7 @@ public class RegViewDefinition {
 
     private String createSql(List<String> tableNames) {
         List<String> excludedColumns = Arrays.asList("patient_id", "encounter_id", "location_id", "location_name",
-                "obs_datetime","date_created", "program_id", "program_name");
+                "obs_datetime","date_created", "date_modified", "program_id", "program_name");
 
         String sql = format("SELECT %s %s FROM %s", createCoalesceQueries(excludedColumns, tableNames),
                 getSelectClause(getTablesMetaData(tableNames), excludedColumns), tableNames.get(0));
@@ -71,6 +74,12 @@ public class RegViewDefinition {
     private String getCoalesceQuery(List<String> tableNames, String columnName) {
         List<String> columnNames = tableNames.stream()
                 .map(tableName -> String.format("%s.%s", tableName, columnName)).collect(Collectors.toList());
+
+        if (OBS_DATETIME.equals(columnName) || DATE_CREATED.equals(columnName)) {
+            return String.format("LEAST(%s) AS %s", StringUtils.join(columnNames, ","), columnName);
+        } else if (DATE_MODIFIED.equals(columnName)) {
+            return String.format("GREATEST(%s) AS %s", StringUtils.join(columnNames, ","), columnName);
+        }
         return String.format("COALESCE(%s) AS %s", StringUtils.join(columnNames, ","), columnName);
     }
 

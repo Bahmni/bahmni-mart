@@ -53,8 +53,9 @@ public class RegViewDefinitionTest {
                 ", COALESCE(reg_nutritional_values.encounter_id,reg_fee_information.encounter_id) AS encounter_id," +
                 " COALESCE(reg_nutritional_values.location_id,reg_fee_information.location_id) AS location_id," +
                 " COALESCE(reg_nutritional_values.location_name,reg_fee_information.location_name) AS location_name," +
-                " COALESCE(reg_nutritional_values.obs_datetime,reg_fee_information.obs_datetime) AS obs_datetime," +
-                " COALESCE(reg_nutritional_values.date_created,reg_fee_information.date_created) AS date_created," +
+                " LEAST(reg_nutritional_values.obs_datetime,reg_fee_information.obs_datetime) AS obs_datetime," +
+                " LEAST(reg_nutritional_values.date_created,reg_fee_information.date_created) AS date_created," +
+                " GREATEST(reg_nutritional_values.date_modified,reg_fee_information.date_modified) AS date_modified," +
                 " COALESCE(reg_nutritional_values.program_id,reg_fee_information.program_id) AS program_id," +
                 " COALESCE(reg_nutritional_values.program_name,reg_fee_information.program_name) AS program_name," +
                 "   FROM reg_nutritional_values FULL OUTER JOIN reg_fee_information " +
