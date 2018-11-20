@@ -126,8 +126,8 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals("test IT", actualObs1.get("field_two"));
         assertEquals(1, actualObs1.get("location_id"));
         assertEquals("test location 1", actualObs1.get("location_name"));
-        assertEquals("2018-12-2 09:07:32", actualObs1.get("obs_datetime"));
-        assertEquals("2018-12-2 09:07:32", actualObs1.get("date_created"));
+        assertEquals("2018-12-02 09:07:32.0", actualObs1.get("obs_datetime").toString());
+        assertEquals("2018-12-02 09:07:32.0", actualObs1.get("date_created").toString());
         assertEquals("2018-12-03 09:07:32.0", actualObs1.get("date_modified").toString());
         assertEquals(1, actualObs1.get("program_id"));
         assertEquals("test program 1", actualObs1.get("program_name"));
@@ -142,8 +142,8 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals("test IT", actualObs1.get("field_two"));
         assertEquals(2, actualObs2.get("location_id"));
         assertEquals("test location 2", actualObs2.get("location_name"));
-        assertEquals("2018-12-2 09:07:42", actualObs2.get("obs_datetime"));
-        assertEquals("2018-12-2 09:07:42", actualObs2.get("date_created"));
+        assertEquals("2018-12-02 09:07:42.0", actualObs2.get("obs_datetime").toString());
+        assertEquals("2018-12-02 09:07:42.0", actualObs2.get("date_created").toString());
         assertNull(actualObs2.get("date_modified"));
         assertEquals(2, actualObs2.get("program_id"));
         assertEquals("test program 2", actualObs2.get("program_name"));
