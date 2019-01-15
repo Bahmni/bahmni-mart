@@ -22,7 +22,7 @@ public class JobContext {
     private ObsJobStrategy obsJobStrategy;
 
     @Autowired
-    private Form2ObsJobStrategy form2ObsJobStrategy;
+    private Form2ObsJobStratergy form2ObsJobStratergy;
 
     @Autowired
     private EAVJobStrategy eavJobStrategy;
@@ -71,7 +71,7 @@ public class JobContext {
         Map<String, JobStrategy> strategyMap = new HashMap<>();
         strategyMap.put(JobType.CUSTOMSQL.toString().toLowerCase(), customSqlJobStrategy);
         strategyMap.put(JobType.OBS.toString().toLowerCase(), obsJobStrategy);
-        strategyMap.put(JobType.FORM2OBS.toString().toLowerCase(), form2ObsJobStrategy);
+        strategyMap.put(JobType.FORM2OBS.toString().toLowerCase(), form2ObsJobStratergy);
         strategyMap.put(JobType.EAV.toString().toLowerCase(), eavJobStrategy);
         strategyMap.put(JobType.BACTERIOLOGY.toString().toLowerCase(), bacteriologyJobStrategy);
         strategyMap.put(JobType.METADATA.toString().toLowerCase(), metaDataJobStrategy);
