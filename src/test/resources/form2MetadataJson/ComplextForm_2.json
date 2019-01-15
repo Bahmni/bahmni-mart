@@ -1,0 +1,402 @@
+{
+    "name": "ComplextForm",
+    "uuid": "7d1d5d8c-abf1-496b-8b81-939dc43db91a",
+    "defaultLocale": "en",
+    "controls": [
+        {
+            "type": "obsControl",
+            "label": {
+                "translationKey": "WEIGHT_1",
+                "id": "1",
+                "units": "(Kg)",
+                "type": "label",
+                "value": "Weight"
+            },
+            "properties": {
+                "mandatory": false,
+                "notes": false,
+                "addMore": false,
+                "hideLabel": false,
+                "controlEvent": false,
+                "location": {
+                    "column": 0,
+                    "row": 0
+                },
+                "abnormal": false
+            },
+            "id": "1",
+            "concept": {
+                "name": "Weight",
+                "uuid": "3e7fd466-0311-462d-b329-5f3d59ad7bde",
+                "datatype": "Numeric",
+                "conceptClass": "Finding",
+                "conceptHandler": null,
+                "answers": [],
+                "properties": {
+                    "allowDecimal": true
+                }
+            },
+            "units": "Kg",
+            "hiNormal": null,
+            "lowNormal": null,
+            "hiAbsolute": null,
+            "lowAbsolute": null
+        },
+        {
+            "type": "section",
+            "label": {
+                "translationKey": "SECTION_2",
+                "type": "label",
+                "value": "Section1",
+                "id": "2"
+            },
+            "properties": {
+                "location": {
+                    "column": 0,
+                    "row": 1
+                },
+                "addMore": true
+            },
+            "id": "2",
+            "controls": [
+                {
+                    "type": "obsControl",
+                    "label": {
+                        "translationKey": "VS,_BLOOD_OXYGEN_SATURATION_3",
+                        "id": "3",
+                        "units": "(%)",
+                        "type": "label",
+                        "value": "VS, Blood oxygen saturation"
+                    },
+                    "properties": {
+                        "mandatory": false,
+                        "notes": false,
+                        "addMore": false,
+                        "hideLabel": false,
+                        "controlEvent": false,
+                        "location": {
+                            "column": 0,
+                            "row": 0
+                        },
+                        "abnormal": false
+                    },
+                    "id": "3",
+                    "concept": {
+                        "name": "VS, Blood oxygen saturation",
+                        "uuid": "aede8f78-2a73-407a-9725-d61e6b5174fa",
+                        "datatype": "Numeric",
+                        "conceptClass": "Test",
+                        "conceptHandler": null,
+                        "answers": [],
+                        "properties": {
+                            "allowDecimal": true
+                        }
+                    },
+                    "units": "%",
+                    "hiNormal": null,
+                    "lowNormal": null,
+                    "hiAbsolute": null,
+                    "lowAbsolute": null
+                },
+                {
+                    "type": "section",
+                    "label": {
+                        "translationKey": "SECTION_4",
+                        "type": "label",
+                        "value": "Inner-Section1",
+                        "id": "4"
+                    },
+                    "properties": {
+                        "location": {
+                            "column": 0,
+                            "row": 1
+                        },
+                        "addMore": true
+                    },
+                    "id": "4",
+                    "controls": [
+                        {
+                            "type": "obsControl",
+                            "label": {
+                                "translationKey": "ANA,_BLOOD_GLUCOSE_5",
+                                "id": "5",
+                                "units": "(mg/dl)",
+                                "type": "label",
+                                "value": "ANA, Blood glucose"
+                            },
+                            "properties": {
+                                "mandatory": false,
+                                "notes": false,
+                                "addMore": true,
+                                "hideLabel": false,
+                                "controlEvent": false,
+                                "location": {
+                                    "column": 0,
+                                    "row": 0
+                                },
+                                "abnormal": false
+                            },
+                            "id": "5",
+                            "concept": {
+                                "name": "ANA, Blood glucose",
+                                "uuid": "5e3ad102-5752-4a86-870e-aa2ac9c224a3",
+                                "datatype": "Numeric",
+                                "conceptClass": "Finding",
+                                "conceptHandler": null,
+                                "answers": [],
+                                "properties": {
+                                    "allowDecimal": true
+                                }
+                            },
+                            "units": "mg/dl",
+                            "hiNormal": null,
+                            "lowNormal": null,
+                            "hiAbsolute": null,
+                            "lowAbsolute": null
+                        }
+                    ]
+                },
+                {
+                    "type": "obsGroupControl",
+                    "label": {
+                        "translationKey": "VS,_BLOOD_GLUCOSE_9",
+                        "type": "label",
+                        "value": "VS, Blood glucose",
+                        "id": "9"
+                    },
+                    "properties": {
+                        "addMore": true,
+                        "location": {
+                            "column": 0,
+                            "row": 2
+                        }
+                    },
+                    "id": "9",
+                    "concept": {
+                        "name": "VS, Blood glucose",
+                        "uuid": "f5cf09a5-0075-4622-a7fa-b91366fbc3b1",
+                        "datatype": "N/A",
+                        "conceptClass": "ConvSet",
+                        "conceptHandler": null,
+                        "set": true,
+                        "setMembers": [
+                            {
+                                "name": "VS, Fasting",
+                                "uuid": "e5f05d21-8084-4fb3-b89f-7bdc5de1353d",
+                                "datatype": "Numeric",
+                                "conceptClass": "Question",
+                                "conceptHandler": null,
+                                "units": "mg/dl",
+                                "hiNormal": null,
+                                "lowNormal": null,
+                                "hiAbsolute": null,
+                                "lowAbsolute": null,
+                                "answers": [],
+                                "properties": {
+                                    "allowDecimal": true
+                                }
+                            },
+                            {
+                                "name": "VS, Random",
+                                "uuid": "8028f99e-9f88-4955-b543-1290c64a45f9",
+                                "datatype": "Numeric",
+                                "conceptClass": "Question",
+                                "conceptHandler": null,
+                                "units": "mg/dl",
+                                "hiNormal": null,
+                                "lowNormal": null,
+                                "hiAbsolute": null,
+                                "lowAbsolute": null,
+                                "answers": [],
+                                "properties": {
+                                    "allowDecimal": true
+                                }
+                            }
+                        ]
+                    },
+                    "controls": [
+                        {
+                            "type": "obsControl",
+                            "label": {
+                                "translationKey": "VS,_FASTING_10",
+                                "id": "10",
+                                "units": "(mg/dl)",
+                                "type": "label",
+                                "value": "VS, Fasting"
+                            },
+                            "properties": {
+                                "mandatory": false,
+                                "notes": false,
+                                "addMore": false,
+                                "hideLabel": false,
+                                "controlEvent": false,
+                                "location": {
+                                    "row": 0,
+                                    "column": 0
+                                },
+                                "abnormal": false
+                            },
+                            "id": "10",
+                            "concept": {
+                                "name": "VS, Fasting",
+                                "uuid": "e5f05d21-8084-4fb3-b89f-7bdc5de1353d",
+                                "datatype": "Numeric",
+                                "conceptClass": "Question",
+                                "conceptHandler": null,
+                                "units": "mg/dl",
+                                "hiNormal": null,
+                                "lowNormal": null,
+                                "hiAbsolute": null,
+                                "lowAbsolute": null,
+                                "answers": [],
+                                "properties": {
+                                    "allowDecimal": true
+                                }
+                            },
+                            "units": "mg/dl",
+                            "hiNormal": null,
+                            "lowNormal": null,
+                            "hiAbsolute": null,
+                            "lowAbsolute": null
+                        },
+                        {
+                            "type": "obsControl",
+                            "label": {
+                                "translationKey": "VS,_RANDOM_11",
+                                "id": "11",
+                                "units": "(mg/dl)",
+                                "type": "label",
+                                "value": "VS, Random"
+                            },
+                            "properties": {
+                                "mandatory": false,
+                                "notes": false,
+                                "addMore": false,
+                                "hideLabel": false,
+                                "controlEvent": false,
+                                "location": {
+                                    "row": 1,
+                                    "column": 0
+                                }
+                            },
+                            "id": "11",
+                            "concept": {
+                                "name": "VS, Random",
+                                "uuid": "8028f99e-9f88-4955-b543-1290c64a45f9",
+                                "datatype": "Numeric",
+                                "conceptClass": "Question",
+                                "conceptHandler": null,
+                                "units": "mg/dl",
+                                "hiNormal": null,
+                                "lowNormal": null,
+                                "hiAbsolute": null,
+                                "lowAbsolute": null,
+                                "answers": [],
+                                "properties": {
+                                    "allowDecimal": true
+                                }
+                            },
+                            "units": "mg/dl",
+                            "hiNormal": null,
+                            "lowNormal": null,
+                            "hiAbsolute": null,
+                            "lowAbsolute": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "label": {
+                "translationKey": "SECTION_6",
+                "type": "label",
+                "value": "Section",
+                "id": "6"
+            },
+            "properties": {
+                "addMore": false,
+                "location": {
+                    "column": 0,
+                    "row": 2
+                }
+            },
+            "id": "6",
+            "unsupportedProperties": [],
+            "controls": [
+                {
+                    "type": "obsControl",
+                    "label": {
+                        "translationKey": "ADT_NOTES_7",
+                        "id": "7",
+                        "units": "",
+                        "type": "label",
+                        "value": "Adt Notes"
+                    },
+                    "properties": {
+                        "mandatory": false,
+                        "notes": false,
+                        "addMore": false,
+                        "hideLabel": false,
+                        "controlEvent": false,
+                        "location": {
+                            "column": 0,
+                            "row": 1
+                        }
+                    },
+                    "id": "7",
+                    "unsupportedProperties": [],
+                    "concept": {
+                        "name": "Adt Notes",
+                        "uuid": "7e3e0fa6-e42f-11e5-8c3e-08002715d519",
+                        "datatype": "Text",
+                        "conceptClass": "Misc",
+                        "conceptHandler": null,
+                        "answers": [],
+                        "properties": {
+                            "allowDecimal": null
+                        }
+                    },
+                    "units": null,
+                    "hiNormal": null,
+                    "lowNormal": null,
+                    "hiAbsolute": null,
+                    "lowAbsolute": null
+                }
+            ]
+        },
+        {
+            "type": "table",
+            "label": {
+              "translationKey": "TABLE_1",
+              "id": "1",
+              "type": "label",
+              "value": "Table"
+            },
+            "properties": {
+              "location": {
+                "column": 0,
+                "row": 1
+              }
+            },
+            "id": "1",
+            "unsupportedProperties": [],
+            "controls": [
+              {
+                "translationKey": "COLUMN1_1",
+                "type": "label",
+                "value": "Column1",
+                "id": "1"
+              },
+              {
+                "translationKey": "COLUMN2_1",
+                "type": "label",
+                "value": "Column2",
+                "id": "1"
+              }
+            ]
+          }
+    ],
+    "events": {},
+    "translationsUrl": "/openmrs/ws/rest/v1/bahmniie/form/translations"
+}
