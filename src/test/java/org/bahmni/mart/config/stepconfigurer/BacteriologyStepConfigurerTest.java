@@ -7,6 +7,7 @@ import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
+import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperSuperClassMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
@@ -39,15 +41,16 @@ public class BacteriologyStepConfigurerTest {
 
     @Mock
     private JobDefinitionReader jobDefinitionReader;
-
+    @Mock
+    FormTableMetadataGenerator formTableMetadataGenerator;
     private StepConfigurer bacteriologyStepConfigurer;
 
     @Before
     public void setUp() throws Exception {
-        bacteriologyStepConfigurer = new BacteriologyStepConfigurer();
-        setValuesForSuperClassMemberFields(bacteriologyStepConfigurer, "jobDefinitionReader", jobDefinitionReader);
+        bacteriologyStepConfigurer = new BacteriologyStepConfigurer(formTableMetadataGenerator);
+        setValuesForSuperSuperClassMemberFields(bacteriologyStepConfigurer, "jobDefinitionReader", jobDefinitionReader);
         setValuesForSuperClassMemberFields(bacteriologyStepConfigurer, "formListProcessor", formListProcessor);
-        setValuesForSuperClassMemberFields(bacteriologyStepConfigurer, "conceptService", conceptService);
+        setValuesForSuperSuperClassMemberFields(bacteriologyStepConfigurer, "conceptService", conceptService);
     }
 
     @Test

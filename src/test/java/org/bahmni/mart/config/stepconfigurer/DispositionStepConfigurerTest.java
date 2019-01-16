@@ -7,6 +7,7 @@ import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
+import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,11 +41,14 @@ public class DispositionStepConfigurerTest {
     @Mock
     private JobDefinitionReader jobDefinitionReader;
 
+    @Mock
+    FormTableMetadataGenerator formTableMetadataGenerator;
+
     private StepConfigurer dispositionStepConfigure;
 
     @Before
     public void setUp() throws Exception {
-        dispositionStepConfigure = new DispositionStepConfigurer();
+        dispositionStepConfigure = new DispositionStepConfigurer(formTableMetadataGenerator);
         setValuesForSuperClassMemberFields(dispositionStepConfigure, "jobDefinitionReader", jobDefinitionReader);
         setValuesForSuperClassMemberFields(dispositionStepConfigure, "formListProcessor", formListProcessor);
         setValuesForSuperClassMemberFields(dispositionStepConfigure, "conceptService", conceptService);

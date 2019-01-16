@@ -42,9 +42,10 @@ public class RegStepConfigurerTest extends StepConfigurerTestHelper {
     @Mock
     private RegConfigHelper regConfigHelper;
 
+    @Mock FormTableMetadataGenerator formTableMetadataGenerator;
     @Before
     public void setUp() throws Exception {
-        regStepConfigurer = new RegStepConfigurer();
+        regStepConfigurer = new RegStepConfigurer(formTableMetadataGenerator);
         setValuesForMemberFields(regStepConfigurer, "regConfigHelper", regConfigHelper);
         setUp(regStepConfigurer);
     }

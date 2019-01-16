@@ -17,6 +17,12 @@ public class CommonTestHelper {
         setField(classInstance, valueForMemberField, field);
     }
 
+    public static void setValuesForSuperSuperClassMemberFields(Object classInstance, String fieldName,
+                                                          Object valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+        Field field = classInstance.getClass().getSuperclass().getSuperclass().getDeclaredField(fieldName);
+        setField(classInstance, valueForMemberField, field);
+    }
+
     private static void setField(Object classInstance, Object valueForMemberField, Field field)
             throws IllegalAccessException {
         field.setAccessible(true);

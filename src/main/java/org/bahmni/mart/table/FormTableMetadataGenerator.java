@@ -10,41 +10,15 @@ import org.bahmni.mart.table.domain.TableData;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.util.*;
 
 @Primary
 @Component("FormTableMetadataGenerator")
-public class FormTableMetadataGenerator implements TableMetadataGenerator {
+public class FormTableMetadataGenerator extends TableMetadataGenerator {
 
-    private Map<String, TableData> tableDataMap = new LinkedHashMap<>();
-
-    public List<TableData> getTableDataList() {
-        return new ArrayList<>(tableDataMap.values());
-    }
-
-    public void setTableDataMap(Map<String, TableData> tableDataMap) {
-        this.tableDataMap = tableDataMap;
-    }
-
-    public void addMetadataForForm(BahmniForm form) {
-        TableData tableData = getTableData(form);
-        String formName = getProcessedName(form.getFormName().getName());
-        if (tableData != null) {
-            tableDataMap.remove(formName);
-            TableColumn foreignKeyColumn = getForeignKeyColumn(form);
-            if (foreignKeyColumn != null && !tableData.getColumns().contains(foreignKeyColumn))
-                tableData.addColumn(foreignKeyColumn);
-        } else {
-            tableData = new TableData(formName);
-            tableData.addAllColumns(getColumns(form));
-        }
-        tableDataMap.put(formName, tableData);
-    }
-
-    private List<TableColumn> getColumns(BahmniForm form) {
+    @Override
+    protected List<TableColumn> getColumns(BahmniForm form) {
         List<TableColumn> columns = new ArrayList<>();
         columns.add(getPrimaryColumn(form));
         columns.add(new TableColumn("patient_id", "integer", false, null));
@@ -57,9 +31,9 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
         columns.add(new TableColumn("program_id", "integer", false, null));
         columns.add(new TableColumn("program_name", "text", false, null));
 
-        TableColumn foreignKeyColumn = getForeignKeyColumn(form);
+        List<TableColumn> foreignKeyColumn = getForeignKeyColumn(form);
         if (foreignKeyColumn != null)
-            columns.add(foreignKeyColumn);
+            columns.addAll(foreignKeyColumn);
         columns.addAll(getNonKeyColumns(form));
         return columns;
     }
@@ -69,7 +43,8 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
                 "integer", true, null);
     }
 
-    private TableColumn getForeignKeyColumn(BahmniForm form) {
+    @Override
+    protected List<TableColumn> getForeignKeyColumn(BahmniForm form) {
         if (form.getParent() != null) {
 
             Concept formParentConcept = form.getParent().getFormName();
@@ -81,43 +56,15 @@ public class FormTableMetadataGenerator implements TableMetadataGenerator {
             String referenceColumn = "id_" + referenceTableName;
             ForeignKey reference = new ForeignKey(referenceColumn, referenceTableName);
 
-            return new TableColumn(referenceColumn, "integer", false, reference);
+            return Arrays.asList(new TableColumn(referenceColumn, "integer", false, reference));
         }
         return null;
-    }
-
-    private List<TableColumn> getNonKeyColumns(BahmniForm form) {
-        List<Concept> fields = form.getFields();
-        List<TableColumn> columns = new ArrayList<>();
-        fields.forEach(field -> columns.add(new TableColumn(getProcessedName(field.getName()),
-                Constants.getPostgresDataTypeFor(field.getDataType()),
-                false,
-                null)));
-        return columns;
-    }
-
-    public TableData getTableData(BahmniForm form) {
-        String processedFormName = getProcessedName(form.getFormName().getName());
-        return getTableDataByName(processedFormName);
-    }
-
-    public int getTableDataMapSize() {
-        return tableDataMap.size();
-    }
-
-    public boolean hasMetadataFor(BahmniForm form) {
-        return tableDataMap.containsKey(getProcessedName(form.getFormName().getName()));
     }
 
     public static String addPrefixToName(String name, String prefix) {
         return StringUtils.isEmpty(prefix) ? name : String.format("%s %s", prefix, name);
     }
 
-    public static String getProcessedName(String formName) {
-        return formName.trim().replaceAll("\\s+", "_").toLowerCase();
-    }
 
-    public TableData getTableDataByName(String processedFormName) {
-        return tableDataMap.get(processedFormName);
-    }
+
 }

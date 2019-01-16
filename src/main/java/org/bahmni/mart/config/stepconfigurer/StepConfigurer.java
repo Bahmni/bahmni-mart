@@ -5,16 +5,17 @@ import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
-import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.service.ConceptService;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.TableGeneratorStep;
+import org.bahmni.mart.table.TableMetadataGenerator;
+import org.bahmni.mart.table.TableMetadataGeneratorContract;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
@@ -24,17 +25,20 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.isAddMoreMultiSelectE
 
 public abstract class StepConfigurer implements StepConfigurerContract {
 
+
+    protected TableMetadataGenerator formTableMetadataGenerator;
+
+    @Autowired
+    public StepConfigurer(TableMetadataGenerator tableMetadataGenerator){
+        formTableMetadataGenerator = tableMetadataGenerator;
+
+    }
     @Autowired
     protected TableGeneratorStep tableGeneratorStep;
 
-    @Autowired
-    protected FormTableMetadataGenerator formTableMetadataGenerator;
 
     @Autowired
     protected ObjectFactory<ObservationExportStep> observationExportStepFactory;
-
-    @Autowired
-    protected FormListProcessor formListProcessor;
 
     @Autowired
     protected JobDefinitionReader jobDefinitionReader;

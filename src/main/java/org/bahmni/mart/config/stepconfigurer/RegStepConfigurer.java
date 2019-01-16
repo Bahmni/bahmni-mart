@@ -15,11 +15,16 @@ import java.util.stream.Collectors;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 
 @Component
-public class RegStepConfigurer extends StepConfigurer {
+public class RegStepConfigurer extends Form1StepConfigurer {
     private static final String TYPE = "reg";
 
     @Autowired
     private RegConfigHelper regConfigHelper;
+
+    @Autowired
+    public RegStepConfigurer(FormTableMetadataGenerator formTableMetadataGenerator) {
+        super(formTableMetadataGenerator);
+    }
 
     @Override
     protected List<BahmniForm> getAllForms() {

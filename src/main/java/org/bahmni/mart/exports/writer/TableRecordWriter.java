@@ -1,7 +1,7 @@
 package org.bahmni.mart.exports.writer;
 
 import org.bahmni.mart.helper.FreeMarkerEvaluator;
-import org.bahmni.mart.table.TableMetadataGenerator;
+import org.bahmni.mart.table.TableMetadataGeneratorContract;
 import org.bahmni.mart.table.TableRecordHolder;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.item.ItemWriter;
@@ -21,7 +21,7 @@ public class TableRecordWriter extends BaseWriter implements ItemWriter<Map<Stri
     private FreeMarkerEvaluator<TableRecordHolder> tableRecordHolderFreeMarkerEvaluator;
 
     @Autowired
-    public TableMetadataGenerator tableMetadataGenerator;
+    public TableMetadataGeneratorContract tableMetadataGenerator;
 
     private TableData tableData;
 

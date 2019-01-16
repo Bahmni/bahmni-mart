@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.ObjectFactory;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperSuperClassMemberFields;
 
 public class StepConfigurerTestHelper {
 
@@ -40,13 +41,13 @@ public class StepConfigurerTestHelper {
     protected Concept concept;
 
     protected void setUp(StepConfigurer classInstance) throws Exception {
-        setValuesForSuperClassMemberFields(classInstance, "tableGeneratorStep", tableGeneratorStep);
-        setValuesForSuperClassMemberFields(classInstance,
-                "formTableMetadataGenerator", formTableMetadataGenerator);
-        setValuesForSuperClassMemberFields(classInstance,
+        setValuesForSuperSuperClassMemberFields(classInstance, "tableGeneratorStep", tableGeneratorStep);
+       setValuesForSuperSuperClassMemberFields(classInstance,
+              "formTableMetadataGenerator", formTableMetadataGenerator);
+        setValuesForSuperSuperClassMemberFields(classInstance,
                 "observationExportStepFactory", observationExportStepFactory);
         setValuesForSuperClassMemberFields(classInstance, "formListProcessor", formListProcessor);
-        setValuesForSuperClassMemberFields(classInstance, "jobDefinitionReader", jobDefinitionReader);
-        setValuesForSuperClassMemberFields(classInstance, "conceptService", conceptService);
+        setValuesForSuperSuperClassMemberFields(classInstance, "jobDefinitionReader", jobDefinitionReader);
+        setValuesForSuperSuperClassMemberFields(classInstance, "conceptService", conceptService);
     }
 }

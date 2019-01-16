@@ -2,6 +2,7 @@ package org.bahmni.mart.form2;
 
 import com.mysql.jdbc.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
@@ -42,7 +43,7 @@ public class Form2ListProcessor {
         bahmniForm.setDepthToParent(0);
         Form2JsonMetadata form2JsonMetadata = form2MetadataReader.read(formJsonPath);
         form2JsonMetadata.getControls().forEach(control -> {
-            parseControl(control, bahmniForm);
+            parseControl(control, bahmniForm,0);
         });
         return bahmniForm;
     }
@@ -54,27 +55,28 @@ public class Form2ListProcessor {
     }
 
 
-    private void parseControl(Control control, BahmniForm bahmniForm) {
-        String conceptName = getConceptName(control);
-        if(!StringUtils.isNullOrEmpty(conceptName)){
-            Concept concept = createConcept(conceptName);
+    private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent) {
+        Concept concept= createConcept(control);
+        if(concept!=null){
             if(isNewFormRequiredByControl(control.getProperties())){
                 BahmniForm childBahmniForm = createChildBahmniForm(concept);
+                depthToParent = depthToParent+1;
                 childBahmniForm.setParent(bahmniForm);
+                childBahmniForm.setDepthToParent(depthToParent);
                 bahmniForm.addChild(childBahmniForm);
                 if (CollectionUtils.isNotEmpty(control.getControls()))
-                    parseChildControls(control.getControls(), childBahmniForm);
+                    parseChildControls(control.getControls(), childBahmniForm, depthToParent);
             }else {
                 if (CollectionUtils.isNotEmpty(control.getControls()))
-                    parseChildControls(control.getControls(), bahmniForm);
+                    parseChildControls(control.getControls(), bahmniForm, depthToParent);
                 else
                     bahmniForm.addField(concept);
             }
         }
     }
 
-    private void parseChildControls(List<Control> controls, BahmniForm bahmniForm) {
-        controls.forEach(childControl -> parseControl(childControl, bahmniForm));
+    private void parseChildControls(List<Control> controls, BahmniForm bahmniForm, int depthToParent) {
+        controls.forEach(childControl -> parseControl(childControl, bahmniForm,depthToParent));
     }
 
     private String getConceptName(Control control) {
@@ -89,6 +91,30 @@ public class Form2ListProcessor {
         if (ignoreConceptNames.contains(conceptName))
             return "";
         return conceptName;
+    }
+
+    private Concept createConcept(Control control) {
+        String conceptName = "";
+        Concept concept = null;
+        final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
+        if (CollectionUtils.isEmpty(control.getControls()) && form2Concept != null) {
+            conceptName = form2Concept.getName();
+            if (ignoreConceptNames.contains(conceptName))
+                return null;
+            concept = new Concept();
+            concept.setName(conceptName);
+            concept.setDataType(form2Concept.getDatatype());
+
+        } else {
+            final ControlLabel controlLabel = control.getLabel();
+            if (controlLabel != null) {
+                conceptName = controlLabel.getValue();
+                concept = new Concept();
+                concept.setName(conceptName);
+            }
+        }
+
+        return concept;
     }
 
     private BahmniForm createChildBahmniForm(Concept concept) {

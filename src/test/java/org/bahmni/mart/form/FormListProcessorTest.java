@@ -4,6 +4,7 @@ import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
+import org.bahmni.mart.helper.FormListHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -108,7 +109,7 @@ public class FormListProcessorTest {
             throws NoSuchFieldException, IllegalAccessException {
 
         Logger logger = mock(Logger.class);
-        setValueForFinalStaticField(FormListProcessor.class, "logger", logger);
+        setValueForFinalStaticField(FormListHelper.class, "logger", logger);
 
         Concept allObservationConcept = new Concept(1, "All Observation Templates", 1);
         List<Concept> conceptList = Collections.singletonList(allObservationConcept);
