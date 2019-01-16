@@ -6,6 +6,16 @@ public class Concept {
     //can be removed
     private String uuid;
 
+    public String getDatatype() {
+        return datatype;
+    }
+
+    public void setDatatype(String datatype) {
+        this.datatype = datatype;
+    }
+
+    private String datatype;
+
     public String getUuid() {
         return uuid;
     }
