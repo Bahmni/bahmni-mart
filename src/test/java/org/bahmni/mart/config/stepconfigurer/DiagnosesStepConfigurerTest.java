@@ -3,9 +3,11 @@ package org.bahmni.mart.config.stepconfigurer;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.form.domain.Concept;
+import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -23,10 +25,11 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class DiagnosesStepConfigurerTest extends StepConfigurerTestHelper {
 
     private DiagnosesStepConfigurer diagnosesStepConfigurer;
-
+    @Mock
+    FormTableMetadataGenerator formTableMetadataGenerator;
     @Before
     public void setUp() throws Exception {
-        diagnosesStepConfigurer = new DiagnosesStepConfigurer();
+        diagnosesStepConfigurer = new DiagnosesStepConfigurer(formTableMetadataGenerator);
         setUp(diagnosesStepConfigurer);
     }
 

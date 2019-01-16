@@ -6,7 +6,10 @@ import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 
@@ -28,7 +31,6 @@ public class SpecialCharacterResolver {
         String actualTableName = tableData.getName();
         String updatedTableName = getUpdatedStringName(updatedToActualTableNames, actualTableName);
         tableData.setName(updatedTableName);
-
         updatedToActualTableNames.put(updatedTableName, actualTableName);
         tableToColumnsMap.put(actualTableName, updatedToActualColumnNamesMap);
 

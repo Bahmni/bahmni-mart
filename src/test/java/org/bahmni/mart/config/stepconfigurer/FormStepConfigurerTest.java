@@ -7,6 +7,7 @@ import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
+import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.ForeignKey;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
@@ -25,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperSuperClassMemberFields;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,7 +50,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     @Mock
     private FlowBuilder<FlowJobBuilder> completeDataExport;
 
-    private StepConfigurer formStepConfigurer;
+    private Form1StepConfigurer formStepConfigurer;
 
     @Mock
     private ObservationExportStep fstgObservationExportStep;
@@ -74,16 +75,18 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
 
     @Mock
     private TableData tableData;
+    @Mock
+    FormTableMetadataGenerator formTableMetadataGenerator;
 
     @Before
     public void setUp() throws Exception {
         mockStatic(JobDefinitionUtil.class);
 
-        formStepConfigurer = new FormStepConfigurer();
+        formStepConfigurer = new FormStepConfigurer(formTableMetadataGenerator);
         setUp(formStepConfigurer);
         when(jobDefinition.getLocale()).thenReturn("locale");
 
-        setValuesForSuperClassMemberFields(formStepConfigurer, "incrementalStrategyContext",
+        setValuesForSuperSuperClassMemberFields(formStepConfigurer, "incrementalStrategyContext",
                 incrementalStrategyContext);
         when(incrementalStrategyContext.getStrategy(anyString())).thenReturn(incrementalUpdateStrategy);
         when(incrementalUpdateStrategy.isMetaDataChanged(anyString(), anyString())).thenReturn(true);
@@ -117,7 +120,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     public void shouldRegisterObservationStepsForTwoForms() throws Exception {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
-        setValuesForSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
+        setValuesForSuperSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
 
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(true);
 
@@ -136,7 +139,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     public void shouldRegisterObservationStepsForTwoFormsAndPrimaryForeignKeyConstraintsAreRevoked() throws Exception {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
-        setValuesForSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
+        setValuesForSuperSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
         List<TableData> tableDataList = getTableData();
         when(formTableMetadataGenerator.getTableData(bahmniForms.get(BAHMNI_FORM)))
                 .thenReturn(tableDataList.get(BAHMNI_FORM));
@@ -189,7 +192,7 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
             NoSuchFieldException, IllegalAccessException {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
-        setValuesForSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
+        setValuesForSuperSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
         when(formTableMetadataGenerator.getTableData(any())).thenReturn(null);
 

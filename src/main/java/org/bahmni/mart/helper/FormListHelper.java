@@ -34,7 +34,7 @@ public class FormListHelper {
     }
 
     public static  List<BahmniForm> flattenFormList(List<BahmniForm> forms) {
-        List<BahmniForm> flattenedList = new ArrayList<>();
+        List<BahmniForm> flattenedList = new ArrayList<>(forms);
          flattenAllForms(forms, flattenedList);
          return flattenedList;
     }

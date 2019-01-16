@@ -7,6 +7,12 @@ public class BahmniForm {
 
     private List<BahmniForm> children = new ArrayList<>();
 
+    public void setNonConceptForm(boolean nonConceptForm) {
+        isNonConceptForm = nonConceptForm;
+    }
+
+    private boolean isNonConceptForm = false;
+
     private BahmniForm parent;
 
     private BahmniForm rootForm;
