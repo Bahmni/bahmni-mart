@@ -15,9 +15,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.repository.init.Jackson2ResourceReader;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.stereotype.Component;
 

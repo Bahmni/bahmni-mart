@@ -48,5 +48,4 @@ public class ControlBuilder {
     public Control build() {
         return control;
     }
-
 }

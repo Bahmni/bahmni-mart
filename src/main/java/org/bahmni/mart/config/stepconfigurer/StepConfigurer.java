@@ -9,13 +9,11 @@ import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.service.ConceptService;
 import org.bahmni.mart.table.TableGeneratorStep;
 import org.bahmni.mart.table.TableMetadataGenerator;
-import org.bahmni.mart.table.TableMetadataGeneratorContract;
 import org.bahmni.mart.table.domain.TableData;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.FlowJobBuilder;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
@@ -25,17 +23,8 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.isAddMoreMultiSelectE
 
 public abstract class StepConfigurer implements StepConfigurerContract {
 
-
-    protected TableMetadataGenerator formTableMetadataGenerator;
-
-    @Autowired
-    public StepConfigurer(TableMetadataGenerator tableMetadataGenerator){
-        formTableMetadataGenerator = tableMetadataGenerator;
-
-    }
     @Autowired
     protected TableGeneratorStep tableGeneratorStep;
-
 
     @Autowired
     protected ObjectFactory<ObservationExportStep> observationExportStepFactory;
@@ -48,7 +37,14 @@ public abstract class StepConfigurer implements StepConfigurerContract {
 
     @Autowired
     protected ConceptService conceptService;
+
     private List<BahmniForm> allForms;
+    protected TableMetadataGenerator formTableMetadataGenerator;
+
+    @Autowired
+    public StepConfigurer(TableMetadataGenerator tableMetadataGenerator) {
+        formTableMetadataGenerator = tableMetadataGenerator;
+    }
 
     @Override
     public void generateTableData(JobDefinition jobDefinition) {

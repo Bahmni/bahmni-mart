@@ -1,7 +1,7 @@
 package org.bahmni.mart.config.stepconfigurer;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.Concept;
@@ -15,7 +15,6 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberField
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperSuperClassMemberFields;
 
 public class StepConfigurerTestHelper {
-
     @Mock
     protected TableGeneratorStep tableGeneratorStep;
 
@@ -42,8 +41,8 @@ public class StepConfigurerTestHelper {
 
     protected void setUp(StepConfigurer classInstance) throws Exception {
         setValuesForSuperSuperClassMemberFields(classInstance, "tableGeneratorStep", tableGeneratorStep);
-       setValuesForSuperSuperClassMemberFields(classInstance,
-              "formTableMetadataGenerator", formTableMetadataGenerator);
+        setValuesForSuperSuperClassMemberFields(classInstance,
+                "formTableMetadataGenerator", formTableMetadataGenerator);
         setValuesForSuperSuperClassMemberFields(classInstance,
                 "observationExportStepFactory", observationExportStepFactory);
         setValuesForSuperClassMemberFields(classInstance, "formListProcessor", formListProcessor);

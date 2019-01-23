@@ -19,5 +19,4 @@ public class ControlProperties {
     public void setMultiSelect(boolean multiSelect) {
         this.multiSelect = multiSelect;
     }
-
 }

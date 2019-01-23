@@ -42,7 +42,7 @@ public class DispositionStepConfigurerTest {
     private JobDefinitionReader jobDefinitionReader;
 
     @Mock
-    FormTableMetadataGenerator formTableMetadataGenerator;
+    private FormTableMetadataGenerator formTableMetadataGenerator;
 
     private StepConfigurer dispositionStepConfigure;
 

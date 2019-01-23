@@ -6,15 +6,11 @@ import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 
 public class SpecialCharacterResolver {
-
     private static final String ALPHA_NUMERIC_UNDERSCORE_REGEX = "[^\\p{L}0-9_]+";
     private static final int MAX_COLUMN_NAME_LENGTH = 59;
 
@@ -22,7 +18,6 @@ public class SpecialCharacterResolver {
     private static DualHashBidiMap updatedToActualTableNames = new DualHashBidiMap();
 
     public static void resolveTableData(TableData tableData) {
-
         if (updatedToActualTableNames.containsKey(tableData.getName())) {
             return;
         }
@@ -33,11 +28,9 @@ public class SpecialCharacterResolver {
         tableData.setName(updatedTableName);
         updatedToActualTableNames.put(updatedTableName, actualTableName);
         tableToColumnsMap.put(actualTableName, updatedToActualColumnNamesMap);
-
     }
 
     public static String getActualColumnName(TableData tableData, TableColumn tableColumn) {
-
         String actualTableName = (String) updatedToActualTableNames.get(tableData.getName());
         DualHashBidiMap updatedToActualColumns = tableToColumnsMap.get(actualTableName);
         String actualColumnName = tableColumn.getName();
@@ -46,11 +39,9 @@ public class SpecialCharacterResolver {
     }
 
     private static DualHashBidiMap getUpdatedToActualColumnNamesMap(TableData tableData) {
-
         DualHashBidiMap updatedToActualColumnNamesMap = new DualHashBidiMap();
 
         for (TableColumn tableColumn : tableData.getColumns()) {
-
             String actualColumnName = tableColumn.getName();
             String updatedColumnName = getUpdatedTableColumnName(updatedToActualColumnNamesMap, actualColumnName);
 
@@ -112,7 +103,6 @@ public class SpecialCharacterResolver {
     }
 
     private static String getUpdatedStringName(Map<String, String> updatedToActualStringMap, String actualString) {
-
         String updatedString = replaceWithUnderscore(actualString);
 
         int underscoreAppender = 1;
@@ -128,12 +118,10 @@ public class SpecialCharacterResolver {
     }
 
     private static String replaceWithUnderscore(String actualString) {
-
         return replaceWithUnderscore(actualString, "");
     }
 
     private static String replaceWithUnderscore(String conceptName, String identifier) {
-
         String updatedConceptName = conceptName
                 .replaceAll(ALPHA_NUMERIC_UNDERSCORE_REGEX, String.format("_%s", identifier))
                 .replaceAll(String.format("(_+%s)\\1+", identifier), String.format("_%s", identifier));

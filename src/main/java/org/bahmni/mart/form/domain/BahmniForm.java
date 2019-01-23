@@ -4,24 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BahmniForm {
-
     private List<BahmniForm> children = new ArrayList<>();
-
-    public void setNonConceptForm(boolean nonConceptForm) {
-        isNonConceptForm = nonConceptForm;
-    }
-
-    private boolean isNonConceptForm = false;
-
     private BahmniForm parent;
-
     private BahmniForm rootForm;
-
     private Concept formName;
-
-    private List<Concept> fields = new ArrayList<>();
-
     private int depthToParent;
+    private List<Concept> fields = new ArrayList<>();
+    private boolean isNonConceptForm = false;
 
     public List<BahmniForm> getChildren() {
         return children;
@@ -71,4 +60,7 @@ public class BahmniForm {
         return rootForm;
     }
 
+    public void setNonConceptForm(boolean nonConceptForm) {
+        isNonConceptForm = nonConceptForm;
+    }
 }

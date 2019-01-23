@@ -41,8 +41,10 @@ public class BacteriologyStepConfigurerTest {
 
     @Mock
     private JobDefinitionReader jobDefinitionReader;
+
     @Mock
-    FormTableMetadataGenerator formTableMetadataGenerator;
+    private FormTableMetadataGenerator formTableMetadataGenerator;
+
     private StepConfigurer bacteriologyStepConfigurer;
 
     @Before

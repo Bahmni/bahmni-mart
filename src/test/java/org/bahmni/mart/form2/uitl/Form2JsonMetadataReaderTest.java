@@ -2,8 +2,12 @@ package org.bahmni.mart.form2.uitl;
 
 import org.bahmni.mart.form2.model.Control;
 import org.bahmni.mart.form2.model.Form2JsonMetadata;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class Form2JsonMetadataReaderTest {
     private static final String FORM_2_METADATA_JSON_DIRECTORY = System.getProperty("user.dir") +
@@ -14,7 +18,7 @@ public class Form2JsonMetadataReaderTest {
         Form2JsonMetadata form2JsonMetadata = new Form2MetadataReader()
                 .read(FORM_2_METADATA_JSON_DIRECTORY + "EmptyForm_1.json");
 
-        Assert.assertEquals(form2JsonMetadata.getName(), "EmptyForm");
+        assertEquals(form2JsonMetadata.getName(), "EmptyForm");
     }
 
     @Test
@@ -22,8 +26,8 @@ public class Form2JsonMetadataReaderTest {
         Form2JsonMetadata form2JsonMetadata = new Form2MetadataReader()
                 .read(FORM_2_METADATA_JSON_DIRECTORY + "EmptyForm_1.json");
 
-        Assert.assertEquals(form2JsonMetadata.getName(), "EmptyForm");
-        Assert.assertNull(form2JsonMetadata.getControls().get(0).getConcept());
+        assertEquals(form2JsonMetadata.getName(), "EmptyForm");
+        assertNull(form2JsonMetadata.getControls().get(0).getConcept());
     }
 
     @Test
@@ -31,10 +35,10 @@ public class Form2JsonMetadataReaderTest {
         Form2JsonMetadata form2JsonMetadata = new Form2MetadataReader()
                 .read(FORM_2_METADATA_JSON_DIRECTORY + "ComplextForm_2.json");
 
-        Assert.assertEquals(form2JsonMetadata.getName(), "ComplextForm");
+        assertEquals(form2JsonMetadata.getName(), "ComplextForm");
         Control childControl = form2JsonMetadata.getControls().get(0);
-        Assert.assertNotNull(childControl.getConcept());
-        Assert.assertEquals(childControl.getConcept().getName(), "Weight");
+        assertNotNull(childControl.getConcept());
+        assertEquals(childControl.getConcept().getName(), "Weight");
     }
 
     @Test
@@ -43,8 +47,7 @@ public class Form2JsonMetadataReaderTest {
                 .read(FORM_2_METADATA_JSON_DIRECTORY + "ComplextForm_2.json");
 
         Control childControl = form2JsonMetadata.getControls().get(1);
-        Assert.assertTrue(childControl.getProperties().isAddMore());
-
+        assertTrue(childControl.getProperties().isAddMore());
     }
 
     @Test
@@ -53,9 +56,6 @@ public class Form2JsonMetadataReaderTest {
                 .read(FORM_2_METADATA_JSON_DIRECTORY + "ComplextForm_2.json");
 
         Control childControl = form2JsonMetadata.getControls().get(3);
-        Assert.assertNull(childControl.getConcept());
-
+        assertNull(childControl.getConcept());
     }
-
-
 }

@@ -23,10 +23,11 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(JobDefinitionUtil.class)
 public class DiagnosesStepConfigurerTest extends StepConfigurerTestHelper {
-
     private DiagnosesStepConfigurer diagnosesStepConfigurer;
+
     @Mock
-    FormTableMetadataGenerator formTableMetadataGenerator;
+    private FormTableMetadataGenerator formTableMetadataGenerator;
+
     @Before
     public void setUp() throws Exception {
         diagnosesStepConfigurer = new DiagnosesStepConfigurer(formTableMetadataGenerator);

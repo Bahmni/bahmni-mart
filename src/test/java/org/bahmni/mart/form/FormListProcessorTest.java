@@ -1,7 +1,7 @@
 package org.bahmni.mart.form;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.helper.FormListHelper;
@@ -31,7 +31,6 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 @PrepareForTest({JobDefinitionUtil.class})
 @RunWith(PowerMockRunner.class)
 public class FormListProcessorTest {
-
     @Mock
     private BahmniFormFactory bahmniFormFactory;
 
@@ -144,7 +143,5 @@ public class FormListProcessorTest {
                 .warn("Skipping the form 'Duplicate form name' since it has duplicate concepts 'concept1'");
         verifyStatic();
         getIgnoreConceptNamesForJob(jobDefinition);
-
     }
-
 }

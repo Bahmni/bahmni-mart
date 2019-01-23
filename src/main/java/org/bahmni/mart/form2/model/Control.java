@@ -5,6 +5,8 @@ import java.util.List;
 public class Control {
     private ControlProperties properties;
     private Concept concept;
+    private ControlLabel label;
+    private List<Control> controls;
 
     public ControlLabel getLabel() {
         return label;
@@ -13,9 +15,6 @@ public class Control {
     public void setLabel(ControlLabel label) {
         this.label = label;
     }
-
-    private ControlLabel label;
-    private List<Control> controls;
 
     public List<Control> getControls() {
         return controls;
@@ -40,6 +39,4 @@ public class Control {
     public void setConcept(Concept concept) {
         this.concept = concept;
     }
-
-
 }
