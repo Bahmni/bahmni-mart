@@ -4,11 +4,8 @@ import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.table.domain.ForeignKey;
 import org.bahmni.mart.table.domain.TableColumn;
-import org.bahmni.mart.table.domain.TableData;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,14 +20,13 @@ public class Form2TableMetadataGenerator extends TableMetadataGenerator {
             String formParentConceptName = formParentConcept.getName();
             String referenceTableName = getProcessedName(formParentConceptName);
             referenceTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(referenceTableName);
-            String referenceColumn = "form_field_path" ;
+            String referenceColumn = "form_field_path";
             ForeignKey reference = new ForeignKey(referenceColumn, referenceTableName);
-            return Arrays.asList(new TableColumn(referenceColumn+ "_"+referenceTableName, "text", false, reference),
+            return Arrays.asList(new TableColumn(referenceColumn + "_" + referenceTableName, "text", false, reference),
                     new TableColumn("encounter_id", "integer", true, new ForeignKey("encounter_id", referenceTableName)));
         }
         return null;
     }
-
 
     @Override
     protected List<TableColumn> getColumns(BahmniForm form) {
@@ -56,9 +52,8 @@ public class Form2TableMetadataGenerator extends TableMetadataGenerator {
     private List<TableColumn> getPrimaryColumns(boolean hasForeignKeyColumn) {
         TableColumn formFieldPathColumn = new TableColumn("form_field_path",
                 "text", true, null);
-        if(hasForeignKeyColumn)
+        if (hasForeignKeyColumn)
             return Arrays.asList(formFieldPathColumn);
-        return Arrays.asList(formFieldPathColumn,new TableColumn("encounter_id", "integer", true, null) );
+        return Arrays.asList(formFieldPathColumn, new TableColumn("encounter_id", "integer", true, null));
     }
-
 }

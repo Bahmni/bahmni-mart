@@ -60,21 +60,19 @@ public abstract class TableMetadataGenerator implements TableMetadataGeneratorCo
         return tableDataMap.containsKey(getProcessedName(form.getFormName().getName()));
     }
 
-    protected  List<TableColumn> getNonKeyColumns(BahmniForm form) {
+    protected List<TableColumn> getNonKeyColumns(BahmniForm form) {
         List<Concept> fields = form.getFields();
         List<TableColumn> columns = new ArrayList<>();
         fields.forEach(field -> {
-
             final String dataType = field.getDataType();
-            if(dataType!=null)
+            if (dataType != null)
                 columns.add(new TableColumn(getProcessedName(field.getName()),
-                    Constants.getPostgresDataTypeFor(dataType),
-                    false,
-                    null));
+                        Constants.getPostgresDataTypeFor(dataType),
+                        false,
+                        null));
         });
         return columns;
     }
-
 
     abstract protected List<TableColumn> getForeignKeyColumn(BahmniForm form);
 

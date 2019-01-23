@@ -3,7 +3,8 @@ package org.bahmni.mart.form2.model;
 import java.util.List;
 
 public class Form2JsonMetadata {
-    List<Control> controls;
+    private List<Control> controls;
+    private String name;
 
     public String getName() {
         return name;
@@ -13,8 +14,6 @@ public class Form2JsonMetadata {
         this.name = name;
     }
 
-    String name;
-
     public List<Control> getControls() {
         return controls;
     }
@@ -22,7 +21,5 @@ public class Form2JsonMetadata {
     public void setControls(List<Control> controls) {
         this.controls = controls;
     }
-
-
 }
 

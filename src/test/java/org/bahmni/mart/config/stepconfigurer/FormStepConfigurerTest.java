@@ -1,7 +1,7 @@
 package org.bahmni.mart.config.stepconfigurer;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
@@ -44,14 +44,11 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(JobDefinitionUtil.class)
 public class FormStepConfigurerTest extends StepConfigurerTestHelper {
-
     private static final int BAHMNI_FORM = 0;
     private static final int FSTG_FORM = 1;
 
     @Mock
     private FlowBuilder<FlowJobBuilder> completeDataExport;
-
-    private Form1StepConfigurer formStepConfigurer;
 
     @Mock
     private ObservationExportStep fstgObservationExportStep;
@@ -76,8 +73,11 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
 
     @Mock
     private TableData tableData;
+
     @Mock
-    FormTableMetadataGenerator formTableMetadataGenerator;
+    private FormTableMetadataGenerator formTableMetadataGenerator;
+
+    private Form1StepConfigurer formStepConfigurer;
 
     @Before
     public void setUp() throws Exception {

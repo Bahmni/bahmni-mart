@@ -2,19 +2,17 @@ package org.bahmni.mart.form2.model;
 
 public class Concept {
     private String name;
-
-    //can be removed
+    //TODO: uuid can be removed
     private String uuid;
+    private String dataType;
 
-    public String getDatatype() {
-        return datatype;
+    public String getDataType() {
+        return dataType;
     }
 
-    public void setDatatype(String datatype) {
-        this.datatype = datatype;
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
-
-    private String datatype;
 
     public String getUuid() {
         return uuid;

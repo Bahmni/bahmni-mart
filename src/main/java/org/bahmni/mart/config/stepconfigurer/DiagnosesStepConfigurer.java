@@ -23,7 +23,6 @@ public class DiagnosesStepConfigurer extends Form1StepConfigurer {
 
     @Override
     protected List<BahmniForm> getAllForms() {
-
         List<Concept> allFormConcepts = conceptService.getConceptsByNames(Collections.singletonList(VISIT_DIAGNOSES));
         return formListProcessor.retrieveAllForms(allFormConcepts,
                 getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), VISIT_DIAGNOSES_TYPE));

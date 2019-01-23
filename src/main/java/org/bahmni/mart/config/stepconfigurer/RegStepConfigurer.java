@@ -29,11 +29,10 @@ public class RegStepConfigurer extends Form1StepConfigurer {
     @Override
     protected List<BahmniForm> getAllForms() {
         JobDefinition jobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE);
-
         List<String> regConcepts = regConfigHelper.getRegConcepts();
-        if (regConcepts.isEmpty())
+        if (regConcepts.isEmpty()) {
             return new ArrayList<>();
-
+        }
         List<Concept> allFormConcepts = conceptService.getConceptsByNames(regConcepts);
         return addPrefixToFormsName(formListProcessor.retrieveAllForms(allFormConcepts, jobDefinition));
     }
