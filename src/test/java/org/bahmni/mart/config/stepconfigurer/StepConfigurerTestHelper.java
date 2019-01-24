@@ -42,8 +42,6 @@ public class StepConfigurerTestHelper {
     protected void setUp(StepConfigurer classInstance) throws Exception {
         setValuesForSuperSuperClassMemberFields(classInstance, "tableGeneratorStep", tableGeneratorStep);
         setValuesForSuperSuperClassMemberFields(classInstance,
-                "formTableMetadataGenerator", formTableMetadataGenerator);
-        setValuesForSuperSuperClassMemberFields(classInstance,
                 "observationExportStepFactory", observationExportStepFactory);
         setValuesForSuperClassMemberFields(classInstance, "formListProcessor", formListProcessor);
         setValuesForSuperSuperClassMemberFields(classInstance, "jobDefinitionReader", jobDefinitionReader);

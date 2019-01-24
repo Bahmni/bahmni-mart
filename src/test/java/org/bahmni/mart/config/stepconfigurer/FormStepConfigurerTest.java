@@ -7,7 +7,6 @@ import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.domain.ForeignKey;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
@@ -73,9 +72,6 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
 
     @Mock
     private TableData tableData;
-
-    @Mock
-    private FormTableMetadataGenerator formTableMetadataGenerator;
 
     private Form1StepConfigurer formStepConfigurer;
 

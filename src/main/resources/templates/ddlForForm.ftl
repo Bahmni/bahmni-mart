@@ -44,12 +44,12 @@ CREATE TABLE "${input.name}"(
         )  ON DELETE CASCADE
     </#if>
 
-    <#assign primaryKeyCoumns = filterColumnsWithPrimaryKey(input.getColumns()) >
-    <#if primaryKeyCoumns?size &gt; 0>
+    <#assign primaryKeyColumns = filterColumnsWithPrimaryKey(input.getColumns()) >
+    <#if primaryKeyColumns?size &gt; 0>
         ,PRIMARY KEY(
-        <#list primaryKeyCoumns as primaryKeyCoumn>
+        <#list primaryKeyColumns as primaryKeyCoumn>
             ${primaryKeyCoumn.name}
-            <#if primaryKeyCoumns?seq_index_of(primaryKeyCoumn) <= primaryKeyCoumns?size - 2 >,</#if>
+            <#if primaryKeyColumns?seq_index_of(primaryKeyCoumn) <= primaryKeyColumns?size - 2 >,</#if>
         </#list>
     )
     </#if>
