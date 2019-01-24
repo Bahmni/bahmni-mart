@@ -28,8 +28,12 @@ public class FormTableMetadataGeneratorTest {
     public void shouldCreateMetadataForGivenForm() {
         BahmniForm form = new BahmniForm();
         form.setFormName(new Concept(123, "formName", 1));
-        form.addField(new Concept(1, "field1", 0));
-        form.addField(new Concept(2, "field2", 0));
+        Concept field1 = new Concept(1, "field1", 0);
+        field1.setDataType("integer");
+        form.addField(field1);
+        Concept field2 = new Concept(2, "field2", 0);
+        field2.setDataType("integer");
+        form.addField(field2);
 
         formTableMetadataGenerator.addMetadataForForm(form);
 
@@ -37,10 +41,12 @@ public class FormTableMetadataGeneratorTest {
         assertTrue(formTableMetadataGenerator.hasMetadataFor(form));
         TableData tableData = formTableMetadataGenerator.getTableData(form);
         assertEquals("formname", tableData.getName());
-        assertTrue(tableData.getColumns().stream().map(TableColumn::getName).collect(Collectors.toList())
-                .containsAll(Arrays.asList("id_formname", "patient_id", "encounter_id", "obs_datetime", "date_created",
-                        "date_modified", "location_id", "location_name", "program_id", "program_name", "field1",
-                        "field2")));
+        List<String> actualColumnNames = tableData.getColumns().stream().map(TableColumn::getName)
+                .collect(Collectors.toList());
+        List<String> expectedColumnNames = Arrays.asList("id_formname", "patient_id", "encounter_id", "obs_datetime",
+                "date_created", "date_modified", "location_id", "location_name", "program_id", "program_name", "field1",
+                "field2");
+        assertTrue(actualColumnNames.containsAll(expectedColumnNames));
     }
 
     @Test

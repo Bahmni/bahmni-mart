@@ -1,8 +1,8 @@
 package org.bahmni.mart.config.stepconfigurer;
 
-import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
+import static org.bahmni.mart.CommonTestHelper.setValuesForSuperSuperClassMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
@@ -49,9 +50,9 @@ public class DispositionStepConfigurerTest {
     @Before
     public void setUp() throws Exception {
         dispositionStepConfigure = new DispositionStepConfigurer(formTableMetadataGenerator);
-        setValuesForSuperClassMemberFields(dispositionStepConfigure, "jobDefinitionReader", jobDefinitionReader);
+        setValuesForSuperSuperClassMemberFields(dispositionStepConfigure, "jobDefinitionReader", jobDefinitionReader);
         setValuesForSuperClassMemberFields(dispositionStepConfigure, "formListProcessor", formListProcessor);
-        setValuesForSuperClassMemberFields(dispositionStepConfigure, "conceptService", conceptService);
+        setValuesForSuperSuperClassMemberFields(dispositionStepConfigure, "conceptService", conceptService);
     }
 
     @Test

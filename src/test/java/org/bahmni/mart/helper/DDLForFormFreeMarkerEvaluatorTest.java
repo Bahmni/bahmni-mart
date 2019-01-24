@@ -92,7 +92,8 @@ public class DDLForFormFreeMarkerEvaluatorTest {
         String generatedSql = freeMarkerEvaluator.evaluate("ddlForForm.ftl", tableData);
         assertNotNull(generatedSql);
         assertEquals("DROP TABLE IF EXISTS \"formWithChildren\" CASCADE; CREATE TABLE " +
-                "\"formWithChildren\"( \"patient_id\" integer PRIMARY KEY , \"encounter_id\" integer );", generatedSql);
+                "\"formWithChildren\"( \"patient_id\" integer , \"encounter_id\" integer" +
+                " ,PRIMARY KEY( patient_id ) );", generatedSql);
     }
 
     @Test
@@ -106,8 +107,9 @@ public class DDLForFormFreeMarkerEvaluatorTest {
         String generatedSql = freeMarkerEvaluator.evaluate("ddlForForm.ftl", tableData);
         assertNotNull(generatedSql);
         assertEquals("DROP TABLE IF EXISTS \"formWithChildren\" CASCADE; CREATE TABLE " +
-                "\"formWithChildren\"( \"patient_id\" integer PRIMARY KEY , \"encounter_id\" " +
-                "integer REFERENCES \"encounter\" (\"id\") ON DELETE CASCADE );", generatedSql);
+                "\"formWithChildren\"( \"patient_id\" integer , \"encounter_id\" integer ," +
+                "FOREIGN KEY ( encounter_id ) REFERENCES \"encounter\" ( id ) ON DELETE CASCADE ," +
+                "PRIMARY KEY( patient_id ) );", generatedSql);
     }
 
 }

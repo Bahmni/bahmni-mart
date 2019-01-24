@@ -2,6 +2,7 @@ package org.bahmni.mart.config.view;
 
 import org.bahmni.mart.helper.RegConfigHelper;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
+import org.bahmni.mart.table.TableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,6 +74,7 @@ public class RegViewDefinitionTest {
         List<Map<String, Object>> metaData = Arrays.asList(nutritionalValue, feeInfo);
 
         mockStatic(FormTableMetadataGenerator.class);
+        mockStatic(TableMetadataGenerator.class);
         when(regConfigHelper.getRegConcepts()).thenReturn(Arrays.asList("Nutritional Values", "Fee Information"));
         when(addPrefixToName("Nutritional Values", "Reg")).thenReturn("Reg Nutritional Values");
         when(addPrefixToName("Fee Information", "Reg")).thenReturn("Reg Fee Information");

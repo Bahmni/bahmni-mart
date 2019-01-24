@@ -5,6 +5,7 @@ import org.bahmni.mart.config.group.GroupedJob;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.config.job.model.SeparateTableConfig;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
+import org.bahmni.mart.table.TableMetadataGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -134,7 +135,7 @@ public class JobDefinitionReaderTest {
 
     @Test
     public void shouldReturnJobDefinitionForGivenProcessedJobName() {
-        mockStatic(FormTableMetadataGenerator.class);
+        mockStatic(TableMetadataGenerator.class);
         when(FormTableMetadataGenerator.getProcessedName("Program Data")).thenReturn("program_data");
 
         JobDefinition programDataDefinition = jobDefinitionReader.getJobDefinitionByProcessedName("program_data");
