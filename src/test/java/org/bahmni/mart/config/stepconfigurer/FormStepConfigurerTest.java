@@ -188,8 +188,8 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     }
 
     @Test
-    public void shouldNotThrowNullPointerExceptionWhileRevokingConstraintsWhenTableDataIsNotPresentInMap() throws
-            NoSuchFieldException, IllegalAccessException {
+    public void shouldNotThrowNullPointerExceptionWhileRevokingConstraintsWhenTableDataIsNotPresentInMap()
+            throws Exception {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
         setValuesForSuperSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);

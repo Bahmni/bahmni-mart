@@ -9,6 +9,8 @@ import java.util.List;
 @Component
 public interface TableMetadataGeneratorContract {
     List<TableData> getTableDataList();
+
     void addMetadataForForm(BahmniForm form);
+
     TableData getTableData(BahmniForm form);
 }

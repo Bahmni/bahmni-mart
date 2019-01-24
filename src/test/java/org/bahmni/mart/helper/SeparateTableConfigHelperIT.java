@@ -78,7 +78,7 @@ public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldReturnEmptyHashSetWhenThereAreNoSeparateTablesAndDefaultAddMoreAndMultiSelects()
-            throws NoSuchFieldException, IllegalAccessException {
+            throws Exception {
 
         JobDefinition jobDefinition = new JobDefinition();
 

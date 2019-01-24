@@ -69,7 +69,7 @@ public class EAVJobListenerTest {
     private EAVJobListener eavJobListener;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         eavJobListener = new EAVJobListener();
         setValuesForSuperClassMemberFields(eavJobListener, "tableGeneratorStep", tableGeneratorStep);
         setValuesForSuperClassMemberFields(eavJobListener, "jobDefinitionReader", jobDefinitionReader);

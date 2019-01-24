@@ -101,7 +101,7 @@ public class OrderStepConfigurerTest {
     private String locale;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         orderStepConfigurer = new OrderStepConfigurer();
         locale = "locale";
         setValuesForMemberFields(orderStepConfigurer, "conceptService", conceptService);
@@ -143,8 +143,8 @@ public class OrderStepConfigurerTest {
     }
 
     @Test
-    public void shouldNotCallDBForAllOrderablesFromSecondCallOnwards() throws NoSuchFieldException,
-            IllegalAccessException, InvalidOrderTypeException, NoSamplesFoundException {
+    public void shouldNotCallDBForAllOrderablesFromSecondCallOnwards() throws Exception,
+            InvalidOrderTypeException, NoSamplesFoundException {
         int orderTypeId = 1;
         String sql = "sql";
         when(concept.getName()).thenReturn(orderable);
@@ -166,7 +166,7 @@ public class OrderStepConfigurerTest {
     }
 
     @Test
-    public void shouldCreateAllOrderableTables() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldCreateAllOrderableTables() throws Exception {
         Map<String, TableData> orderablesTableData = new HashMap<>();
         orderablesTableData.put("tableName", mock(TableData.class));
         setValuesForMemberFields(orderStepConfigurer, "orderablesTableData", orderablesTableData);

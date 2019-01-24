@@ -7,18 +7,18 @@ import java.lang.reflect.Modifier;
 public class CommonTestHelper {
 
     public static void setValuesForMemberFields(Object classInstance, String fieldName, Object valueForMemberField)
-            throws NoSuchFieldException, IllegalAccessException {
+            throws Exception {
         setField(classInstance, valueForMemberField, classInstance.getClass().getDeclaredField(fieldName));
     }
 
     public static void setValuesForSuperClassMemberFields(Object classInstance, String fieldName,
-                  Object valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+                                                          Object valueForMemberField) throws Exception {
         Field field = classInstance.getClass().getSuperclass().getDeclaredField(fieldName);
         setField(classInstance, valueForMemberField, field);
     }
 
     public static void setValuesForSuperSuperClassMemberFields(Object classInstance, String fieldName,
-                                                          Object valueForMemberField) throws NoSuchFieldException, IllegalAccessException {
+                                                               Object valueForMemberField) throws Exception {
         Field field = classInstance.getClass().getSuperclass().getSuperclass().getDeclaredField(fieldName);
         setField(classInstance, valueForMemberField, field);
     }
@@ -30,7 +30,7 @@ public class CommonTestHelper {
     }
 
     public static void setValueForFinalStaticField(Class classInstance, String fieldName, Object valueForMemberField)
-            throws NoSuchFieldException, IllegalAccessException {
+            throws Exception {
         Field field = classInstance.getDeclaredField(fieldName);
         Field modifiersField = Field.class.getDeclaredField("modifiers");
         modifiersField.setAccessible(true);

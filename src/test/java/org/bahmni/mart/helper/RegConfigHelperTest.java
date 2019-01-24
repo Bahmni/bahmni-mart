@@ -78,7 +78,7 @@ public class RegConfigHelperTest {
             "}";
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         regConfigHelper = new RegConfigHelper();
         setValuesForMemberFields(regConfigHelper, "defaultExtensionConfigFile", "default.json");
         setValuesForMemberFields(regConfigHelper, "implementationExtensionConfigFile", "implementation.json");

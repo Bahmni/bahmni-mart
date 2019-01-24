@@ -69,7 +69,7 @@ public class JobContextTest {
     }
 
     @Test
-    public void shouldLogWarningForInvalidJobType() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldLogWarningForInvalidJobType() throws Exception {
 
         when(jobStrategies.get(jobType)).thenReturn(null);
         when(jobDefinition.getName()).thenReturn("Obs Data");

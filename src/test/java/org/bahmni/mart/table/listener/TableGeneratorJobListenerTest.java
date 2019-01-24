@@ -66,7 +66,7 @@ public class TableGeneratorJobListenerTest {
     private TableGeneratorJobListener tableGeneratorJobListener;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         mockStatic(JobDefinitionUtil.class);
         tableGeneratorJobListener = new TableGeneratorJobListener();
         setValuesForSuperClassMemberFields(tableGeneratorJobListener, "jobDefinitionReader", jobDefinitionReader);

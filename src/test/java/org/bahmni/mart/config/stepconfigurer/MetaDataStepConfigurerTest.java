@@ -65,7 +65,7 @@ public class MetaDataStepConfigurerTest {
     private MetaDataStepConfigurer metaDataStepConfigurer;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         metaDataStepConfigurer = new MetaDataStepConfigurer();
         setValuesForMemberFields(metaDataStepConfigurer, "tableGeneratorStep", tableGeneratorStep);
         setValuesForMemberFields(metaDataStepConfigurer, "tableData", tableData);

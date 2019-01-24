@@ -36,7 +36,7 @@ public class JobDefinitionReaderTest {
     private GroupedJob groupedJob;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         mockStatic(BatchUtils.class);
         String json = "{\"jobs\": [\n" +
                 "  {\n" +
