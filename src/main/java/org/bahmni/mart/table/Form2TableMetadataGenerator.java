@@ -10,22 +10,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Component("Form2TableMetadataGenerator")
 public class Form2TableMetadataGenerator extends TableMetadataGenerator {
 
     @Override
     protected List<TableColumn> getForeignKeyColumn(BahmniForm form) {
-        if (form.getParent() != null) {
-            Concept formParentConcept = form.getParent().getFormName();
-            String formParentConceptName = formParentConcept.getName();
-            String referenceTableName = getProcessedName(formParentConceptName);
-            referenceTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(referenceTableName);
-            String referenceColumn = "form_field_path";
-            ForeignKey reference = new ForeignKey(referenceColumn, referenceTableName);
-            return Arrays.asList(new TableColumn(referenceColumn + "_" + referenceTableName, "text", false, reference),
-                    new TableColumn("encounter_id", "integer", true, new ForeignKey("encounter_id", referenceTableName)));
+        if (isNull(form.getParent())) {
+            return null;
         }
-        return null;
+        Concept formParentConcept = form.getParent().getFormName();
+        String formParentConceptName = formParentConcept.getName();
+        String referenceTableName = getProcessedName(formParentConceptName);
+        referenceTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(referenceTableName);
+        String referenceColumn = "form_field_path";
+        ForeignKey reference = new ForeignKey(referenceColumn, referenceTableName);
+        return Arrays.asList(
+                new TableColumn(referenceColumn + "_" + referenceTableName,
+                        "text", false, reference),
+                new TableColumn("encounter_id", "integer", true,
+                        new ForeignKey("encounter_id", referenceTableName)));
     }
 
     @Override
@@ -54,6 +59,7 @@ public class Form2TableMetadataGenerator extends TableMetadataGenerator {
                 "text", true, null);
         if (hasForeignKeyColumn)
             return Arrays.asList(formFieldPathColumn);
-        return Arrays.asList(formFieldPathColumn, new TableColumn("encounter_id", "integer", true, null));
+        return Arrays.asList(formFieldPathColumn,
+                new TableColumn("encounter_id", "integer", true, null));
     }
 }

@@ -25,12 +25,12 @@ public class Form2MetadataReader {
         return parse(bufferedReader);
     }
 
-    private Form2JsonMetadata parse(BufferedReader metadataReader){
-       try {
-           Form2JsonMetadata form2JsonMetadata = new Gson().fromJson(metadataReader, Form2JsonMetadata.class);
-           return form2JsonMetadata;
-       }catch(Exception e){
-           return null;
-       }
+    private Form2JsonMetadata parse(BufferedReader metadataReader) {
+        try {
+            Form2JsonMetadata form2JsonMetadata = new Gson().fromJson(metadataReader, Form2JsonMetadata.class);
+            return form2JsonMetadata;
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

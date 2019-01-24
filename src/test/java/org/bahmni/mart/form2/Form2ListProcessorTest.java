@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -27,12 +28,10 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PrepareForTest({JobDefinitionUtil.class})
 @RunWith(PowerMockRunner.class)
 public class Form2ListProcessorTest {
-    private final String FORM_PATH = "SomeForm.json";
-    private final String COMPLEX_FORM = "ComplextForm";
+    private static final String FORM_PATH = "SomeForm.json";
+    private static final String COMPLEX_FORM = "ComplextForm";
     private Form2ListProcessor form2ListProcessor;
     private Map<String, String> allForms = new HashMap<String, String>();
-    private static final String FORM_2_METADATA_JSON_DIRECTORY = System.getProperty("user.dir") +
-            "/src/test/resources/form2MetadataJson/";
 
     @Mock
     private JobDefinition jobDefinition;
@@ -41,21 +40,20 @@ public class Form2ListProcessorTest {
     private Form2MetadataReader form2MetadataReader;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         form2ListProcessor = new Form2ListProcessor();
         allForms.put(COMPLEX_FORM, FORM_PATH);
         setValuesForMemberFields(form2ListProcessor, "form2MetadataReader", form2MetadataReader);
     }
 
     @Test
-    public void shouldGetTheBahmniFormWithFieldsWhenFormHasOnlyObsControl(){
-        Control ObsControl;
+    public void shouldGetTheBahmniFormWithFieldsWhenFormHasOnlyObsControl() {
         final String obsConceptName = "ObsConcept";
-        ObsControl = new ControlBuilder()
+        Control obsControl = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName, "obs_concept_1").build();
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        form2JsonMetadata.setControls(new ArrayList<>(Arrays.asList(ObsControl)));
+        form2JsonMetadata.setControls(new ArrayList<>(singletonList(obsControl)));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -70,14 +68,13 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldGetTheBahmniFormWithChildrenWhenFormHasObsControlWithAddMore(){
-        Control ObsControl;
+    public void shouldGetTheBahmniFormWithChildrenWhenFormHasObsControlWithAddMore() {
         final String obsConceptName = "ObsConcept";
-        ObsControl = new ControlBuilder()
+        Control obsControl = new ControlBuilder()
                 .withPropertyAddMore(true)
                 .withConcept(obsConceptName, "obs_concept_1").build();
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        form2JsonMetadata.setControls(new ArrayList<>(Arrays.asList(ObsControl)));
+        form2JsonMetadata.setControls(new ArrayList<>(singletonList(obsControl)));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -92,19 +89,18 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldGetTheBahmniFormWithFieldAsObsConceptWhenFormHasObsInsideSection(){
-        Control ObsControl, SectionControl;
+    public void shouldGetTheBahmniFormWithFieldAsObsConceptWhenFormHasObsInsideSection() {
         final String obsConceptName = "ObsConcept";
-        ObsControl = new ControlBuilder()
+        Control obsControl = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName, "obs_concept_1").build();
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        SectionControl = new ControlBuilder()
+        Control sectionControl = new ControlBuilder()
                 .withLabel("Section")
-                .withControls(Arrays.asList(ObsControl))
+                .withControls(singletonList(obsControl))
                 .withPropertyAddMore(false)
                 .build();
-        form2JsonMetadata.setControls(Arrays.asList(SectionControl));
+        form2JsonMetadata.setControls(singletonList(sectionControl));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -118,19 +114,18 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldGetTheBahmniFormWithChildrenAsObsConceptWhenFormHasObsWithAddMoreInsideSection(){
-        Control ObsControl, SectionControl;
+    public void shouldGetTheBahmniFormWithChildrenAsObsConceptWhenFormHasObsWithAddMoreInsideSection() {
         final String obsConceptName = "ObsConcept";
-        ObsControl = new ControlBuilder()
+        Control obsControl = new ControlBuilder()
                 .withPropertyAddMore(true)
                 .withConcept(obsConceptName, "obs_concept_1").build();
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        SectionControl = new ControlBuilder()
+        Control sectionControl = new ControlBuilder()
                 .withLabel("Section")
-                .withControls(Arrays.asList(ObsControl))
+                .withControls(singletonList(obsControl))
                 .withPropertyAddMore(false)
                 .build();
-        form2JsonMetadata.setControls(Arrays.asList(SectionControl));
+        form2JsonMetadata.setControls(singletonList(sectionControl));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -145,19 +140,18 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldReturnBahmniFormChildAsSectionWithObsConceptAsChildWhenSectionAddMoreContainsObsAddMore(){
-        Control ObsControl, SectionControl;
+    public void shouldReturnBahmniFormChildAsSectionWithObsConceptAsChildWhenSectionAddMoreContainsObsAddMore() {
         final String obsConceptName = "ObsConcept";
-        ObsControl = new ControlBuilder()
+        Control obsControl = new ControlBuilder()
                 .withPropertyAddMore(true)
                 .withConcept(obsConceptName, "obs_concept_1").build();
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        SectionControl = new ControlBuilder()
+        Control sectionControl = new ControlBuilder()
                 .withLabel("Section")
-                .withControls(Arrays.asList(ObsControl))
+                .withControls(singletonList(obsControl))
                 .withPropertyAddMore(true)
                 .build();
-        form2JsonMetadata.setControls(Arrays.asList(SectionControl));
+        form2JsonMetadata.setControls(singletonList(sectionControl));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -176,23 +170,22 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldReturnBahmniFormChildAsSectionWith2ObsConceptAsChildrenWhenSectionAddMoreContains2ObsAddMore(){
-        Control ObsControl1,ObsControl2, SectionControl;
+    public void shouldReturnBahmniFormChildAsSectionWith2ObsConceptAsChildrenWhenSectionAddMoreContains2ObsAddMore() {
         final String obsConceptName1 = "ObsConcept1";
         final String obsConceptName2 = "ObsConcept2";
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        ObsControl1 = new ControlBuilder()
+        Control obsControl1 = new ControlBuilder()
                 .withPropertyAddMore(true)
                 .withConcept(obsConceptName1, "obs_concept_1").build();
-        ObsControl2 = new ControlBuilder()
+        Control obsControl2 = new ControlBuilder()
                 .withPropertyAddMore(true)
                 .withConcept(obsConceptName2, "obs_concept_2").build();
-        SectionControl = new ControlBuilder()
+        Control sectionControl = new ControlBuilder()
                 .withLabel("Section")
-                .withControls(Arrays.asList(ObsControl1, ObsControl2))
+                .withControls(Arrays.asList(obsControl1, obsControl2))
                 .withPropertyAddMore(true)
                 .build();
-        form2JsonMetadata.setControls(Arrays.asList(SectionControl));
+        form2JsonMetadata.setControls(singletonList(sectionControl));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -212,23 +205,22 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldReturnBahmniFormWith2ObsConceptAsChildrenWhenSectionContains2ObsAddMore(){
-        Control ObsControl1,ObsControl2, SectionControl;
+    public void shouldReturnBahmniFormWith2ObsConceptAsChildrenWhenSectionContains2ObsAddMore() {
         final String obsConceptName1 = "ObsConcept1";
         final String obsConceptName2 = "ObsConcept2";
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        ObsControl1 = new ControlBuilder()
+        Control obsControl1 = new ControlBuilder()
                 .withPropertyAddMore(true)
                 .withConcept(obsConceptName1, "obs_concept_1").build();
-        ObsControl2 = new ControlBuilder()
+        Control obsControl2 = new ControlBuilder()
                 .withPropertyAddMore(true)
                 .withConcept(obsConceptName2, "obs_concept_2").build();
-        SectionControl = new ControlBuilder()
+        Control sectionControl = new ControlBuilder()
                 .withLabel("Section")
-                .withControls(Arrays.asList(ObsControl1, ObsControl2))
+                .withControls(Arrays.asList(obsControl1, obsControl2))
                 .withPropertyAddMore(false)
                 .build();
-        form2JsonMetadata.setControls(Arrays.asList(SectionControl));
+        form2JsonMetadata.setControls(singletonList(sectionControl));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -244,22 +236,21 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldReturnBahmniFormWithTableObsWhenFormContainsATable(){
-        Control EmptyControl1, EmptyControl2, TableControl, ObsControl;
+    public void shouldReturnBahmniFormWithTableObsWhenFormContainsATable() {
         final String obsConceptName1 = "ObsConcept1";
-        ObsControl = new ControlBuilder()
+        Control obsControl = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName1, "obs_concept_1").build();
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        EmptyControl1 = new ControlBuilder().build();
-        EmptyControl2 = new ControlBuilder().build();
-        TableControl = new ControlBuilder()
-                .withControls(Arrays.asList(EmptyControl1,EmptyControl2,ObsControl))
+        Control emptyControl1 = new ControlBuilder().build();
+        Control emptyControl2 = new ControlBuilder().build();
+        Control tableControl = new ControlBuilder()
+                .withControls(Arrays.asList(emptyControl1, emptyControl2, obsControl))
                 .withPropertyAddMore(false)
                 .withLabel("Table")
                 .build();
 
-        form2JsonMetadata.setControls(Arrays.asList(TableControl));
+        form2JsonMetadata.setControls(singletonList(tableControl));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -273,28 +264,27 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldFilterOutFormsWithDuplicateConcepts(){
-        Control ObsControl1,ObsControl2, SectionControl1, SectionControl2;
+    public void shouldFilterOutFormsWithDuplicateConcepts() {
         final String obsConceptName1 = "ObsConcept1";
         final String obsConceptName2 = "ObsConcept2";
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        ObsControl1 = new ControlBuilder()
+        Control obsControl1 = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName1, "obs_concept_1").build();
-        ObsControl2 = new ControlBuilder()
+        Control obsControl2 = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName2, "obs_concept_2").build();
-        SectionControl1 = new ControlBuilder()
+        Control sectionControl1 = new ControlBuilder()
                 .withLabel("Section")
-                .withControls(Arrays.asList(ObsControl1,ObsControl1, ObsControl2))
+                .withControls(Arrays.asList(obsControl1, obsControl1, obsControl2))
                 .withPropertyAddMore(false)
                 .build();
-        SectionControl2 =  new ControlBuilder()
+        Control sectionControl2 = new ControlBuilder()
                 .withLabel("Section")
-                .withControls(Arrays.asList(ObsControl2))
+                .withControls(singletonList(obsControl2))
                 .withPropertyAddMore(false)
                 .build();
-        form2JsonMetadata.setControls(Arrays.asList(SectionControl1, SectionControl2));
+        form2JsonMetadata.setControls(Arrays.asList(sectionControl1, sectionControl2));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
@@ -303,25 +293,23 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldFilterOutConceptsGivenInIgnoreConceptNames(){
-
-        Control ObsControl1,ObsControl2, SectionControl1;
+    public void shouldFilterOutConceptsGivenInIgnoreConceptNames() {
         final String obsConceptName1 = "ObsConcept1";
         final String obsConceptName2 = "ObsConcept2";
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
-        ObsControl1 = new ControlBuilder()
+        Control obsControl1 = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName1, "obs_concept_1").build();
-        ObsControl2 = new ControlBuilder()
+        Control obsControl2 = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName2, "obs_concept_2").build();
-        SectionControl1 = new ControlBuilder()
+        Control sectionControl1 = new ControlBuilder()
                 .withLabel("Section")
-                .withControls(Arrays.asList(ObsControl1, ObsControl2))
+                .withControls(Arrays.asList(obsControl1, obsControl2))
                 .withPropertyAddMore(false)
                 .build();
-        when(jobDefinition.getColumnsToIgnore()).thenReturn(Arrays.asList(obsConceptName2));
-        form2JsonMetadata.setControls(Arrays.asList(SectionControl1));
+        when(jobDefinition.getColumnsToIgnore()).thenReturn(singletonList(obsConceptName2));
+        form2JsonMetadata.setControls(singletonList(sectionControl1));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);

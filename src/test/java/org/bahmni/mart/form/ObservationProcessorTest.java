@@ -48,7 +48,7 @@ public class ObservationProcessorTest {
     private ObservationProcessor observationProcessor;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         initMocks(this);
 
         form = new BahmniForm();

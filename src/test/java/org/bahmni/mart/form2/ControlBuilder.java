@@ -11,28 +11,28 @@ public class ControlBuilder {
 
     private Control control = new Control();
 
-    public ControlBuilder(){
+    public ControlBuilder() {
         control.setProperties(new ControlProperties());
     }
 
-    public ControlBuilder withLabel(String label){
+    public ControlBuilder withLabel(String label) {
         ControlLabel controlLabel = new ControlLabel();
         controlLabel.setValue(label);
         control.setLabel(controlLabel);
         return this;
     }
 
-    public ControlBuilder withPropertyAddMore(boolean addMore){
+    public ControlBuilder withPropertyAddMore(boolean addMore) {
         control.getProperties().setAddMore(addMore);
         return this;
     }
 
-    public Control withPropertyMultiSelect(boolean isMultiSelect){
+    public Control withPropertyMultiSelect(boolean isMultiSelect) {
         control.getProperties().setAddMore(isMultiSelect);
         return control;
     }
 
-    public ControlBuilder withConcept(String name, String uuid){
+    public ControlBuilder withConcept(String name, String uuid) {
         Concept concept = new Concept();
         concept.setName(name);
         concept.setUuid(uuid);
@@ -40,7 +40,7 @@ public class ControlBuilder {
         return this;
     }
 
-    public ControlBuilder withControls(List<Control> controls){
+    public ControlBuilder withControls(List<Control> controls) {
         control.setControls(controls);
         return this;
     }

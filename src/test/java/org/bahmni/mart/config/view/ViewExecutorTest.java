@@ -40,7 +40,7 @@ public class ViewExecutorTest {
     private ViewExecutor viewExecutor;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         viewExecutor = new ViewExecutor();
         setValuesForMemberFields(viewExecutor, "martJdbcTemplate", martJdbcTemplate);
     }
@@ -64,7 +64,7 @@ public class ViewExecutorTest {
     }
 
     @Test
-    public void shouldLogTheErrorIfViewSQLSyntaxIsIncorrect() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldLogTheErrorIfViewSQLSyntaxIsIncorrect() throws Exception {
         ViewDefinition viewDefinition = new ViewDefinition();
         viewDefinition.setName("view1");
         viewDefinition.setSql("select * from patient");
@@ -79,7 +79,7 @@ public class ViewExecutorTest {
     }
 
     @Test
-    public void shouldLogTheErrorIfViewSQLIsEmpty() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldLogTheErrorIfViewSQLIsEmpty() throws Exception {
         ViewDefinition viewDefinition = new ViewDefinition();
         viewDefinition.setName("view1");
         viewDefinition.setSql("");

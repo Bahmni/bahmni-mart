@@ -55,6 +55,28 @@ public class Form2ListProcessor {
         return concept;
     }
 
+    private Concept createConcept(Control control) {
+        String conceptName = "";
+        Concept concept = null;
+        final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
+        if (isEmpty(control.getControls()) && form2Concept != null) {
+            conceptName = form2Concept.getName();
+            if (ignoreConceptNames.contains(conceptName))
+                return null;
+            concept = new Concept();
+            concept.setName(conceptName);
+            concept.setDataType(form2Concept.getDataType());
+        } else {
+            final ControlLabel controlLabel = control.getLabel();
+            if (controlLabel != null) {
+                conceptName = controlLabel.getValue();
+                concept = new Concept();
+                concept.setName(conceptName);
+            }
+        }
+        return concept;
+    }
+
     private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent) {
         Concept concept = createConcept(control);
         if (isNull(concept)) {
@@ -80,28 +102,6 @@ public class Form2ListProcessor {
 
     private void parseChildControls(List<Control> controls, BahmniForm bahmniForm, int depthToParent) {
         controls.forEach(childControl -> parseControl(childControl, bahmniForm, depthToParent));
-    }
-
-    private Concept createConcept(Control control) {
-        String conceptName = "";
-        Concept concept = null;
-        final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
-        if (isEmpty(control.getControls()) && form2Concept != null) {
-            conceptName = form2Concept.getName();
-            if (ignoreConceptNames.contains(conceptName))
-                return null;
-            concept = new Concept();
-            concept.setName(conceptName);
-            concept.setDataType(form2Concept.getDataType());
-        } else {
-            final ControlLabel controlLabel = control.getLabel();
-            if (controlLabel != null) {
-                conceptName = controlLabel.getValue();
-                concept = new Concept();
-                concept.setName(conceptName);
-            }
-        }
-        return concept;
     }
 
     private BahmniForm createChildBahmniForm(Concept concept) {

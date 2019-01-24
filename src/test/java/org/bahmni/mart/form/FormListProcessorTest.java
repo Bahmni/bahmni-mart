@@ -40,7 +40,7 @@ public class FormListProcessorTest {
     private FormListProcessor formListProcessor;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         formListProcessor = new FormListProcessor();
         setValuesForMemberFields(formListProcessor, "bahmniFormFactory", bahmniFormFactory);
     }
@@ -105,7 +105,7 @@ public class FormListProcessorTest {
 
     @Test
     public void shouldRetrieveAllFormsByFilteringFormsWithDuplicateConcepts()
-            throws NoSuchFieldException, IllegalAccessException {
+            throws Exception {
 
         Logger logger = mock(Logger.class);
         setValueForFinalStaticField(FormListHelper.class, "logger", logger);

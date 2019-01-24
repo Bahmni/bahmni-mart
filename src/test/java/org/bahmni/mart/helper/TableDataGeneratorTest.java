@@ -38,7 +38,7 @@ public class TableDataGeneratorTest {
     private static final String LIMIT = " LIMIT 1";
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         tableDataGenerator = new TableDataGenerator();
         setValuesForMemberFields(tableDataGenerator, "openmrsJdbcTemplate", openmrsJdbcTemplate);
         setValuesForMemberFields(tableDataGenerator, "martJdbcTemplate", martJdbcTemplate);

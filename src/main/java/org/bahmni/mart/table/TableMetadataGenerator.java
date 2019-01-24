@@ -74,7 +74,7 @@ public abstract class TableMetadataGenerator implements TableMetadataGeneratorCo
         return columns;
     }
 
-    abstract protected List<TableColumn> getForeignKeyColumn(BahmniForm form);
+    protected abstract List<TableColumn> getForeignKeyColumn(BahmniForm form);
 
-    abstract protected List<TableColumn> getColumns(BahmniForm form);
+    protected abstract List<TableColumn> getColumns(BahmniForm form);
 }

@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.nonNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -59,15 +60,20 @@ public class Form2TableMetadataGeneratorTest {
         child.setFormName(createConcept("formName"));
         child.addField(createConcept("field1"));
         child.addField(createConcept("field2"));
+
         form2TableMetadataGenerator.addMetadataForForm(child);
 
         assertEquals(1, form2TableMetadataGenerator.getTableDataMapSize());
         assertTrue(form2TableMetadataGenerator.hasMetadataFor(child));
-        TableData expectedTableData = form2TableMetadataGenerator.getTableData(child);
-        assertEquals("formname", expectedTableData.getName());
-        assertTrue(expectedTableData.getColumns().stream().map(TableColumn::getName).collect(Collectors.toList())
-                .containsAll(Arrays.asList("form_field_path", "form_field_path_parent_name", "patient_id", "encounter_id", "field1")));
-        final List<TableColumn> foreignTableColumns = expectedTableData.getColumns().stream().filter(tableColumn -> tableColumn.getReference() != null).collect(Collectors.toList());
+        TableData actualTableData = form2TableMetadataGenerator.getTableData(child);
+        assertEquals("formname", actualTableData.getName());
+        List<String> expectedColumns = Arrays.asList("form_field_path", "form_field_path_parent_name",
+                "patient_id", "encounter_id", "field1");
+        List<String> actualColumns = actualTableData.getColumns().stream()
+                .map(TableColumn::getName).collect(Collectors.toList());
+        assertTrue(actualColumns.containsAll(expectedColumns));
+        final List<TableColumn> foreignTableColumns = actualTableData.getColumns().stream()
+                .filter(tableColumn -> nonNull(tableColumn.getReference())).collect(Collectors.toList());
         Assert.assertEquals(foreignTableColumns.size(), 2);
         Assert.assertEquals(foreignTableColumns.get(0).getName(), "form_field_path_parent_name");
         Assert.assertEquals(foreignTableColumns.get(1).getName(), "encounter_id");
@@ -83,7 +89,8 @@ public class Form2TableMetadataGeneratorTest {
         List<TableColumn> expectedTableData = form2TableMetadataGenerator.getColumns(form);
         assertTrue(expectedTableData.stream().map(TableColumn::getName).collect(Collectors.toList())
                 .containsAll(Arrays.asList("form_field_path", "patient_id", "encounter_id", "field1")));
-        final List<TableColumn> foreignTableColumns = expectedTableData.stream().filter(tableColumn -> tableColumn.getReference() != null).collect(Collectors.toList());
+        final List<TableColumn> foreignTableColumns = expectedTableData.stream()
+                .filter(tableColumn -> nonNull(tableColumn.getReference())).collect(Collectors.toList());
         Assert.assertEquals(foreignTableColumns.size(), 0);
 
     }

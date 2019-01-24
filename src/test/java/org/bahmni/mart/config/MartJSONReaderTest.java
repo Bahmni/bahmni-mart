@@ -47,7 +47,7 @@ public class MartJSONReaderTest {
     private JobDefinition groupedTypeJobDefintion;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
 
         JobDefinition jobDefinition = mock(JobDefinition.class);
         when(jobDefinition.getName()).thenReturn("Program Data");
@@ -171,7 +171,7 @@ public class MartJSONReaderTest {
     }
 
     @Test
-    public void shouldReadJSONForFirstTime() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldReadJSONForFirstTime() throws Exception {
         mockStatic(BatchUtils.class);
         String json = "{\n" +
                 "  \"jobs\": [\n" +

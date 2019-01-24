@@ -17,7 +17,7 @@ public class IncrementalUpdateConfigTest {
     }
 
     @Test
-    public void shouldReturnTrueIfAllFieldsArePresent() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldReturnTrueIfAllFieldsArePresent() throws Exception {
         setValuesForMemberFields(incrementalUpdateConfig, "updateOn", "update_on");
         setValuesForMemberFields(incrementalUpdateConfig, "eventCategory", "test");
         setValuesForMemberFields(incrementalUpdateConfig, "openmrsTableName", "table_name");
@@ -26,7 +26,7 @@ public class IncrementalUpdateConfigTest {
     }
 
     @Test
-    public void shouldReturnFalseIfUpdateOnIsNotPresent() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldReturnFalseIfUpdateOnIsNotPresent() throws Exception {
         setValuesForMemberFields(incrementalUpdateConfig, "eventCategory", "test");
         setValuesForMemberFields(incrementalUpdateConfig, "openmrsTableName", "table_name");
 
@@ -34,7 +34,7 @@ public class IncrementalUpdateConfigTest {
     }
 
     @Test
-    public void shouldReturnFalseIfEventCategoryIsNotPresent() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldReturnFalseIfEventCategoryIsNotPresent() throws Exception {
         setValuesForMemberFields(incrementalUpdateConfig, "updateOn", "update_on");
         setValuesForMemberFields(incrementalUpdateConfig, "openmrsTableName", "table_name");
 
@@ -42,7 +42,7 @@ public class IncrementalUpdateConfigTest {
     }
 
     @Test
-    public void shouldReturnFalseIfOpenmrsTableNameIsNotPresent() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldReturnFalseIfOpenmrsTableNameIsNotPresent() throws Exception {
         setValuesForMemberFields(incrementalUpdateConfig, "updateOn", "update_on");
         setValuesForMemberFields(incrementalUpdateConfig, "eventCategory", "test");
 

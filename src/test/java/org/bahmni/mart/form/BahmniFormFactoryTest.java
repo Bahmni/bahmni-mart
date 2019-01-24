@@ -57,7 +57,7 @@ public class BahmniFormFactoryTest {
     private String locale;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         locale = "locale";
 
         separateTableNames = Arrays.asList("Operation Notes Template",

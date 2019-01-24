@@ -63,7 +63,7 @@ public class OrderConceptUtilTest {
     private String locale;
 
     @Before
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+    public void setUp() throws Exception {
         orderConceptUtil = new OrderConceptUtil();
         locale = "locale";
         setValuesForMemberFields(orderConceptUtil, "conceptService", conceptService);
