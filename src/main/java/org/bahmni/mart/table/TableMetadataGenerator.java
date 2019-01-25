@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
+
 public abstract class TableMetadataGenerator implements TableMetadataGeneratorContract {
 
     protected Map<String, TableData> tableDataMap = new LinkedHashMap<>();
@@ -42,9 +44,9 @@ public abstract class TableMetadataGenerator implements TableMetadataGeneratorCo
         String formName = getProcessedName(form.getFormName().getName());
         if (tableData != null) {
             tableDataMap.remove(formName);
-            List<TableColumn> foreignKeyColumn = getForeignKeyColumn(form);
-            if (foreignKeyColumn != null && !tableData.getColumns().contains(foreignKeyColumn))
-                tableData.addAllColumns(foreignKeyColumn);
+            List<TableColumn> foreignKeyColumns = getForeignKeyColumns(form);
+            if (isNotEmpty(foreignKeyColumns) && !tableData.getColumns().containsAll(foreignKeyColumns))
+                tableData.addAllColumns(foreignKeyColumns);
         } else {
             tableData = new TableData(formName);
             tableData.addAllColumns(getColumns(form));
@@ -74,7 +76,7 @@ public abstract class TableMetadataGenerator implements TableMetadataGeneratorCo
         return columns;
     }
 
-    protected abstract List<TableColumn> getForeignKeyColumn(BahmniForm form);
+    protected abstract List<TableColumn> getForeignKeyColumns(BahmniForm form);
 
     protected abstract List<TableColumn> getColumns(BahmniForm form);
 }

@@ -3,7 +3,6 @@ package org.bahmni.mart;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -83,7 +82,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         batchConfiguration.setShouldRunBatchJob(false);
     }
 
-    @Ignore
     @Test
     @Sql(scripts = {"classpath:testDataSet/insertPatientDataWithDiagnoses.sql"},
             config = @SqlConfig(transactionManager = "customOpenmrsITContext"))
@@ -216,7 +214,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyRecords(procRecords);
     }
 
-    @Ignore
     @Test
     public void shouldUpdateEventRecordIdInMarkerTable() {
         String maxEventRecordId = getMaxEventRecordId();
@@ -230,7 +227,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals(3, healthEducationData.size());
     }
 
-    @Ignore
     @Test
     public void shouldApplyIncrementalUpdateForObsData() throws IOException {
         batchConfiguration.run();
