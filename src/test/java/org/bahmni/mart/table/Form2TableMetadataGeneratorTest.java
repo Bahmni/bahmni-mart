@@ -44,7 +44,7 @@ public class Form2TableMetadataGeneratorTest {
     }
 
     @Test
-    public void shouldCreateMetadataForChildFormsContainingForeignKey() {
+    public void shouldCreateMetadataForChildFormsContainingReferenceKey() {
         BahmniForm grandParentForm = new BahmniForm();
         grandParentForm.setFormName(createConcept("grand parent form"));
 
@@ -72,11 +72,6 @@ public class Form2TableMetadataGeneratorTest {
         List<String> actualColumns = actualTableData.getColumns().stream()
                 .map(TableColumn::getName).collect(Collectors.toList());
         assertTrue(actualColumns.containsAll(expectedColumns));
-        final List<TableColumn> foreignTableColumns = actualTableData.getColumns().stream()
-                .filter(tableColumn -> nonNull(tableColumn.getReference())).collect(Collectors.toList());
-        Assert.assertEquals(foreignTableColumns.size(), 2);
-        Assert.assertEquals(foreignTableColumns.get(0).getName(), "form_field_path_parent_name");
-        Assert.assertEquals(foreignTableColumns.get(1).getName(), "encounter_id");
     }
 
     @Test

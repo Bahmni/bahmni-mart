@@ -10,6 +10,7 @@ import static java.util.Objects.nonNull;
 public class TableData {
     private String name;
     private List<TableColumn> columns;
+    private List<TableColumn> primaryColumns;
 
     public TableData(String name) {
         this.name = name;

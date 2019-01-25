@@ -17,20 +17,7 @@ public class Form2TableMetadataGenerator extends TableMetadataGenerator {
 
     @Override
     protected List<TableColumn> getForeignKeyColumn(BahmniForm form) {
-        if (isNull(form.getParent())) {
-            return null;
-        }
-        Concept formParentConcept = form.getParent().getFormName();
-        String formParentConceptName = formParentConcept.getName();
-        String referenceTableName = getProcessedName(formParentConceptName);
-        referenceTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(referenceTableName);
-        String referenceColumn = "form_field_path";
-        ForeignKey reference = new ForeignKey(referenceColumn, referenceTableName);
-        return Arrays.asList(
-                new TableColumn(referenceColumn + "_" + referenceTableName,
-                        "text", false, reference),
-                new TableColumn("encounter_id", "integer", true,
-                        new ForeignKey("encounter_id", referenceTableName)));
+        return null;
     }
 
     @Override
@@ -45,21 +32,28 @@ public class Form2TableMetadataGenerator extends TableMetadataGenerator {
         columns.add(new TableColumn("location_name", "text", false, null));
         columns.add(new TableColumn("program_id", "integer", false, null));
         columns.add(new TableColumn("program_name", "text", false, null));
-        List<TableColumn> foreignKeyColumn = getForeignKeyColumn(form);
-        final boolean hasForeignKeyColumn = foreignKeyColumn != null;
-        if (hasForeignKeyColumn)
-            columns.addAll(foreignKeyColumn);
-        columns.addAll(getPrimaryColumns(hasForeignKeyColumn));
+        columns.add(new TableColumn("encounter_id", "integer", true, null));
+        if (!isNull(form.getParent())) {
+            final TableColumn referenceColumn = getParentReferenceColumn(form);
+            columns.add(referenceColumn);
+        }
+        columns.addAll(getPrimaryColumns());
         columns.addAll(getNonKeyColumns(form));
         return columns;
     }
 
-    private List<TableColumn> getPrimaryColumns(boolean hasForeignKeyColumn) {
+    private TableColumn getParentReferenceColumn(BahmniForm form) {
+        Concept formParentConcept = form.getParent().getFormName();
+        String formParentConceptName = formParentConcept.getName();
+        String referenceTableName = getProcessedName(formParentConceptName);
+        referenceTableName = SpecialCharacterResolver.getUpdatedTableNameIfExist(referenceTableName);
+        return new TableColumn("form_field_path_" + referenceTableName, "text", true, null);
+    }
+
+    private List<TableColumn> getPrimaryColumns() {
         TableColumn formFieldPathColumn = new TableColumn("form_field_path",
                 "text", true, null);
-        if (hasForeignKeyColumn)
             return Arrays.asList(formFieldPathColumn);
-        return Arrays.asList(formFieldPathColumn,
-                new TableColumn("encounter_id", "integer", true, null));
+
     }
 }
