@@ -14,7 +14,7 @@ import static java.util.Objects.isNull;
 public class Form2TableMetadataGenerator extends TableMetadataGenerator {
 
     @Override
-    protected List<TableColumn> getForeignKeyColumn(BahmniForm form) {
+    protected List<TableColumn> getForeignKeyColumns(BahmniForm form) {
         return null;
     }
 

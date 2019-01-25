@@ -30,7 +30,7 @@ public class FormTableMetadataGenerator extends TableMetadataGenerator {
         columns.add(new TableColumn("program_id", "integer", false, null));
         columns.add(new TableColumn("program_name", "text", false, null));
 
-        List<TableColumn> foreignKeyColumn = getForeignKeyColumn(form);
+        List<TableColumn> foreignKeyColumn = getForeignKeyColumns(form);
         if (foreignKeyColumn != null)
             columns.addAll(foreignKeyColumn);
         columns.addAll(getNonKeyColumns(form));
@@ -43,7 +43,7 @@ public class FormTableMetadataGenerator extends TableMetadataGenerator {
     }
 
     @Override
-    protected List<TableColumn> getForeignKeyColumn(BahmniForm form) {
+    protected List<TableColumn> getForeignKeyColumns(BahmniForm form) {
         if (form.getParent() == null) {
             return null;
         }
