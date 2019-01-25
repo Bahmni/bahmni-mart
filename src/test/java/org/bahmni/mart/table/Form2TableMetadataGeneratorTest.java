@@ -67,7 +67,7 @@ public class Form2TableMetadataGeneratorTest {
         assertTrue(form2TableMetadataGenerator.hasMetadataFor(child));
         TableData actualTableData = form2TableMetadataGenerator.getTableData(child);
         assertEquals("formname", actualTableData.getName());
-        List<String> expectedColumns = Arrays.asList("form_field_path", "form_field_path_parent_name",
+        List<String> expectedColumns = Arrays.asList("form_field_path", "reference_form_field_path",
                 "patient_id", "encounter_id", "field1");
         List<String> actualColumns = actualTableData.getColumns().stream()
                 .map(TableColumn::getName).collect(Collectors.toList());

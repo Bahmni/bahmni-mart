@@ -3,6 +3,7 @@ package org.bahmni.mart.table.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -10,11 +11,10 @@ import static java.util.Objects.nonNull;
 public class TableData {
     private String name;
     private List<TableColumn> columns;
-    private List<TableColumn> primaryColumns;
 
     public TableData(String name) {
         this.name = name;
-        this.columns = new ArrayList<TableColumn>();
+        this.columns = new ArrayList<>();
     }
 
     public TableData() {
@@ -31,6 +31,10 @@ public class TableData {
 
     public List<TableColumn> getColumns() {
         return columns;
+    }
+
+    public List<TableColumn> getPrimaryKeyColumns() {
+        return columns.stream().filter(TableColumn::isPrimaryKey).collect(Collectors.toList());
     }
 
     public void setColumns(List<TableColumn> columns) {
