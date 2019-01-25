@@ -4,14 +4,14 @@ public class Concept {
     private String name;
     //TODO: uuid can be removed
     private String uuid;
-    private String dataType;
+    private String datatype;
 
-    public String getDataType() {
-        return dataType;
+    public String getDatatype() {
+        return datatype;
     }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
+    public void setDatatype(String datatype) {
+        this.datatype = datatype;
     }
 
     public String getUuid() {

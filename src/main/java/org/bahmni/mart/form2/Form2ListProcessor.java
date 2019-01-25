@@ -65,7 +65,7 @@ public class Form2ListProcessor {
                 return null;
             concept = new Concept();
             concept.setName(conceptName);
-            concept.setDataType(form2Concept.getDataType());
+            concept.setDataType(form2Concept.getDatatype());
         } else {
             final ControlLabel controlLabel = control.getLabel();
             if (controlLabel != null) {
