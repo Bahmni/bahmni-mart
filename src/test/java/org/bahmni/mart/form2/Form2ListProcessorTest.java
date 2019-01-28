@@ -23,6 +23,7 @@ import java.util.Map;
 import static java.util.Collections.singletonList;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @PrepareForTest({JobDefinitionUtil.class})
@@ -44,6 +45,8 @@ public class Form2ListProcessorTest {
         form2ListProcessor = new Form2ListProcessor();
         allForms.put(COMPLEX_FORM, FORM_PATH);
         setValuesForMemberFields(form2ListProcessor, "form2MetadataReader", form2MetadataReader);
+        mockStatic(JobDefinitionUtil.class);
+        when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(true);
     }
 
     @Test
@@ -310,15 +313,40 @@ public class Form2ListProcessorTest {
                 .withControls(Arrays.asList(obsControl1, obsControl2))
                 .withPropertyAddMore(false)
                 .build();
-        when(jobDefinition.getColumnsToIgnore()).thenReturn(singletonList(obsConceptName2));
+        when(JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(singletonList(obsConceptName2));
         form2JsonMetadata.setControls(singletonList(sectionControl1));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final List<Concept> fields = allForms.get(0).getFields();
-        assertEquals(fields.size(), 1);
+        assertEquals(1, fields.size());
         assertEquals(fields.get(0).getName(), obsConceptName1);
+    }
+
+    @Test
+    public void shouldNotAddChildrenForAddMoreAndMultiSelectWhenEnableAddMoreAndMultiSelectIsFalse() {
+        String multiSelectConceptName = "multiSelectObsConcept";
+        Control multiSelectObsControl = new ControlBuilder()
+                .withPropertyMultiSelect(true)
+                .withConcept(multiSelectConceptName, "obs_concept_1").build();
+        String addMoreConceptName = "addMoreObsConcept";
+        Control addMoreObsControl = new ControlBuilder()
+                .withPropertyAddMore(true)
+                .withConcept(addMoreConceptName, "obs_concept_2").build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        form2JsonMetadata.setControls(Arrays.asList(multiSelectObsControl, addMoreObsControl));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
+
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        List<Concept> fields = allForms.get(0).getFields();
+        assertEquals(0, allForms.get(0).getChildren().size());
+        assertEquals(2, fields.size());
+        assertEquals(multiSelectConceptName, fields.get(0).getName());
+        assertEquals(addMoreConceptName, fields.get(1).getName());
     }
 }
