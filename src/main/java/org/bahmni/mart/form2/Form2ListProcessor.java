@@ -27,9 +27,12 @@ public class Form2ListProcessor {
 
     @Autowired
     private Form2MetadataReader form2MetadataReader;
+
     private List<String> ignoreConceptNames;
+    private JobDefinition jobDefinition;
 
     public List<BahmniForm> getAllForms(Map<String, String> allLatestFormPaths, JobDefinition jobDefinition) {
+        this.jobDefinition = jobDefinition;
         ignoreConceptNames = JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition);
         ArrayList<BahmniForm> allBahmniForms = allLatestFormPaths.keySet().stream().map(formName ->
                 getBahmniForm(formName, allLatestFormPaths.get(formName)))
@@ -113,6 +116,7 @@ public class Form2ListProcessor {
     }
 
     private boolean isNewFormRequiredByControl(ControlProperties properties) {
-        return properties.isAddMore() || properties.isMultiSelect();
+        return JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition) &&
+                (properties.isAddMore() || properties.isMultiSelect());
     }
 }

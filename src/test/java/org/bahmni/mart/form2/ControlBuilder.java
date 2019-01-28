@@ -27,9 +27,9 @@ public class ControlBuilder {
         return this;
     }
 
-    public Control withPropertyMultiSelect(boolean isMultiSelect) {
-        control.getProperties().setAddMore(isMultiSelect);
-        return control;
+    public ControlBuilder withPropertyMultiSelect(boolean isMultiSelect) {
+        control.getProperties().setMultiSelect(isMultiSelect);
+        return this;
     }
 
     public ControlBuilder withConcept(String name, String uuid) {
