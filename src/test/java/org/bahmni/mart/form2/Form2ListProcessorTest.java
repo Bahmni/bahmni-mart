@@ -207,6 +207,8 @@ public class Form2ListProcessorTest {
         assertEquals(sectionChildren.size(), 2);
         assertEquals(sectionChildren.get(0).getFormName().getName(), obsConceptName1);
         assertEquals(sectionChildren.get(1).getFormName().getName(), obsConceptName2);
+        assertEquals(2, sectionChildren.get(0).getDepthToParent());
+        assertEquals(2, sectionChildren.get(1).getDepthToParent());
     }
 
     @Test
@@ -238,6 +240,8 @@ public class Form2ListProcessorTest {
         assertEquals(bahmniFormChildren.size(), 2);
         assertEquals(bahmniFormChildren.get(0).getFormName().getName(), obsConceptName1);
         assertEquals(bahmniFormChildren.get(1).getFormName().getName(), obsConceptName2);
+        assertEquals(2, bahmniFormChildren.get(0).getDepthToParent());
+        assertEquals(2, bahmniFormChildren.get(1).getDepthToParent());
     }
 
     @Test
