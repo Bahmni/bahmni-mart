@@ -167,6 +167,8 @@ public class Form2ListProcessorTest {
         final List<BahmniForm> sectionChildren = bahmniFormChildren.get(0).getChildren();
         assertEquals(sectionChildren.size(), 1);
         assertEquals(sectionChildren.get(0).getFormName().getName(), obsConceptName);
+        assertEquals(1, sectionChildren.get(0).getFields().size());
+        assertEquals(obsConceptName, sectionChildren.get(0).getFields().get(0).getName());
     }
 
     @Test

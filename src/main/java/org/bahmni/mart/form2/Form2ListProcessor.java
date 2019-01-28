@@ -88,15 +88,17 @@ public class Form2ListProcessor {
             childBahmniForm.setParent(bahmniForm);
             childBahmniForm.setDepthToParent(depthToParent);
             bahmniForm.addChild(childBahmniForm);
-            if (isNotEmpty(control.getControls())) {
-                parseChildControls(control.getControls(), childBahmniForm, depthToParent);
-            }
+            processInnerControls(control, childBahmniForm, concept, depthToParent);
         } else {
-            if (isNotEmpty(control.getControls())) {
-                parseChildControls(control.getControls(), bahmniForm, depthToParent);
-            } else {
-                bahmniForm.addField(concept);
-            }
+            processInnerControls(control, bahmniForm, concept, depthToParent);
+        }
+    }
+
+    private void processInnerControls(Control control, BahmniForm bahmniForm, Concept concept, int depthToParent) {
+        if (isNotEmpty(control.getControls())) {
+            parseChildControls(control.getControls(), bahmniForm, depthToParent);
+        } else {
+            bahmniForm.addField(concept);
         }
     }
 
