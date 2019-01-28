@@ -85,9 +85,9 @@ public class Form2ListProcessor {
         if (isNull(concept)) {
             return;
         }
+        depthToParent++;
         if (isNewFormRequiredByControl(control.getProperties())) {
             BahmniForm childBahmniForm = createChildBahmniForm(concept);
-            depthToParent = depthToParent + 1;
             childBahmniForm.setParent(bahmniForm);
             childBahmniForm.setDepthToParent(depthToParent);
             bahmniForm.addChild(childBahmniForm);
