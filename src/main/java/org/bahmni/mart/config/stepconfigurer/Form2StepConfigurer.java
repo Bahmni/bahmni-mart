@@ -15,7 +15,7 @@ import java.util.Map;
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 
 @Component
-public class From2StepConfigurer extends StepConfigurer {
+public class Form2StepConfigurer extends StepConfigurer {
     private static final String TYPE = "form2obs";
 
     @Autowired
@@ -25,7 +25,7 @@ public class From2StepConfigurer extends StepConfigurer {
     protected Form2ListProcessor form2ListProcessor;
 
     @Autowired
-    public From2StepConfigurer(Form2TableMetadataGenerator formTableMetadataGenerator) {
+    public Form2StepConfigurer(Form2TableMetadataGenerator formTableMetadataGenerator) {
         super(formTableMetadataGenerator);
     }
 

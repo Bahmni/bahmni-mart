@@ -1,7 +1,7 @@
 package org.bahmni.mart.job;
 
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.config.stepconfigurer.From2StepConfigurer;
+import org.bahmni.mart.config.stepconfigurer.Form2StepConfigurer;
 import org.springframework.batch.core.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class Form2ObsJobStrategy extends StepRegister implements JobStrategy  {
 
-    private final From2StepConfigurer form2StepConfigurer;
+    private final Form2StepConfigurer form2StepConfigurer;
 
     @Autowired
-    public Form2ObsJobStrategy(From2StepConfigurer formStepConfigurer) {
+    public Form2ObsJobStrategy(Form2StepConfigurer formStepConfigurer) {
         this.form2StepConfigurer = formStepConfigurer;
     }
 
