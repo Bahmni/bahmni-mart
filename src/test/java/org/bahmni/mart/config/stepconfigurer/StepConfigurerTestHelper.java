@@ -2,7 +2,7 @@ package org.bahmni.mart.config.stepconfigurer;
 
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.exports.ObservationExportStep;
+import org.bahmni.mart.exports.Form1ObservationExportStep;
 import org.bahmni.mart.form.FormListProcessor;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.service.ConceptService;
@@ -25,7 +25,7 @@ public class StepConfigurerTestHelper {
     protected FormListProcessor formListProcessor;
 
     @Mock
-    protected ObjectFactory<ObservationExportStep> observationExportStepFactory;
+    protected ObjectFactory<Form1ObservationExportStep> observationExportStepFactory;
 
     @Mock
     protected ConceptService conceptService;
