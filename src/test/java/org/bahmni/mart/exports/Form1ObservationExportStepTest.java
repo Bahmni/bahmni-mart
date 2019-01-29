@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 @PrepareForTest({BatchUtils.class, JobDefinitionUtil.class})
 @RunWith(PowerMockRunner.class)
-public class ObservationExportStepTest {
+public class Form1ObservationExportStepTest {
 
     @Mock
     private DataSource dataSource;
@@ -62,24 +62,24 @@ public class ObservationExportStepTest {
     @Mock
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
-    private ObservationExportStep observationExportStep;
+    private Form1ObservationExportStep form1ObservationExportStep;
     private static final String JOB_NAME = "job Name";
 
     @Before
     public void setUp() throws Exception {
-        observationExportStep = new ObservationExportStep();
-        observationExportStep.setJobDefinition(jobDefinition);
+        form1ObservationExportStep = new Form1ObservationExportStep();
+        form1ObservationExportStep.setJobDefinition(jobDefinition);
 
         PowerMockito.mockStatic(BatchUtils.class);
-        setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(form1ObservationExportStep,
                 "dataSource", dataSource);
-        setValuesForMemberFields(observationExportStep, "stepBuilderFactory", stepBuilderFactory);
-        setValuesForMemberFields(observationExportStep, "freeMarkerEvaluator", freeMarkerEvaluator);
-        setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(form1ObservationExportStep, "stepBuilderFactory", stepBuilderFactory);
+        setValuesForMemberFields(form1ObservationExportStep, "freeMarkerEvaluator", freeMarkerEvaluator);
+        setValuesForMemberFields(form1ObservationExportStep,
                 "observationProcessorFactory", observationProcessorFactory);
-        setValuesForMemberFields(observationExportStep,
+        setValuesForMemberFields(form1ObservationExportStep,
                 "databaseObsWriterObjectFactory", obsWriterObjectFactory);
-        setValuesForMemberFields(observationExportStep, "obsIncrementalUpdater", obsIncrementalUpdater);
+        setValuesForMemberFields(form1ObservationExportStep, "obsIncrementalUpdater", obsIncrementalUpdater);
         BatchUtils.stepNumber = 0;
         when(obsIncrementalUpdater.isMetaDataChanged(any(), anyString())).thenReturn(true);
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
@@ -95,11 +95,11 @@ public class ObservationExportStepTest {
                 "InTheFormNameMoreThanHundredCharacterInTheFormName";
         when(formName.getName()).thenReturn("Form").thenReturn(formWithLenthyName);
 
-        observationExportStep.setForm(form);
+        form1ObservationExportStep.setForm(form);
 
-        String stepName = observationExportStep.getStepName("Insertion Step");
+        String stepName = form1ObservationExportStep.getStepName("Insertion Step");
         assertEquals("Insertion Step-1 Form", stepName);
-        stepName = observationExportStep.getStepName("Insertion Step");
+        stepName = form1ObservationExportStep.getStepName("Insertion Step");
         assertEquals("Insertion Step-2 " +
                 "moreThanHundredCharacterInTheFormNameMoreThanHundredCharacterInTheFormNameMoreThanH", stepName);
 
@@ -112,7 +112,7 @@ public class ObservationExportStepTest {
         StepBuilder stepBuilder = mock(StepBuilder.class);
         BahmniForm form = mock(BahmniForm.class);
         Concept formNameConcept = mock(Concept.class);
-        observationExportStep.setForm(form);
+        form1ObservationExportStep.setForm(form);
         SimpleStepBuilder simpleStepBuilder = mock(SimpleStepBuilder.class);
 
         when(form.getFormName()).thenReturn(formNameConcept);
@@ -130,7 +130,7 @@ public class ObservationExportStepTest {
         PowerMockito.mockStatic(JobDefinitionUtil.class);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(any(JobDefinition.class))).thenReturn(true);
 
-        Step observationExportStepStep = observationExportStep.getStep();
+        Step observationExportStepStep = form1ObservationExportStep.getStep();
 
         assertNotNull(observationExportStepStep);
         assertEquals(expectedBaseExportStep, observationExportStepStep);
@@ -141,10 +141,10 @@ public class ObservationExportStepTest {
         String formName = "FormOne";
         BahmniForm form = mock(BahmniForm.class);
         setUpStepConfig(formName, form);
-        observationExportStep.setJobDefinition(jobDefinition);
+        form1ObservationExportStep.setJobDefinition(jobDefinition);
         when(obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME)).thenReturn(false);
 
-        observationExportStep.getStep();
+        form1ObservationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Insertion Step-1 " + formName);
         verify(obsIncrementalUpdater).isMetaDataChanged(formName, JOB_NAME);
@@ -159,7 +159,7 @@ public class ObservationExportStepTest {
         setUpStepConfig(formName, form);
         when(obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME)).thenReturn(true);
 
-        observationExportStep.getStep();
+        form1ObservationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Insertion Step-1 " + formName);
         verify(jobDefinition).getName();
@@ -170,7 +170,7 @@ public class ObservationExportStepTest {
     private void setUpStepConfig(String formName, BahmniForm form) {
         StepBuilder stepBuilder = mock(StepBuilder.class);
         Concept formNameConcept = mock(Concept.class);
-        observationExportStep.setForm(form);
+        form1ObservationExportStep.setForm(form);
         SimpleStepBuilder simpleStepBuilder = mock(SimpleStepBuilder.class);
 
         when(form.getFormName()).thenReturn(formNameConcept);

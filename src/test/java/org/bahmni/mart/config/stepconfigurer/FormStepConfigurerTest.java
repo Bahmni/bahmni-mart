@@ -2,7 +2,7 @@ package org.bahmni.mart.config.stepconfigurer;
 
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.exports.ObservationExportStep;
+import org.bahmni.mart.exports.Form1ObservationExportStep;
 import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
 import org.bahmni.mart.form.domain.BahmniForm;
@@ -49,10 +49,10 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     private FlowBuilder<FlowJobBuilder> completeDataExport;
 
     @Mock
-    private ObservationExportStep fstgObservationExportStep;
+    private Form1ObservationExportStep fstgForm1ObservationExportStep;
 
     @Mock
-    private ObservationExportStep medicalHistoryObservationExportStep;
+    private Form1ObservationExportStep medicalHistoryForm1ObservationExportStep;
 
     @Mock
     private Step medicalHistoryStep;
@@ -123,10 +123,10 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 
         verify(observationExportStepFactory, times(2)).getObject();
-        verify(medicalHistoryObservationExportStep, times(1)).setForm(bahmniForms.get(BAHMNI_FORM));
-        verify(fstgObservationExportStep, times(1)).setForm(bahmniForms.get(FSTG_FORM));
-        verify(medicalHistoryObservationExportStep, times(1)).getStep();
-        verify(fstgObservationExportStep, times(1)).getStep();
+        verify(medicalHistoryForm1ObservationExportStep, times(1)).setForm(bahmniForms.get(BAHMNI_FORM));
+        verify(fstgForm1ObservationExportStep, times(1)).setForm(bahmniForms.get(FSTG_FORM));
+        verify(medicalHistoryForm1ObservationExportStep, times(1)).getStep();
+        verify(fstgForm1ObservationExportStep, times(1)).getStep();
         verify(completeDataExport, times(1)).next(medicalHistoryStep);
         verify(completeDataExport, times(1)).next(fstgStep);
     }
@@ -146,10 +146,10 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
 
         verify(observationExportStepFactory, times(2)).getObject();
-        verify(medicalHistoryObservationExportStep, times(1)).setForm(bahmniForms.get(BAHMNI_FORM));
-        verify(fstgObservationExportStep, times(1)).setForm(bahmniForms.get(FSTG_FORM));
-        verify(medicalHistoryObservationExportStep, times(1)).getStep();
-        verify(fstgObservationExportStep, times(1)).getStep();
+        verify(medicalHistoryForm1ObservationExportStep, times(1)).setForm(bahmniForms.get(BAHMNI_FORM));
+        verify(fstgForm1ObservationExportStep, times(1)).setForm(bahmniForms.get(FSTG_FORM));
+        verify(medicalHistoryForm1ObservationExportStep, times(1)).getStep();
+        verify(fstgForm1ObservationExportStep, times(1)).getStep();
         verify(completeDataExport, times(1)).next(medicalHistoryStep);
         verify(completeDataExport, times(1)).next(fstgStep);
         verify(formTableMetadataGenerator, times(1)).getTableData(bahmniForms.get(BAHMNI_FORM));
@@ -202,10 +202,10 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         bahmniForms.add(fstg);
 
         when(formListProcessor.retrieveAllForms(any(), any())).thenReturn(bahmniForms);
-        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryObservationExportStep)
-                .thenReturn(fstgObservationExportStep);
-        when(medicalHistoryObservationExportStep.getStep()).thenReturn(medicalHistoryStep);
-        when(fstgObservationExportStep.getStep()).thenReturn(fstgStep);
+        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryForm1ObservationExportStep)
+                .thenReturn(fstgForm1ObservationExportStep);
+        when(medicalHistoryForm1ObservationExportStep.getStep()).thenReturn(medicalHistoryStep);
+        when(fstgForm1ObservationExportStep.getStep()).thenReturn(fstgStep);
     }
 
     private void verifyNoPrimaryOrForeignKeyConstraints(List<TableData> tableDataList) {

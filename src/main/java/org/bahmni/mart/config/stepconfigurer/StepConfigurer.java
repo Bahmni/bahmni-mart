@@ -2,7 +2,7 @@ package org.bahmni.mart.config.stepconfigurer;
 
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.exports.ObservationExportStep;
+import org.bahmni.mart.exports.Form1ObservationExportStep;
 import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
 import org.bahmni.mart.form.domain.BahmniForm;
@@ -27,7 +27,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     protected TableGeneratorStep tableGeneratorStep;
 
     @Autowired
-    protected ObjectFactory<ObservationExportStep> observationExportStepFactory;
+    protected ObjectFactory<Form1ObservationExportStep> observationExportStepFactory;
 
     @Autowired
     protected JobDefinitionReader jobDefinitionReader;
@@ -60,7 +60,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     @Override
     public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition) {
         for (BahmniForm form : allForms) {
-            ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
+            Form1ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
             observationExportStep.setJobDefinition(jobDefinition);
             observationExportStep.setForm(form);
             TableData tableData = formTableMetadataGenerator.getTableData(form);
@@ -73,7 +73,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     }
 
     private void addSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition,
-                          ObservationExportStep observationExportStep, TableData tableData) {
+                          Form1ObservationExportStep observationExportStep, TableData tableData) {
         if (nonNull(tableData) && isMetadataSame(jobDefinition, tableData))
             completeDataExport.next(observationExportStep.getRemovalStep());
         completeDataExport.next(observationExportStep.getStep());
