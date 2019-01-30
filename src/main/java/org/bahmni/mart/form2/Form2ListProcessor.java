@@ -89,12 +89,17 @@ public class Form2ListProcessor {
         if (isNewFormRequiredByControl(control.getProperties())) {
             BahmniForm childBahmniForm = createChildBahmniForm(concept);
             childBahmniForm.setParent(bahmniForm);
+            childBahmniForm.setRootForm(getRootForm(bahmniForm));
             childBahmniForm.setDepthToParent(depthToParent);
             bahmniForm.addChild(childBahmniForm);
             processInnerControls(control, childBahmniForm, concept, depthToParent);
         } else {
             processInnerControls(control, bahmniForm, concept, depthToParent);
         }
+    }
+
+    private BahmniForm getRootForm(BahmniForm bahmniForm) {
+        return bahmniForm.getDepthToParent() == 0 ? bahmniForm : bahmniForm.getRootForm();
     }
 
     private void processInnerControls(Control control, BahmniForm bahmniForm, Concept concept, int depthToParent) {

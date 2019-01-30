@@ -23,6 +23,7 @@ import java.util.Map;
 import static java.util.Collections.singletonList;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -198,17 +199,21 @@ public class Form2ListProcessorTest {
         assertEquals(allForms.size(), 1);
         final BahmniForm bahmniForm = allForms.get(0);
         assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
+        assertNull(bahmniForm.getRootForm());
         final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
         assertEquals(bahmniForm.getFields().size(), 0);
         assertEquals(bahmniFormChildren.size(), 1);
         assertEquals(bahmniFormChildren.get(0).getFormName().getName(), "Section");
         assertEquals(bahmniFormChildren.get(0).getFields().size(), 0);
+        assertEquals(bahmniForm, bahmniFormChildren.get(0).getRootForm());
         final List<BahmniForm> sectionChildren = bahmniFormChildren.get(0).getChildren();
         assertEquals(sectionChildren.size(), 2);
         assertEquals(sectionChildren.get(0).getFormName().getName(), obsConceptName1);
         assertEquals(sectionChildren.get(1).getFormName().getName(), obsConceptName2);
         assertEquals(2, sectionChildren.get(0).getDepthToParent());
         assertEquals(2, sectionChildren.get(1).getDepthToParent());
+        assertEquals(bahmniForm, sectionChildren.get(0).getRootForm());
+        assertEquals(bahmniForm, sectionChildren.get(1).getRootForm());
     }
 
     @Test
