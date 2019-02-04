@@ -14,6 +14,8 @@ public class Obs {
     private String locationName;
     private String programId;
     private String programName;
+    private String formFieldPath;
+    private String referenceFormFieldPath;
 
     public Obs() {
     }
@@ -128,5 +130,21 @@ public class Obs {
 
     public void setProgramName(String programName) {
         this.programName = programName;
+    }
+
+    public String getFormFieldPath() {
+        return formFieldPath;
+    }
+
+    public void setFormFieldPath(String formFieldPath) {
+        this.formFieldPath = formFieldPath;
+    }
+
+    public String getReferenceFormFieldPath() {
+        return referenceFormFieldPath;
+    }
+
+    public void setReferenceFormFieldPath(String referenceFormFieldPath) {
+        this.referenceFormFieldPath = referenceFormFieldPath;
     }
 }
