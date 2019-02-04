@@ -13,6 +13,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.bahmni.mart.BatchUtils.constructSqlWithParameter;
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
@@ -101,5 +103,22 @@ public class BatchUtilsTest {
 
         assertEquals("Select * from table where column = 'value'",
                 constructSqlWithParameter(sql, "parameter", "value"));
+    }
+
+    @Test
+    public void shouldReplaceParameterWithBooleanValue() {
+        String sql = "SELECT * FROM table WHERE column IS :parameter";
+
+        assertEquals("SELECT * FROM table WHERE column IS true",
+                constructSqlWithParameter(sql, "parameter", true));
+    }
+
+    @Test
+    public void shouldReplaceParameterWithListOfStringValues() {
+        String sql = "SELECT * FROM table WHERE column IN (:parameter)";
+
+        List<String> values = Arrays.asList("value1", "value2");
+        assertEquals("SELECT * FROM table WHERE column IN ('value1', 'value2')",
+                constructSqlWithParameter(sql, "parameter", values));
     }
 }

@@ -6,6 +6,8 @@ import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BatchUtils {
 
@@ -37,6 +39,17 @@ public class BatchUtils {
 
     public static String constructSqlWithParameter(String sql, String parameter, String value) {
         return sql.replaceAll(String.format(":%s", parameter), String.format("'%s'", value));
+    }
+
+    public static String constructSqlWithParameter(String sql, String parameter, boolean value) {
+        return sql.replaceAll(String.format(":%s", parameter), String.format("%s", value));
+    }
+
+    public static String constructSqlWithParameter(String sql, String parameter, List<String> values) {
+        String joinedValues = values.stream()
+                .map(value -> String.format("'%s'", value))
+                .collect(Collectors.joining(", "));
+        return sql.replaceAll(String.format(":%s", parameter), String.format("%s", joinedValues));
     }
 
     private static String getStringForPsql(String value) {
