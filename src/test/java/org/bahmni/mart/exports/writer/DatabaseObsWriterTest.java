@@ -1,5 +1,6 @@
 package org.bahmni.mart.exports.writer;
 
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.ObsRecordExtractorForTable;
 import org.bahmni.mart.exports.updatestrategy.ObsIncrementalUpdateStrategy;
 import org.bahmni.mart.form.domain.BahmniForm;
@@ -42,6 +43,9 @@ public class DatabaseObsWriterTest {
     @Mock
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
+    @Mock
+    private JobDefinition jobDefinition;
+
     @Before
     public void setUp() throws Exception {
         databaseObsWriter = new DatabaseObsWriter();
@@ -82,6 +86,7 @@ public class DatabaseObsWriterTest {
         items.add(obsList);
 
         databaseObsWriter.setForm(bahmniForm);
+        databaseObsWriter.setJobDefinition(jobDefinition);
         when(formTableMetadataGenerator.getTableData(bahmniForm)).thenReturn(new TableData("test"));
         when(freeMarkerEvaluatorForTableRecords.evaluate(anyString(), any(ObsRecordExtractorForTable.class)))
                 .thenReturn("some sql");

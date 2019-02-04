@@ -162,6 +162,10 @@ public class ObsRecordExtractorForTable {
               return obs.getProgramId();
           case "program_name":
               return obs.getProgramName();
+          case "form_field_path":
+              return obs.getFormFieldPath();
+          case "reference_form_field_path":
+              return obs.getReferenceFormFieldPath();
           default:
               return null;
         }
