@@ -1,18 +1,18 @@
-SELECT o.encounter_id                                           AS encounterId,
-       o.person_id                                              AS patientId,
-       o.concept_id                                             AS conceptId,
-       o.obs_id                                                 AS id,
+SELECT o.encounter_id                                                                  AS encounterId,
+       o.person_id                                                                     AS patientId,
+       o.concept_id                                                                    AS conceptId,
+       o.obs_id                                                                        AS id,
        COALESCE(DATE_FORMAT(o.value_datetime, '%d/%b/%Y %T'), o.value_numeric, o.value_text,
                 vcc.code, value_concept_locale.name, cvn.concept_full_name,
-                cvn.concept_short_name)                         AS value,
-       COALESCE(locale_obs_con.name, obs_con.concept_full_name) AS conceptName,
-       o.obs_datetime                                           AS obsDateTime,
-       o.date_created                                           AS dateCreated,
-       o.location_id                                            AS locationId,
-       l.name                                                   AS locationName,
-       p.program_id                                             AS programId,
-       p.name                                                   AS programName,
-       o.form_namespace_and_path                                AS formFieldPath
+                cvn.concept_short_name)                                                AS value,
+       COALESCE(locale_obs_con.name, obs_con.concept_full_name)                        AS conceptName,
+       o.obs_datetime                                                                  AS obsDateTime,
+       o.date_created                                                                  AS dateCreated,
+       o.location_id                                                                   AS locationId,
+       l.name                                                                          AS locationName,
+       p.program_id                                                                    AS programId,
+       p.name                                                                          AS programName,
+       SUBSTRING(o.form_namespace_and_path, INSTR(o.form_namespace_and_path, '^') + 1) AS formFieldPath
 FROM obs o
        JOIN concept_view obs_con ON o.form_namespace_and_path LIKE CONCAT('%', :formName, '%') AND voided IS :voided
                                       AND o.concept_id =
