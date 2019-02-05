@@ -358,4 +358,29 @@ public class Form2ListProcessorTest {
         assertEquals(multiSelectConceptName, fields.get(0).getName());
         assertEquals(addMoreConceptName, fields.get(1).getName());
     }
+
+    @Test
+    public void shouldSetIsSectionToTrueWhenControlIsASection() {
+        final String obsConceptName1 = "ObsConcept1";
+        final String obsConceptName2 = "ObsConcept2";
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        Control obsControl1 = new ControlBuilder()
+                .withPropertyAddMore(false)
+                .withConcept(obsConceptName1, "obs_concept_1").build();
+        Control sectionControl1 = new ControlBuilder()
+                .withLabel("Section")
+                .withType("Section")
+                .withControls(Arrays.asList(obsControl1))
+                .withPropertyAddMore(true)
+                .build();
+
+        form2JsonMetadata.setControls(singletonList(sectionControl1));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        assertEquals(true, allForms.get(0).getChildren().get(0).getFormName().isSection());
+    }
+
 }

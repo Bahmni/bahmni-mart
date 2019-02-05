@@ -7,6 +7,7 @@ public class Control {
     private Concept concept;
     private ControlLabel label;
     private List<Control> controls;
+    private String type;
 
     public ControlLabel getLabel() {
         return label;
@@ -38,5 +39,13 @@ public class Control {
 
     public void setConcept(Concept concept) {
         this.concept = concept;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
