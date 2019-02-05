@@ -137,23 +137,4 @@ public class FormTableMetadataGeneratorTest {
 
         assertEquals(expected, actual);
     }
-
-    @Test
-    public void shouldReturnTableWithNameAppendedWithRootFormNameWhenFormIsSection() {
-
-        final Concept formName1 = new Concept(111, "formName", 0);
-        final BahmniForm form = new BahmniForm();
-        form.setFormName(formName1);
-
-        BahmniForm sectionForm = new BahmniForm();
-        final Concept sectionFormName = new Concept(123, "sectionName", 1);
-        sectionFormName.setIsSection(true);
-
-        sectionForm.setRootForm(form);
-        sectionForm.setFormName(sectionFormName);
-
-        formTableMetadataGenerator.addMetadataForForm(sectionForm);
-        TableData tableData = formTableMetadataGenerator.getTableDataList().get(0);
-        assertEquals("formname_sectionname",tableData.getName());
-    }
 }

@@ -362,7 +362,6 @@ public class Form2ListProcessorTest {
     @Test
     public void shouldSetIsSectionToTrueWhenControlIsASection() {
         final String obsConceptName1 = "ObsConcept1";
-        final String obsConceptName2 = "ObsConcept2";
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
         Control obsControl1 = new ControlBuilder()
                 .withPropertyAddMore(false)
@@ -380,7 +379,7 @@ public class Form2ListProcessorTest {
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
         assertEquals(1, allForms.size());
-        assertEquals(true, allForms.get(0).getChildren().get(0).getFormName().isSection());
+        assertEquals(COMPLEX_FORM  + " Section", allForms.get(0).getChildren().get(0).getFormName().getName());
     }
 
 }

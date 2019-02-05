@@ -58,7 +58,7 @@ public class Form2ListProcessor {
         return concept;
     }
 
-    private Concept createConcept(Control control) {
+    private Concept createConcept(Control control, String rootformName) {
         String conceptName = "";
         Concept concept = null;
         final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
@@ -78,12 +78,12 @@ public class Form2ListProcessor {
             }
         }
         if (control.getType() != null && control.getType().toLowerCase().equals("section"))
-            concept.setIsSection(true);
+            concept.setName(rootformName + " " + concept.getName());
         return concept;
     }
 
     private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent) {
-        Concept concept = createConcept(control);
+        Concept concept = createConcept(control, getRootForm(bahmniForm).getFormName().getName());
         if (isNull(concept)) {
             return;
         }
