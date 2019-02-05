@@ -108,6 +108,21 @@
       ]
     },
     {
+      "name": "Form2 Obs Data",
+      "type": "form2obs",
+      "incrementalUpdateConfig": {
+        "updateOn": "encounter_id",
+        "eventCategory": "Encounter",
+        "openmrsTableName": "encounter"
+      },
+      "separateTableConfig": {
+        "enableForAddMoreAndMultiSelect": true,
+        "separateTables": []
+      },
+      "conceptReferenceSource": "",
+      "columnsToIgnore": []
+    },
+    {
       "name": "Bacteriology Data",
       "conceptReferenceSource": "",
       "type": "bacteriology",

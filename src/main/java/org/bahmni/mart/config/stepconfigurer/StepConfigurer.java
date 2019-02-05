@@ -3,6 +3,8 @@ package org.bahmni.mart.config.stepconfigurer;
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.exports.Form1ObservationExportStep;
+import org.bahmni.mart.exports.Form2ObservationExportStep;
+import org.bahmni.mart.exports.ObservationExportStep;
 import org.bahmni.mart.exports.updatestrategy.IncrementalStrategyContext;
 import org.bahmni.mart.exports.updatestrategy.IncrementalUpdateStrategy;
 import org.bahmni.mart.form.domain.BahmniForm;
@@ -23,11 +25,16 @@ import static org.bahmni.mart.config.job.JobDefinitionUtil.isAddMoreMultiSelectE
 
 public abstract class StepConfigurer implements StepConfigurerContract {
 
+    private static final String JOB_TYPE = "form2obs";
+
     @Autowired
     protected TableGeneratorStep tableGeneratorStep;
 
     @Autowired
-    protected ObjectFactory<Form1ObservationExportStep> observationExportStepFactory;
+    protected ObjectFactory<Form1ObservationExportStep> form1ObservationExportStepObjectFactory;
+
+    @Autowired
+    protected ObjectFactory<Form2ObservationExportStep> form2ObservationExportStepObjectFactory;
 
     @Autowired
     protected JobDefinitionReader jobDefinitionReader;
@@ -65,7 +72,9 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     @Override
     public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition) {
         for (BahmniForm form : allForms) {
-            Form1ObservationExportStep observationExportStep = observationExportStepFactory.getObject();
+            ObservationExportStep observationExportStep = JOB_TYPE.equals(jobDefinition.getType()) ?
+                    form2ObservationExportStepObjectFactory.getObject() :
+                    form1ObservationExportStepObjectFactory.getObject();
             observationExportStep.setJobDefinition(jobDefinition);
             observationExportStep.setForm(form);
             TableData tableData = formTableMetadataGenerator.getTableData(form);
@@ -74,7 +83,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     }
 
     private void addSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition,
-                          Form1ObservationExportStep observationExportStep, TableData tableData) {
+                          ObservationExportStep observationExportStep, TableData tableData) {
         if (nonNull(tableData) && isMetadataSame(jobDefinition, tableData))
             completeDataExport.next(observationExportStep.getRemovalStep());
         completeDataExport.next(observationExportStep.getStep());

@@ -24,19 +24,19 @@ public class Form2ObservationProcessor implements ItemProcessor<Map<String, Obje
     @Override
     public List<Obs> process(Map<String, Object> item) {
         Obs obs = new Obs();
-        obs.setEncounterId((String) item.get("encounterId"));
-        obs.setPatientId((String) item.get("patientId"));
+        obs.setEncounterId(String.valueOf(item.get("encounterId")));
+        obs.setPatientId(String.valueOf(item.get("patientId")));
         obs.setId((Integer) item.get("id"));
         Concept concept = new Concept();
         concept.setId((Integer) item.get("conceptId"));
         concept.setName((String) item.get("conceptName"));
         obs.setField(concept);
         obs.setValue((String) item.get("value"));
-        obs.setObsDateTime((String) item.get("obsDateTime"));
-        obs.setDateCreated((String) item.get("dateCreated"));
-        obs.setLocationId((String) item.get("locationId"));
+        obs.setObsDateTime(String.valueOf(item.get("obsDateTime")));
+        obs.setDateCreated(String.valueOf(item.get("dateCreated")));
+        obs.setLocationId(String.valueOf(item.get("locationId")));
         obs.setLocationName((String) item.get("locationName"));
-        obs.setProgramId((String) item.get("programId"));
+        obs.setProgramId(String.valueOf(item.get("programId")));
         obs.setProgramName((String) item.get("programName"));
         String formFieldPath = (String) item.get("formFieldPath");
         setFormFieldPath(obs, formFieldPath);

@@ -398,3 +398,41 @@ INSERT INTO orders (order_id, order_type_id, concept_id, orderer, encounter_id, 
 INSERT INTO event_records ( uuid, title, timestamp, uri, object, category, date_created, tags) VALUES ( '72b6fbd8-5afa-41b7-82f1-8219f04ef975', 'Encounter', '2018-07-19 17:05:27', null, '/openmrs/ws/rest/v1/bahmnicore/bahmniencounter/c0046218-263a-4f63-aa49-8d9f37b111c4?includeAll=true', 'Encounter', '2018-07-19 17:05:27', 'Encounter');
 
 -- End of test data for Orders test data
+
+-- Form builder forms test data
+
+INSERT INTO concept VALUES
+(27, 0, null, null, null, 3, 11, 0, 1, '2016-03-07 12:10:33', null, 1, '2016-03-07 12:10:33',
+  null, null, null, '7e2bdbd0-e42f-11e5-8c3e-08002715d519'),
+(2186, 0, null, null, null, 1, 5, 0, 8, '2017-06-09 09:18:09', null, 8, '2017-06-09 09:18:09',
+  null, null, null,'9b95ce36-c39f-4372-826d-7cdb7cc99a1d'),
+(3498, 0, null, null, null, 2, 11, 0, 8, '2017-11-17 09:21:14', null, 8, '2017-11-17 09:21:14',
+  null, null, null,'f952b0f7-b7e7-46ae-b71c-26dfc7f343d7'),
+(3408, 0, null, null, null, 4, 11, 0, 8, '2017-11-17 09:21:04', null, 8, '2017-11-17 09:21:04',
+  null, null, null, '9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1'),
+(3409, 0, null, null, null, 4, 11, 0, 8, '2017-11-17 09:21:04', null, 8, '2017-11-17 09:21:04',
+  null, null, null, 'a7411c07-b028-4b51-8f39-703c3ce849cf'),
+(3410, 0, null, null, null, 4, 11, 0, 8, '2017-11-17 09:21:04', null, 8, '2017-11-17 09:21:04',
+  null, null, null, '339e2f8c-d52f-402a-a4ea-f6946d481e0b');
+
+INSERT INTO concept_name VALUES
+(69, 27, 'Disposition Note', 'en', 1, 1, '2016-03-07 12:10:33', 'FULLY_SPECIFIED', 0, null, null,
+  null, '7e2be2cd-e42f-11e5-8c3e-08002715d519', null, null),
+(3144, 2186, 'WWN, Systolic blood pressure', 'en', 1, 8, '2017-06-09 09:18:09', 'FULLY_SPECIFIED', 0,
+  null, null, null, '39da68f4-fe6e-440d-83d8-1a7701ed17fe', null, null),
+(5465, 3498, 'HI, Penicillin', 'en', 1, 8, '2017-11-17 09:21:14', 'FULLY_SPECIFIED', 0,
+  null, null, null, '2a0eeeb2-ac4f-46f6-ade2-80d5558a80f7', null, null),
+(5295, 3408, 'Susceptible', 'en', 1, 8, '2017-11-17 09:21:04', 'FULLY_SPECIFIED', 0,
+  null, null, null, 'b522c92d-2e5e-4047-997e-5ef608cc9317', null, null),
+(5296, 3409, 'Resistant', 'en', 1, 8, '2017-11-17 09:21:04', 'FULLY_SPECIFIED', 0,
+  null, null, null, '55ac3508-a9e2-4d72-9652-8b1d387dabeb', null, null),
+(5297, 3410, 'Intermediate', 'en', 1, 8, '2017-11-17 09:21:04', 'FULLY_SPECIFIED', 0,
+  null, null, null, 'a7b6b0bd-60aa-4118-a580-bf18a0cefcc9', null, null);
+
+
+INSERT INTO form(form_id, name, version, published, creator, date_created, changed_by, date_changed, retired, uuid)
+VALUES
+(78, 'FormBuilderForm', 2, 1, 8, '2019-02-05 10:59:14', 8,
+'2019-02-05 10:59:17', 0,'0a15ea90-a310-43db-a55b-e80b75423bb8')
+
+-- End of form builder forms test data
