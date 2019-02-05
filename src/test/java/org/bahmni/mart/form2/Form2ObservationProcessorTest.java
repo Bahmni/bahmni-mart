@@ -103,6 +103,24 @@ public class Form2ObservationProcessorTest {
         assertEquals("FormOne.1/3-0", obs.getReferenceFormFieldPath());
     }
 
+    @Test
+    public void shouldReturnObsWithParentFormFieldPathAndReferenceFormFieldPathWhenFormIsMultiSelect() {
+        BahmniForm form = mock(BahmniForm.class);
+        BahmniForm parentForm = mock(BahmniForm.class);
+        when(parentForm.getDepthToParent()).thenReturn(1);
+        when(form.getParent()).thenReturn(parentForm);
+        when(form.getDepthToParent()).thenReturn(4);
+        form2ObservationProcessor.setForm(form);
+        Map<String, Object> obsRow = getObsRow();
+
+        List<Obs> obsList = form2ObservationProcessor.process(obsRow);
+
+        assertEquals(1, obsList.size());
+        Obs obs = obsList.get(0);
+        assertEquals("FormOne.1/3-0/7-0/2-1/100-0", obs.getFormFieldPath());
+        assertEquals("FormOne.1/3-0", obs.getReferenceFormFieldPath());
+    }
+
     private Map<String, Object> getObsRow() {
         Map<String, Object> obsRow = new HashMap<>();
         obsRow.put("encounterId", "abc123");
