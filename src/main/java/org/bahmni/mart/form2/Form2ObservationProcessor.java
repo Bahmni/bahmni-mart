@@ -71,7 +71,7 @@ public class Form2ObservationProcessor implements ItemProcessor<Map<String, Obje
             slashIndex = formFieldPath.indexOf(SLASH, slashIndex + 1);
             slashCount++;
         }
-        return slashIndex;
+        return slashIndex == -1 ? formFieldPath.length() : slashIndex;
     }
 
     public void setForm(BahmniForm form) {
