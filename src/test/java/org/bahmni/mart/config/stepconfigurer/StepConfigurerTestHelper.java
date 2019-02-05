@@ -42,7 +42,7 @@ public class StepConfigurerTestHelper {
     protected void setUp(StepConfigurer classInstance) throws Exception {
         setValuesForSuperSuperClassMemberFields(classInstance, "tableGeneratorStep", tableGeneratorStep);
         setValuesForSuperSuperClassMemberFields(classInstance,
-                "observationExportStepFactory", observationExportStepFactory);
+                "form1ObservationExportStepObjectFactory", observationExportStepFactory);
         setValuesForSuperClassMemberFields(classInstance, "formListProcessor", formListProcessor);
         setValuesForSuperSuperClassMemberFields(classInstance, "jobDefinitionReader", jobDefinitionReader);
         setValuesForSuperSuperClassMemberFields(classInstance, "conceptService", conceptService);

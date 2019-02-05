@@ -791,5 +791,57 @@ create table event_records
 		unique (id)
 );
 
+DROP TABLE IF EXISTS form CASCADE;
+create table form
+(
+	form_id int auto_increment
+		primary key,
+	name varchar(255) default '' not null,
+	version varchar(50) default '' not null,
+	build int null,
+	published tinyint(1) default '0' not null,
+	xslt text null,
+	template text null,
+	description text null,
+	encounter_type int null,
+	creator int default '0' not null,
+	date_created datetime not null,
+	changed_by int null,
+	date_changed datetime null,
+	retired tinyint(1) default '0' not null,
+	retired_by int null,
+	date_retired datetime null,
+	retired_reason varchar(255) null,
+	uuid char(38) not null,
+	constraint form_uuid_index
+		unique (uuid)
+);
+
+
+DROP TABLE IF EXISTS form_resource CASCADE;
+create table form_resource
+(
+	form_resource_id int auto_increment
+		primary key,
+	form_id int not null,
+	name varchar(255) not null,
+	value_reference text not null,
+	datatype varchar(255) null,
+	datatype_config text null,
+	preferred_handler varchar(255) null,
+	handler_config text null,
+	uuid char(38) not null,
+	date_changed datetime null,
+	changed_by int null,
+	constraint unique_form_and_name
+		unique (form_id, name),
+	constraint uuid
+		unique (uuid),
+	constraint form_resource_changed_by
+		foreign key (changed_by) references users (user_id),
+	constraint form_resource_form_fk
+		foreign key (form_id) references form (form_id)
+);
+
 SET FOREIGN_KEY_CHECKS=1;
 
