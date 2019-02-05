@@ -41,7 +41,10 @@ public abstract class TableMetadataGenerator implements TableMetadataGeneratorCo
 
     public void addMetadataForForm(BahmniForm form) {
         TableData tableData = getTableData(form);
-        String formName = getProcessedName(form.getFormName().getName());
+        String getInitialFormName = form.getFormName().getName();
+        if(form.getFormName().isSection())
+            getInitialFormName = form.getRootForm().getFormName().getName() +" " + getInitialFormName;
+        String formName = getProcessedName(getInitialFormName);
         if (tableData != null) {
             tableDataMap.remove(formName);
             List<TableColumn> foreignKeyColumns = getForeignKeyColumns(form);

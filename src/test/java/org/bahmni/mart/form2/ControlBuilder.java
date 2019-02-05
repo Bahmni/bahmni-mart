@@ -48,4 +48,9 @@ public class ControlBuilder {
     public Control build() {
         return control;
     }
+
+    public ControlBuilder withType(String section) {
+       control.setType("Section");
+       return this;
+    }
 }
