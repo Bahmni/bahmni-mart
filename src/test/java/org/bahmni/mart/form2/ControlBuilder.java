@@ -50,7 +50,7 @@ public class ControlBuilder {
     }
 
     public ControlBuilder withType(String section) {
-       control.setType("Section");
-       return this;
+        control.setType("Section");
+        return this;
     }
 }

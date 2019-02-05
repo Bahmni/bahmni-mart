@@ -77,7 +77,7 @@ public class Form2ListProcessor {
                 concept.setName(conceptName);
             }
         }
-        if(control.getType()!=null && control.getType().toLowerCase().equals("section"))
+        if (control.getType() != null && control.getType().toLowerCase().equals("section"))
             concept.setIsSection(true);
         return concept;
     }
