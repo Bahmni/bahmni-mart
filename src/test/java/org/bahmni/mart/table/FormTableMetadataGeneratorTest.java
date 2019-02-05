@@ -154,6 +154,6 @@ public class FormTableMetadataGeneratorTest {
 
         formTableMetadataGenerator.addMetadataForForm(sectionForm);
         TableData tableData = formTableMetadataGenerator.getTableDataList().get(0);
-        assertEquals("formname_sectionname",tableData.getName() );
+        assertEquals("formname_sectionname",tableData.getName());
     }
 }
