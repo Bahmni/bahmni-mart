@@ -114,14 +114,14 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
 
     @Test
     public void shouldCreateTablesAndInsertDataForForm2Obs() throws IOException {
-        String sql = String.format("INSERT INTO test_openmrs.form_resource (form_resource_id, form_id, name, " +
+        String sql = String.format("INSERT INTO form_resource (form_resource_id, form_id, name, " +
                 "value_reference, datatype, uuid) VALUES " +
-                "(77, 78, 'FormOne', '%s', 'org.bahmni.customdatatype.datatype.FileSystemStorageDatatype', " +
+                "(77, 78, 'FormBuilderForm', '%s', 'org.bahmni.customdatatype.datatype.FileSystemStorageDatatype', " +
                 "'3f480fe5-da11-4c08-afad-5dc440515167')",
                 System.getProperty("user.dir") + "/src/test/resources/form2MetadataJson/FormBuilderForm_1.json");
 
-        openmrsJdbcTemplate.execute(getSqlFromResource("testDataSet/Form2ObsData.sql"));
         openmrsJdbcTemplate.execute(sql);
+        openmrsJdbcTemplate.execute(getSqlFromResource("testDataSet/Form2ObsData.sql"));
 
         batchConfiguration.run();
 
