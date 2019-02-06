@@ -1,5 +1,5 @@
 -- One Patient Data
-INSERT INTO test_openmrs.obs VALUES
+INSERT INTO obs VALUES
 (1236492,125,2186,58639,null,'2019-02-05 11:02:16',9,null,null,null,null,null,null,null,4,null,null,null,null,8,
 '2019-02-05 11:02:16',0,null,null,null,'a5714d67-b655-4dc8-9f56-87b1dfac1ba6',null,'Bahmni^FormBuilderForm.1/1-0','FINAL',null),
 (1236493,125,27,58639,null,'2019-02-05 11:02:16',9,null,null,null,null,null,null,null,null,null,'Notes 1',null,null,8,
