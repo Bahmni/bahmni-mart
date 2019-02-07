@@ -29,6 +29,7 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberField
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getJobDefinitionByType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
@@ -114,6 +115,51 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     }
 
     @Test
+    public void shouldDropConstraintsWhenIsAddMoreMultiSelectEnabledIsFalse() {
+        ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
+        setUpBahmniFormsAndSteps(bahmniForms);
+        when(JobDefinitionUtil.getJobDefinitionByType(any(), any())).thenReturn(jobDefinition);
+        List<TableData> tableDataList = getTableData();
+        when(formTableMetadataGenerator.getTableData(bahmniForms.get(BAHMNI_FORM)))
+                .thenReturn(tableDataList.get(BAHMNI_FORM));
+        when(formTableMetadataGenerator.getTableData(bahmniForms.get(FSTG_FORM)))
+                .thenReturn(tableDataList.get(FSTG_FORM));
+        when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(false);
+
+        formStepConfigurer.generateTableData(jobDefinition);
+
+        verifyNoPrimaryOrForeignKeyConstraints(tableDataList);
+    }
+
+    @Test
+    public void shouldNotDropConstraintsWhenIsAddMoreMultiSelectEnabledIsTrue() {
+        ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
+        BahmniForm medicalHistoryForm = new BahmniForm();
+        bahmniForms.add(medicalHistoryForm);
+        when(formListProcessor.retrieveAllForms(any(), any())).thenReturn(bahmniForms);
+        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryObservationExportStep);
+        when(medicalHistoryObservationExportStep.getStep()).thenReturn(medicalHistoryStep);
+        when(JobDefinitionUtil.getJobDefinitionByType(any(), any())).thenReturn(jobDefinition);
+        String medicalHistoryFormName = "medical_history";
+        String medicalHistoryPrimaryKey = "id_medical_history";
+        TableData medicalHistoryTableData = new TableData(medicalHistoryFormName);
+        TableColumn idMedicalHistory = new TableColumn(medicalHistoryPrimaryKey, "int", true, null);
+        TableColumn someColumnInMedicalHistory = new TableColumn("some column", "int", false, null);
+        medicalHistoryTableData.setColumns(Arrays.asList(idMedicalHistory, someColumnInMedicalHistory));
+        List<TableData> tableDataList = Arrays.asList(medicalHistoryTableData);
+        when(formTableMetadataGenerator.getTableData(bahmniForms.get(BAHMNI_FORM)))
+                .thenReturn(tableDataList.get(BAHMNI_FORM));
+        when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(true);
+
+        formStepConfigurer.generateTableData(jobDefinition);
+        tableDataList.forEach(tableData -> tableData.getColumns().forEach(tableColumn -> {
+            if ("id_medical_history".equals(tableColumn.getName())) {
+                assertTrue(tableColumn.isPrimaryKey());
+            }
+        }));
+    }
+
+    @Test
     public void shouldRegisterObservationStepsForTwoForms() throws Exception {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
@@ -155,7 +201,6 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         verify(completeDataExport, times(1)).next(fstgStep);
         verify(formTableMetadataGenerator, times(1)).getTableData(bahmniForms.get(BAHMNI_FORM));
         verify(formTableMetadataGenerator, times(1)).getTableData(bahmniForms.get(FSTG_FORM));
-        verifyNoPrimaryOrForeignKeyConstraints(tableDataList);
     }
 
     @Test

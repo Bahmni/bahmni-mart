@@ -50,6 +50,11 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     public void generateTableData(JobDefinition jobDefinition) {
         allForms = getAllForms();
         allForms.forEach(formTableMetadataGenerator::addMetadataForForm);
+        allForms.forEach(form -> {
+            if (!isAddMoreMultiSelectEnabled(jobDefinition)) {
+                revokeConstraints(formTableMetadataGenerator.getTableData(form));
+            }
+        });
     }
 
     @Override
@@ -65,10 +70,6 @@ public abstract class StepConfigurer implements StepConfigurerContract {
             observationExportStep.setForm(form);
             TableData tableData = formTableMetadataGenerator.getTableData(form);
             addSteps(completeDataExport, jobDefinition, observationExportStep, tableData);
-
-            if (!isAddMoreMultiSelectEnabled(jobDefinition)) {
-                revokeConstraints(tableData);
-            }
         }
     }
 
