@@ -16,6 +16,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,8 +246,8 @@ public class Form2ListProcessorTest {
         assertEquals(bahmniFormChildren.size(), 2);
         assertEquals(bahmniFormChildren.get(0).getFormName().getName(), obsConceptName1);
         assertEquals(bahmniFormChildren.get(1).getFormName().getName(), obsConceptName2);
-        assertEquals(2, bahmniFormChildren.get(0).getDepthToParent());
-        assertEquals(2, bahmniFormChildren.get(1).getDepthToParent());
+        assertEquals(1, bahmniFormChildren.get(0).getDepthToParent());
+        assertEquals(1, bahmniFormChildren.get(1).getDepthToParent());
     }
 
     @Test
@@ -380,6 +381,60 @@ public class Form2ListProcessorTest {
 
         assertEquals(1, allForms.size());
         assertEquals(COMPLEX_FORM  + " Section", allForms.get(0).getChildren().get(0).getFormName().getName());
+    }
+
+    @Test
+    public void shouldReturnBahmniFormHavingSectionWith2NestedSectionsAndTheFirstInnerSectionIsAddMoreWithObs() {
+        final String obsConceptName1 = "ObsConcept1";
+        final String obsConceptName2 = "ObsConcept2";
+        final String obsConceptName3 = "ObsConcept3";
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        Control obsControl1 = new ControlBuilder()
+                .withConcept(obsConceptName1, "obs_concept_1").build();
+        Control obsControl2 = new ControlBuilder()
+                .withConcept(obsConceptName2, "obs_concept_2").build();
+        Control obsControl3 = new ControlBuilder()
+                .withConcept(obsConceptName3, "obs_concept_3").build();
+        Control mostInnerSectionControl = new ControlBuilder()
+                .withLabel("Section11")
+                .withControls(Collections.singletonList(obsControl3))
+                .withPropertyAddMore(true)
+                .build();
+        Control innerSectionControl = new ControlBuilder()
+                .withLabel("Section1")
+                .withControls(Arrays.asList(obsControl2, mostInnerSectionControl))
+                .withPropertyAddMore(false)
+                .build();
+        Control sectionControl = new ControlBuilder()
+                .withLabel("Section")
+                .withControls(Arrays.asList(obsControl1, innerSectionControl))
+                .withPropertyAddMore(true)
+                .build();
+        form2JsonMetadata.setControls(singletonList(sectionControl));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(allForms.size(), 1);
+        final BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
+        assertNull(bahmniForm.getRootForm());
+        assertEquals(0, bahmniForm.getFields().size());
+        final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
+        assertEquals(1, bahmniFormChildren.size());
+        BahmniForm sectionForm = bahmniFormChildren.get(0);
+        assertEquals("Section", sectionForm.getFormName().getName());
+        assertEquals(1, sectionForm.getDepthToParent());
+        List<Concept> sectionFormFields = sectionForm.getFields();
+        assertEquals(2, sectionFormFields.size());
+        assertEquals(obsConceptName1, sectionFormFields.get(0).getName());
+        assertEquals(obsConceptName2, sectionFormFields.get(1).getName());
+        assertEquals(1, sectionForm.getChildren().size());
+        BahmniForm mostInnerSectionForm = sectionForm.getChildren().get(0);
+        assertEquals("Section11", mostInnerSectionForm.getFormName().getName());
+        assertEquals(3, mostInnerSectionForm.getDepthToParent());
+        assertEquals(1, mostInnerSectionForm.getFields().size());
+        assertEquals(obsConceptName3, mostInnerSectionForm.getFields().get(0).getName());
     }
 
 }

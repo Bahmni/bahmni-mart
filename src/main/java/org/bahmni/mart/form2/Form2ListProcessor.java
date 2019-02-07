@@ -47,7 +47,7 @@ public class Form2ListProcessor {
         bahmniForm.setDepthToParent(0);
         Form2JsonMetadata form2JsonMetadata = form2MetadataReader.read(formJsonPath);
         form2JsonMetadata.getControls().forEach(control -> {
-            parseControl(control, bahmniForm, 0);
+            parseControl(control, bahmniForm, 0, false);
         });
         return bahmniForm;
     }
@@ -82,21 +82,26 @@ public class Form2ListProcessor {
         return concept;
     }
 
-    private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent) {
+    private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent, boolean isParentAddMore) {
         Concept concept = createConcept(control, getRootForm(bahmniForm).getFormName().getName());
         if (isNull(concept)) {
             return;
         }
-        depthToParent++;
+        if (isParentAddMore) {
+            depthToParent++;
+        }
         if (isNewFormRequiredByControl(control.getProperties())) {
             BahmniForm childBahmniForm = createChildBahmniForm(concept);
             childBahmniForm.setParent(bahmniForm);
             childBahmniForm.setRootForm(getRootForm(bahmniForm));
+            if (!isParentAddMore) {
+                depthToParent++;
+            }
             childBahmniForm.setDepthToParent(depthToParent);
             bahmniForm.addChild(childBahmniForm);
-            processInnerControls(control, childBahmniForm, concept, depthToParent);
+            processInnerControls(control, childBahmniForm, concept, depthToParent, true);
         } else {
-            processInnerControls(control, bahmniForm, concept, depthToParent);
+            processInnerControls(control, bahmniForm, concept, depthToParent, isParentAddMore);
         }
     }
 
@@ -104,16 +109,18 @@ public class Form2ListProcessor {
         return bahmniForm.getDepthToParent() == 0 ? bahmniForm : bahmniForm.getRootForm();
     }
 
-    private void processInnerControls(Control control, BahmniForm bahmniForm, Concept concept, int depthToParent) {
+    private void processInnerControls(Control control, BahmniForm bahmniForm, Concept concept, int depthToParent,
+                                      boolean isParentAddMore) {
         if (isNotEmpty(control.getControls())) {
-            parseChildControls(control.getControls(), bahmniForm, depthToParent);
+            parseChildControls(control.getControls(), bahmniForm, depthToParent, isParentAddMore);
         } else {
             bahmniForm.addField(concept);
         }
     }
 
-    private void parseChildControls(List<Control> controls, BahmniForm bahmniForm, int depthToParent) {
-        controls.forEach(childControl -> parseControl(childControl, bahmniForm, depthToParent));
+    private void parseChildControls(List<Control> controls, BahmniForm bahmniForm, int depthToParent,
+                                    boolean isParentAddMore) {
+        controls.forEach(childControl -> parseControl(childControl, bahmniForm, depthToParent, isParentAddMore));
     }
 
     private BahmniForm createChildBahmniForm(Concept concept) {
