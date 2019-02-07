@@ -136,8 +136,8 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
         BahmniForm medicalHistoryForm = new BahmniForm();
         bahmniForms.add(medicalHistoryForm);
         when(formListProcessor.retrieveAllForms(any(), any())).thenReturn(bahmniForms);
-        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryObservationExportStep);
-        when(medicalHistoryObservationExportStep.getStep()).thenReturn(medicalHistoryStep);
+        when(observationExportStepFactory.getObject()).thenReturn(medicalHistoryForm1ObservationExportStep);
+        when(medicalHistoryForm1ObservationExportStep.getStep()).thenReturn(medicalHistoryStep);
         when(JobDefinitionUtil.getJobDefinitionByType(any(), any())).thenReturn(jobDefinition);
         String medicalHistoryFormName = "medical_history";
         String medicalHistoryPrimaryKey = "id_medical_history";
