@@ -467,4 +467,27 @@ public class Form2ListProcessorTest {
         assertEquals(1, multiSelectForm.getFields().size());
         assertEquals(0, multiSelectForm.getChildren().size());
     }
+
+    @Test
+    public void shouldNotAddTextFieldsInTheFormWhenIgnoreAllFreeTextConceptsSetToTrueInTheJob() {
+        String obsConceptName1 = "ObsConcept1";
+        String obsConceptName2 = "ObsConcept2";
+        Control obsControl1 = new ControlBuilder()
+                .withConcept(obsConceptName1, "obs_concept_1").build();
+        obsControl1.getConcept().setDatatype("Text");
+        Control obsControl2 = new ControlBuilder()
+                .withConcept(obsConceptName2, "obs_concept_2").build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        form2JsonMetadata.setControls(new ArrayList<>(Arrays.asList(obsControl1, obsControl2)));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(true);
+
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        BahmniForm bahmniForm = allForms.get(0);
+        List<Concept> fields = bahmniForm.getFields();
+        assertEquals(1, fields.size());
+        assertEquals(obsConceptName2, fields.get(0).getName());
+    }
 }

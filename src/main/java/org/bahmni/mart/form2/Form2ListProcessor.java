@@ -25,11 +25,12 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 @Component
 public class Form2ListProcessor {
 
-    @Autowired
-    private Form2MetadataReader form2MetadataReader;
-
+    private static final String TEXT_DATATYPE = "Text";
     private List<String> ignoreConceptNames;
     private JobDefinition jobDefinition;
+
+    @Autowired
+    private Form2MetadataReader form2MetadataReader;
 
     public List<BahmniForm> getAllForms(Map<String, String> allLatestFormPaths, JobDefinition jobDefinition) {
         this.jobDefinition = jobDefinition;
@@ -115,6 +116,9 @@ public class Form2ListProcessor {
         if (isNotEmpty(control.getControls())) {
             parseChildControls(control.getControls(), bahmniForm, depthToParent, isParentAddMore);
         } else {
+            if (jobDefinition.getIgnoreAllFreeTextConcepts() && TEXT_DATATYPE.equals(concept.getDataType())) {
+                return;
+            }
             bahmniForm.addField(concept);
         }
     }
