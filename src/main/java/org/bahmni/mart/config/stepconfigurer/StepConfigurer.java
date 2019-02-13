@@ -58,7 +58,7 @@ public abstract class StepConfigurer implements StepConfigurerContract {
         allForms = getAllForms();
         allForms.forEach(formTableMetadataGenerator::addMetadataForForm);
         allForms.forEach(form -> {
-            if (!isAddMoreMultiSelectEnabled(jobDefinition)) {
+            if (!isAddMoreMultiSelectEnabled(jobDefinition) || form.isMultiSelect()) {
                 revokeConstraints(formTableMetadataGenerator.getTableData(form));
             }
         });

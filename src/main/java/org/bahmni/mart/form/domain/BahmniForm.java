@@ -11,6 +11,7 @@ public class BahmniForm {
     private int depthToParent;
     private List<Concept> fields = new ArrayList<>();
     private boolean isNonConceptForm = false;
+    private boolean isMultiSelect = false;
 
     public List<BahmniForm> getChildren() {
         return children;
@@ -62,5 +63,13 @@ public class BahmniForm {
 
     public void setNonConceptForm(boolean nonConceptForm) {
         isNonConceptForm = nonConceptForm;
+    }
+
+    public boolean isMultiSelect() {
+        return isMultiSelect;
+    }
+
+    public void setIsMultiSelect(boolean multiSelect) {
+        this.isMultiSelect = multiSelect;
     }
 }

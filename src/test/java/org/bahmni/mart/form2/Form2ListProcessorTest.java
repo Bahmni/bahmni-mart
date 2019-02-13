@@ -24,7 +24,9 @@ import java.util.Map;
 import static java.util.Collections.singletonList;
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -437,4 +439,32 @@ public class Form2ListProcessorTest {
         assertEquals(obsConceptName3, mostInnerSectionForm.getFields().get(0).getName());
     }
 
+    @Test
+    public void shouldGetTheBahmniFormWithChildBahmniFormWhenFormHasObsControlWithMultiSelect() {
+        String obsConceptName1 = "ObsConcept1";
+        String obsConceptName2 = "ObsConcept2";
+        Control obsControl1 = new ControlBuilder()
+                .withPropertyMultiSelect(true)
+                .withConcept(obsConceptName1, "obs_concept_1").build();
+        Control obsControl2 = new ControlBuilder()
+                .withConcept(obsConceptName2, "obs_concept_2").build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        form2JsonMetadata.setControls(new ArrayList<>(Arrays.asList(obsControl1, obsControl2)));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(1, bahmniForm.getFields().size());
+        assertFalse(bahmniForm.isMultiSelect());
+        assertEquals(obsConceptName2, bahmniForm.getFields().get(0).getName());
+        List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
+        assertEquals(1, bahmniFormChildren.size());
+        BahmniForm multiSelectForm = bahmniFormChildren.get(0);
+        assertTrue(multiSelectForm.isMultiSelect());
+        assertEquals(obsConceptName1, multiSelectForm.getFormName().getName());
+        assertEquals(1, multiSelectForm.getFields().size());
+        assertEquals(0, multiSelectForm.getChildren().size());
+    }
 }

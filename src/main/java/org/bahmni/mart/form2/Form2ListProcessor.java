@@ -94,6 +94,7 @@ public class Form2ListProcessor {
             BahmniForm childBahmniForm = createChildBahmniForm(concept);
             childBahmniForm.setParent(bahmniForm);
             childBahmniForm.setRootForm(getRootForm(bahmniForm));
+            childBahmniForm.setIsMultiSelect(control.getProperties().isMultiSelect());
             if (!isParentAddMore) {
                 depthToParent++;
             }

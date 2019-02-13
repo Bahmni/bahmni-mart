@@ -56,7 +56,7 @@ public class DatabaseObsWriter extends BaseWriter implements ItemWriter<List<Obs
 
     private void insertForm2Records(List<? extends List<Obs>> items) {
         TableData tableData = form2TableMetadataGenerator.getTableData(form);
-        List<? extends List<Obs>> groupedItems = groupForm2Obs(items);
+        List<? extends List<Obs>> groupedItems = form.isMultiSelect() ? items : groupForm2Obs(items);
         insertRecords(groupedItems, tableData);
     }
 

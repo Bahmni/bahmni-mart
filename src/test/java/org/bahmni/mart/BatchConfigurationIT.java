@@ -151,23 +151,22 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals("FormBuilderForm.1/2-0", String.valueOf(sectionRecordTwo.get("form_field_path")));
         assertEquals("FormBuilderForm", String.valueOf(sectionRecordTwo.get("reference_form_field_path")));
 
-        //TODO: Fix Multi Select primary key generation while creating table to allow inserting multi select data
-//        assertEquals(3, multiSelectRecords.size());
-//        Map<String, Object> multiSelectRecordOne = multiSelectRecords.get(0);
-//        Map<String, Object> multiSelectRecordTwo = multiSelectRecords.get(1);
-//        Map<String, Object> multiSelectRecordThree = multiSelectRecords.get(1);
-//
-//        assertTrue(Arrays.asList("Susceptible", "Resistant", "Intermediate").containsAll(Arrays.asList(
-//                String.valueOf(multiSelectRecordOne.get("hi_penicillin")),
-//                String.valueOf(multiSelectRecordTwo.get("hi_penicillin")),
-//                String.valueOf(multiSelectRecordThree.get("hi_penicillin")))));
-//        assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordOne.get("form_field_path")));
-//        assertEquals("FormBuilderForm.1/2-0", String.valueOf(multiSelectRecordOne.get("reference_form_field_path")));
-//        assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordTwo.get("form_field_path")));
-//        assertEquals("FormBuilderForm.1/2-0", String.valueOf(multiSelectRecordTwo.get("reference_form_field_path")));
-//        assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordThree.get("form_field_path")));
-//        assertEquals("FormBuilderForm.1/2-0",
-//                String.valueOf(multiSelectRecordThree.get("reference_form_field_path")));
+        assertEquals(3, multiSelectRecords.size());
+        Map<String, Object> multiSelectRecordOne = multiSelectRecords.get(0);
+        Map<String, Object> multiSelectRecordTwo = multiSelectRecords.get(1);
+        Map<String, Object> multiSelectRecordThree = multiSelectRecords.get(2);
+
+        assertTrue(Arrays.asList("Susceptible", "Resistant", "Intermediate").containsAll(Arrays.asList(
+                String.valueOf(multiSelectRecordOne.get("hi_penicillin")),
+                String.valueOf(multiSelectRecordTwo.get("hi_penicillin")),
+                String.valueOf(multiSelectRecordThree.get("hi_penicillin")))));
+        assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordOne.get("form_field_path")));
+        assertEquals("FormBuilderForm.1/2-0", String.valueOf(multiSelectRecordOne.get("reference_form_field_path")));
+        assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordTwo.get("form_field_path")));
+        assertEquals("FormBuilderForm.1/2-0", String.valueOf(multiSelectRecordTwo.get("reference_form_field_path")));
+        assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordThree.get("form_field_path")));
+        assertEquals("FormBuilderForm.1/2-0",
+                String.valueOf(multiSelectRecordThree.get("reference_form_field_path")));
     }
 
     @Test
