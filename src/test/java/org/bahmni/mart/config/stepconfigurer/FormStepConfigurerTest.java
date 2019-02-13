@@ -34,9 +34,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
@@ -162,6 +164,9 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     public void shouldRegisterObservationStepsForTwoForms() throws Exception {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
+        Concept concept = mock(Concept.class);
+        bahmniForms.get(0).addField(concept);
+        bahmniForms.get(1).addField(concept);
         setValuesForSuperSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
 
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(true);
@@ -178,9 +183,31 @@ public class FormStepConfigurerTest extends StepConfigurerTestHelper {
     }
 
     @Test
+    public void shouldNotRegisterObservationStepsForTwoFormsWhichAreNotHavingAnyFields() throws Exception {
+        ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
+        setUpBahmniFormsAndSteps(bahmniForms);
+
+        setValuesForSuperSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
+        when(jobDefinition.getType()).thenReturn("form2obs");
+
+        formStepConfigurer.registerSteps(completeDataExport, jobDefinition);
+
+        verify(observationExportStepFactory, never()).getObject();
+        verify(medicalHistoryForm1ObservationExportStep, never()).setForm(bahmniForms.get(BAHMNI_FORM));
+        verify(fstgForm1ObservationExportStep, never()).setForm(bahmniForms.get(FSTG_FORM));
+        verify(medicalHistoryForm1ObservationExportStep, never()).getStep();
+        verify(fstgForm1ObservationExportStep, never()).getStep();
+        verify(completeDataExport, never()).next(medicalHistoryStep);
+        verify(completeDataExport, never()).next(fstgStep);
+    }
+
+    @Test
     public void shouldRegisterObservationStepsForTwoFormsAndPrimaryForeignKeyConstraintsAreRevoked() throws Exception {
         ArrayList<BahmniForm> bahmniForms = new ArrayList<>();
         setUpBahmniFormsAndSteps(bahmniForms);
+        Concept concept = mock(Concept.class);
+        bahmniForms.get(0).addField(concept);
+        bahmniForms.get(1).addField(concept);
         setValuesForSuperSuperClassMemberFields(formStepConfigurer, "allForms", bahmniForms);
         List<TableData> tableDataList = getTableData();
         when(formTableMetadataGenerator.getTableData(bahmniForms.get(BAHMNI_FORM)))

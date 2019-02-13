@@ -72,7 +72,11 @@ public abstract class StepConfigurer implements StepConfigurerContract {
     @Override
     public void registerSteps(FlowBuilder<FlowJobBuilder> completeDataExport, JobDefinition jobDefinition) {
         for (BahmniForm form : allForms) {
-            ObservationExportStep observationExportStep = JOB_TYPE.equals(jobDefinition.getType()) ?
+            boolean isForm2ObsJob = JOB_TYPE.equals(jobDefinition.getType());
+            if (form.getFields().isEmpty() && isForm2ObsJob) {
+                continue;
+            }
+            ObservationExportStep observationExportStep = isForm2ObsJob ?
                     form2ObservationExportStepObjectFactory.getObject() :
                     form1ObservationExportStepObjectFactory.getObject();
             observationExportStep.setJobDefinition(jobDefinition);
