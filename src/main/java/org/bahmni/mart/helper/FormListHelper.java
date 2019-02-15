@@ -19,6 +19,13 @@ public class FormListHelper {
                 .collect(Collectors.toList());
     }
 
+    public static List<BahmniForm> filterFormsWithOutDuplicateConceptsAtAnyLevel(List<BahmniForm> bahmniForms) {
+        return bahmniForms.stream()
+                .filter(bahmniForm -> !hasDuplicateConcepts(bahmniForm,
+                        new HashSet<>(), bahmniForm.getFormName().getName()))
+                .collect(Collectors.toList());
+    }
+
     private static boolean hasDuplicateConcepts(BahmniForm bahmniForm) {
         if (bahmniForm != null) {
             Set<String> concepts = new HashSet<>();
@@ -28,6 +35,22 @@ public class FormListHelper {
                             bahmniForm.getFormName().getName(), concept.getName()));
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasDuplicateConcepts(BahmniForm bahmniForm, Set<String> concepts, String rootFormName) {
+        for (Concept concept : bahmniForm.getFields()) {
+            if (!concepts.add(concept.getName())) {
+                logger.warn(String.format("Skipping the form '%s' since it has duplicate concepts '%s'",
+                        rootFormName, concept.getName()));
+                return true;
+            }
+        }
+        for (BahmniForm childForm : bahmniForm.getChildren()) {
+            if (hasDuplicateConcepts(childForm, concepts, rootFormName)) {
+                return true;
             }
         }
         return false;
