@@ -19,11 +19,16 @@ public class FormListHelper {
                 .collect(Collectors.toList());
     }
 
-    public static List<BahmniForm> filterFormsWithOutDuplicateConceptsAtAnyLevel(List<BahmniForm> bahmniForms) {
+    public static List<BahmniForm> filterFormsWithOutDuplicateSectionsAndConcepts(List<BahmniForm> bahmniForms) {
         return bahmniForms.stream()
-                .filter(bahmniForm -> !hasDuplicateConcepts(bahmniForm,
-                        new HashSet<>(), bahmniForm.getFormName().getName()))
+                .filter(bahmniForm -> !hasDuplicateSectionsOrConcepts(bahmniForm))
                 .collect(Collectors.toList());
+    }
+
+    private static boolean hasDuplicateSectionsOrConcepts(BahmniForm bahmniForm) {
+        String rootFormName = bahmniForm.getFormName().getName();
+        return hasDuplicateSections(bahmniForm, new HashSet<>(), rootFormName) ||
+                hasDuplicateConcepts(bahmniForm, new HashSet<>(), rootFormName);
     }
 
     private static boolean hasDuplicateConcepts(BahmniForm bahmniForm) {
@@ -50,6 +55,20 @@ public class FormListHelper {
         }
         for (BahmniForm childForm : bahmniForm.getChildren()) {
             if (hasDuplicateConcepts(childForm, concepts, rootFormName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasDuplicateSections(BahmniForm bahmniForm, Set<String> formNames, String rootFormName) {
+        for (BahmniForm form : bahmniForm.getChildren()) {
+            if (!formNames.add(form.getFormName().getName())) {
+                logger.warn(String.format("Skipping the form '%s' since it has duplicate sections '%s'",
+                        rootFormName, form.getFormName().getName()));
+                return true;
+            }
+            if (hasDuplicateSections(form, formNames, rootFormName)) {
                 return true;
             }
         }

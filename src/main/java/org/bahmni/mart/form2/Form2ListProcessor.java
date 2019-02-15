@@ -38,7 +38,7 @@ public class Form2ListProcessor {
         ArrayList<BahmniForm> allBahmniForms = allLatestFormPaths.keySet().stream().map(formName ->
                 getBahmniForm(formName, allLatestFormPaths.get(formName)))
                 .collect(Collectors.toCollection(ArrayList::new));
-        return FormListHelper.filterFormsWithOutDuplicateConcepts(allBahmniForms);
+        return FormListHelper.filterFormsWithOutDuplicateSectionsAndConcepts(allBahmniForms);
     }
 
     private BahmniForm getBahmniForm(String formName, String formJsonPath) {
