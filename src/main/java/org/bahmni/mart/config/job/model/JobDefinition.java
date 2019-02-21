@@ -18,7 +18,7 @@ public class JobDefinition {
     private List<GroupedJobConfig> groupedJobConfigs;
     private IncrementalUpdateConfig incrementalUpdateConfig;
     private String locale;
-
+    private List<String> includeFreeTextConceptNames;
 
     public int getChunkSizeToRead() {
         return chunkSizeToRead;
@@ -106,5 +106,9 @@ public class JobDefinition {
 
     public String getLocale() {
         return locale;
+    }
+
+    public List<String> getIncludeFreeTextConceptNames() {
+        return includeFreeTextConceptNames;
     }
 }

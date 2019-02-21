@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -170,5 +171,27 @@ public class IgnoreColumnsConfigHelperTest {
         verify(conceptService, times(0)).getFreeTextConcepts();
         verifyStatic(times(1));
         getIgnoreConceptNamesForJob(jobDefinition);
+    }
+
+    @Test
+    public void shouldRemoveTheConceptsWhichAreInIncludeFreeTextConceptNamesFromIgnoreConcepts() {
+        List<String> includeFreeTextConceptNames = new ArrayList<>();
+        includeFreeTextConceptNames.add("IncludeFreeTextConcept");
+        Concept includeFreeTextConcept = new Concept(1, "IncludeFreeTextConcept", 0);
+        Concept anotherFreeTextConcept = new Concept(2, "AnotherFreeTextConcept", 0);
+        List<Concept> includeFreeTextConcepts = new ArrayList<>();
+        includeFreeTextConcepts.add(includeFreeTextConcept);
+        List<Concept> allFreeTextConcepts = new ArrayList<>();
+        allFreeTextConcepts.add(includeFreeTextConcept);
+        allFreeTextConcepts.add(anotherFreeTextConcept);
+        when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.TRUE);
+        when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(Boolean.TRUE);
+        when(jobDefinition.getIncludeFreeTextConceptNames()).thenReturn(includeFreeTextConceptNames);
+        when(conceptService.getConceptsByNames(includeFreeTextConceptNames)).thenReturn(includeFreeTextConcepts);
+        when(conceptService.getFreeTextConcepts()).thenReturn(allFreeTextConcepts);
+
+        HashSet<Concept> ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
+
+        assertEquals(ignoreConcepts.size(), 1);
     }
 }

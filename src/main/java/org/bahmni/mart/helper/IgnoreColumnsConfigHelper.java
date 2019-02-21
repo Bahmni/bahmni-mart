@@ -6,8 +6,11 @@ import org.bahmni.mart.form.service.ConceptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 import static org.bahmni.mart.config.job.JobDefinitionUtil.getIgnoreConceptNamesForJob;
 
@@ -33,9 +36,25 @@ public class IgnoreColumnsConfigHelper {
         if (!isJobWithOutIgnoreColumns(jobDefinition))
             ignoreConcepts.addAll(conceptService.getConceptsByNames(jobDefinition.getColumnsToIgnore()));
 
-        if (jobDefinition.getIgnoreAllFreeTextConcepts())
-            ignoreConcepts.addAll(conceptService.getFreeTextConcepts());
+        HashSet<Concept> freeTextConceptsToBeIgnored = getAllFreeTextConceptsToBeIgnored(jobDefinition);
+        ignoreConcepts.addAll(freeTextConceptsToBeIgnored);
         return ignoreConcepts;
+    }
+
+    private HashSet<Concept> getAllFreeTextConceptsToBeIgnored(JobDefinition jobDefinition) {
+        HashSet<Concept> textConceptsToBeIgnored = new HashSet<>();
+        if (jobDefinition.getIgnoreAllFreeTextConcepts()) {
+            List<Concept> allFreeTextConcepts = conceptService.getFreeTextConcepts();
+            textConceptsToBeIgnored.addAll(allFreeTextConcepts);
+            List<Concept> textConceptsToInclude = new ArrayList<>();
+            if (!Objects.isNull(jobDefinition.getIncludeFreeTextConceptNames()) &&
+                    jobDefinition.getIncludeFreeTextConceptNames().size() > 0) {
+                textConceptsToInclude = conceptService
+                        .getConceptsByNames(jobDefinition.getIncludeFreeTextConceptNames());
+            }
+            textConceptsToBeIgnored.removeAll(textConceptsToInclude);
+        }
+        return textConceptsToBeIgnored;
     }
 
     private Boolean isJobWithOutIgnoreColumns(JobDefinition jobDefinition) {
