@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
-import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 import static org.bahmni.mart.table.SpecialCharacterResolver.getUpdatedTableNameIfExist;
@@ -93,8 +92,7 @@ public class ObsIncrementalUpdateStrategyTest {
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "martJdbcTemplate", martJdbcTemplate);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "markerManager", markerManager);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "tableDataGenerator", tableDataGenerator);
-        setValuesForMemberFields(obsIncrementalUpdater,
-                "tableMetadataGenerator", tableMetadataGenerator);
+        obsIncrementalUpdater.setTableMetadataGenerator(tableMetadataGenerator);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId",
                                             Integer.parseInt(MAX_EVENT_RECORD_ID));

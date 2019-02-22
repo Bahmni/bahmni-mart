@@ -30,6 +30,9 @@ public class IncrementalStrategyContext {
     @Autowired
     private SimpleIncrementalUpdateStrategy simpleIncrementalUpdateStrategy;
 
+    @Autowired
+    private Form2ObsIncrementalStrategy form2ObsIncrementalStrategy;
+
     private Map<String, IncrementalUpdateStrategy> incrementalStrategies;
 
     @PostConstruct
@@ -37,6 +40,7 @@ public class IncrementalStrategyContext {
         incrementalStrategies = new HashMap<>();
         incrementalStrategies.put(JobType.CUSTOMSQL.toString(), customSqlIncrementalUpdateStrategy);
         incrementalStrategies.put(JobType.OBS.toString(), obsIncrementalUpdateStrategy);
+        incrementalStrategies.put(JobType.FORM2OBS.toString(), form2ObsIncrementalStrategy);
         incrementalStrategies.put(JobType.BACTERIOLOGY.toString(), obsIncrementalUpdateStrategy);
         incrementalStrategies.put(JobType.DIAGNOSES.toString(), obsIncrementalUpdateStrategy);
         incrementalStrategies.put(JobType.DISPOSITION.toString(), obsIncrementalUpdateStrategy);

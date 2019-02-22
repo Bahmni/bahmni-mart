@@ -123,7 +123,7 @@ public class Form2ObservationProcessorTest {
 
     private Map<String, Object> getObsRow() {
         Map<String, Object> obsRow = new HashMap<>();
-        obsRow.put("encounterId", "abc123");
+        obsRow.put("encounter_id", "abc123");
         obsRow.put("patientId", "def789");
         obsRow.put("conceptId", 7);
         obsRow.put("id", 97);

@@ -3,11 +3,14 @@ package org.bahmni.mart.exports;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.updatestrategy.Form2ObsIncrementalStrategy;
 import org.bahmni.mart.exports.writer.DatabaseObsWriter;
+import org.bahmni.mart.exports.writer.RemovalWriter;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.form2.Form2ObservationProcessor;
+import org.bahmni.mart.table.Form2TableMetadataGenerator;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
@@ -50,6 +53,15 @@ public class Form2ObservationExportStep implements ObservationExportStep {
     @Autowired
     private ObjectFactory<DatabaseObsWriter> databaseObsWriterObjectFactory;
 
+    @Autowired
+    private Form2ObsIncrementalStrategy obsIncrementalUpdater;
+
+    @Autowired
+    private ObjectFactory<RemovalWriter> removalWriterObjectFactory;
+
+    @Autowired
+    private Form2TableMetadataGenerator form2TableMetadataGenerator;
+
     @Override
     public Step getStep() {
         return stepBuilderFactory.get(getStepName("Insertion Step"))
@@ -72,6 +84,9 @@ public class Form2ObservationExportStep implements ObservationExportStep {
 
     private JdbcCursorItemReader<Map<String, Object>> obsReader(boolean voided) {
         String sql = getProcessedSql(voided);
+        if (!obsIncrementalUpdater.isMetaDataChanged(form.getFormName().getName(), jobDefinition.getName())) {
+            sql = obsIncrementalUpdater.updateReaderSql(sql, jobDefinition.getName(), "encounter_id");
+        }
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);
@@ -122,7 +137,18 @@ public class Form2ObservationExportStep implements ObservationExportStep {
 
     @Override
     public Step getRemovalStep() {
-        return null;
+        return stepBuilderFactory.get(getStepName("Removal Step"))
+                .<Map<String, Object>, Map<String, Object>>chunk(100)
+                .reader(obsReader(true))
+                .writer(getRemovalWriter())
+                .build();
+    }
+
+    private RemovalWriter getRemovalWriter() {
+        RemovalWriter writer = removalWriterObjectFactory.getObject();
+        writer.setJobDefinition(jobDefinition);
+        writer.setTableData(form2TableMetadataGenerator.getTableData(form));
+        return writer;
     }
 
     @PostConstruct

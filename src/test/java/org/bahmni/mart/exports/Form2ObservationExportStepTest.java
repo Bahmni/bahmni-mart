@@ -3,10 +3,14 @@ package org.bahmni.mart.exports;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.model.JobDefinition;
+import org.bahmni.mart.exports.updatestrategy.Form2ObsIncrementalStrategy;
 import org.bahmni.mart.exports.writer.DatabaseObsWriter;
+import org.bahmni.mart.exports.writer.RemovalWriter;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form2.Form2ObservationProcessor;
+import org.bahmni.mart.table.Form2TableMetadataGenerator;
+import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +61,15 @@ public class Form2ObservationExportStepTest {
     @Mock
     private ObjectFactory<DatabaseObsWriter> obsWriterObjectFactory;
 
+    @Mock
+    private ObjectFactory<RemovalWriter> removalWriterObjectFactory;
+
+    @Mock
+    private Form2TableMetadataGenerator form2TableMetadataGenerator;
+
+    @Mock
+    private Form2ObsIncrementalStrategy obsIncrementalStrategy;
+
     private Form2ObservationExportStep form2ObservationExportStep;
     private static final String JOB_NAME = "job Name";
 
@@ -68,11 +81,17 @@ public class Form2ObservationExportStepTest {
         BatchUtils.stepNumber = 0;
         setValuesForMemberFields(form2ObservationExportStep, "dataSource", dataSource);
         setValuesForMemberFields(form2ObservationExportStep, "stepBuilderFactory", stepBuilderFactory);
+        setValuesForMemberFields(form2ObservationExportStep, "obsIncrementalUpdater", obsIncrementalStrategy);
         setValuesForMemberFields(form2ObservationExportStep,
                 "observationProcessorFactory", observationProcessorFactory);
         setValuesForMemberFields(form2ObservationExportStep,
                 "databaseObsWriterObjectFactory", obsWriterObjectFactory);
+        setValuesForMemberFields(form2ObservationExportStep,
+                "removalWriterObjectFactory",removalWriterObjectFactory);
+        setValuesForMemberFields(form2ObservationExportStep,
+                "form2TableMetadataGenerator",form2TableMetadataGenerator);
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
+        when(obsIncrementalStrategy.isMetaDataChanged(any(), any())).thenReturn(true);
     }
 
     @Test
@@ -99,6 +118,7 @@ public class Form2ObservationExportStepTest {
         String formName = "FormName";
         TaskletStep expectedBaseExportStep = mock(TaskletStep.class);
         StepBuilder stepBuilder = mock(StepBuilder.class);
+        Form2ObsIncrementalStrategy obsIncrementalUpdater = mock(Form2ObsIncrementalStrategy.class);
         BahmniForm form = mock(BahmniForm.class);
         Concept formNameConcept = mock(Concept.class);
         form2ObservationExportStep.setForm(form);
@@ -113,6 +133,7 @@ public class Form2ObservationExportStepTest {
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
+        when(obsIncrementalUpdater.isMetaDataChanged(any(), any())).thenReturn(true);
 
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
 
@@ -144,13 +165,13 @@ public class Form2ObservationExportStepTest {
         when(observationProcessorFactory.getObject()).thenReturn(new Form2ObservationProcessor());
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
         when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyString())).thenReturn(obsReadersSql);
-        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(),  anyList())).thenReturn(obsReadersSql);
-        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(),  anyBoolean())).thenReturn(obsReadersSql);
+        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyList())).thenReturn(obsReadersSql);
+        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyBoolean())).thenReturn(obsReadersSql);
 
         form2ObservationExportStep.getStep();
 
-        verify(form, times(2)).getFormName();
-        verify(form.getFormName(), times(2)).getName();
+        verify(form, times(3)).getFormName();
+        verify(form.getFormName(), times(3)).getName();
         verify(form).getFields();
         verify(concept1).getName();
         verify(concept2).getName();
@@ -196,13 +217,13 @@ public class Form2ObservationExportStepTest {
         when(observationProcessorFactory.getObject()).thenReturn(new Form2ObservationProcessor());
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
         when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyString())).thenReturn(obsReadersSql);
-        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(),  anyList())).thenReturn(obsReadersSql);
-        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(),  anyBoolean())).thenReturn(obsReadersSql);
+        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyList())).thenReturn(obsReadersSql);
+        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyBoolean())).thenReturn(obsReadersSql);
 
         form2ObservationExportStep.getStep();
 
-        verify(form, times(1)).getFormName();
-        verify(form.getFormName(), times(1)).getName();
+        verify(form, times(2)).getFormName();
+        verify(form.getFormName(), times(2)).getName();
         verify(rootForm, times(1)).getFormName();
         verify(rootForm.getFormName(), times(1)).getName();
         verify(form).getFields();
@@ -221,7 +242,61 @@ public class Form2ObservationExportStepTest {
         BatchUtils.constructSqlWithParameter(obsReadersSql, "locale", "fr");
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptReferenceSource", "WHO");
+    }
 
+    @Test
+    public void shouldUpdateReaderSqlForIncrementalUpdateWhenNoMetaDataIsChanged() throws Exception {
+        String formName = "FormOne";
+        BahmniForm form = mock(BahmniForm.class);
+        setUpStepConfig(formName, form);
+        when(form.getDepthToParent()).thenReturn(0);
+        when(jobDefinition.getName()).thenReturn("form2obs");
+        String obsReadersSql = "obs reader sql";
+        setValuesForMemberFields(form2ObservationExportStep, "obsReaderSql", obsReadersSql);
+        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyString())).thenReturn(obsReadersSql);
+        when(observationProcessorFactory.getObject()).thenReturn(new Form2ObservationProcessor());
+        when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
+        when(obsIncrementalStrategy.isMetaDataChanged("FormOne", "form2obs")).thenReturn(false);
+
+        form2ObservationExportStep.getStep();
+
+        verify(obsIncrementalStrategy).isMetaDataChanged("FormOne", "form2obs");
+        verify(obsIncrementalStrategy).updateReaderSql(obsReadersSql, "form2obs", "encounter_id");
+    }
+
+    @Test
+    public void shouldReturnRemovalStep() throws Exception {
+        String formName = "FormOne";
+        BahmniForm form = mock(BahmniForm.class);
+        Concept formNameConcept = mock(Concept.class);
+        when(form.getFormName()).thenReturn(formNameConcept);
+        when(formNameConcept.getName()).thenReturn(formName);
+        TableData tableData = mock(TableData.class);
+        when(jobDefinition.getName()).thenReturn("form2obs");
+        String obsReadersSql = "obs reader sql";
+        setValuesForMemberFields(form2ObservationExportStep, "form", form);
+        setValuesForMemberFields(form2ObservationExportStep, "obsReaderSql", obsReadersSql);
+        when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyString())).thenReturn(obsReadersSql);
+        RemovalWriter removalWriter = mock(RemovalWriter.class);
+        when(removalWriterObjectFactory.getObject()).thenReturn(removalWriter);
+        when(form2TableMetadataGenerator.getTableData(form)).thenReturn(tableData);
+
+        StepBuilder stepBuilder = mock(StepBuilder.class);
+        SimpleStepBuilder simpleStepBuilder = mock(SimpleStepBuilder.class);
+        when(stepBuilderFactory.get("Removal Step-1 " + formName)).thenReturn(stepBuilder);
+        when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.writer(removalWriter)).thenReturn(simpleStepBuilder);
+        TaskletStep expectedStep = mock(TaskletStep.class);
+        when(simpleStepBuilder.build()).thenReturn(expectedStep);
+
+        Step actualRemovalStep = form2ObservationExportStep.getRemovalStep();
+
+        assertEquals(expectedStep, actualRemovalStep);
+        verify(obsIncrementalStrategy).isMetaDataChanged("FormOne", "form2obs");
+        verify(removalWriterObjectFactory).getObject();
+        verify(removalWriter).setTableData(tableData);
+        verify(removalWriter).setJobDefinition(jobDefinition);
     }
 
     private void setUpStepConfig(String formName, BahmniForm form) {
@@ -238,5 +313,4 @@ public class Form2ObservationExportStepTest {
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
     }
-
 }

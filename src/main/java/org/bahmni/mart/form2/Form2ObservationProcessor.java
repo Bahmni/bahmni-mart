@@ -24,7 +24,7 @@ public class Form2ObservationProcessor implements ItemProcessor<Map<String, Obje
     @Override
     public List<Obs> process(Map<String, Object> item) {
         Obs obs = new Obs();
-        obs.setEncounterId(String.valueOf(item.get("encounterId")));
+        obs.setEncounterId(String.valueOf(item.get("encounter_id")));
         obs.setPatientId(String.valueOf(item.get("patientId")));
         obs.setId((Integer) item.get("id"));
         Concept concept = new Concept();

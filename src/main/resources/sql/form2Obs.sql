@@ -1,4 +1,4 @@
-SELECT o.encounter_id                                                                  AS encounterId,
+SELECT o.encounter_id,
        o.person_id                                                                     AS patientId,
        o.concept_id                                                                    AS conceptId,
        o.obs_id                                                                        AS id,
