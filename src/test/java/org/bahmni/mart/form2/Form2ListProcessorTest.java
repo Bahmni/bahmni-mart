@@ -7,6 +7,7 @@ import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form2.model.Control;
 import org.bahmni.mart.form2.model.Form2JsonMetadata;
 import org.bahmni.mart.form2.uitl.Form2MetadataReader;
+import org.bahmni.mart.helper.IgnoreColumnsConfigHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +44,9 @@ public class Form2ListProcessorTest {
     private JobDefinition jobDefinition;
 
     @Mock
+    private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
+
+    @Mock
     private Form2MetadataReader form2MetadataReader;
 
     @Before
@@ -49,6 +54,8 @@ public class Form2ListProcessorTest {
         form2ListProcessor = new Form2ListProcessor();
         allForms.put(COMPLEX_FORM, FORM_PATH);
         setValuesForMemberFields(form2ListProcessor, "form2MetadataReader", form2MetadataReader);
+        setValuesForMemberFields(form2ListProcessor, "ignoreColumnsConfigHelper", ignoreColumnsConfigHelper);
+        when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition)).thenReturn(new HashSet<>());
         mockStatic(JobDefinitionUtil.class);
         when(JobDefinitionUtil.isAddMoreMultiSelectEnabled(jobDefinition)).thenReturn(true);
     }
@@ -320,12 +327,15 @@ public class Form2ListProcessorTest {
         Control obsControl2 = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName2, "obs_concept_2").build();
+        Concept concept2 = new Concept(2, obsConceptName2, 0);
         Control sectionControl1 = new ControlBuilder()
                 .withLabel("Section")
                 .withControls(Arrays.asList(obsControl1, obsControl2))
                 .withPropertyAddMore(false)
                 .build();
-        when(JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition)).thenReturn(singletonList(obsConceptName2));
+        HashSet<Concept> ignoredConcepts = new HashSet<>();
+        ignoredConcepts.add(concept2);
+        when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition)).thenReturn(ignoredConcepts);
         form2JsonMetadata.setControls(singletonList(sectionControl1));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
@@ -469,18 +479,20 @@ public class Form2ListProcessorTest {
     }
 
     @Test
-    public void shouldNotAddTextFieldsInTheFormWhenIgnoreAllFreeTextConceptsSetToTrueInTheJob() {
+    public void shouldNotAddTheConceptsInIgnoreConcepts() {
         String obsConceptName1 = "ObsConcept1";
         String obsConceptName2 = "ObsConcept2";
         Control obsControl1 = new ControlBuilder()
                 .withConcept(obsConceptName1, "obs_concept_1").build();
         obsControl1.getConcept().setDatatype("Text");
+        Concept concept1 = new Concept(1, obsConceptName1, 0);
         Control obsControl2 = new ControlBuilder()
                 .withConcept(obsConceptName2, "obs_concept_2").build();
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
         form2JsonMetadata.setControls(new ArrayList<>(Arrays.asList(obsControl1, obsControl2)));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
-        when(jobDefinition.getIgnoreAllFreeTextConcepts()).thenReturn(true);
+        when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition))
+                .thenReturn(new HashSet<>(Arrays.asList(concept1)));
 
         List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 

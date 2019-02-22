@@ -10,10 +10,12 @@ import org.bahmni.mart.form2.model.ControlProperties;
 import org.bahmni.mart.form2.model.Form2JsonMetadata;
 import org.bahmni.mart.form2.uitl.Form2MetadataReader;
 import org.bahmni.mart.helper.FormListHelper;
+import org.bahmni.mart.helper.IgnoreColumnsConfigHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,16 +27,18 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 @Component
 public class Form2ListProcessor {
 
-    private static final String TEXT_DATATYPE = "Text";
-    private List<String> ignoreConceptNames;
+    private HashSet<Concept> ignoreConcepts;
     private JobDefinition jobDefinition;
 
     @Autowired
     private Form2MetadataReader form2MetadataReader;
 
+    @Autowired
+    private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
+
     public List<BahmniForm> getAllForms(Map<String, String> allLatestFormPaths, JobDefinition jobDefinition) {
         this.jobDefinition = jobDefinition;
-        ignoreConceptNames = JobDefinitionUtil.getIgnoreConceptNamesForJob(jobDefinition);
+        ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
         ArrayList<BahmniForm> allBahmniForms = allLatestFormPaths.keySet().stream().map(formName ->
                 getBahmniForm(formName, allLatestFormPaths.get(formName)))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -65,7 +69,7 @@ public class Form2ListProcessor {
         final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
         if (isEmpty(control.getControls()) && form2Concept != null) {
             conceptName = form2Concept.getName();
-            if (ignoreConceptNames.contains(conceptName))
+            if (isInIgnoreConcepts(conceptName))
                 return null;
             concept = new Concept();
             concept.setName(conceptName);
@@ -81,6 +85,10 @@ public class Form2ListProcessor {
         if (control.getType() != null && control.getType().toLowerCase().equals("section"))
             concept.setName(rootformName + " " + concept.getName());
         return concept;
+    }
+
+    private boolean isInIgnoreConcepts(String conceptName) {
+        return this.ignoreConcepts.stream().anyMatch(o -> o.getName().equals(conceptName));
     }
 
     private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent, boolean isParentAddMore) {
@@ -116,9 +124,6 @@ public class Form2ListProcessor {
         if (isNotEmpty(control.getControls())) {
             parseChildControls(control.getControls(), bahmniForm, depthToParent, isParentAddMore);
         } else {
-            if (jobDefinition.getIgnoreAllFreeTextConcepts() && TEXT_DATATYPE.equals(concept.getDataType())) {
-                return;
-            }
             bahmniForm.addField(concept);
         }
     }
