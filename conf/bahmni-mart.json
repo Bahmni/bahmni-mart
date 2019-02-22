@@ -128,23 +128,6 @@
       "ignoreAllFreeTextConcepts": true,
       "columnsToIgnore": [
         "Image"
-      ],
-      "includeFreeTextConceptNames": [
-        "MH, Referred by",
-        "FSTG, Comments",
-        "FSTG, Type of medical information needed for next submission",
-        "FSTG, Comments about postpone reason",
-        "FSTG, Comments about refusal",
-        "FSTG, Document(s) needed to be complete",
-        "FSTG, Comments about Anaesthesia validation",
-        "FST, Type of medical information needed for next submission",
-        "FUP, Comments about Defaulter",
-        "FUP, Comments about dismissal",
-        "FUP, Comments about further stage admission",
-        "FUP, Comments about MBA",
-        "FUP, Comments about next follow-up",
-        "FUP, Comments about re-admission",
-        "FV, Comments on FV"
       ]
     },
     {
