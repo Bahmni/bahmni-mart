@@ -2,6 +2,7 @@ package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.job.JobType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +18,7 @@ public class IncrementalStrategyContext {
     private CustomSqlIncrementalUpdateStrategy customSqlIncrementalUpdateStrategy;
 
     @Autowired
+    @Qualifier("obsIncrementalStrategy")
     private ObsIncrementalUpdateStrategy obsIncrementalUpdateStrategy;
 
     @Autowired
@@ -27,7 +29,6 @@ public class IncrementalStrategyContext {
 
     @Autowired
     private SimpleIncrementalUpdateStrategy simpleIncrementalUpdateStrategy;
-
 
     private Map<String, IncrementalUpdateStrategy> incrementalStrategies;
 

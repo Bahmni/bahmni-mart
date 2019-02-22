@@ -2,8 +2,8 @@ package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.helper.TableDataGenerator;
-import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
+import org.bahmni.mart.table.TableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
@@ -60,7 +60,7 @@ public class ObsIncrementalUpdateStrategyTest {
     private TableDataGenerator tableDataGenerator;
 
     @Mock
-    private FormTableMetadataGenerator formTableMetadataGenerator;
+    private TableMetadataGenerator tableMetadataGenerator;
 
     @Mock
     private Map markerMap;
@@ -94,7 +94,7 @@ public class ObsIncrementalUpdateStrategyTest {
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "markerManager", markerManager);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "tableDataGenerator", tableDataGenerator);
         setValuesForMemberFields(obsIncrementalUpdater,
-                "formTableMetadataGenerator", formTableMetadataGenerator);
+                "tableMetadataGenerator", tableMetadataGenerator);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId",
                                             Integer.parseInt(MAX_EVENT_RECORD_ID));
@@ -278,7 +278,7 @@ public class ObsIncrementalUpdateStrategyTest {
         when(getUpdatedTableNameIfExist(actualTableName)).thenReturn(updatedTableName);
         when(tableDataGenerator.getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one"))
                 .thenReturn(new TableData());
-        when(formTableMetadataGenerator.getTableDataByName(actualTableName))
+        when(tableMetadataGenerator.getTableDataByName(actualTableName))
                 .thenReturn(tableData);
 
         boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME);
@@ -292,7 +292,7 @@ public class ObsIncrementalUpdateStrategyTest {
         SpecialCharacterResolver.getActualTableName(actualTableName);
         verifyStatic();
         SpecialCharacterResolver.resolveTableData(tableData);
-        verify(formTableMetadataGenerator).getTableDataByName(actualTableName);
+        verify(tableMetadataGenerator).getTableDataByName(actualTableName);
         assertFalse(metaDataChangeMap.isEmpty());
         verify(metaDataChangeMap).put("form,_name@one", true);
     }
@@ -312,7 +312,7 @@ public class ObsIncrementalUpdateStrategyTest {
         when(SpecialCharacterResolver.getActualTableName(anyString())).thenReturn(actualTableName);
         when(tableDataGenerator.getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one"))
                 .thenReturn(tableData);
-        when(formTableMetadataGenerator.getTableDataByName(actualTableName))
+        when(tableMetadataGenerator.getTableDataByName(actualTableName))
                 .thenReturn(tableData);
 
         boolean metaDataChanged = obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME);
@@ -326,7 +326,7 @@ public class ObsIncrementalUpdateStrategyTest {
         SpecialCharacterResolver.resolveTableData(tableData);
 
         verify(tableDataGenerator).getTableDataFromMart(updatedTableName, "SELECT * FROM form_name_one");
-        verify(formTableMetadataGenerator).getTableDataByName(actualTableName);
+        verify(tableMetadataGenerator).getTableDataByName(actualTableName);
         assertFalse(metaDataChangeMap.isEmpty());
         verify(metaDataChangeMap).put("form,_name@one", false);
     }
@@ -344,7 +344,7 @@ public class ObsIncrementalUpdateStrategyTest {
         getUpdatedTableNameIfExist(actualTableName);
 
         verify(tableDataGenerator, never()).getTableDataFromMart(anyString(), anyString());
-        verify(formTableMetadataGenerator, never()).getTableDataByName(actualTableName);
+        verify(tableMetadataGenerator, never()).getTableDataByName(actualTableName);
     }
 
     @Test
@@ -352,7 +352,7 @@ public class ObsIncrementalUpdateStrategyTest {
         String formName = "table, name";
         String actualTableName = "table,_name";
         when(SpecialCharacterResolver.getActualTableName(anyString())).thenReturn(actualTableName);
-        when(formTableMetadataGenerator.getTableDataByName(actualTableName)).thenReturn(new TableData(actualTableName));
+        when(tableMetadataGenerator.getTableDataByName(actualTableName)).thenReturn(new TableData(actualTableName));
         when(getUpdatedTableNameIfExist(actualTableName)).thenReturn("table_name");
         when(tableDataGenerator.getTableDataFromMart("table_name", "SELECT * FROM table_name"))
                 .thenThrow(BadSqlGrammarException.class);

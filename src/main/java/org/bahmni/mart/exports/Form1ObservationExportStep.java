@@ -15,6 +15,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.stereotype.Component;
@@ -53,6 +54,7 @@ public class Form1ObservationExportStep implements ObservationExportStep {
     private FormTableMetadataGenerator formTableMetadataGenerator;
 
     @Autowired
+    @Qualifier("obsIncrementalStrategy")
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
     private JobDefinition jobDefinition;
