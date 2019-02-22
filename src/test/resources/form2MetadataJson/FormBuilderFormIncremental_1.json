@@ -1,0 +1,50 @@
+{
+  "name": "FormBuilderFormIncremental",
+  "id": 77,
+  "uuid": "21d6be20-596f-4ab6-98ab-f5cc153e8409",
+  "defaultLocale": "en",
+  "controls": [
+    {
+      "type": "obsControl",
+      "label": {
+        "translationKey": "WWN,_SYSTOLIC_BLOOD_PRESSURE_1",
+        "id": "1",
+        "units": "(mmHg)",
+        "type": "label",
+        "value": "WWN, Systolic blood pressure"
+      },
+      "properties": {
+        "mandatory": false,
+        "notes": false,
+        "addMore": false,
+        "hideLabel": false,
+        "controlEvent": false,
+        "location": {
+          "column": 0,
+          "row": 0
+        },
+        "abnormal": false
+      },
+      "id": "1",
+      "unsupportedProperties": [],
+      "concept": {
+        "name": "WWN, Systolic blood pressure",
+        "uuid": "9b95ce36-c39f-4372-826d-7cdb7cc99a1d",
+        "datatype": "Numeric",
+        "conceptClass": "Finding",
+        "conceptHandler": null,
+        "answers": [],
+        "properties": {
+          "allowDecimal": true
+        }
+      },
+      "units": "mmHg",
+      "hiNormal": null,
+      "lowNormal": null,
+      "hiAbsolute": null,
+      "lowAbsolute": null
+    }
+  ],
+  "events": {},
+  "translationsUrl": "/openmrs/ws/rest/v1/bahmniie/form/translations"
+}

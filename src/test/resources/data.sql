@@ -433,6 +433,10 @@ INSERT INTO concept_name VALUES
 INSERT INTO form(form_id, name, version, published, creator, date_created, changed_by, date_changed, retired, uuid)
 VALUES
 (78, 'FormBuilderForm', 2, 1, 8, '2019-02-05 10:59:14', 8,
-'2019-02-05 10:59:17', 0,'0a15ea90-a310-43db-a55b-e80b75423bb8')
+'2019-02-05 10:59:17', 0,'0a15ea90-a310-43db-a55b-e80b75423bb8');
 
+INSERT INTO form(form_id, name, version, published, creator, date_created, changed_by, date_changed, retired, uuid)
+VALUES
+(90, 'FormBuilderFormIncremental', 2, 1, 8, '2019-02-05 10:59:14', 8,
+'2019-02-05 10:59:17', 0,'0a15ea90-a310-43db-a55b-eaeb75423ab8');
 -- End of form builder forms test data

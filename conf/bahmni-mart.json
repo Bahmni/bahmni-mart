@@ -132,7 +132,7 @@
       ]
     },
     {
-      "name": "Obs Form2 Data",
+      "name": "Form2 Obs Data",
       "type": "form2obs",
       "incrementalUpdateConfig": {
         "updateOn": "encounter_id",

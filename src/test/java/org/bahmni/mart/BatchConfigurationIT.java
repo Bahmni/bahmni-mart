@@ -50,6 +50,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         martJdbcTemplate.execute(getSqlFromResource("testDataSet/eavIncrementalUpdateData.sql"));
         martJdbcTemplate.execute(getSqlFromResource("testDataSet/IncrementalUpdateData.sql"));
         martJdbcTemplate.execute(getSqlFromResource("testDataSet/ordersIncrementalUpdate.sql"));
+        martJdbcTemplate.execute(getSqlFromResource("testDataSet/Form2IncrementalData.sql"));
 
         batchConfiguration.setShouldRunBatchJob(true);
         expectedPatientList = new HashMap<>();
@@ -111,17 +112,16 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyBacteriologyData(tableNames);
     }
 
-
     @Test
+    @Sql(scripts = {"classpath:testDataSet/Form2ObsData.sql"},
+            config = @SqlConfig(transactionManager = "customOpenmrsITContext"))
     public void shouldCreateTablesAndInsertDataForForm2Obs() throws IOException {
         String sql = String.format("INSERT INTO form_resource (form_resource_id, form_id, name, " +
                 "value_reference, datatype, uuid) VALUES " +
                 "(77, 78, 'FormBuilderForm', '%s', 'org.bahmni.customdatatype.datatype.FileSystemStorageDatatype', " +
                 "'3f480fe5-da11-4c08-afad-5dc440515167')",
                 System.getProperty("user.dir") + "/src/test/resources/form2MetadataJson/FormBuilderForm_1.json");
-
         openmrsJdbcTemplate.execute(sql);
-        openmrsJdbcTemplate.execute(getSqlFromResource("testDataSet/Form2ObsData.sql"));
 
         batchConfiguration.run();
 
@@ -167,6 +167,37 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordThree.get("form_field_path")));
         assertEquals("FormBuilderForm.1/2-0",
                 String.valueOf(multiSelectRecordThree.get("reference_form_field_path")));
+    }
+
+    @Test
+    @Sql(scripts = {"classpath:testDataSet/Form2IncrementalObsData.sql"},
+            config = @SqlConfig(transactionManager = "customOpenmrsITContext"))
+    public void shouldApplyIncrementalUpdateForForm2Obs() throws IOException {
+        String sql = String.format("INSERT INTO form_resource (form_resource_id, form_id, name, " +
+                        "value_reference, datatype, uuid) VALUES " +
+                        "(78, 90, 'FormBuilderFormIncremental', '%s', " +
+                        "'org.bahmni.customdatatype.datatype.FileSystemStorageDatatype', " +
+                        "'3f480fe5-da11-4c08-afad-5dc440515168')",
+                System.getProperty("user.dir") +
+                        "/src/test/resources/form2MetadataJson/FormBuilderFormIncremental_1.json");
+        openmrsJdbcTemplate.execute(sql);
+
+        batchConfiguration.run();
+
+        String maxEventRecordId = getMaxEventRecordId();
+        assertEquals(maxEventRecordId, getEventRecordIdForJob("Form2 Obs Data"));
+
+        List<Map<String, Object>> formRecords = martJdbcTemplate
+                .queryForList("SELECT * FROM formbuilderformincremental");
+        assertEquals(3, formRecords.size());
+        Map<String, Object> formRecordOne = formRecords.get(0);
+        Map<String, Object> formRecordTwo = formRecords.get(1);
+        Map<String, Object> formRecordThree = formRecords.get(2);
+        assertTrue(Arrays.asList("9", "4", "5").containsAll(Arrays.asList(
+                String.valueOf(formRecordOne.get("wwn_systolic_blood_pressure")),
+                String.valueOf(formRecordTwo.get("wwn_systolic_blood_pressure")),
+                String.valueOf(formRecordThree.get("wwn_systolic_blood_pressure")))));
+        assertEquals("FormBuilderFormIncremental", String.valueOf(formRecordThree.get("form_field_path")));
     }
 
     @Test
