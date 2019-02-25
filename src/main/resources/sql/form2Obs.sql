@@ -14,7 +14,8 @@ SELECT o.encounter_id,
        p.name                                                                          AS programName,
        SUBSTRING(o.form_namespace_and_path, INSTR(o.form_namespace_and_path, '^') + 1) AS formFieldPath
 FROM obs o
-       JOIN concept_view obs_con ON o.form_namespace_and_path LIKE CONCAT('%', :formName, '.%') AND voided IS :voided
+       JOIN concept_view obs_con ON o.form_namespace_and_path LIKE CONCAT('%', :formName, '.%')
+                                      AND (:voided IS TRUE OR o.voided IS :voided)
                                       AND o.concept_id =
                                           obs_con.concept_id AND obs_con.concept_full_name IN
                                                                  (:conceptNames) AND
