@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,16 +22,32 @@ public class FormService {
 
     @Value("classpath:sql/form2FormList.sql")
     private Resource form2FormListResource;
+    private static final String FORM_NAME = "name";
 
     public Map<String, String> getAllLatestFormPaths() {
         Map<String, String> formPaths = new HashMap<>();
-        final String form2FormListQuery = BatchUtils.convertResourceOutputToString(form2FormListResource);
-        List<Map<String, Object>> forms = openmrsDbTemplate.queryForList(form2FormListQuery);
+        List<Map<String, Object>> forms = executeFormListQuery();
         for (Map<String, Object> form : forms) {
-            String name = (String) form.get("name");
+            String name = (String) form.get(FORM_NAME);
             String valueReference = (String) form.get("value_reference");
             formPaths.put(name, valueReference);
         }
         return formPaths;
+    }
+
+    private List<Map<String, Object>> executeFormListQuery() {
+        final String form2FormListQuery = BatchUtils.convertResourceOutputToString(form2FormListResource);
+        return openmrsDbTemplate.queryForList(form2FormListQuery);
+    }
+
+    public Map<String, Integer> getFormNamesWithLatestVersionNumber() {
+        LinkedHashMap<String, Integer> formNameAndVersionMap = new LinkedHashMap<>();
+        List<Map<String, Object>> forms = executeFormListQuery();
+        forms.forEach(form -> {
+            String name = (String) form.get(FORM_NAME);
+            int version = (int) form.get("version");
+            formNameAndVersionMap.put(name, version);
+        });
+        return formNameAndVersionMap;
     }
 }
