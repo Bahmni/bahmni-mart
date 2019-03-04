@@ -5,7 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-class TranslationMetadata {
+public class TranslationMetadata {
 
     private static final String  TRANSLATION_FILES_LOCATION_SQL = "SELECT property_value FROM global_property " +
             "WHERE property = 'bahmni.formTranslations.directory'";
@@ -17,7 +17,7 @@ class TranslationMetadata {
         this.openmrsJdbcTemplate = openmrsJdbcTemplate;
     }
 
-    String getTranslationsFilePath(String formName, int formVersion) {
+    public String getTranslationsFilePath(String formName, int formVersion) {
 
         String fromTranslationsPath = openmrsJdbcTemplate.queryForObject(TRANSLATION_FILES_LOCATION_SQL, String.class);
 
