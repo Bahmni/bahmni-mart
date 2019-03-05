@@ -1,6 +1,7 @@
 package org.bahmni.mart.form2.translations.util;
 
 import org.apache.commons.io.FileUtils;
+import org.bahmni.mart.form2.translations.TranslationException;
 import org.bahmni.mart.form2.translations.TranslationMetadata;
 import org.bahmni.mart.form2.translations.model.Form2Translation;
 import org.junit.Before;
@@ -16,6 +17,9 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
@@ -115,6 +119,53 @@ public class Form2TranslationsReaderTest {
         verify(logger, times(1)).warn(eq("Unable to read the translations file " +
                         "'/home/bahmni/clinical_forms/translations/Vitals_2.json'."),
                 any(IOException.class));
+
+    }
+
+    @Test
+    public void shouldReturnTranslationForGivenConceptTranslationKey() {
+        Form2Translation form2Translation = new Form2Translation();
+        String conceptTranslationKey = "HEIGHT_1";
+        String expectedTranslation = "Height";
+        Map<String, String> conceptTranslationMap = new HashMap<>();
+        conceptTranslationMap.put(conceptTranslationKey, expectedTranslation);
+        form2Translation.setConcepts(conceptTranslationMap);
+
+        String translation = form2TranslationsReader.getTranslation(form2Translation, conceptTranslationKey);
+
+        assertEquals(expectedTranslation, translation);
+
+    }
+
+    @Test
+    public void shouldReturnTranslationForGivenLabelTranslationKey() {
+        Form2Translation form2Translation = new Form2Translation();
+        String labelTranslationKey = "LABEL_1";
+        String expectedTranslation = "Weight";
+        Map<String, String> labelTranslationMap = new HashMap<>();
+        labelTranslationMap.put(labelTranslationKey, expectedTranslation);
+        form2Translation.setConcepts(Collections.EMPTY_MAP);
+        form2Translation.setLabels(labelTranslationMap);
+
+        String translation = form2TranslationsReader.getTranslation(form2Translation, labelTranslationKey);
+
+        assertEquals(expectedTranslation, translation);
+
+    }
+
+    @Test
+    public void shouldThrowTranslationExceptionIfForm2TranslationIsNull() {
+
+        expectedException.expect(TranslationException.class);
+        form2TranslationsReader.getTranslation(null, "translationKey");
+
+    }
+
+    @Test
+    public void shouldThrowTranslationExceptionForEmptyTranslationKey() {
+
+        expectedException.expect(TranslationException.class);
+        form2TranslationsReader.getTranslation(new Form2Translation(), "");
 
     }
 }
