@@ -16,13 +16,12 @@ import java.util.Map;
 @Component
 public class FormService {
 
+    private static final String FORM_NAME = "name";
     @Qualifier("openmrsJdbcTemplate")
     @Autowired
     JdbcTemplate openmrsDbTemplate;
-
     @Value("classpath:sql/form2FormList.sql")
     private Resource form2FormListResource;
-    private static final String FORM_NAME = "name";
 
     public Map<String, String> getAllLatestFormPaths() {
         Map<String, String> formPaths = new HashMap<>();
@@ -42,12 +41,16 @@ public class FormService {
 
     public Map<String, Integer> getFormNamesWithLatestVersionNumber() {
         LinkedHashMap<String, Integer> formNameAndVersionMap = new LinkedHashMap<>();
-        List<Map<String, Object>> forms = executeFormListQuery();
+        List<Map<String, Object>> forms = getLatestFormNamesWithVersion();
         forms.forEach(form -> {
             String name = (String) form.get(FORM_NAME);
-            int version = (int) form.get("version");
+            int version = Integer.parseInt((String) form.get("version"));
             formNameAndVersionMap.put(name, version);
         });
         return formNameAndVersionMap;
+    }
+
+    private List<Map<String, Object>> getLatestFormNamesWithVersion() {
+        return openmrsDbTemplate.queryForList("SELECT name , MAX(version) as version FROM FORM GROUP BY name");
     }
 }

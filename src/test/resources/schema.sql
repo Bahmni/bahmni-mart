@@ -845,3 +845,25 @@ create table form_resource
 
 SET FOREIGN_KEY_CHECKS=1;
 
+drop table if exists global_property cascade ;
+create table global_property
+(
+  property varchar(255) default '' not null
+    primary key,
+  property_value text null,
+  description text null,
+  uuid char(38) not null,
+  datatype varchar(255) null,
+  datatype_config text null,
+  preferred_handler varchar(255) null,
+  handler_config text null,
+  date_changed datetime null,
+  changed_by int null,
+  constraint global_property_uuid_index
+  unique (uuid)
+
+);
+
+
+
+

@@ -120,7 +120,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 "value_reference, datatype, uuid) VALUES " +
                 "(77, 78, 'FormBuilderForm', '%s', 'org.bahmni.customdatatype.datatype.FileSystemStorageDatatype', " +
                 "'3f480fe5-da11-4c08-afad-5dc440515167')",
-                System.getProperty("user.dir") + "/src/test/resources/form2MetadataJson/FormBuilderForm_1.json");
+                System.getProperty("user.dir") + "/src/test/resources/form2MetadataJson/FormBuilderForm_2.json");
         openmrsJdbcTemplate.execute(sql);
 
         batchConfiguration.run();
@@ -179,7 +179,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                         "'org.bahmni.customdatatype.datatype.FileSystemStorageDatatype', " +
                         "'3f480fe5-da11-4c08-afad-5dc440515168')",
                 System.getProperty("user.dir") +
-                        "/src/test/resources/form2MetadataJson/FormBuilderFormIncremental_1.json");
+                        "/src/test/resources/form2MetadataJson/FormBuilderFormIncremental_2.json");
         openmrsJdbcTemplate.execute(sql);
 
         batchConfiguration.run();

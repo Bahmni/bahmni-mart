@@ -1,5 +1,6 @@
 package org.bahmni.mart.form2;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.config.job.JobDefinitionUtil;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
@@ -8,6 +9,9 @@ import org.bahmni.mart.form2.model.Control;
 import org.bahmni.mart.form2.model.ControlLabel;
 import org.bahmni.mart.form2.model.ControlProperties;
 import org.bahmni.mart.form2.model.Form2JsonMetadata;
+import org.bahmni.mart.form2.service.FormService;
+import org.bahmni.mart.form2.translations.model.Form2Translation;
+import org.bahmni.mart.form2.translations.util.Form2TranslationsReader;
 import org.bahmni.mart.form2.uitl.Form2MetadataReader;
 import org.bahmni.mart.helper.FormListHelper;
 import org.bahmni.mart.helper.IgnoreColumnsConfigHelper;
@@ -15,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,14 +32,23 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 @Component
 public class Form2ListProcessor {
 
+    private static final String DEFAULT_LOCALE = "en";
+    Map<String, Integer> formNamesWithLatestVersionNumber;
     private HashSet<Concept> ignoreConcepts;
     private JobDefinition jobDefinition;
-
     @Autowired
     private Form2MetadataReader form2MetadataReader;
-
     @Autowired
     private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
+
+    private Form2TranslationsReader form2TranslationsReader;
+    private Map<String, Form2Translation> formToTranslationsMap = new HashMap<>();
+
+    @Autowired
+    public Form2ListProcessor(FormService formService, Form2TranslationsReader form2TranslationsReader) {
+        formNamesWithLatestVersionNumber = formService.getFormNamesWithLatestVersionNumber();
+        this.form2TranslationsReader = form2TranslationsReader;
+    }
 
     public List<BahmniForm> getAllForms(Map<String, String> allLatestFormPaths, JobDefinition jobDefinition) {
         this.jobDefinition = jobDefinition;
@@ -68,7 +82,7 @@ public class Form2ListProcessor {
         Concept concept = null;
         final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
         if (isEmpty(control.getControls()) && form2Concept != null) {
-            conceptName = form2Concept.getName();
+            conceptName = getTranslatedName(rootformName, control.getLabel());
             if (isInIgnoreConcepts(conceptName))
                 return null;
             concept = new Concept();
@@ -77,14 +91,32 @@ public class Form2ListProcessor {
         } else {
             final ControlLabel controlLabel = control.getLabel();
             if (controlLabel != null) {
-                conceptName = controlLabel.getValue();
                 concept = new Concept();
-                concept.setName(conceptName);
+                concept.setName(getTranslatedName(rootformName, controlLabel));
             }
         }
         if (control.getType() != null && control.getType().toLowerCase().equals("section"))
             concept.setName(rootformName + " " + concept.getName());
         return concept;
+    }
+
+    private String getTranslatedName(String rootFormName, ControlLabel controlLabel) {
+        if (!formToTranslationsMap.containsKey(rootFormName)) {
+            formToTranslationsMap.put(rootFormName, getForm2Translation(rootFormName));
+        }
+        Form2Translation form2Translation = formToTranslationsMap.get(rootFormName);
+        return form2TranslationsReader.getTranslation(form2Translation, controlLabel.getTranslationKey());
+    }
+
+    private Form2Translation getForm2Translation(String rootFormName) {
+        Integer formVersion = formNamesWithLatestVersionNumber.get(rootFormName);
+        if (formVersion == null) {
+            formVersion = 0;
+        }
+        String locale = jobDefinition.getLocale();
+        locale = StringUtils.isBlank(locale) ? DEFAULT_LOCALE : locale;
+
+        return form2TranslationsReader.read(rootFormName, formVersion, locale);
     }
 
     private boolean isInIgnoreConcepts(String conceptName) {

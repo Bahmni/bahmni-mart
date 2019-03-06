@@ -1,11 +1,12 @@
 package org.bahmni.mart.form2.translations.model;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Form2Translation {
     private String locale;
-    private Map<String, String> labels;
-    private Map<String, String> concepts;
+    private Map<String, String> labels = new HashMap<>();
+    private Map<String, String> concepts = new HashMap<>();
     private String formName;
     private String version;
 

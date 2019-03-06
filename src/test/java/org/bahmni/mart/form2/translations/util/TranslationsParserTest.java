@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 
 import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.verify;
 
 public class TranslationsParserTest {
@@ -56,9 +55,9 @@ public class TranslationsParserTest {
 
         Form2Translation form2Translation = TranslationsParser.parse(translation, "abc");
 
-        assertNull(form2Translation.getLabels());
-        assertNull(form2Translation.getConcepts());
-        assertNull(form2Translation.getLocale());
+        assertEquals(0, form2Translation.getLabels().size());
+        assertEquals(0, form2Translation.getConcepts().size());
+        assertEquals(null, form2Translation.getLocale());
     }
 
     @Test

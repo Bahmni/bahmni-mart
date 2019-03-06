@@ -439,4 +439,7 @@ INSERT INTO form(form_id, name, version, published, creator, date_created, chang
 VALUES
 (90, 'FormBuilderFormIncremental', 2, 1, 8, '2019-02-05 10:59:14', 8,
 '2019-02-05 10:59:17', 0,'0a15ea90-a310-43db-a55b-eaeb75423ab8');
+
+INSERT INTO global_property(property, property_value, uuid) VALUES ('bahmni.formTranslations.directory',
+'src/test/resources/form2MetadataJson/translations', '67e4dd4b-3860-4b32-9e53-019ad7e74951')
 -- End of form builder forms test data

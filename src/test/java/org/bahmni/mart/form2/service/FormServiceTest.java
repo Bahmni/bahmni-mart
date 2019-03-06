@@ -43,12 +43,13 @@ public class FormServiceTest {
     @Test
     public void shouldReturnMapWithKeysAsFormNamesAndValuesAsLatestVersion() {
 
+        String formNameAndVersionSql = "SELECT name , MAX(version) as version FROM FORM GROUP BY name";
         Map<String, Object> formRow = new LinkedHashMap<>();
         formRow.put("name", "Vitals");
-        formRow.put("version", 3);
+        formRow.put("version", "3");
         List<Map<String, Object>> formRows = new ArrayList<>();
         formRows.add(formRow);
-        when(jdbcTemplate.queryForList(sql)).thenReturn(formRows);
+        when(jdbcTemplate.queryForList(formNameAndVersionSql)).thenReturn(formRows);
 
         Map<String, Integer> formNameAndVersionMap = formService.getFormNamesWithLatestVersionNumber();
 
