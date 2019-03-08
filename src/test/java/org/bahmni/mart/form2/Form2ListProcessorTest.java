@@ -92,13 +92,13 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
-        assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
-        assertEquals(bahmniForm.getChildren().size(), 0);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
+        assertEquals(0, bahmniForm.getChildren().size());
         final List<Concept> bahmniFormFields = bahmniForm.getFields();
-        assertEquals(bahmniFormFields.size(), 1);
-        assertEquals(bahmniFormFields.get(0).getName(), obsConceptName);
+        assertEquals(1, bahmniFormFields.size());
+        assertEquals(obsConceptName, bahmniFormFields.get(0).getName());
     }
 
     @Test
@@ -116,13 +116,13 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
-        assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
-        assertEquals(bahmniForm.getFields().size(), 0);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
+        assertEquals(0, bahmniForm.getFields().size());
         final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
-        assertEquals(bahmniFormChildren.size(), 1);
-        assertEquals(bahmniFormChildren.get(0).getFormName().getName(), obsConceptName);
+        assertEquals(1, bahmniFormChildren.size());
+        assertEquals(obsConceptName, bahmniFormChildren.get(0).getFormName().getName());
     }
 
     @Test
@@ -151,12 +151,12 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
-        assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
         final List<Concept> bahmniFormFields = bahmniForm.getFields();
-        assertEquals(bahmniFormFields.size(), 1);
-        assertEquals(bahmniFormFields.get(0).getName(), obsConceptName);
+        assertEquals(1, bahmniFormFields.size());
+        assertEquals(obsConceptName, bahmniFormFields.get(0).getName());
     }
 
     @Test
@@ -185,13 +185,13 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
-        assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
         final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
-        assertEquals(bahmniForm.getFields().size(), 0);
-        assertEquals(bahmniFormChildren.size(), 1);
-        assertEquals(bahmniFormChildren.get(0).getFormName().getName(), obsConceptName);
+        assertEquals(0, bahmniForm.getFields().size());
+        assertEquals(1, bahmniFormChildren.size());
+        assertEquals(obsConceptName, bahmniFormChildren.get(0).getFormName().getName());
     }
 
     @Test
@@ -221,17 +221,17 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
-        assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
         final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
-        assertEquals(bahmniForm.getFields().size(), 0);
-        assertEquals(bahmniFormChildren.size(), 1);
-        assertEquals(bahmniFormChildren.get(0).getFormName().getName(), "ComplexForm Section");
-        assertEquals(bahmniFormChildren.get(0).getFields().size(), 0);
+        assertEquals(0, bahmniForm.getFields().size());
+        assertEquals(1, bahmniFormChildren.size());
+        assertEquals("ComplexForm Section", bahmniFormChildren.get(0).getFormName().getName());
+        assertEquals(0, bahmniFormChildren.get(0).getFields().size());
         final List<BahmniForm> sectionChildren = bahmniFormChildren.get(0).getChildren();
-        assertEquals(sectionChildren.size(), 1);
-        assertEquals(sectionChildren.get(0).getFormName().getName(), obsConceptName);
+        assertEquals(1, sectionChildren.size());
+        assertEquals(obsConceptName, sectionChildren.get(0).getFormName().getName());
         assertEquals(1, sectionChildren.get(0).getFields().size());
         assertEquals(obsConceptName, sectionChildren.get(0).getFields().get(0).getName());
     }
@@ -273,20 +273,20 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
-        assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
         assertNull(bahmniForm.getRootForm());
         final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
-        assertEquals(bahmniForm.getFields().size(), 0);
-        assertEquals(bahmniFormChildren.size(), 1);
-        assertEquals(bahmniFormChildren.get(0).getFormName().getName(), "ComplexForm Section");
-        assertEquals(bahmniFormChildren.get(0).getFields().size(), 0);
-        assertEquals(bahmniForm, bahmniFormChildren.get(0).getRootForm());
+        assertEquals(0, bahmniForm.getFields().size());
+        assertEquals(1, bahmniFormChildren.size());
+        assertEquals("ComplexForm Section", bahmniFormChildren.get(0).getFormName().getName());
+        assertEquals(0, bahmniFormChildren.get(0).getFields().size());
+        assertEquals(bahmniFormChildren.get(0).getRootForm(), bahmniForm);
         final List<BahmniForm> sectionChildren = bahmniFormChildren.get(0).getChildren();
-        assertEquals(sectionChildren.size(), 2);
-        assertEquals(sectionChildren.get(0).getFormName().getName(), obsConceptName1);
-        assertEquals(sectionChildren.get(1).getFormName().getName(), obsConceptName2);
+        assertEquals(2, sectionChildren.size());
+        assertEquals(obsConceptName1, sectionChildren.get(0).getFormName().getName());
+        assertEquals(obsConceptName2, sectionChildren.get(1).getFormName().getName());
         assertEquals(2, sectionChildren.get(0).getDepthToParent());
         assertEquals(2, sectionChildren.get(1).getDepthToParent());
         assertEquals(bahmniForm, sectionChildren.get(0).getRootForm());
@@ -330,14 +330,14 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
-        assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
         final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
-        assertEquals(bahmniForm.getFields().size(), 0);
-        assertEquals(bahmniFormChildren.size(), 2);
-        assertEquals(bahmniFormChildren.get(0).getFormName().getName(), obsConceptName1);
-        assertEquals(bahmniFormChildren.get(1).getFormName().getName(), obsConceptName2);
+        assertEquals(0, bahmniForm.getFields().size());
+        assertEquals(2, bahmniFormChildren.size());
+        assertEquals(obsConceptName1, bahmniFormChildren.get(0).getFormName().getName());
+        assertEquals(obsConceptName2, bahmniFormChildren.get(1).getFormName().getName());
         assertEquals(1, bahmniFormChildren.get(0).getDepthToParent());
         assertEquals(1, bahmniFormChildren.get(1).getDepthToParent());
     }
@@ -366,12 +366,12 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 1);
+        assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
-        assertEquals(bahmniForm.getFormName().getName(), COMPLEX_FORM);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
         final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
-        assertEquals(bahmniForm.getFields().size(), 1);
-        assertEquals(bahmniFormChildren.size(), 0);
+        assertEquals(1, bahmniForm.getFields().size());
+        assertEquals(0, bahmniFormChildren.size());
     }
 
     @Test
@@ -420,7 +420,7 @@ public class Form2ListProcessorTest {
 
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
-        assertEquals(allForms.size(), 0);
+        assertEquals(0, allForms.size());
     }
 
     @Test
@@ -466,7 +466,7 @@ public class Form2ListProcessorTest {
         assertEquals(1, allForms.size());
         final List<Concept> fields = allForms.get(0).getFields();
         assertEquals(1, fields.size());
-        assertEquals(fields.get(0).getName(), obsConceptName1);
+        assertEquals(obsConceptName1, fields.get(0).getName());
     }
 
     @Test
