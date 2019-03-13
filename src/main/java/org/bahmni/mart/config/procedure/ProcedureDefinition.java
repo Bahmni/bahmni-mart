@@ -4,6 +4,7 @@ public class ProcedureDefinition {
 
     private String name;
     private String sourceFilePath;
+    private ProcedureParameters procedureParameters;
 
     public String getName() {
         return name;
@@ -11,5 +12,9 @@ public class ProcedureDefinition {
 
     public String getSourceFilePath() {
         return sourceFilePath;
+    }
+
+    ProcedureParameters getProcedureParameters() {
+        return procedureParameters;
     }
 }
