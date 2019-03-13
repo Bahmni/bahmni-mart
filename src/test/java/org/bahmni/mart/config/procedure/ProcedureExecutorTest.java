@@ -3,6 +3,7 @@ package org.bahmni.mart.config.procedure;
 import org.bahmni.mart.BatchUtils;
 import org.bahmni.mart.config.job.SQLFileLoader;
 import org.bahmni.mart.exception.BatchResourceException;
+import org.bahmni.mart.helper.FreeMarkerEvaluator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +43,9 @@ public class ProcedureExecutorTest {
     private JdbcTemplate jdbcTemplate;
 
     @Mock
+    private FreeMarkerEvaluator freeMarkerEvaluator;
+
+    @Mock
     private Resource resource;
 
     @Mock
@@ -52,15 +56,16 @@ public class ProcedureExecutorTest {
         procedureExecutor = new ProcedureExecutor();
         setValuesForMemberFields(procedureExecutor, "martJdbcTemplate", jdbcTemplate);
         setValuesForMemberFields(procedureExecutor, "logger", logger);
+        setValuesForMemberFields(procedureExecutor, "freeMarkerEvaluator", freeMarkerEvaluator);
         mockStatic(SQLFileLoader.class);
         mockStatic(BatchUtils.class);
     }
 
     @Test
-    public void shouldExecuteProcedureFromGivenSourceFilePath() throws Exception {
+    public void shouldExecuteProcedureFromGivenSQLSourceFilePath() throws Exception {
         ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
         when(procedureDefinition.getName()).thenReturn("Test Procedure");
-        String path = "Some path";
+        String path = "Some path.sql";
         when(procedureDefinition.getSourceFilePath()).thenReturn(path);
         when(loadResource(path)).thenReturn(resource);
         String validSql = "valid sql";
@@ -75,7 +80,7 @@ public class ProcedureExecutorTest {
     public void shouldLogErrorGivenWrongFilePath() throws Exception {
         ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
         when(procedureDefinition.getName()).thenReturn("Test Procedure");
-        String path = "invalid path";
+        String path = "invalid path.sql";
         when(procedureDefinition.getSourceFilePath()).thenReturn(path);
         when(loadResource(path)).thenThrow(BatchResourceException.class);
 
@@ -89,7 +94,7 @@ public class ProcedureExecutorTest {
     public void shouldLogErrorWhenSqlHasDropToken() throws Exception {
         ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
         when(procedureDefinition.getName()).thenReturn("Test Procedure");
-        String path = "invalid path";
+        String path = "invalid path.sql";
         when(procedureDefinition.getSourceFilePath()).thenReturn(path);
         when(loadResource(path)).thenReturn(resource);
         when(convertResourceOutputToString(resource)).thenReturn("DROP sql");
@@ -121,5 +126,22 @@ public class ProcedureExecutorTest {
         List<String> actualFailedProcedures = procedureExecutor.getFailedProcedures();
 
         assertTrue(singletonList("Test Procedure").containsAll(actualFailedProcedures));
+    }
+
+    @Test
+    public void shouldExecuteProcedureFromGivenFTLSourceFilePath() throws Exception {
+        ProcedureDefinition procedureDefinition = mock(ProcedureDefinition.class);
+        when(procedureDefinition.getName()).thenReturn("Test Procedure");
+        String path = "Some path.ftl";
+        when(procedureDefinition.getSourceFilePath()).thenReturn(path);
+        ProcedureParameters procedureParameters = new ProcedureParameters();
+        when(procedureDefinition.getProcedureParameters()).thenReturn(procedureParameters);
+        when(loadResource(path)).thenReturn(resource);
+        String validFtl = "some sql";
+        when(freeMarkerEvaluator.evaluate(path, procedureParameters)).thenReturn(validFtl);
+
+        procedureExecutor.execute(Arrays.asList(procedureDefinition));
+
+        verify(jdbcTemplate, times(1)).execute(validFtl);
     }
 }
