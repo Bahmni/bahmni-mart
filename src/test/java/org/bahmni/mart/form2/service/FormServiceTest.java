@@ -43,7 +43,7 @@ public class FormServiceTest {
     @Test
     public void shouldReturnMapWithKeysAsFormNamesAndValuesAsLatestVersion() {
 
-        String formNameAndVersionSql = "SELECT name , MAX(version) as version FROM FORM GROUP BY name";
+        String formNameAndVersionSql = "SELECT name , MAX(version) as version FROM form GROUP BY name";
         Map<String, Object> formRow = new LinkedHashMap<>();
         formRow.put("name", "Vitals");
         formRow.put("version", "3");

@@ -51,6 +51,6 @@ public class FormService {
     }
 
     private List<Map<String, Object>> getLatestFormNamesWithVersion() {
-        return openmrsDbTemplate.queryForList("SELECT name , MAX(version) as version FROM FORM GROUP BY name");
+        return openmrsDbTemplate.queryForList("SELECT name , MAX(version) as version FROM form GROUP BY name");
     }
 }
