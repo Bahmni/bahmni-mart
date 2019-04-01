@@ -69,7 +69,11 @@ To install bahmni-mart follow the steps given below
 * Before running the installtion please add the following parameters in setup.yml file
 
   * ANALYTICS_DB_PASSWORD
-  * OPENMRS_DB_PASSWORD  
+  * OPENMRS_DB_PASSWORD
+  * METABASE_DB_PASSWORD
+  
+  **Note** : Password should be a Non Empty string. 
+    
 * Install **Bahmni-mart** application
     ```bash
     ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml'
