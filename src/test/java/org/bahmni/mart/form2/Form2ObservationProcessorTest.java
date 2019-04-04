@@ -30,6 +30,9 @@ public class Form2ObservationProcessorTest {
         when(form.getDepthToParent()).thenReturn(0);
         form2ObservationProcessor.setForm(form);
         Map<String, Object> obsRow = getObsRow();
+        Map<String, String> fieldNameAndFullySpecifiedNameMap = new HashMap<>();
+        fieldNameAndFullySpecifiedNameMap.put("age", "age");
+        when(form.getFieldNameAndFullySpecifiedNameMap()).thenReturn(fieldNameAndFullySpecifiedNameMap);
 
         List<Obs> obsList = form2ObservationProcessor.process(obsRow);
 

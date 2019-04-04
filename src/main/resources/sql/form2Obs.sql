@@ -6,7 +6,7 @@ SELECT
   COALESCE(DATE_FORMAT(o.value_datetime, '%d/%b/%Y %T'), o.value_numeric, o.value_text,
            vcc.code, value_concept_locale.name, cvn.concept_full_name,
            cvn.concept_short_name)                                                AS value,
-  COALESCE(locale_obs_con.name, obs_con.name)                                     AS conceptName,
+  COALESCE(obs_con.name)                                     AS conceptName,
   o.obs_datetime                                                                  AS obsDateTime,
   o.date_created                                                                  AS dateCreated,
   o.location_id                                                                   AS locationId,
@@ -21,10 +21,6 @@ FROM obs o
                                    obs_con.concept_id AND obs_con.name IN
                                                           (:conceptNames)
                                AND obs_con.concept_name_type = 'FULLY_SPECIFIED'
-  LEFT OUTER JOIN concept_name locale_obs_con
-    ON locale_obs_con.concept_id = o.concept_id AND locale_obs_con.locale = :locale
-       AND locale_obs_con.concept_name_type = 'FULLY_SPECIFIED' AND
-       locale_obs_con.voided IS FALSE
   LEFT OUTER JOIN location l ON o.location_id = l.location_id
   LEFT OUTER JOIN episode_encounter ee ON ee.encounter_id = o.encounter_id
   LEFT OUTER JOIN episode_patient_program epp ON ee.episode_id = epp.episode_id

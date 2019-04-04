@@ -29,7 +29,7 @@ public class Form2ObservationProcessor implements ItemProcessor<Map<String, Obje
         obs.setId((Integer) item.get("id"));
         Concept concept = new Concept();
         concept.setId((Integer) item.get("conceptId"));
-        concept.setName((String) item.get("conceptName"));
+        concept.setName(this.form.getFieldNameAndFullySpecifiedNameMap().get((String) item.get("conceptName")));
         obs.setField(concept);
         obs.setValue((String) item.get("value"));
         obs.setObsDateTime(String.valueOf(item.get("obsDateTime")));
