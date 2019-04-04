@@ -100,6 +100,17 @@ public class Form2ListProcessor {
         return concept;
     }
 
+    private String getConceptNameFromFormJson(Control control) {
+        String conceptName = "";
+        final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
+        if (isEmpty(control.getControls()) && form2Concept != null) {
+            conceptName = form2Concept.getName();
+            return conceptName;
+        } else {
+            return conceptName;
+        }
+    }
+
     private String getTranslatedName(String rootFormName, ControlLabel controlLabel) {
         if (!formToTranslationsMap.containsKey(rootFormName)) {
             formToTranslationsMap.put(rootFormName, getForm2Translation(rootFormName));
@@ -125,6 +136,7 @@ public class Form2ListProcessor {
 
     private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent, boolean isParentAddMore) {
         Concept concept = createConcept(control, getRootForm(bahmniForm).getFormName().getName());
+        String conceptFullySpecifiedName = getConceptNameFromFormJson(control);
         if (isNull(concept)) {
             return;
         }
@@ -141,9 +153,11 @@ public class Form2ListProcessor {
             }
             childBahmniForm.setDepthToParent(depthToParent);
             bahmniForm.addChild(childBahmniForm);
-            processInnerControls(control, childBahmniForm, concept, depthToParent, true);
+            processInnerControls(control, childBahmniForm, concept, depthToParent, true,
+                    conceptFullySpecifiedName);
         } else {
-            processInnerControls(control, bahmniForm, concept, depthToParent, isParentAddMore);
+            processInnerControls(control, bahmniForm, concept, depthToParent, isParentAddMore,
+                    conceptFullySpecifiedName);
         }
     }
 
@@ -152,11 +166,12 @@ public class Form2ListProcessor {
     }
 
     private void processInnerControls(Control control, BahmniForm bahmniForm, Concept concept, int depthToParent,
-                                      boolean isParentAddMore) {
+                                      boolean isParentAddMore, String fullySpecifiedName) {
         if (isNotEmpty(control.getControls())) {
             parseChildControls(control.getControls(), bahmniForm, depthToParent, isParentAddMore);
         } else {
             bahmniForm.addField(concept);
+            bahmniForm.addFieldNameAndFullySpecifiedNameMap(fullySpecifiedName, concept.getName());
         }
     }
 

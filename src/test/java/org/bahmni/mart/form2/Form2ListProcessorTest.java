@@ -661,4 +661,89 @@ public class Form2ListProcessorTest {
         assertEquals(1, fields.size());
         assertEquals(obsConceptName2, fields.get(0).getName());
     }
+
+    @Test
+    public void shouldCreateMapWithTheTranslatedValuesInBahmniFormWithObsAddMoreAndObsGroup() {
+        String obsConceptName1 = "ObsConcept1";
+        String obsConcept1TranslationKey = "OBS_CONCEPT_1";
+        String obsConceptName2 = "ObsConcept2";
+        String obsConcept2TranslationKey = "OBS_CONCEPT_2";
+        Control obsControl1 = new ControlBuilder()
+                .withPropertyAddMore(true)
+                .withConcept(obsConceptName1, "obs_control_1_uuid")
+                .withLabel(obsConceptName1, obsConcept1TranslationKey).build();
+        Control obsControl2 = new ControlBuilder()
+                .withConcept(obsConceptName2, "obs_control_2_uuid")
+                .withLabel(obsConceptName2, obsConcept2TranslationKey).build();
+        Control obsGroupControl1 = new ControlBuilder()
+                .withLabel("obsGroupControl", "OBS_GROUP_CONTROL_1")
+                .withControls(Collections.singletonList(obsControl2)).build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        form2JsonMetadata.setControls(new ArrayList<>(Arrays.asList(obsControl1, obsGroupControl1)));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        String obsConceptName1InGivenLocale = "ObsConcept1InGivenLocale";
+        String obsConceptName2InGivenLocale = "ObsConcept2InGivenLocale";
+        when(form2TranslationsReader.getTranslation(form2Translation, obsConcept1TranslationKey))
+                .thenReturn(obsConceptName1InGivenLocale);
+        when(form2TranslationsReader.getTranslation(form2Translation, obsConcept2TranslationKey))
+                .thenReturn(obsConceptName2InGivenLocale);
+
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(1, bahmniForm.getFieldNameAndFullySpecifiedNameMap().size());
+        assertEquals(1, bahmniForm.getChildren().get(0).getFieldNameAndFullySpecifiedNameMap().size());
+        assertEquals(obsConceptName1InGivenLocale, bahmniForm.getChildren().get(0)
+                .getFieldNameAndFullySpecifiedNameMap().get(obsConceptName1));
+        assertEquals(obsConceptName2InGivenLocale,
+                bahmniForm.getFieldNameAndFullySpecifiedNameMap().get(obsConceptName2));
+    }
+
+    @Test
+    public void shouldCreateMapWithTheTranslatedValuesInBahmniFormWithSectionAndObsGroupAddMore() {
+        String obsConceptName1 = "ObsConcept1";
+        String obsConcept1TranslationKey = "OBS_CONCEPT_1";
+        String obsConceptName2 = "ObsConcept2";
+        String obsConcept2TranslationKey = "OBS_CONCEPT_2";
+        String sectionName = "Section";
+        String sectionTranslationKey = "SECTION_1";
+
+        Control obsControl1 = new ControlBuilder()
+                .withConcept(obsConceptName1, "obs_control_1_uuid")
+                .withLabel(obsConceptName1, obsConcept1TranslationKey).build();
+        Control obsControl2 = new ControlBuilder()
+                .withConcept(obsConceptName2, "obs_control_2_uuid")
+                .withLabel(obsConceptName2, obsConcept2TranslationKey).build();
+        Control obsGroupControl1 = new ControlBuilder()
+                .withPropertyAddMore(true)
+                .withLabel("obsGroupControl", "OBS_GROUP_CONTROL_1")
+                .withControls(Collections.singletonList(obsControl2)).build();
+        Control sectionControl = new ControlBuilder()
+                .withLabel(sectionName, sectionTranslationKey)
+                .withControls(singletonList(obsControl1))
+                .withType("section")
+                .withPropertyAddMore(false)
+                .build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        form2JsonMetadata.setControls(new ArrayList<>(Arrays.asList(sectionControl, obsGroupControl1)));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        String obsConceptName1InGivenLocale = "ObsConcept1InGivenLocale";
+        String obsConceptName2InGivenLocale = "ObsConcept2InGivenLocale";
+        when(form2TranslationsReader.getTranslation(form2Translation, obsConcept1TranslationKey))
+                .thenReturn(obsConceptName1InGivenLocale);
+        when(form2TranslationsReader.getTranslation(form2Translation, obsConcept2TranslationKey))
+                .thenReturn(obsConceptName2InGivenLocale);
+
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(1, bahmniForm.getChildren().get(0).getFieldNameAndFullySpecifiedNameMap().size());
+        assertEquals(1, bahmniForm.getFieldNameAndFullySpecifiedNameMap().size());
+        assertEquals(obsConceptName1InGivenLocale, bahmniForm.getFieldNameAndFullySpecifiedNameMap()
+                .get(obsConceptName1));
+        assertEquals(obsConceptName2InGivenLocale, bahmniForm.getChildren().get(0)
+                .getFieldNameAndFullySpecifiedNameMap().get(obsConceptName2));
+    }
 }
