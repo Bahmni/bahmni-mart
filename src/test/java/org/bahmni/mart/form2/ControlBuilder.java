@@ -41,6 +41,11 @@ public class ControlBuilder {
         return this;
     }
 
+    ControlBuilder withConcept(Concept concept) {
+        control.setConcept(concept);
+        return this;
+    }
+
     ControlBuilder withControls(List<Control> controls) {
         control.setControls(controls);
         return this;
