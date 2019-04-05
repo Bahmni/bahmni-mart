@@ -1,1 +1,15 @@
-{"en":{"concepts":{"WWN,_SYSTOLIC_BLOOD_PRESSURE_1":"WWN, Systolic blood pressure","DISPOSITION_NOTE_3":"Disposition Note","HI,_PENICILLIN_4":"HI, Penicillin","SUSCEPTIBLE_4":"Susceptible","RESISTANT_4":"Resistant","INTERMEDIATE_4":"Intermediate"},"labels":{"SECTION_2":"Section"}}}
+{
+  "en": {
+    "concepts": {
+      "WWN,_SYSTOLIC_BLOOD_PRESSURE_1": "WWN, Systolic blood pressure",
+      "DISPOSITION_NOTE_3": "Disposition Note",
+      "HI,_PENICILLIN_4": "Translated Name for Penicillin",
+      "SUSCEPTIBLE_4": "Susceptible",
+      "RESISTANT_4": "Resistant",
+      "INTERMEDIATE_4": "Intermediate"
+    },
+    "labels": {
+      "SECTION_2": "Section"
+    }
+  }
+}
