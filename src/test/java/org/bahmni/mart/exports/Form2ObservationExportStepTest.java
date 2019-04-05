@@ -185,8 +185,6 @@ public class Form2ObservationExportStepTest {
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "voided", false);
         verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "locale", "fr");
-        verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptReferenceSource", "WHO");
 
     }
@@ -211,7 +209,6 @@ public class Form2ObservationExportStepTest {
         fieldNameAndFullySpecifiedNameMap.put(concept1Name, concept1Name);
         fieldNameAndFullySpecifiedNameMap.put(concept2Name, concept2Name);
         when(form.getFieldNameAndFullySpecifiedNameMap()).thenReturn(fieldNameAndFullySpecifiedNameMap);
-        when(jobDefinition.getLocale()).thenReturn("fr");
         when(jobDefinition.getConceptReferenceSource()).thenReturn("WHO");
         String obsReadersSql = "obs reader sql";
         setValuesForMemberFields(form2ObservationExportStep, "obsReaderSql", obsReadersSql);
@@ -236,8 +233,6 @@ public class Form2ObservationExportStepTest {
                 Arrays.asList(concept2Name, concept1Name));
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "voided", false);
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "locale", "fr");
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptReferenceSource", "WHO");
     }

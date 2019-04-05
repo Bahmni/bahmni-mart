@@ -4,7 +4,7 @@ SELECT
   o.concept_id                                                                    AS conceptId,
   o.obs_id                                                                        AS id,
   COALESCE(DATE_FORMAT(o.value_datetime, '%d/%b/%Y %T'), o.value_numeric, o.value_text,
-           vcc.code, value_concept_locale.name, cvn.concept_full_name,
+           vcc.code, cvn.concept_full_name,
            cvn.concept_short_name)                                                AS value,
   COALESCE(obs_con.name)                                     AS conceptName,
   o.obs_datetime                                                                  AS obsDateTime,
@@ -27,9 +27,6 @@ FROM obs o
   LEFT OUTER JOIN patient_program pp ON epp.patient_program_id = pp.patient_program_id AND pp.voided = FALSE
   LEFT OUTER JOIN program p ON pp.program_id = p.program_id
   LEFT OUTER JOIN concept codedConcept ON o.value_coded = codedConcept.concept_id
-  LEFT OUTER JOIN concept_name value_concept_locale
-    ON value_concept_locale.concept_id = o.value_coded AND value_concept_locale.locale = :locale
-       AND value_concept_locale.concept_name_type = 'FULLY_SPECIFIED' AND value_concept_locale.voided IS FALSE
   LEFT OUTER JOIN concept_view cvn ON codedConcept.concept_id = cvn.concept_id
   LEFT OUTER JOIN concept_reference_term_map_view vcc ON vcc.concept_id = o.value_coded
                                                          AND vcc.concept_map_type_name = 'SAME-AS'

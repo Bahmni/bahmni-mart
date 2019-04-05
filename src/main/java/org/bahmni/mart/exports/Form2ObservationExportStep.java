@@ -115,7 +115,6 @@ public class Form2ObservationExportStep implements ObservationExportStep {
         obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "formName",
                 getFormName());
         obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "conceptNames", conceptNames);
-        obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "locale", jobDefinition.getLocale());
         obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql,
                 "conceptReferenceSource", jobDefinition.getConceptReferenceSource());
         return obsReaderSql;
