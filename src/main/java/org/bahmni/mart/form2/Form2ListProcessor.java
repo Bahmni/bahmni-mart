@@ -186,8 +186,10 @@ public class Form2ListProcessor {
         control.getConcept().getAnswers()
                 .stream()
                 .forEach(conceptAnswer -> {
+                    String translatedConceptAnswer = getTranslatedName(rootFormName, conceptAnswer.getTranslationKey());
                     bahmniForm.addFieldNameAndFullySpecifiedNameMap(conceptAnswer.getDisplayString(),
-                            getTranslatedName(rootFormName, conceptAnswer.getTranslationKey()));
+                            isNull(translatedConceptAnswer) ?
+                                    conceptAnswer.getDisplayString() : translatedConceptAnswer);
                 });
     }
 
