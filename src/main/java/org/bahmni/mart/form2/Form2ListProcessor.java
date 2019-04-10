@@ -93,8 +93,9 @@ public class Form2ListProcessor {
         } else {
             final ControlLabel controlLabel = control.getLabel();
             if (controlLabel != null) {
+                String translatedName = getTranslatedName(rootformName, controlLabel.getTranslationKey());
                 concept = new Concept();
-                concept.setName(getTranslatedName(rootformName, controlLabel.getTranslationKey()));
+                concept.setName(isNull(translatedName) ? controlLabel.getValue() : translatedName);
             }
         }
         if (control.getType() != null && control.getType().toLowerCase().equals("section"))

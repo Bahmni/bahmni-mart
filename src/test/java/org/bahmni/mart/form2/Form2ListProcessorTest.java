@@ -878,4 +878,38 @@ public class Form2ListProcessorTest {
         assertEquals(obsConceptAnswerName2, bahmniForm.getFieldNameAndFullySpecifiedNameMap()
                 .get(obsConceptAnswerName2));
     }
+
+    @Test
+    public void shouldReturnBahmniFormMapWithDefaultSectionNameWhenTranslationIsNotAvailable() {
+        final String obsConceptName = "ObsConcept";
+        final String conceptTranslationKey = "OBS_CONCEPT_1";
+        String sectionName = "Section";
+        final String sectionTranslationKey = "SECTION_1";
+
+        Control obsControl = new ControlBuilder()
+                .withConcept(obsConceptName, "obs_concept_1")
+                .withLabel(obsConceptName, conceptTranslationKey).build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        Control sectionControl = new ControlBuilder()
+                .withLabel(sectionName, sectionTranslationKey)
+                .withControls(singletonList(obsControl))
+                .withType("section")
+                .withPropertyAddMore(true)
+                .build();
+        form2JsonMetadata.setControls(singletonList(sectionControl));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        when(form2TranslationsReader.getTranslation(form2Translation, conceptTranslationKey))
+                .thenReturn(obsConceptName);
+        when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey)).thenReturn(null);
+
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        final BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
+        final List<Concept> bahmniFormFields = bahmniForm.getFields();
+        assertEquals(0, bahmniFormFields.size());
+        assertEquals(obsConceptName, bahmniForm.getChildren().get(0).getFields().get(0).getName());
+        assertEquals(COMPLEX_FORM + " " + sectionName, bahmniForm.getChildren().get(0).getFormName().getName());
+    }
 }
