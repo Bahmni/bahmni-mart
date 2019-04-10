@@ -792,4 +792,38 @@ public class Form2ListProcessorTest {
         assertEquals(obsConceptAnswerName, bahmniForm.getFieldNameAndFullySpecifiedNameMap()
                 .get(obsConceptAnswerName));
     }
+
+    @Test
+    public void shouldGetConceptNameInDefaultLanguageWhenTranslationForConceptIsNotPresent() {
+        String obsConceptName1 = "ObsConcept1";
+        String obsConcept1TranslationKey = "OBS_CONCEPT_1";
+        String obsConceptName2 = "ObsConcept2";
+        String obsConcept2TranslationKey = "OBS_CONCEPT_2";
+        Control obsControl1 = new ControlBuilder()
+                .withConcept(obsConceptName1, "obs_control_1_uuid")
+                .withLabel(obsConceptName1, obsConcept1TranslationKey).build();
+        Control obsControl2 = new ControlBuilder()
+                .withConcept(obsConceptName2, "obs_control_2_uuid")
+                .withLabel(obsConceptName2, obsConcept2TranslationKey).build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        form2JsonMetadata.setControls(new ArrayList<>(Arrays.asList(obsControl1, obsControl2)));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        String obsConceptName2InGivenLocale = "ObsConcept2InGivenLocale";
+        when(form2TranslationsReader.getTranslation(form2Translation, obsConcept1TranslationKey))
+                .thenReturn(null);
+        when(form2TranslationsReader.getTranslation(form2Translation, obsConcept2TranslationKey))
+                .thenReturn(obsConceptName2InGivenLocale);
+
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(2, bahmniForm.getFieldNameAndFullySpecifiedNameMap().size());
+        assertEquals((new Concept(null, obsConceptName1, null)), bahmniForm.getFields().get(0));
+        assertEquals((new Concept(null, obsConceptName2InGivenLocale, null)), bahmniForm.getFields().get(1));
+        assertEquals(obsConceptName1, bahmniForm.getFieldNameAndFullySpecifiedNameMap()
+                .get(obsConceptName1));
+        assertEquals(obsConceptName2InGivenLocale, bahmniForm.getFieldNameAndFullySpecifiedNameMap()
+                .get(obsConceptName2));
+    }
 }
