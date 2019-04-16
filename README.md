@@ -81,8 +81,9 @@ To install bahmni-mart follow the steps given below
     |:-----------|:---------|
     | metabase_with_ssl | Set to true to add ssl certificate for metabase. When this is true, the properties **bahmni_lets_encrypt_cert_dir, metabase_keystore_password** should be provided. Default value is 'false'
     | bahmni_lets_encrypt_cert_dir | Let's encrypt certificates directory, it is mandatory if **metabase_with_ssl** set to true. Eg: /etc/letsencrypt/live/demo.bahmni.org
-    | metabase_keystore_password | Some password to generate jks file, it is mandatory if **metabase_with_ssl** set to true|
-    Since let's encrypt certificates expires after 90 days, you need to regenerate jks file after renewing bahmni certificates. Use following command to regenerate jks file
+    | metabase_keystore_password | Some password to generate jks file, it is mandatory if **metabase_with_ssl** set to true
+   
+   Since let's encrypt certificates expires after 90 days, you need to regenerate jks file after renewing bahmni certificates. Use following command to regenerate jks file
     
     ```/opt/bahmni-mart/bin/pemtojks.sh <bahmni_lets_encrypt_cert_dir> <metabase_keystore_password>```
     
