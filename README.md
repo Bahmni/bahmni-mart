@@ -68,9 +68,9 @@ To install bahmni-mart follow the steps given below
 * Update the values presents in **/etc/bahmni-mart-playbook/setup.yml** inventory file as per your requirement
 * Before running the installtion please add the following parameters in setup.yml file
 
-  * ANALYTICS_DB_PASSWORD
-  * OPENMRS_DB_PASSWORD
-  * METABASE_DB_PASSWORD
+  * analytics_db_password
+  * openmrs_db_password
+  * metabase_db_password
   
   **Note** : Password should be a Non Empty string. 
 * HTTPS for metabase (optional)
