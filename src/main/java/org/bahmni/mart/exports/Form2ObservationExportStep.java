@@ -24,9 +24,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.bahmni.mart.BatchUtils.stepNumber;
 
@@ -110,15 +110,11 @@ public class Form2ObservationExportStep implements ObservationExportStep {
 
     private String getProcessedSql(boolean voided) {
         String obsReaderSql = this.obsReaderSql;
-        List<String> conceptNames = form.getFields()
-                .stream()
-                .map(field -> field.getName())
-                .collect(Collectors.toList());
+        List<String> conceptNames = new ArrayList<>(form.getFieldNameAndFullySpecifiedNameMap().keySet());
         obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "voided", voided);
         obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "formName",
                 getFormName());
         obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "conceptNames", conceptNames);
-        obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "locale", jobDefinition.getLocale());
         obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql,
                 "conceptReferenceSource", jobDefinition.getConceptReferenceSource());
         return obsReaderSql;

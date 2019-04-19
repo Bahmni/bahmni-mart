@@ -26,6 +26,8 @@ import org.springframework.beans.factory.ObjectFactory;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
@@ -153,11 +155,12 @@ public class Form2ObservationExportStepTest {
         BahmniForm form = mock(BahmniForm.class);
         setUpStepConfig(formName, form);
         when(form.getDepthToParent()).thenReturn(0);
-        Concept concept1 = mock(Concept.class);
-        Concept concept2 = mock(Concept.class);
-        when(concept1.getName()).thenReturn("HI, concept1");
-        when(concept2.getName()).thenReturn("PI, concept2");
-        when(form.getFields()).thenReturn(Arrays.asList(concept1, concept2));
+        String concept1Name = "HI, concept1";
+        String concept2Name = "PI, concept2";
+        Map<String, String> fieldNameAndFullySpecifiedNameMap = new HashMap<>();
+        fieldNameAndFullySpecifiedNameMap.put(concept1Name, concept1Name);
+        fieldNameAndFullySpecifiedNameMap.put(concept2Name, concept2Name);
+        when(form.getFieldNameAndFullySpecifiedNameMap()).thenReturn(fieldNameAndFullySpecifiedNameMap);
         when(jobDefinition.getLocale()).thenReturn("fr");
         when(jobDefinition.getConceptReferenceSource()).thenReturn("WHO");
         String obsReadersSql = "obs reader sql";
@@ -172,20 +175,15 @@ public class Form2ObservationExportStepTest {
 
         verify(form, times(3)).getFormName();
         verify(form.getFormName(), times(3)).getName();
-        verify(form).getFields();
-        verify(concept1).getName();
-        verify(concept2).getName();
-        verify(jobDefinition).getLocale();
+        verify(form).getFieldNameAndFullySpecifiedNameMap();
         verify(jobDefinition).getConceptReferenceSource();
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "formName", "FormOne");
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptNames",
-                Arrays.asList("HI, concept1", "PI, concept2"));
+                Arrays.asList(concept2Name, concept1Name));
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "voided", false);
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "locale", "fr");
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptReferenceSource", "WHO");
 
@@ -205,12 +203,12 @@ public class Form2ObservationExportStepTest {
         when(form.getDepthToParent()).thenReturn(1);
         when(form.getRootForm()).thenReturn(rootForm);
 
-        Concept concept1 = mock(Concept.class);
-        Concept concept2 = mock(Concept.class);
-        when(concept1.getName()).thenReturn("HI, concept1");
-        when(concept2.getName()).thenReturn("PI, concept2");
-        when(form.getFields()).thenReturn(Arrays.asList(concept1, concept2));
-        when(jobDefinition.getLocale()).thenReturn("fr");
+        String concept1Name = "HI, concept1";
+        String concept2Name = "PI, concept2";
+        Map<String, String> fieldNameAndFullySpecifiedNameMap = new HashMap<>();
+        fieldNameAndFullySpecifiedNameMap.put(concept1Name, concept1Name);
+        fieldNameAndFullySpecifiedNameMap.put(concept2Name, concept2Name);
+        when(form.getFieldNameAndFullySpecifiedNameMap()).thenReturn(fieldNameAndFullySpecifiedNameMap);
         when(jobDefinition.getConceptReferenceSource()).thenReturn("WHO");
         String obsReadersSql = "obs reader sql";
         setValuesForMemberFields(form2ObservationExportStep, "obsReaderSql", obsReadersSql);
@@ -226,20 +224,15 @@ public class Form2ObservationExportStepTest {
         verify(form.getFormName(), times(2)).getName();
         verify(rootForm, times(1)).getFormName();
         verify(rootForm.getFormName(), times(1)).getName();
-        verify(form).getFields();
-        verify(concept1).getName();
-        verify(concept2).getName();
-        verify(jobDefinition).getLocale();
+        verify(form).getFieldNameAndFullySpecifiedNameMap();
         verify(jobDefinition).getConceptReferenceSource();
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "formName", "FormOne");
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptNames",
-                Arrays.asList("HI, concept1", "PI, concept2"));
+                Arrays.asList(concept2Name, concept1Name));
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "voided", false);
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "locale", "fr");
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptReferenceSource", "WHO");
     }

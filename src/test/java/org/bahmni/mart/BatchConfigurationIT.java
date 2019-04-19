@@ -130,7 +130,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         List<Map<String, Object>> sectionRecords = martJdbcTemplate
                 .queryForList("SELECT * FROM formbuilderform_section");
         List<Map<String, Object>> multiSelectRecords = martJdbcTemplate
-                .queryForList("SELECT * FROM hi_penicillin");
+                .queryForList("SELECT * FROM translated_name_for_penicillin");
 
         assertEquals(2, formRecords.size());
         Map<String, Object> formRecordOne = formRecords.get(0);
@@ -157,9 +157,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         Map<String, Object> multiSelectRecordThree = multiSelectRecords.get(2);
 
         assertTrue(Arrays.asList("Susceptible", "Resistant", "Intermediate").containsAll(Arrays.asList(
-                String.valueOf(multiSelectRecordOne.get("hi_penicillin")),
-                String.valueOf(multiSelectRecordTwo.get("hi_penicillin")),
-                String.valueOf(multiSelectRecordThree.get("hi_penicillin")))));
+                String.valueOf(multiSelectRecordOne.get("translated_name_for_penicillin")),
+                String.valueOf(multiSelectRecordTwo.get("translated_name_for_penicillin")),
+                String.valueOf(multiSelectRecordThree.get("translated_name_for_penicillin")))));
         assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordOne.get("form_field_path")));
         assertEquals("FormBuilderForm.1/2-0", String.valueOf(multiSelectRecordOne.get("reference_form_field_path")));
         assertEquals("FormBuilderForm.1/2-0/4-0", String.valueOf(multiSelectRecordTwo.get("form_field_path")));

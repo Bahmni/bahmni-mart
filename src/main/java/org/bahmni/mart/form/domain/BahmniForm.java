@@ -1,7 +1,9 @@
 package org.bahmni.mart.form.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BahmniForm {
     private List<BahmniForm> children = new ArrayList<>();
@@ -12,6 +14,7 @@ public class BahmniForm {
     private List<Concept> fields = new ArrayList<>();
     private boolean isNonConceptForm = false;
     private boolean isMultiSelect = false;
+    private Map<String, String> fieldNameAndFullySpecifiedNameMap = new HashMap<>();
 
     public List<BahmniForm> getChildren() {
         return children;
@@ -71,5 +74,13 @@ public class BahmniForm {
 
     public void setIsMultiSelect(boolean multiSelect) {
         this.isMultiSelect = multiSelect;
+    }
+
+    public void addFieldNameAndFullySpecifiedNameMap(String fieldName, String fullySpecifiedName) {
+        this.fieldNameAndFullySpecifiedNameMap.put(fieldName, fullySpecifiedName);
+    }
+
+    public Map<String, String> getFieldNameAndFullySpecifiedNameMap() {
+        return fieldNameAndFullySpecifiedNameMap;
     }
 }

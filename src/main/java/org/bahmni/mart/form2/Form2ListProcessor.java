@@ -43,6 +43,7 @@ public class Form2ListProcessor {
 
     private Form2TranslationsReader form2TranslationsReader;
     private Map<String, Form2Translation> formToTranslationsMap = new HashMap<>();
+    private static final String CODED_DATA_TYPE = "Coded";
 
     @Autowired
     public Form2ListProcessor(FormService formService, Form2TranslationsReader form2TranslationsReader) {
@@ -82,7 +83,8 @@ public class Form2ListProcessor {
         Concept concept = null;
         final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
         if (isEmpty(control.getControls()) && form2Concept != null) {
-            conceptName = getTranslatedName(rootformName, control.getLabel());
+            String translatedConceptName = getTranslatedName(rootformName, control.getLabel().getTranslationKey());
+            conceptName = isNull(translatedConceptName) ? form2Concept.getName() : translatedConceptName;
             if (isInIgnoreConcepts(conceptName))
                 return null;
             concept = new Concept();
@@ -91,8 +93,9 @@ public class Form2ListProcessor {
         } else {
             final ControlLabel controlLabel = control.getLabel();
             if (controlLabel != null) {
+                String translatedName = getTranslatedName(rootformName, controlLabel.getTranslationKey());
                 concept = new Concept();
-                concept.setName(getTranslatedName(rootformName, controlLabel));
+                concept.setName(isNull(translatedName) ? controlLabel.getValue() : translatedName);
             }
         }
         if (control.getType() != null && control.getType().toLowerCase().equals("section"))
@@ -100,12 +103,23 @@ public class Form2ListProcessor {
         return concept;
     }
 
-    private String getTranslatedName(String rootFormName, ControlLabel controlLabel) {
+    private String getConceptNameFromFormJson(Control control) {
+        String conceptName = "";
+        final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
+        if (isEmpty(control.getControls()) && form2Concept != null) {
+            conceptName = form2Concept.getName();
+            return conceptName;
+        } else {
+            return conceptName;
+        }
+    }
+
+    private String getTranslatedName(String rootFormName, String translationKey) {
         if (!formToTranslationsMap.containsKey(rootFormName)) {
             formToTranslationsMap.put(rootFormName, getForm2Translation(rootFormName));
         }
         Form2Translation form2Translation = formToTranslationsMap.get(rootFormName);
-        return form2TranslationsReader.getTranslation(form2Translation, controlLabel.getTranslationKey());
+        return form2TranslationsReader.getTranslation(form2Translation, translationKey);
     }
 
     private Form2Translation getForm2Translation(String rootFormName) {
@@ -125,6 +139,7 @@ public class Form2ListProcessor {
 
     private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent, boolean isParentAddMore) {
         Concept concept = createConcept(control, getRootForm(bahmniForm).getFormName().getName());
+        String conceptFullySpecifiedName = getConceptNameFromFormJson(control);
         if (isNull(concept)) {
             return;
         }
@@ -141,9 +156,11 @@ public class Form2ListProcessor {
             }
             childBahmniForm.setDepthToParent(depthToParent);
             bahmniForm.addChild(childBahmniForm);
-            processInnerControls(control, childBahmniForm, concept, depthToParent, true);
+            processInnerControls(control, childBahmniForm, concept, depthToParent, true,
+                    conceptFullySpecifiedName);
         } else {
-            processInnerControls(control, bahmniForm, concept, depthToParent, isParentAddMore);
+            processInnerControls(control, bahmniForm, concept, depthToParent, isParentAddMore,
+                    conceptFullySpecifiedName);
         }
     }
 
@@ -152,12 +169,29 @@ public class Form2ListProcessor {
     }
 
     private void processInnerControls(Control control, BahmniForm bahmniForm, Concept concept, int depthToParent,
-                                      boolean isParentAddMore) {
+                                      boolean isParentAddMore, String fullySpecifiedName) {
         if (isNotEmpty(control.getControls())) {
             parseChildControls(control.getControls(), bahmniForm, depthToParent, isParentAddMore);
         } else {
             bahmniForm.addField(concept);
+            if (CODED_DATA_TYPE.equalsIgnoreCase(concept.getDataType())) {
+                addCodedAnswersToBahmniFormMap(bahmniForm, control);
+            }
+            bahmniForm.addFieldNameAndFullySpecifiedNameMap(fullySpecifiedName, concept.getName());
         }
+    }
+
+    private void addCodedAnswersToBahmniFormMap(BahmniForm bahmniForm, Control control) {
+        String rootFormName = bahmniForm.getRootForm() == null ? bahmniForm.getFormName().getName()
+                : bahmniForm.getRootForm().getFormName().getName();
+        control.getConcept().getAnswers()
+                .stream()
+                .forEach(conceptAnswer -> {
+                    String translatedConceptAnswer = getTranslatedName(rootFormName, conceptAnswer.getTranslationKey());
+                    bahmniForm.addFieldNameAndFullySpecifiedNameMap(conceptAnswer.getDisplayString(),
+                            isNull(translatedConceptAnswer) ?
+                                    conceptAnswer.getDisplayString() : translatedConceptAnswer);
+                });
     }
 
     private void parseChildControls(List<Control> controls, BahmniForm bahmniForm, int depthToParent,
