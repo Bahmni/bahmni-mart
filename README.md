@@ -74,7 +74,8 @@ To install bahmni-mart follow the steps given below
   
   **Note** : Password should be a Non Empty string. 
 * HTTPS for metabase (optional)
-  * Certificates generated from [let's encrypt](https://bahmni.atlassian.net/wiki/spaces/BAH/pages/35586093/Configure+Valid+SSL+Certificates) can be used for metabase by converting them into jks format.
+  * Let's encrypt
+    * Certificates generated from [let's encrypt](https://bahmni.atlassian.net/wiki/spaces/BAH/pages/35586093/Configure+Valid+SSL+Certificates) can be used for metabase by converting them into jks format.
     Update the following properties in setup.yml to run metabase with https.
     
     |Property | Comment |
@@ -85,17 +86,32 @@ To install bahmni-mart follow the steps given below
    
    Since let's encrypt certificates expires after 90 days, you need to regenerate jks file after renewing bahmni certificates. Use following command to regenerate jks file
     
-    ```/opt/bahmni-mart/bin/pemtojks.sh <bahmni_lets_encrypt_cert_dir> <metabase_keystore_password>```
+    ```bash
+    /opt/bahmni-mart/bin/pemtojks.sh <bahmni_lets_encrypt_cert_dir> <metabase_keystore_password>
+    ```
     
     Stop metabase container and update metabase docker container
     
-    ```docker-compose -f /opt/bahmni-mart/metabase-ssl-docker-compose.yml up -d```
-    
-* Install **Bahmni-mart** application
     ```bash
-    ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml'
+    docker-compose -f /opt/bahmni-mart/metabase-ssl-docker-compose.yml up -d
     ```
-    Note: Abvoe playbook deploys [bahmni-mart](https://github.com/bahmni-msf/bahmni-mart) along with [metabase](https://metabase.com)(docker container) and [spring cloud data flow server](https://cloud.spring.io/spring-cloud-dataflow/)(docker container)
+  * Custom ssl 
+    * If you use other than let's encrypt certificates, generate jks(Java Key Store) file from your ssl certificate and provide jks file path in **custom_keystore_location** and provide the **metabase_keystore_password**(password which was used to generating jks file)  
+### Command to deploy mart
+ #### Metabase without ssl
+```bash 
+ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "custom_ssl,lets_encrypt_ssl"
+```
+#### Metabase with let's encrypt ssl(optional)
+```bash
+ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,custom_ssl"
+```
+#### Metabase with custom ssl(optional)
+```bash
+ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,lets_encrypt_ssl"
+```
+
+Note: Abvoe playbook deploys [bahmni-mart](https://github.com/bahmni-msf/bahmni-mart) along with [metabase](https://metabase.com)(docker container) and [spring cloud data flow server](https://cloud.spring.io/spring-cloud-dataflow/)(docker container)
 * Update **bahmni-mart** config. The config will be present in **/var/www/bahmni_config/bahmni-mart/bahmni-mart.json** 
 
 ### Access the Application
