@@ -29,10 +29,8 @@ import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -81,7 +79,6 @@ public class Form1ObservationExportStepTest {
                 "databaseObsWriterObjectFactory", obsWriterObjectFactory);
         setValuesForMemberFields(form1ObservationExportStep, "obsIncrementalUpdater", obsIncrementalUpdater);
         BatchUtils.stepNumber = 0;
-        when(obsIncrementalUpdater.isMetaDataChanged(any(), anyString())).thenReturn(true);
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
     }
 
@@ -142,14 +139,12 @@ public class Form1ObservationExportStepTest {
         BahmniForm form = mock(BahmniForm.class);
         setUpStepConfig(formName, form);
         form1ObservationExportStep.setJobDefinition(jobDefinition);
-        when(obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME)).thenReturn(false);
 
         form1ObservationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Insertion Step-1 " + formName);
-        verify(obsIncrementalUpdater).isMetaDataChanged(formName, JOB_NAME);
         verify(jobDefinition, atLeastOnce()).getName();
-        verify(obsIncrementalUpdater).updateReaderSql("some sql", JOB_NAME, "encounter_id");
+        verify(obsIncrementalUpdater).updateReaderSql("some sql", JOB_NAME, "encounter_id","FormOne");
     }
 
     @Test
@@ -157,14 +152,12 @@ public class Form1ObservationExportStepTest {
         String formName = "FormTwo";
         BahmniForm form = mock(BahmniForm.class);
         setUpStepConfig(formName, form);
-        when(obsIncrementalUpdater.isMetaDataChanged(formName, JOB_NAME)).thenReturn(true);
 
         form1ObservationExportStep.getStep();
 
         verify(stepBuilderFactory).get("Insertion Step-1 " + formName);
         verify(jobDefinition).getName();
-        verify(obsIncrementalUpdater).isMetaDataChanged(formName, JOB_NAME);
-        verify(obsIncrementalUpdater, never()).updateReaderSql(anyString(), anyString(), anyString());
+        verify(obsIncrementalUpdater).updateReaderSql("some sql", JOB_NAME, "encounter_id", "FormTwo");
     }
 
     private void setUpStepConfig(String formName, BahmniForm form) {

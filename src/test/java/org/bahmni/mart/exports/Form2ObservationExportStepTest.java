@@ -93,7 +93,6 @@ public class Form2ObservationExportStepTest {
         setValuesForMemberFields(form2ObservationExportStep,
                 "form2TableMetadataGenerator",form2TableMetadataGenerator);
         when(jobDefinition.getName()).thenReturn(JOB_NAME);
-        when(obsIncrementalStrategy.isMetaDataChanged(any(), any())).thenReturn(true);
     }
 
     @Test
@@ -135,7 +134,6 @@ public class Form2ObservationExportStepTest {
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
         when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
-        when(obsIncrementalUpdater.isMetaDataChanged(any(), any())).thenReturn(true);
 
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
 
@@ -249,12 +247,10 @@ public class Form2ObservationExportStepTest {
         when(BatchUtils.constructSqlWithParameter(anyObject(), anyObject(), anyString())).thenReturn(obsReadersSql);
         when(observationProcessorFactory.getObject()).thenReturn(new Form2ObservationProcessor());
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
-        when(obsIncrementalStrategy.isMetaDataChanged("FormOne", "form2obs")).thenReturn(false);
 
         form2ObservationExportStep.getStep();
 
-        verify(obsIncrementalStrategy).isMetaDataChanged("FormOne", "form2obs");
-        verify(obsIncrementalStrategy).updateReaderSql(obsReadersSql, "form2obs", "encounter_id");
+        verify(obsIncrementalStrategy).updateReaderSql(obsReadersSql, "form2obs", "encounter_id", "FormOne");
     }
 
     @Test
@@ -286,7 +282,6 @@ public class Form2ObservationExportStepTest {
         Step actualRemovalStep = form2ObservationExportStep.getRemovalStep();
 
         assertEquals(expectedStep, actualRemovalStep);
-        verify(obsIncrementalStrategy).isMetaDataChanged("FormOne", "form2obs");
         verify(removalWriterObjectFactory).getObject();
         verify(removalWriter).setTableData(tableData);
         verify(removalWriter).setJobDefinition(jobDefinition);
