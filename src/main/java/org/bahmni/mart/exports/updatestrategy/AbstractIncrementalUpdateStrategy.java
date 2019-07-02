@@ -43,7 +43,7 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
 
     @Autowired
     @Qualifier("openmrsJdbcTemplate")
-    private JdbcTemplate openmrsJdbcTemplate;
+    JdbcTemplate openmrsJdbcTemplate;
 
     @Autowired
     @Qualifier("martJdbcTemplate")
@@ -63,12 +63,23 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
 
     @Override
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
-        Optional<Map<String, Object>> optionalMarkerMap = markerManager.getJobMarkerMap(jobName);
-        if (!optionalMarkerMap.isPresent() || ZERO.equals(optionalMarkerMap.get().get(EVENT_RECORD_ID))) {
-            return readerSql;
-        }
+        Optional<Map<String, Object>> optionalMarkerMap = getJobMarkerMap(jobName);
+        return isFullLoad(optionalMarkerMap) ? readerSql
+                : getSqlForIncrementalUpdate(readerSql, updateOn, optionalMarkerMap);
+    }
+
+    String getSqlForIncrementalUpdate(String readerSql, String updateOn,
+                                              Optional<Map<String, Object>> optionalMarkerMap) {
         String joinedIds = getJoinedIds(optionalMarkerMap.get());
         return String.format(UPDATED_READER_SQL, readerSql, updateOn, joinedIds);
+    }
+
+    Optional<Map<String, Object>> getJobMarkerMap(String jobName) {
+        return markerManager.getJobMarkerMap(jobName);
+    }
+
+    boolean isFullLoad(Optional<Map<String, Object>> optionalMarkerMap) {
+        return !optionalMarkerMap.isPresent() || ZERO.equals(optionalMarkerMap.get().get(EVENT_RECORD_ID));
     }
 
     @Override

@@ -10,11 +10,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
+import static org.bahmni.mart.CommonTestHelper.setValuesForMemberFields;
 import static org.bahmni.mart.CommonTestHelper.setValuesForSuperClassMemberFields;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
 import static org.bahmni.mart.table.SpecialCharacterResolver.getUpdatedTableNameIfExist;
@@ -69,6 +72,8 @@ public class ObsIncrementalUpdateStrategyTest {
 
     private ObsIncrementalUpdateStrategy obsIncrementalUpdater;
 
+    private Integer maxObsId = 101010;
+
     private static final String MAX_EVENT_RECORD_ID = "20";
     private static final String JOB_NAME = "JobName";
     private static final String READER_SQL = "SELECT id, name FROM test";
@@ -80,7 +85,7 @@ public class ObsIncrementalUpdateStrategyTest {
     private static final String QUERY_FOR_IDS = format("SELECT %s_id FROM %s WHERE uuid in ('%s','%s')",
             TABLE_NAME, TABLE_NAME, "99b885e9-c49c-4b5a-aa4c-e8a8fb93484d", "55527d10-5789-46e1-af16-59082938f11c");
     private static final String queryForMaxEventRecordId = "SELECT MAX(id) FROM event_records";
-    private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s)";
+    private static final String UPDATED_READER_SQL = "SELECT * FROM ( %s ) result WHERE %s IN (%s) AND obs_id <=%s";
     private static final String eventRecordedForJob = "10";
 
 
@@ -96,6 +101,7 @@ public class ObsIncrementalUpdateStrategyTest {
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "metaDataChangeMap", metaDataChangeMap);
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId",
                                             Integer.parseInt(MAX_EVENT_RECORD_ID));
+        setValuesForMemberFields(obsIncrementalUpdater, "maxObsId", maxObsId);
 
         mockStatic(SpecialCharacterResolver.class);
 
@@ -112,7 +118,7 @@ public class ObsIncrementalUpdateStrategyTest {
         String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
 
         verify(markerManager).getJobMarkerMap(JOB_NAME);
-        assertEquals(READER_SQL, updatedReaderSql);
+        assertEquals(format("%s AND obs0.obs_id <=%d", READER_SQL, maxObsId), updatedReaderSql);
     }
 
     @Test
@@ -125,7 +131,7 @@ public class ObsIncrementalUpdateStrategyTest {
 
         verify(markerManager).getJobMarkerMap(JOB_NAME);
         verify(markerMap).get("event_record_id");
-        assertEquals(READER_SQL, actualUpdatedReaderSql);
+        assertEquals(String.format("%s AND obs0.obs_id <=%s", READER_SQL, maxObsId), actualUpdatedReaderSql);
     }
 
     @Test
@@ -138,7 +144,7 @@ public class ObsIncrementalUpdateStrategyTest {
         String queryForIDs = format("SELECT %s_id FROM %s WHERE uuid in ('%s')",
                                 TABLE_NAME, TABLE_NAME, wrongUuid);
         when(openmrsJdbcTemplate.queryForList(queryForIDs, String.class)).thenReturn(Arrays.asList(""));
-        String expectedUpdatedReaderSql = format(UPDATED_READER_SQL, READER_SQL, UPDATE_ON, "-1");
+        String expectedUpdatedReaderSql = format(UPDATED_READER_SQL, READER_SQL, UPDATE_ON, "-1", maxObsId);
 
         String actualUpdateReaderSql = obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
 
@@ -158,7 +164,8 @@ public class ObsIncrementalUpdateStrategyTest {
 
         String readerSql = obsIncrementalUpdater.updateReaderSql(this.READER_SQL, JOB_NAME, UPDATE_ON);
 
-        assertEquals("SELECT * FROM ( SELECT id, name FROM test ) result WHERE id IN (-1)", readerSql);
+        assertEquals(String.format("SELECT * FROM ( SELECT id, name FROM test ) result " +
+                "WHERE id IN (-1) AND obs_id <=%d", maxObsId), readerSql);
         verify(markerManager).getJobMarkerMap(JOB_NAME);
         verify(markerMap, times(2)).get("event_record_id");
         verify(markerMap).get("category");
@@ -183,7 +190,8 @@ public class ObsIncrementalUpdateStrategyTest {
         setUpForUuids();
         List<String> ids = Arrays.asList("1", "2");
         when(openmrsJdbcTemplate.queryForList(QUERY_FOR_IDS, String.class)).thenReturn(ids);
-        String expectedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (1,2)", READER_SQL, UPDATE_ON);
+        String expectedReaderSql = format("SELECT * FROM ( %s ) result " +
+                "WHERE %s IN (1,2) AND obs_id <=%s", READER_SQL, UPDATE_ON, maxObsId);
 
         String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
 
@@ -195,8 +203,8 @@ public class ObsIncrementalUpdateStrategyTest {
         when(openmrsJdbcTemplate.queryForList(
                 format(QUERY_FOR_EVENT_URLS, eventRecordedForJob, MAX_EVENT_RECORD_ID, CATEGORY), String.class))
                 .thenReturn(new ArrayList<>());
-        String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (-1)", READER_SQL,
-                UPDATE_ON);
+        String expectedUpdatedReaderSql = format("SELECT * FROM ( %s ) result WHERE %s IN (-1) AND obs_id <=%s",
+                READER_SQL, UPDATE_ON, maxObsId);
 
         String updatedReaderSql = obsIncrementalUpdater.updateReaderSql(READER_SQL, JOB_NAME, UPDATE_ON);
 
@@ -372,5 +380,35 @@ public class ObsIncrementalUpdateStrategyTest {
         when(openmrsJdbcTemplate.queryForList(
                 format(QUERY_FOR_EVENT_URLS, eventRecordedForJob, MAX_EVENT_RECORD_ID, CATEGORY), String.class))
                 .thenReturn(eventRecordObjects);
+    }
+
+    @Test
+    public void shouldReturnFullLoadSqlWhenTableMetadataIsChanged() {
+        ObsIncrementalUpdateStrategy obsIncrementalUpdateStrategySpy = Mockito.spy(ObsIncrementalUpdateStrategy.class);
+        Mockito.doReturn(Boolean.TRUE).when(obsIncrementalUpdateStrategySpy)
+                .isMetaDataChanged(anyString(), anyString());
+        ReflectionTestUtils.setField(obsIncrementalUpdateStrategySpy, "maxObsId", 101010);
+
+        String updateReaderSql = obsIncrementalUpdateStrategySpy
+                .updateReaderSql("some sql", "obs job", "encounter_id", "table name");
+
+        assertEquals(String.format("some sql AND obs0.obs_id <=%d", maxObsId), updateReaderSql);
+
+    }
+
+    @Test
+    public void shouldReturnIncrementalLoadSqlWhenTableMetadataIsNotChanged() {
+        ObsIncrementalUpdateStrategy obsIncrementalUpdateStrategySpy = Mockito.spy(ObsIncrementalUpdateStrategy.class);
+        ReflectionTestUtils.setField(obsIncrementalUpdateStrategySpy, "maxObsId", 101010);
+        Mockito.doReturn(Boolean.FALSE).when(obsIncrementalUpdateStrategySpy)
+                .isMetaDataChanged(anyString(), anyString());
+        Mockito.doReturn(String.format("some sql AND obs_id <=%d", maxObsId))
+                .when(obsIncrementalUpdateStrategySpy).updateReaderSql(anyString(), anyString(), anyString());
+
+        String updateReaderSql = obsIncrementalUpdateStrategySpy
+                .updateReaderSql("some sql", "obs job", "encounter_id", "table name");
+
+        verify(obsIncrementalUpdateStrategySpy).updateReaderSql("some sql", "obs job", "encounter_id");
+        assertEquals(String.format("some sql AND obs_id <=%d", maxObsId), updateReaderSql);
     }
 }

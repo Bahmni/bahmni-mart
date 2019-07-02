@@ -170,8 +170,6 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
     }
 
     @Test
-    @Sql(scripts = {"classpath:testDataSet/Form2IncrementalObsData.sql"},
-            config = @SqlConfig(transactionManager = "customOpenmrsITContext"))
     public void shouldApplyIncrementalUpdateForForm2Obs() throws IOException {
         String sql = String.format("INSERT INTO form_resource (form_resource_id, form_id, name, " +
                         "value_reference, datatype, uuid) VALUES " +
