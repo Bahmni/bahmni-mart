@@ -27,7 +27,7 @@ public class ObsIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrat
 
     @Override
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
-        Optional<Map<String, Object>> jobMarkerMap = super.getJobMarkerMap(jobName);
+        Optional<Map<String, Object>> jobMarkerMap = getJobMarkerMap(jobName);
         return isFullLoad(jobMarkerMap) ?  getSqlForFullLoadWithMaxObsLimit(readerSql)
                 : getSqlForIncrementalLoadWithMaxObsLimit(readerSql, updateOn, jobMarkerMap);
 
@@ -40,7 +40,7 @@ public class ObsIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrat
 
     private String getSqlForIncrementalLoadWithMaxObsLimit(String readerSql, String updateOn,
                                                            Optional<Map<String, Object>> jobMarkerMap) {
-        String sqlForIncrementalUpdate = super.getSqlForIncrementalUpdate(readerSql, updateOn, jobMarkerMap);
+        String sqlForIncrementalUpdate = getSqlForIncrementalUpdate(readerSql, updateOn, jobMarkerMap);
         return String.format(QUERY_FOR_INCREMENTAL_LOAD_WITH_OBS_ID_CONDITION, sqlForIncrementalUpdate, maxObsId);
     }
 
