@@ -21,20 +21,20 @@ public class Form2ObsIncrementalStrategy extends ObsIncrementalUpdateStrategy {
 
     @Override
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
-        Optional<Map<String, Object>> jobMarkerMap = super.getJobMarkerMap(jobName);
+        Optional<Map<String, Object>> jobMarkerMap = getJobMarkerMap(jobName);
         return isFullLoad(jobMarkerMap) ?  getSqlForFullLoadWithMaxObsLimit(readerSql)
                 : getSqlForIncrementalLoadWithMaxObsLimit(readerSql, updateOn, jobMarkerMap);
 
     }
 
     public String updateReaderSql(String sql, String jobName, String updateOn, String formName) {
-        return super.isMetaDataChanged(formName, jobName) ? getSqlForFullLoadWithMaxObsLimit(sql) :
+        return isMetaDataChanged(formName, jobName) ? getSqlForFullLoadWithMaxObsLimit(sql) :
                 updateReaderSql(sql, jobName, updateOn);
     }
 
     private String getSqlForIncrementalLoadWithMaxObsLimit(String readerSql, String updateOn,
                                                            Optional<Map<String, Object>> jobMarkerMap) {
-        String sqlForIncrementalUpdate = super.getSqlForIncrementalUpdate(readerSql, updateOn, jobMarkerMap);
+        String sqlForIncrementalUpdate = getSqlForIncrementalUpdate(readerSql, updateOn, jobMarkerMap);
         return String.format(QUERY_FOR_INCREMENTAL_LOAD_WITH_OBS_ID_CONDITION, sqlForIncrementalUpdate, maxObsId);
     }
 
@@ -44,6 +44,6 @@ public class Form2ObsIncrementalStrategy extends ObsIncrementalUpdateStrategy {
 
     @PostConstruct
     public void postConstruct() {
-        super.setTableMetadataGenerator(form2TableMetadataGenerator);
+        setTableMetadataGenerator(form2TableMetadataGenerator);
     }
 }
