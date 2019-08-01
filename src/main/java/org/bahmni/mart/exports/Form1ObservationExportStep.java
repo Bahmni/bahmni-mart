@@ -62,7 +62,7 @@ public class Form1ObservationExportStep implements ObservationExportStep {
     @Override
     public Step getStep() {
         int chunkSize = jobDefinition.getChunkSizeToRead();
-        chunkSize = chunkSize > 0 ? chunkSize : 100;
+        chunkSize = chunkSize > 0 ? chunkSize : 500;
         return stepBuilderFactory.get(getStepName("Insertion Step"))
                 .<Map<String, Object>, List<Obs>>chunk(chunkSize)
                 .reader(obsReader(false))
