@@ -115,7 +115,7 @@ public class Form1ObservationExportStepTest {
         when(form.getFormName()).thenReturn(formNameConcept);
         when(formNameConcept.getName()).thenReturn(formName);
         when(stepBuilderFactory.get("Insertion Step-1 " + formName)).thenReturn(stepBuilder);
-        when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
+        when(stepBuilder.chunk(500)).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
         when(observationProcessorFactory.getObject()).thenReturn(new ObservationProcessor());
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
@@ -169,7 +169,7 @@ public class Form1ObservationExportStepTest {
         when(form.getFormName()).thenReturn(formNameConcept);
         when(formNameConcept.getName()).thenReturn(formName);
         when(stepBuilderFactory.get("Insertion Step-1 " + formName)).thenReturn(stepBuilder);
-        when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
+        when(stepBuilder.chunk(500)).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
         when(observationProcessorFactory.getObject()).thenReturn(new ObservationProcessor());
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
