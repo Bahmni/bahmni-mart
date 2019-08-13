@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -175,10 +175,8 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
                 "test location 2", "2", "test program 2",
                 "test", null);
 
-        items.add(singletonList(obs1));
-        items.add(singletonList(obs2));
-        items.add(singletonList(obs3));
-        items.add(singletonList(obs4));
+        items.add(Arrays.asList(obs1, obs2));
+        items.add(Arrays.asList(obs3, obs4));
 
         form2TableMetadataGenerator.addMetadataForForm(bahmniForm);
         databaseObsWriter.setForm(bahmniForm);
@@ -265,20 +263,18 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
                 "test location 1", "1", "test program 1",
                 "test.1/2-0", "test");
 
-        Obs obs3 = createObs("56", "3", 3, null, fieldOne, "40",
+        Obs obs3 = createObs("560", "3", 3, null, fieldOne, "40",
                 null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
                 "test location 1", "1", "test program 1",
                 "test.1/2-1", "test");
 
-        Obs obs4 = createObs("56", "3", 4, null, fieldTwo, "test IT 2",
+        Obs obs4 = createObs("560", "3", 4, null, fieldTwo, "test IT 2",
                 null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
                 "test location 1", "1", "test program 1",
                 "test.1/2-1", "test");
 
-        items.add(singletonList(obs1));
-        items.add(singletonList(obs2));
-        items.add(singletonList(obs3));
-        items.add(singletonList(obs4));
+        items.add(Arrays.asList(obs1, obs2));
+        items.add(Arrays.asList(obs3, obs4));
 
         form2TableMetadataGenerator.addMetadataForForm(bahmniForm);
         databaseObsWriter.setForm(bahmniForm);
@@ -311,7 +307,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals("test.1/2-1", actualObs2.get("form_field_path"));
         assertEquals("test", actualObs2.get("reference_form_field_path"));
         assertEquals(3, actualObs2.get("patient_id"));
-        assertEquals(56, actualObs2.get("encounter_id"));
+        assertEquals(560, actualObs2.get("encounter_id"));
         assertEquals(new BigDecimal(40), actualObs2.get("field_one"));
         assertEquals("test IT 2", actualObs2.get("field_two"));
         assertEquals(1, actualObs2.get("location_id"));

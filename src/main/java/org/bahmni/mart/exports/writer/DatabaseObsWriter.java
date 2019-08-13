@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -56,19 +58,28 @@ public class DatabaseObsWriter extends BaseWriter implements ItemWriter<List<Obs
 
     private void insertForm2Records(List<? extends List<Obs>> items) {
         TableData tableData = form2TableMetadataGenerator.getTableData(form);
-        List<? extends List<Obs>> groupedItems = form.isMultiSelect() ? items : groupForm2Obs(items);
+        List<? extends List<Obs>> groupedItems = form.isMultiSelect() ? flattenItems(items) : groupForm2Obs(items);
         insertRecords(groupedItems, tableData);
     }
 
-    private List<? extends List<Obs>> groupForm2Obs(List<? extends List<Obs>> items) {
-        List<Obs> obsList = items.stream()
-                .map(item -> item.get(0)).collect(Collectors.toList());
-        Function<Obs, List<Object>> compositeKey = obs ->
-                Arrays.asList(obs.getEncounterId(), obs.getFormFieldPath());
-        Map<Object, List<Obs>> groupedObs = obsList.stream()
-                .collect(Collectors.groupingBy(compositeKey, Collectors.toList()));
+    private List<List<Obs>> flattenItems(List<? extends List<Obs>> items) {
         List<List<Obs>> groupedItems = new ArrayList<>();
-        groupedObs.forEach((key, value) -> groupedItems.add(value));
+        List<List<Obs>> tempItems = new ArrayList<>();
+        tempItems.addAll(items);
+        List<Obs> flattenedItems = tempItems.stream().flatMap(Collection::stream).collect(Collectors.toList());
+        flattenedItems.forEach(obs -> groupedItems.add(Collections.singletonList(obs)));
+        return groupedItems;
+    }
+
+    private List<List<Obs>> groupForm2Obs(List<? extends List<Obs>> items) {
+        List<List<Obs>> groupedItems = new ArrayList<>();
+        items.forEach(obsList -> {
+            Function<Obs, List<Object>> compositeKey = obs ->
+                    Arrays.asList(obs.getEncounterId(), obs.getFormFieldPath());
+            Map<Object, List<Obs>> groupedObs = obsList.stream()
+                    .collect(Collectors.groupingBy(compositeKey, Collectors.toList()));
+            groupedObs.forEach((key, value) -> groupedItems.add(value));
+        });
         return groupedItems;
     }
 

@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +37,7 @@ public class Form2ObservationExportStep implements ObservationExportStep {
     private JobDefinition jobDefinition;
     private String obsReaderSql;
 
-    @Value("classpath:sql/form2Obs.sql")
+    @Value("classpath:sql/forms2Reader.sql")
     private Resource obsReaderSqlResource;
 
     @Autowired
@@ -68,7 +67,7 @@ public class Form2ObservationExportStep implements ObservationExportStep {
         chunkSize = chunkSize > 0 ? chunkSize : 500;
         return stepBuilderFactory.get(getStepName("Insertion Step"))
                 .<Map<String, Object>, List<Obs>>chunk(chunkSize)
-                .reader(obsReader(false))
+                .reader(obsReader())
                 .processor(observationProcessor())
                 .writer(getWriter())
                 .build();
@@ -84,8 +83,8 @@ public class Form2ObservationExportStep implements ObservationExportStep {
         this.form = form;
     }
 
-    private JdbcCursorItemReader<Map<String, Object>> obsReader(boolean voided) {
-        String sql = getProcessedSql(voided);
+    private JdbcCursorItemReader<Map<String, Object>> obsReader() {
+        String sql = getProcessedSql();
         sql = obsIncrementalUpdater.updateReaderSql(sql, jobDefinition.getName(), "encounter_id",
                 form.getFormName().getName());
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
@@ -98,6 +97,7 @@ public class Form2ObservationExportStep implements ObservationExportStep {
     private Form2ObservationProcessor observationProcessor() {
         Form2ObservationProcessor observationProcessor = observationProcessorFactory.getObject();
         observationProcessor.setForm(form);
+        observationProcessor.setJobDefinition(jobDefinition);
         return observationProcessor;
     }
 
@@ -109,15 +109,10 @@ public class Form2ObservationExportStep implements ObservationExportStep {
         return writer;
     }
 
-    private String getProcessedSql(boolean voided) {
+    private String getProcessedSql() {
         String obsReaderSql = this.obsReaderSql;
-        List<String> conceptNames = new ArrayList<>(form.getFieldNameAndFullySpecifiedNameMap().keySet());
-        obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "voided", voided);
         obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "formName",
                 getFormName());
-        obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql, "conceptNames", conceptNames);
-        obsReaderSql = BatchUtils.constructSqlWithParameter(obsReaderSql,
-                "conceptReferenceSource", jobDefinition.getConceptReferenceSource());
         return obsReaderSql;
     }
 
@@ -136,7 +131,7 @@ public class Form2ObservationExportStep implements ObservationExportStep {
     public Step getRemovalStep() {
         return stepBuilderFactory.get(getStepName("Removal Step"))
                 .<Map<String, Object>, Map<String, Object>>chunk(100)
-                .reader(obsReader(true))
+                .reader(obsReader())
                 .writer(getRemovalWriter())
                 .build();
     }

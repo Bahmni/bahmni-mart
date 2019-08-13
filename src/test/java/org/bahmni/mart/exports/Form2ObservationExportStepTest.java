@@ -25,7 +25,6 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.ObjectFactory;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -173,18 +172,8 @@ public class Form2ObservationExportStepTest {
 
         verify(form, times(3)).getFormName();
         verify(form.getFormName(), times(3)).getName();
-        verify(form).getFieldNameAndFullySpecifiedNameMap();
-        verify(jobDefinition).getConceptReferenceSource();
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "formName", "FormOne");
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptNames",
-                Arrays.asList(concept2Name, concept1Name));
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "voided", false);
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptReferenceSource", "WHO");
-
     }
 
     @Test
@@ -222,17 +211,8 @@ public class Form2ObservationExportStepTest {
         verify(form.getFormName(), times(2)).getName();
         verify(rootForm, times(1)).getFormName();
         verify(rootForm.getFormName(), times(1)).getName();
-        verify(form).getFieldNameAndFullySpecifiedNameMap();
-        verify(jobDefinition).getConceptReferenceSource();
         verifyStatic();
         BatchUtils.constructSqlWithParameter(obsReadersSql, "formName", "FormOne");
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptNames",
-                Arrays.asList(concept2Name, concept1Name));
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "voided", false);
-        verifyStatic();
-        BatchUtils.constructSqlWithParameter(obsReadersSql, "conceptReferenceSource", "WHO");
     }
 
     @Test

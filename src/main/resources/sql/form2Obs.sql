@@ -16,7 +16,7 @@ SELECT
   SUBSTRING(o.form_namespace_and_path, INSTR(o.form_namespace_and_path, '^') + 1) AS formFieldPath
 FROM obs o
   JOIN concept_name obs_con ON o.form_namespace_and_path LIKE CONCAT('%', :formName, '.%')
-                               AND (:voided IS TRUE OR o.voided IS :voided)
+                               AND (o.voided IS FALSE)
                                AND o.concept_id =
                                    obs_con.concept_id AND obs_con.name IN
                                                           (:conceptNames)
@@ -32,3 +32,4 @@ FROM obs o
                                                          AND vcc.concept_map_type_name = 'SAME-AS'
                                                          AND
                                                          vcc.concept_reference_source_name = :conceptReferenceSource
+WHERE o.encounter_id = :encounterId

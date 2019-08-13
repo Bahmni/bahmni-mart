@@ -14,7 +14,7 @@ import java.util.Optional;
 public class Form2ObsIncrementalStrategy extends ObsIncrementalUpdateStrategy {
 
     private static final String QUERY_FOR_FULL_LOAD_WITH_OBS_ID_CONDITION = "%s WHERE o.obs_id <=%d";
-    private static final String QUERY_FOR_INCREMENTAL_LOAD_WITH_OBS_ID_CONDITION = "%s AND id <=%d";
+    private static final String QUERY_FOR_INCREMENTAL_LOAD_WITH_OBS_ID_CONDITION = "%s AND obs_id <=%d";
 
     @Autowired
     private Form2TableMetadataGenerator form2TableMetadataGenerator;

@@ -1,17 +1,28 @@
 package org.bahmni.mart.form2;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
 import org.bahmni.mart.form.domain.Obs;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.core.io.Resource;
 
+import javax.annotation.PostConstruct;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Collections.singletonList;
 
 @Component
 @Scope(value = "prototype")
@@ -21,29 +32,48 @@ public class Form2ObservationProcessor implements ItemProcessor<Map<String, Obje
     private static final String DOT = ".";
     private BahmniForm form;
 
+    @Value("classpath:sql/form2Obs.sql")
+    private Resource formObsSqlResource;
+
+    @Autowired
+    @Qualifier("openmrsNamedJdbcTemplate")
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    private String form2ObsSql;
+    private JobDefinition jobDefinition;
+
     @Override
-    public List<Obs> process(Map<String, Object> item) {
-        Obs obs = new Obs();
-        obs.setEncounterId(String.valueOf(item.get("encounter_id")));
-        obs.setPatientId(String.valueOf(item.get("patientId")));
-        obs.setId((Integer) item.get("id"));
-        Concept concept = new Concept();
-        concept.setId((Integer) item.get("conceptId"));
-        concept.setName(this.form.getFieldNameAndFullySpecifiedNameMap().get((String) item.get("conceptName")));
-        obs.setField(concept);
-        String itemValue = (String) item.get("value");
-        String value = this.form.getFieldNameAndFullySpecifiedNameMap().containsKey(itemValue) ?
-                this.form.getFieldNameAndFullySpecifiedNameMap().get(itemValue) : itemValue;
-        obs.setValue(value);
-        obs.setObsDateTime(String.valueOf(item.get("obsDateTime")));
-        obs.setDateCreated(String.valueOf(item.get("dateCreated")));
-        obs.setLocationId(String.valueOf(item.get("locationId")));
-        obs.setLocationName((String) item.get("locationName"));
-        obs.setProgramId(String.valueOf(item.get("programId")));
-        obs.setProgramName((String) item.get("programName"));
-        String formFieldPath = (String) item.get("formFieldPath");
-        setFormFieldPath(obs, formFieldPath);
-        return singletonList(obs);
+    public List<Obs> process(Map<String, Object> encounterIdMap) {
+        String encounterId = String.valueOf(encounterIdMap.get("encounter_id"));
+        return getFormObs(encounterId);
+    }
+
+    private List<Obs> getFormObs(String encounterId) {
+        List<String> conceptNames = new ArrayList<>(form.getFieldNameAndFullySpecifiedNameMap().keySet());
+        Map<String, Object> params = new HashMap<>();
+        String rootFormName = form.getRootForm() != null ? form.getRootForm().getFormName().getName()
+                : form.getFormName().getName();
+        params.put("formName", rootFormName);
+        params.put("encounterId", encounterId);
+        params.put("conceptNames", conceptNames);
+        params.put("conceptReferenceSource", jobDefinition.getConceptReferenceSource());
+        return getObs(params, form2ObsSql);
+    }
+
+    private List<Obs> getObs(Map<String, Object> params, String queryString) {
+        return jdbcTemplate.query(queryString, params, new BeanPropertyRowMapper<Obs>(Obs.class) {
+            @Override
+            public Obs mapRow(ResultSet resultSet, int rowNumber) throws SQLException {
+                Obs obs = super.mapRow(resultSet, rowNumber);
+                Concept concept = new Concept();
+                concept.setId(resultSet.getInt("conceptId"));
+                concept.setName(form.getFieldNameAndFullySpecifiedNameMap()
+                        .get(resultSet.getString("conceptName")));
+                obs.setField(concept);
+                setFormFieldPath(obs,obs.getFormFieldPath());
+                return obs;
+            }
+        });
     }
 
     private void setFormFieldPath(Obs obs, String formFieldPath) {
@@ -79,5 +109,14 @@ public class Form2ObservationProcessor implements ItemProcessor<Map<String, Obje
 
     public void setForm(BahmniForm form) {
         this.form = form;
+    }
+
+    public void setJobDefinition(JobDefinition jobDefinition) {
+        this.jobDefinition = jobDefinition;
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        this.form2ObsSql = BatchUtils.convertResourceOutputToString(formObsSqlResource);
     }
 }
