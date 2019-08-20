@@ -121,4 +121,23 @@ public class BatchUtilsTest {
         assertEquals("SELECT * FROM table WHERE column IN ('value1', 'value2')",
                 constructSqlWithParameter(sql, "parameter", values));
     }
+
+    @Test
+    public void shouldEscapeApostropheAndReplaceParameterWithStringValue() {
+        String sql = "Select * from table where column = :parameter";
+
+        assertEquals("Select * from table where column = 'patient\\'s form'",
+                constructSqlWithParameter(sql, "parameter", "patient's form"));
+
+    }
+
+
+    @Test
+    public void shouldEscapeApostropheAndReplaceParameterWithListOfStringValue() {
+        String sql = "SELECT * FROM table WHERE column IN (:parameter)";
+
+        List<String> values = Arrays.asList("one's value", "two's value");
+        assertEquals("SELECT * FROM table WHERE column IN ('one\\'s value', 'two\\'s value')",
+                constructSqlWithParameter(sql, "parameter", values));
+    }
 }
