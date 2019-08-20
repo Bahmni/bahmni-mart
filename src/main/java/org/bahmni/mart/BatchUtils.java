@@ -1,6 +1,7 @@
 package org.bahmni.mart;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bahmni.mart.exception.BatchResourceException;
 import org.springframework.core.io.Resource;
 
@@ -38,7 +39,8 @@ public class BatchUtils {
     }
 
     public static String constructSqlWithParameter(String sql, String parameter, String value) {
-        return sql.replaceAll(String.format(":%s", parameter), String.format("'%s'", value));
+        String processedValue = escapeApostropheInString(value);
+        return sql.replaceAll(String.format(":%s", parameter), String.format("'%s'", processedValue));
     }
 
     public static String constructSqlWithParameter(String sql, String parameter, boolean value) {
@@ -47,13 +49,18 @@ public class BatchUtils {
 
     public static String constructSqlWithParameter(String sql, String parameter, List<String> values) {
         String joinedValues = values.stream()
-                .map(value -> String.format("'%s'", value))
+                .map(value -> String.format("'%s'", escapeApostropheInString(value)))
                 .collect(Collectors.joining(", "));
         return sql.replaceAll(String.format(":%s", parameter), String.format("%s", joinedValues));
     }
 
     private static String getStringForPsql(String value) {
         return String.format("'%s'", value);
+    }
+
+    private static String escapeApostropheInString(String value) {
+        String escapeApostrophe = "\\\\\\\\'";
+        return StringUtils.isEmpty(value) ? value : value.replaceAll("'", escapeApostrophe);
     }
 }
 
