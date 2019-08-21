@@ -416,7 +416,7 @@ INSERT INTO concept VALUES
   null, null, null, '339e2f8c-d52f-402a-a4ea-f6946d481e0b');
 
 INSERT INTO concept_name VALUES
-(69, 27, 'Disposition Note', 'en', 1, 1, '2016-03-07 12:10:33', 'FULLY_SPECIFIED', 0, null, null,
+(69, 27, 'Disposition''s Note', 'en', 1, 1, '2016-03-07 12:10:33', 'FULLY_SPECIFIED', 0, null, null,
   null, '7e2be2cd-e42f-11e5-8c3e-08002715d519', null, null),
 (3144, 2186, 'WWN, Systolic blood pressure', 'en', 1, 8, '2017-06-09 09:18:09', 'FULLY_SPECIFIED', 0,
   null, null, null, '39da68f4-fe6e-440d-83d8-1a7701ed17fe', null, null),

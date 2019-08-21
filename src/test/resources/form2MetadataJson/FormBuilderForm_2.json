@@ -69,7 +69,7 @@
             "id": "3",
             "units": "",
             "type": "label",
-            "value": "Disposition Note"
+            "value": "Disposition's Note"
           },
           "properties": {
             "mandatory": false,
@@ -85,7 +85,7 @@
           "id": "3",
           "unsupportedProperties": [],
           "concept": {
-            "name": "Disposition Note",
+            "name": "Disposition's Note",
             "uuid": "7e2bdbd0-e42f-11e5-8c3e-08002715d519",
             "datatype": "Text",
             "conceptClass": "Misc",
