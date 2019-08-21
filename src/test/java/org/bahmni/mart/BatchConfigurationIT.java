@@ -144,8 +144,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         Map<String, Object> sectionRecordOne = sectionRecords.get(0);
         Map<String, Object> sectionRecordTwo = sectionRecords.get(1);
         assertTrue(Arrays.asList("Notes 2", "Notes 1").containsAll(Arrays.asList(
-                String.valueOf(sectionRecordOne.get("disposition_note")),
-                String.valueOf(sectionRecordTwo.get("disposition_note")))));
+                String.valueOf(sectionRecordOne.get("disposition_s_note")),
+                String.valueOf(sectionRecordTwo.get("disposition_s_note")))));
         assertEquals("FormBuilderForm.1/2-0", String.valueOf(sectionRecordOne.get("form_field_path")));
         assertEquals("FormBuilderForm", String.valueOf(sectionRecordOne.get("reference_form_field_path")));
         assertEquals("FormBuilderForm.1/2-0", String.valueOf(sectionRecordTwo.get("form_field_path")));
