@@ -6,7 +6,7 @@ SELECT
   ppd.date_completed,
   ppd.program_outcome,
   pd.gender,
-  pd.birthdate            AS birth_date,
+  pd.birthyear            AS birth_year,
   EXTRACT(YEAR FROM (SELECT age( md.start_date, TO_DATE(CONCAT('01-01-', pd.birthyear), 'dd-MM-yyyy')))) AS age_at_medication,
   age_group(md.start_date, TO_DATE(CONCAT('01-01-', pd.birthyear), 'dd-MM-yyyy')) AS age_group_at_medication,
   pd.dead,
