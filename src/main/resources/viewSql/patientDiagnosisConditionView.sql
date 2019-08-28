@@ -1,7 +1,7 @@
 SELECT
   pd.person_id AS patient_id,
   pd.gender,
-  pd.birthdate               AS birth_date,
+  pd.birthyear               AS birth_year,
   EXTRACT(YEAR FROM (SELECT age( c.onset_date, TO_DATE(CONCAT('01-01-', pd.birthyear), 'dd-MM-yyyy')))) AS age_at_condition,
   age_group(c.onset_date, TO_DATE(CONCAT('01-01-', pd.birthyear), 'dd-MM-yyyy')) AS age_group_at_condition,
   pd.dead,

@@ -1,7 +1,7 @@
 SELECT
   pd.person_id,
   pd.gender,
-  pd.birthdate,
+  pd.birthyear,
   EXTRACT(YEAR FROM (SELECT age( pvd.visit_start_date, TO_DATE(CONCAT('01-01-', pd.birthyear), 'dd-MM-yyyy')))) AS age_at_visit,
   age_group(pvd.visit_start_date, TO_DATE(CONCAT('01-01-', pd.birthyear), 'dd-MM-yyyy')) AS age_group_at_visit,
   pd.birthtime,
