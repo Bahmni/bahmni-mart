@@ -70,10 +70,18 @@ public class Form2ObservationProcessor implements ItemProcessor<Map<String, Obje
                 concept.setName(form.getFieldNameAndFullySpecifiedNameMap()
                         .get(resultSet.getString("conceptName")));
                 obs.setField(concept);
+                setValueToObs(resultSet, obs);
                 setFormFieldPath(obs,obs.getFormFieldPath());
                 return obs;
             }
         });
+    }
+
+    private void setValueToObs(ResultSet resultSet, Obs obs) throws SQLException {
+        String itemValue = resultSet.getString("value");
+        String value = form.getFieldNameAndFullySpecifiedNameMap().containsKey(itemValue) ?
+                form.getFieldNameAndFullySpecifiedNameMap().get(itemValue) : itemValue;
+        obs.setValue(value);
     }
 
     private void setFormFieldPath(Obs obs, String formFieldPath) {
