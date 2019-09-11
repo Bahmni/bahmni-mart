@@ -1,0 +1,209 @@
+{
+  "name": "MultiselectForm",
+  "id": 254,
+  "uuid": "cc8cadba-1afc-488f-b014-57f30552eefa",
+  "defaultLocale": "en",
+  "controls": [
+    {
+      "type": "section",
+      "label": {
+        "translationKey": "SECTION_4",
+        "type": "label",
+        "value": "Section",
+        "id": "1"
+      },
+      "properties": {
+        "addMore": false,
+        "location": {
+          "column": 0,
+          "row": 0
+        }
+      },
+      "id": "1",
+      "controls": [
+        {
+          "type": "obsControl",
+          "label": {
+            "translationKey": "HI,_PENICILLIN_6",
+            "id": "2",
+            "units": "",
+            "type": "label",
+            "value": "HI, Penicillin"
+          },
+          "properties": {
+            "mandatory": false,
+            "notes": false,
+            "addMore": false,
+            "hideLabel": false,
+            "controlEvent": false,
+            "location": {
+              "column": 0,
+              "row": 0
+            },
+            "autoComplete": false,
+            "multiSelect": true,
+            "dropDown": false
+          },
+          "id": "2",
+          "concept": {
+            "name": "HI, Penicillin",
+            "uuid": "f952b0f7-b7e7-46ae-b71c-26dfc7f343d7",
+            "datatype": "Coded",
+            "conceptClass": "Misc",
+            "conceptHandler": null,
+            "answers": [
+              {
+                "uuid": "9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1",
+                "name": {
+                  "display": "Susceptible",
+                  "uuid": "b522c92d-2e5e-4047-997e-5ef608cc9317",
+                  "name": "Susceptible",
+                  "locale": "en",
+                  "localePreferred": true,
+                  "conceptNameType": "FULLY_SPECIFIED",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1/name/b522c92d-2e5e-4047-997e-5ef608cc9317"
+                    },
+                    {
+                      "rel": "full",
+                      "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1/name/b522c92d-2e5e-4047-997e-5ef608cc9317?v=full"
+                    }
+                  ],
+                  "resourceVersion": "1.9"
+                },
+                "names": [
+                  {
+                    "display": "Susceptible",
+                    "uuid": "b522c92d-2e5e-4047-997e-5ef608cc9317",
+                    "name": "Susceptible",
+                    "locale": "en",
+                    "localePreferred": true,
+                    "conceptNameType": "FULLY_SPECIFIED",
+                    "links": [
+                      {
+                        "rel": "self",
+                        "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1/name/b522c92d-2e5e-4047-997e-5ef608cc9317"
+                      },
+                      {
+                        "rel": "full",
+                        "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/9fe15e1f-bfd3-4d38-ad2c-5671f9f405e1/name/b522c92d-2e5e-4047-997e-5ef608cc9317?v=full"
+                      }
+                    ],
+                    "resourceVersion": "1.9"
+                  }
+                ],
+                "displayString": "Susceptible",
+                "resourceVersion": "2.0",
+                "translationKey": "SUSCEPTIBLE_2"
+              },
+              {
+                "uuid": "a7411c07-b028-4b51-8f39-703c3ce849cf",
+                "name": {
+                  "display": "Resistant",
+                  "uuid": "55ac3508-a9e2-4d72-9652-8b1d387dabeb",
+                  "name": "Resistant",
+                  "locale": "en",
+                  "localePreferred": true,
+                  "conceptNameType": "FULLY_SPECIFIED",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/a7411c07-b028-4b51-8f39-703c3ce849cf/name/55ac3508-a9e2-4d72-9652-8b1d387dabeb"
+                    },
+                    {
+                      "rel": "full",
+                      "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/a7411c07-b028-4b51-8f39-703c3ce849cf/name/55ac3508-a9e2-4d72-9652-8b1d387dabeb?v=full"
+                    }
+                  ],
+                  "resourceVersion": "1.9"
+                },
+                "names": [
+                  {
+                    "display": "Resistant",
+                    "uuid": "55ac3508-a9e2-4d72-9652-8b1d387dabeb",
+                    "name": "Resistant",
+                    "locale": "en",
+                    "localePreferred": true,
+                    "conceptNameType": "FULLY_SPECIFIED",
+                    "links": [
+                      {
+                        "rel": "self",
+                        "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/a7411c07-b028-4b51-8f39-703c3ce849cf/name/55ac3508-a9e2-4d72-9652-8b1d387dabeb"
+                      },
+                      {
+                        "rel": "full",
+                        "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/a7411c07-b028-4b51-8f39-703c3ce849cf/name/55ac3508-a9e2-4d72-9652-8b1d387dabeb?v=full"
+                      }
+                    ],
+                    "resourceVersion": "1.9"
+                  }
+                ],
+                "displayString": "Resistant",
+                "resourceVersion": "2.0",
+                "translationKey": "RESISTANT_2"
+              },
+              {
+                "uuid": "339e2f8c-d52f-402a-a4ea-f6946d481e0b",
+                "name": {
+                  "display": "Intermediate",
+                  "uuid": "a7b6b0bd-60aa-4118-a580-bf18a0cefcc9",
+                  "name": "Intermediate",
+                  "locale": "en",
+                  "localePreferred": true,
+                  "conceptNameType": "FULLY_SPECIFIED",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/339e2f8c-d52f-402a-a4ea-f6946d481e0b/name/a7b6b0bd-60aa-4118-a580-bf18a0cefcc9"
+                    },
+                    {
+                      "rel": "full",
+                      "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/339e2f8c-d52f-402a-a4ea-f6946d481e0b/name/a7b6b0bd-60aa-4118-a580-bf18a0cefcc9?v=full"
+                    }
+                  ],
+                  "resourceVersion": "1.9"
+                },
+                "names": [
+                  {
+                    "display": "Intermediate",
+                    "uuid": "a7b6b0bd-60aa-4118-a580-bf18a0cefcc9",
+                    "name": "Intermediate",
+                    "locale": "en",
+                    "localePreferred": true,
+                    "conceptNameType": "FULLY_SPECIFIED",
+                    "links": [
+                      {
+                        "rel": "self",
+                        "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/339e2f8c-d52f-402a-a4ea-f6946d481e0b/name/a7b6b0bd-60aa-4118-a580-bf18a0cefcc9"
+                      },
+                      {
+                        "rel": "full",
+                        "uri": "http://192.168.33.10/openmrs/ws/rest/v1/concept/339e2f8c-d52f-402a-a4ea-f6946d481e0b/name/a7b6b0bd-60aa-4118-a580-bf18a0cefcc9?v=full"
+                      }
+                    ],
+                    "resourceVersion": "1.9"
+                  }
+                ],
+                "displayString": "Intermediate",
+                "resourceVersion": "2.0",
+                "translationKey": "INTERMEDIATE_2"
+              }
+            ],
+            "properties": {
+              "allowDecimal": null
+            }
+          },
+          "units": null,
+          "hiNormal": null,
+          "lowNormal": null,
+          "hiAbsolute": null,
+          "lowAbsolute": null
+        }
+      ]
+    }
+  ],
+  "events": {},
+  "translationsUrl": "/openmrs/ws/rest/v1/bahmniie/form/translations"
+}
