@@ -440,6 +440,11 @@ VALUES
 (90, 'FormBuilderFormIncremental', 2, 1, 8, '2019-02-05 10:59:14', 8,
 '2019-02-05 10:59:17', 0,'0a15ea90-a310-43db-a55b-eaeb75423ab8');
 
+INSERT INTO form(form_id, name, version, published, creator, date_created, changed_by, date_changed, retired, uuid)
+VALUES
+(91, 'MultiselectForm', 1, 1, 8, '2019-09-07 10:59:14', 8,
+'2019-02-05 10:59:17', 0,'0a15ea90-a310-43db-a55b-eaeb75423cb8');
+
 INSERT INTO global_property(property, property_value, uuid) VALUES ('bahmni.formTranslations.directory',
 'src/test/resources/form2MetadataJson/translations', '67e4dd4b-3860-4b32-9e53-019ad7e74951');
 -- End of form builder forms test data
@@ -463,3 +468,18 @@ INSERT INTO obs VALUES
 '2019-02-05 11:15:46',0,null,null,null,'s5cc3908-146a-4097-becd-e62550015b4b',null,'Bahmni^FormBuilderFormIncremental.1/1-0','FINAL',null),
 (1236506,126,3498,58638,null,'2019-02-05 11:15:46',9,null,null,null,3410,null,null,null,null,null,null,null,null,8,
 '2019-02-05 11:15:46',0,null,null,null,'r287eba1-e7a8-48b3-9fbd-6ca7c67dd394',null,'Bahmni^FormBuilderFormIncremental.1/2-0/4-0','FINAL',null);
+
+INSERT INTO encounter
+(encounter_id, encounter_type, patient_id, location_id, form_id, encounter_datetime, creator, date_created, voided, voided_by, date_voided, void_reason, changed_by, date_changed, visit_id, uuid)
+VALUES
+(137, 1, 125, 8, null, '2018-07-04 17:31:08', 8, '2018-07-04 17:31:08', 0, null, null, null, null, null, 5182, '2da7f5b1-ff19-476a-b797-eecee07bc354');
+
+INSERT INTO obs
+VALUES (1236507, 125, 3498, 137, null, '2019-09-10 06:30:41', 8, null, null, null, 3408, null, null, null,
+        null, null, null, null, null, 8, '2019-09-10 06:30:41', 0, null, null, null,
+        '73240cd3-7a50-4967-98bf-b3690beca914', null, 'Bahmni^MultiselectForm.1/2-0', 'FINAL',
+        null),
+       (1236508, 125, 3498, 137, null, '2019-09-10 06:30:41', 8, null, null, null, 3409, null, null, null,
+        null, null, null, null, null, 8, '2019-09-10 06:30:41', 0, null, null, null,
+        '87618339-dc02-40c0-b20b-58ae5d03bc4e', null, 'Bahmni^MultiselectForm.1/2-0', 'FINAL', null);
+

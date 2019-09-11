@@ -386,6 +386,31 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         verifyOrdersIncrementalData(expectedOrdersData, actualOrdersData);
     }
 
+    @Test
+    public void shouldCreateTablesAndInsertDataForForm2ObsOnlyMultiSelect() throws IOException {
+        String sql = String.format("INSERT INTO form_resource (form_resource_id, form_id, name, " +
+                        "value_reference, datatype, uuid) VALUES " +
+                        "(98, 91, 'MultiselectForm', '%s', " +
+                        "'org.bahmni.customdatatype.datatype.FileSystemStorageDatatype', " +
+                        "'3f480fe5-da11-4c08-afad-5dc440515169')",
+                System.getProperty("user.dir") +
+                        "/src/test/resources/form2MetadataJson/MultiselectForm_1.json");
+        openmrsJdbcTemplate.execute(sql);
+        batchConfiguration.run();
+        List<Map<String, Object>> formRecords = martJdbcTemplate
+                .queryForList("SELECT * FROM multiselectform");
+        List<Map<String, Object>> obsRecords = martJdbcTemplate
+                .queryForList("SELECT * FROM hi_penicillin");
+        assertEquals(2, obsRecords.size());
+        Map<String, Object> sectionRecordOne = obsRecords.get(0);
+        Map<String, Object> sectionRecordTwo = obsRecords.get(1);
+        assertEquals("MultiselectForm.1/2-0", sectionRecordOne.get("form_field_path"));
+        assertEquals("MultiselectForm.1/2-0", sectionRecordTwo.get("form_field_path"));
+
+        assertEquals("Susceptible", sectionRecordOne.get("hi_penicillin"));
+        assertEquals("Resistant", sectionRecordTwo.get("hi_penicillin"));
+    }
+
     private void verifyOrdersIncrementalData(List<Map<String, Object>> expectedOrdersData,
                                              List<Map<String, Object>> actualOrdersData) {
         for (int index = 0; index < actualOrdersData.size(); index++) {

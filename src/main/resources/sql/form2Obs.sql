@@ -33,3 +33,4 @@ FROM obs o
                                                          AND
                                                          vcc.concept_reference_source_name = :conceptReferenceSource
 WHERE o.encounter_id = :encounterId
+GROUP BY IFNULL(o.value_coded, UUID()), formFieldPath;
