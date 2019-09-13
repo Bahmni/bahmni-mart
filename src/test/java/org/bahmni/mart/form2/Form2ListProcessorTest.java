@@ -912,4 +912,39 @@ public class Form2ListProcessorTest {
         assertEquals(obsConceptName, bahmniForm.getChildren().get(0).getFields().get(0).getName());
         assertEquals(COMPLEX_FORM + " " + sectionName, bahmniForm.getChildren().get(0).getFormName().getName());
     }
+
+    @Test
+    public void shouldAvoidTextConceptsWhenIgnoreFreeTextPropertyIsTrueInNonDefaultLocale() {
+        final String obsConceptName = "ObsConcept";
+        final String translationKey = "OBS_CONCEPT_1";
+        Map<String, String> conceptTranslations = new HashMap<>();
+        conceptTranslations.put(translationKey, "FrenchConcept");
+        Form2Translation form2TranslationObj = new Form2Translation();
+        form2TranslationObj.setConcepts(conceptTranslations);
+        form2TranslationObj.setLocale("fr");
+        form2TranslationObj.setFormName(COMPLEX_FORM);
+        form2TranslationObj.setVersion("1");
+        Control obsControl = new ControlBuilder()
+                .withPropertyAddMore(false)
+                .withConcept(obsConceptName, "obs_concept_1")
+                .withLabel(obsConceptName, translationKey).build();
+        Concept ignoreConcept = new Concept(2, obsConceptName, 0);
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        form2JsonMetadata.setControls(new ArrayList<>(singletonList(obsControl)));
+
+        when(jobDefinition.getLocale()).thenReturn("fr");
+        when(form2TranslationsReader.getTranslation(any(), any())).thenReturn("FrenchConcept");
+        when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition))
+                .thenReturn(new HashSet<>(Collections.singletonList(ignoreConcept)));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        when(form2TranslationsReader.getTranslation(form2Translation, translationKey)).thenReturn(obsConceptName);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+
+        assertEquals(1, allForms.size());
+        final BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
+        assertEquals(0, bahmniForm.getChildren().size());
+        final List<Concept> bahmniFormFields = bahmniForm.getFields();
+        assertEquals(0, bahmniFormFields.size());
+    }
 }
