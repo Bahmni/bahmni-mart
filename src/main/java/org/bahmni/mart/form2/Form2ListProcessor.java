@@ -83,10 +83,10 @@ public class Form2ListProcessor {
         Concept concept = null;
         final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
         if (isEmpty(control.getControls()) && form2Concept != null) {
+            if (isInIgnoreConcepts(form2Concept.getName()))
+                return null;
             String translatedConceptName = getTranslatedName(rootformName, control.getLabel().getTranslationKey());
             conceptName = isNull(translatedConceptName) ? form2Concept.getName() : translatedConceptName;
-            if (isInIgnoreConcepts(conceptName))
-                return null;
             concept = new Concept();
             concept.setName(conceptName);
             concept.setDataType(form2Concept.getDatatype());
