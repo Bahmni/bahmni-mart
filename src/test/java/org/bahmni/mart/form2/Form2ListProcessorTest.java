@@ -917,13 +917,6 @@ public class Form2ListProcessorTest {
     public void shouldAvoidTextConceptsWhenIgnoreFreeTextPropertyIsTrueInNonDefaultLocale() {
         final String obsConceptName = "ObsConcept";
         final String translationKey = "OBS_CONCEPT_1";
-        Map<String, String> conceptTranslations = new HashMap<>();
-        conceptTranslations.put(translationKey, "FrenchConcept");
-        Form2Translation form2TranslationObj = new Form2Translation();
-        form2TranslationObj.setConcepts(conceptTranslations);
-        form2TranslationObj.setLocale("fr");
-        form2TranslationObj.setFormName(COMPLEX_FORM);
-        form2TranslationObj.setVersion("1");
         Control obsControl = new ControlBuilder()
                 .withPropertyAddMore(false)
                 .withConcept(obsConceptName, "obs_concept_1")
@@ -932,14 +925,13 @@ public class Form2ListProcessorTest {
         Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
         form2JsonMetadata.setControls(new ArrayList<>(singletonList(obsControl)));
 
-        when(jobDefinition.getLocale()).thenReturn("fr");
-        when(form2TranslationsReader.getTranslation(any(), any())).thenReturn("FrenchConcept");
         when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition))
                 .thenReturn(new HashSet<>(Collections.singletonList(ignoreConcept)));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
-        when(form2TranslationsReader.getTranslation(form2Translation, translationKey)).thenReturn(obsConceptName);
         final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
 
+        verify(ignoreColumnsConfigHelper).getIgnoreConceptsForJob(any());
+        verify(form2MetadataReader).read(any());
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
         assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
