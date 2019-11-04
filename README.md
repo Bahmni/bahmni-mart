@@ -100,15 +100,15 @@ To install bahmni-mart follow the steps given below
 ### Command to deploy mart
  #### Metabase without ssl
 ```bash 
-ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "custom_ssl,lets_encrypt_ssl"
+ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "custom_ssl,lets_encrypt_ssl" -vv
 ```
 #### Metabase with let's encrypt ssl(optional)
 ```bash
-ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,custom_ssl"
+ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,custom_ssl" -vv
 ```
 #### Metabase with custom ssl(optional)
 ```bash
-ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,lets_encrypt_ssl"
+ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,lets_encrypt_ssl" -vv
 ```
 
 Note: Abvoe playbook deploys [bahmni-mart](https://github.com/bahmni-msf/bahmni-mart) along with [metabase](https://metabase.com)(docker container) and [spring cloud data flow server](https://cloud.spring.io/spring-cloud-dataflow/)(docker container)
