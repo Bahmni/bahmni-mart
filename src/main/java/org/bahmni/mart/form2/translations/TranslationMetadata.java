@@ -23,4 +23,15 @@ public class TranslationMetadata {
 
         return String.format("%s/%s_%s.json", fromTranslationsPath, formName, formVersion);
     }
+
+    public String getNormalizedTranslationsFilePath(String formName, int formVersion) {
+
+        String VALID_FILE_NAME_CHAR_REGEX = "[^a-zA-Z0-9_\\-.]";
+
+        String fromTranslationsPath = openmrsJdbcTemplate.queryForObject(TRANSLATION_FILES_LOCATION_SQL, String.class);
+
+        return String.format("%s/%s_%s.json", fromTranslationsPath,
+                formName.replaceAll(VALID_FILE_NAME_CHAR_REGEX,"_"),
+                formVersion);
+    }
 }
