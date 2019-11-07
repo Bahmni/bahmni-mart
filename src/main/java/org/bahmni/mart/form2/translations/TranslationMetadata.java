@@ -26,7 +26,7 @@ public class TranslationMetadata {
 
     public String getNormalizedTranslationsFilePath(String formName, int formVersion) {
 
-        String VALID_FILE_NAME_CHAR_REGEX = "[^a-zA-Z0-9_\\-.]";
+        final String VALID_FILE_NAME_CHAR_REGEX = "[^a-zA-Z0-9_\\-.]";
 
         String fromTranslationsPath = openmrsJdbcTemplate.queryForObject(TRANSLATION_FILES_LOCATION_SQL, String.class);
 
