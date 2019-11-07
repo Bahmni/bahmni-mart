@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
@@ -26,10 +27,11 @@ import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @PrepareForTest(FileUtils.class)
@@ -104,6 +106,56 @@ public class Form2TranslationsReaderTest {
         assertEquals("Poids", form2Translations.getConcepts().get("WEIGHT_1"));
         assertEquals("Lectures", form2Translations.getLabels().get("SECTION_1"));
 
+    }
+
+    @Test
+    public void shouldReturnForm2TranslationsForGivenSpecialCharacterFormNameVersionAndLocaleWithNormalizedFilePath()
+            throws IOException {
+
+        String formNameWithSpecialCharacters = "2 Vitãls spéciælity_2.json";
+        String normalizedFileName = "2_Vit_ls_sp_ci_lity_2.json";
+        createFile(normalizedFileName);
+        String translationsAsString = "{\n" +
+                "  \"en\": {\n" +
+                "    \"concepts\": {\n" +
+                "      \"HEIGHT_1\": \"Height\",\n" +
+                "      \"WEIGHT_1\": \"Weight\",\n" +
+                "    },\n" +
+                "    \"labels\": {\n" +
+                "      \"SECTION_1\": \"Readings\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"fr\": {\n" +
+                "    \"concepts\": {\n" +
+                "      \"HEIGHT_1\": \"la taille\",\n" +
+                "      \"WEIGHT_1\": \"Poids\",\n" +
+                "    },\n" +
+                "    \"labels\": {\n" +
+                "      \"SECTION_1\": \"Lectures\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        when(translationMetadata.getTranslationsFilePath(formNameWithSpecialCharacters, formVersion))
+                .thenReturn(tempTranslationFolderPath + "/" + formNameWithSpecialCharacters);
+        when(translationMetadata.getNormalizedTranslationsFilePath(formNameWithSpecialCharacters, formVersion))
+                .thenReturn(tempTranslationFolderPath + "/" + normalizedFileName);
+        when(readFileToString(any(File.class))).thenReturn(translationsAsString);
+
+        Form2Translation form2Translations = form2TranslationsReader.read(formNameWithSpecialCharacters,
+                formVersion, locale);
+
+        assertEquals(2, form2Translations.getConcepts().size());
+        assertEquals(1, form2Translations.getLabels().size());
+        assertEquals("la taille", form2Translations.getConcepts().get("HEIGHT_1"));
+        assertEquals("Poids", form2Translations.getConcepts().get("WEIGHT_1"));
+        assertEquals("Lectures", form2Translations.getLabels().get("SECTION_1"));
+
+        InOrder inOrder = inOrder(translationMetadata);
+        inOrder.verify(translationMetadata, times(1))
+                .getTranslationsFilePath(formNameWithSpecialCharacters, formVersion);
+        inOrder.verify(translationMetadata, times(1))
+                .getNormalizedTranslationsFilePath(formNameWithSpecialCharacters, formVersion);
     }
 
     @Test
