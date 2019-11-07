@@ -8,7 +8,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -41,20 +43,36 @@ public class Form2TranslationsReaderTest {
     String locale = "fr";
     private TranslationMetadata translationMetadata;
     private Form2TranslationsReader form2TranslationsReader;
+    private String tempTranslationFolderPath;
     @Rule
     private ExpectedException expectedException = ExpectedException.none();
 
     @Before
-    public void setUp() {
+    public void setUp() throws IllegalAccessException, NoSuchFieldException, IOException {
         translationMetadata = Mockito.mock(TranslationMetadata.class);
         form2TranslationsReader = new Form2TranslationsReader(translationMetadata);
         mockStatic(FileUtils.class);
+        createTempFolder();
+    }
+
+
+    private void createTempFolder() throws IOException, NoSuchFieldException, IllegalAccessException {
+        TemporaryFolder temporaryFolder = new TemporaryFolder();
+        temporaryFolder.create();
+        String translationsPath = temporaryFolder.getRoot().getAbsolutePath();
+        tempTranslationFolderPath=translationsPath;
+    }
+
+    private void createFile(String fileName) throws IOException {
+        File file = new File(tempTranslationFolderPath+"/" + fileName);
+        file.createNewFile();
     }
 
     @Test
     public void shouldReturnForm2TranslationsForGivenFormNameVersionAndLocale() throws IOException {
 
-        String translationsFilePath = "/home/bahmni/clinical_forms/translations/Vitals_2.json";
+        String formName = "Vitals_2.json";
+        createFile(formName);
         String translationsAsString = "{\n" +
                 "  \"en\": {\n" +
                 "    \"concepts\": {\n" +
@@ -77,7 +95,7 @@ public class Form2TranslationsReaderTest {
                 "}";
 
         when(translationMetadata.getTranslationsFilePath(formName, formVersion))
-                .thenReturn(translationsFilePath);
+                .thenReturn(tempTranslationFolderPath +"/"+ formName);
         when(readFileToString(any(File.class))).thenReturn(translationsAsString);
 
         Form2Translation form2Translations = form2TranslationsReader.read(formName, formVersion, locale);
@@ -95,6 +113,8 @@ public class Form2TranslationsReaderTest {
         String invalidFilePath = "abc/Vitals_2.json";
         when(translationMetadata.getTranslationsFilePath(formName, formVersion))
                 .thenReturn(invalidFilePath);
+        when(translationMetadata.getNormalizedTranslationsFilePath(formName, formVersion))
+                .thenReturn(invalidFilePath);
         when(readFileToString(any(File.class))).thenThrow(FileNotFoundException.class);
         Logger logger = mock(Logger.class);
         setValueForFinalStaticField(Form2TranslationsReader.class, "logger", logger);
@@ -107,8 +127,10 @@ public class Form2TranslationsReaderTest {
 
     @Test
     public void shouldLogWarningForAnyIOException() throws Exception {
-        String translationFilePath = "/home/bahmni/clinical_forms/translations/Vitals_2.json";
+        String translationFilePath = tempTranslationFolderPath+ "/Vitals_2.json";
         when(translationMetadata.getTranslationsFilePath(formName, formVersion))
+                .thenReturn(translationFilePath);
+        when(translationMetadata.getNormalizedTranslationsFilePath(formName,formVersion))
                 .thenReturn(translationFilePath);
         when(readFileToString(any(File.class))).thenThrow(IOException.class);
         Logger logger = mock(Logger.class);
@@ -116,8 +138,8 @@ public class Form2TranslationsReaderTest {
 
         form2TranslationsReader.read(formName, formVersion, locale);
 
-        verify(logger, times(1)).warn(eq("Unable to read the translations file " +
-                        "'/home/bahmni/clinical_forms/translations/Vitals_2.json'."),
+        verify(logger, times(1)).warn(eq(String.format("Unable to read the translations file " +
+                        "'%s/Vitals_2.json'.", tempTranslationFolderPath)),
                 any(IOException.class));
 
     }
