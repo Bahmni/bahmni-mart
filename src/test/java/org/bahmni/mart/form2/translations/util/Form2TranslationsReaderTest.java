@@ -10,8 +10,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
@@ -28,10 +26,10 @@ import static org.bahmni.mart.CommonTestHelper.setValueForFinalStaticField;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @PrepareForTest(FileUtils.class)
@@ -49,7 +47,7 @@ public class Form2TranslationsReaderTest {
 
     @Before
     public void setUp() throws IllegalAccessException, NoSuchFieldException, IOException {
-        translationMetadata = Mockito.mock(TranslationMetadata.class);
+        translationMetadata = mock(TranslationMetadata.class);
         form2TranslationsReader = new Form2TranslationsReader(translationMetadata);
         mockStatic(FileUtils.class);
         createTempFolder();
@@ -60,11 +58,11 @@ public class Form2TranslationsReaderTest {
         TemporaryFolder temporaryFolder = new TemporaryFolder();
         temporaryFolder.create();
         String translationsPath = temporaryFolder.getRoot().getAbsolutePath();
-        tempTranslationFolderPath=translationsPath;
+        tempTranslationFolderPath = translationsPath;
     }
 
     private void createFile(String fileName) throws IOException {
-        File file = new File(tempTranslationFolderPath+"/" + fileName);
+        File file = new File(tempTranslationFolderPath + "/" + fileName);
         file.createNewFile();
     }
 
@@ -95,7 +93,7 @@ public class Form2TranslationsReaderTest {
                 "}";
 
         when(translationMetadata.getTranslationsFilePath(formName, formVersion))
-                .thenReturn(tempTranslationFolderPath +"/"+ formName);
+                .thenReturn(tempTranslationFolderPath + "/" + formName);
         when(readFileToString(any(File.class))).thenReturn(translationsAsString);
 
         Form2Translation form2Translations = form2TranslationsReader.read(formName, formVersion, locale);
@@ -127,7 +125,7 @@ public class Form2TranslationsReaderTest {
 
     @Test
     public void shouldLogWarningForAnyIOException() throws Exception {
-        String translationFilePath = tempTranslationFolderPath+ "/Vitals_2.json";
+        String translationFilePath = tempTranslationFolderPath + "/Vitals_2.json";
         when(translationMetadata.getTranslationsFilePath(formName, formVersion))
                 .thenReturn(translationFilePath);
         when(translationMetadata.getNormalizedTranslationsFilePath(formName,formVersion))
