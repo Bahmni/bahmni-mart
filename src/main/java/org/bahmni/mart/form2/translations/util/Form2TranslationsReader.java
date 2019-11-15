@@ -45,12 +45,13 @@ public class Form2TranslationsReader {
 
     private JSONObject getTranslationsAsJSONObject(String formName, int version) {
         String translationsFilePath = translationMetadata.getTranslationsFilePath(formName, version);
-
-        return new JSONObject(getTranslationsAsString(translationsFilePath));
+        File translationsFile = new File(translationsFilePath);
+        if (!translationsFile.exists())
+            translationsFile = new File(translationMetadata.getNormalizedTranslationsFilePath(formName, version));
+        return new JSONObject(getTranslationsAsString(translationsFile));
     }
 
-    private String getTranslationsAsString(String translationsFilePath) {
-        File translationsFile = new File(translationsFilePath);
+    private String getTranslationsAsString(File translationsFile) {
         String translations = "{}";
         try {
             translations = FileUtils.readFileToString(translationsFile);
