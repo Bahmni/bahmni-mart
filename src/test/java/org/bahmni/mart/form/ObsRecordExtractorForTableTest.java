@@ -356,4 +356,40 @@ public class ObsRecordExtractorForTableTest {
         assertEquals("'2018-11-10 12:00:00'", obsRecordExtractorForTable.getRecordList().get(0).get("obs_datetime"));
         assertEquals("'2018-11-10 12:01:00'", obsRecordExtractorForTable.getRecordList().get(0).get("date_modified"));
     }
+
+    @Test
+    public void shouldGiveRecordsWhenTableNameLengthIsMoreThan59() {
+
+        obsRecordExtractorForTable =
+                new ObsRecordExtractorForTable("mtc_additional_contributing_medical_or_treatment_related_reasons");
+
+        String primaryKeyColumnName = "id_mtc_additional_contributing_medical_or_treatment_related";
+
+        TableData tableData = new TableData();
+        tableData.setName("mtc_additional_contributing_medical_or_treatment_related_reasons");
+        TableColumn primaryKeyColumn = new TableColumn(primaryKeyColumnName, "integer", false, null);
+        tableData.setColumns(Collections.singletonList(primaryKeyColumn));
+
+        Obs obs1 = new Obs();
+        obs1.setField(new Concept(000, "some concept", 0));
+        obs1.setId(111);
+
+        Obs obs2 = new Obs();
+        obs2.setField(new Concept(002, "any concept", 0));
+        obs2.setId(123);
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, primaryKeyColumn))
+                .thenReturn(primaryKeyColumnName);
+
+        obsRecordExtractorForTable.setAddMoreMultiSelectEnabledForSeparateTables(false);
+        obsRecordExtractorForTable.execute(Arrays.asList(Collections.singletonList(obs1),
+                Collections.singletonList(obs2)), tableData);
+
+        List<Map<String, String>> recordList = obsRecordExtractorForTable.getRecordList();
+
+        assertTrue(recordList.get(0).keySet().contains(primaryKeyColumnName));
+        assertTrue(recordList.get(1).keySet().contains(primaryKeyColumnName));
+        assertEquals("111", recordList.get(0).get(primaryKeyColumnName));
+        assertEquals("123", recordList.get(1).get(primaryKeyColumnName));
+    }
 }

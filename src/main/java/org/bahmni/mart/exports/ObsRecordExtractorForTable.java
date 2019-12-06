@@ -25,6 +25,8 @@ public class ObsRecordExtractorForTable {
 
     private List<Map<String, String>> recordList = new ArrayList<>();
 
+    private static final int MAX_COLUMN_NAME_LENGTH = 59;
+
     public ObsRecordExtractorForTable(String tableName) {
         this.tableName = tableName;
     }
@@ -92,7 +94,11 @@ public class ObsRecordExtractorForTable {
     }
 
     private boolean isConstraintName(String conceptName, String tableColumnName) {
-        return tableColumnName.equals("id_" + getProcessedName(conceptName));
+        String processedColumnName = "id_" + getProcessedName(conceptName);
+        if (processedColumnName.length() > MAX_COLUMN_NAME_LENGTH) {
+            processedColumnName = processedColumnName.substring(0, MAX_COLUMN_NAME_LENGTH);
+        }
+        return tableColumnName.equals(processedColumnName);
     }
 
     private void mapAdditionalDetails(TableData tableData, List<Obs> record, Map<String, String> recordMap) {
