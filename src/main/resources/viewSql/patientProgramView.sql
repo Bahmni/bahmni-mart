@@ -31,10 +31,11 @@ SELECT
   ppd.date_created AS patient_program_date_created,
   ppd.date_changed AS patient_program_date_changed,
   ppd.changed_by_id AS patient_program_changed_by_id,
-  ppd.changed_by_name AS patient_program_changed_by_name
+  ppd.changed_by_name AS patient_program_changed_by_name,
+  ppd.voided AS patient_program_voided
 
 FROM person_details_default pd LEFT OUTER JOIN person_address_default pa ON pa.person_id = pd.person_id
   LEFT OUTER JOIN person_attributes pat ON pat.person_id = pd.person_id
-  LEFT OUTER JOIN patient_program_data_default ppd ON ppd.patient_id = pat.person_id
+  LEFT OUTER JOIN patient_program_data_default ppd ON ppd.patient_id = pd.person_id
   LEFT OUTER JOIN programs_default pg ON pg.program_id = ppd.program_id
   LEFT OUTER JOIN patient_state_default ps ON ps.patient_program_id = ppd.patient_program_id
