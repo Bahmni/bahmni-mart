@@ -29,7 +29,7 @@ FROM obs o
        AND par_fr_obs_con.concept_name_type = 'FULLY_SPECIFIED' AND par_fr_obs_con.voided IS FALSE
   LEFT OUTER JOIN episode_encounter ee ON ee.encounter_id = o.encounter_id
   LEFT OUTER JOIN episode_patient_program epp ON ee.episode_id = epp.episode_id
-  LEFT OUTER JOIN patient_program pp ON epp.patient_program_id = pp.patient_program_id AND pp.voided = FALSE
+  LEFT OUTER JOIN patient_program pp ON epp.patient_program_id = pp.patient_program_id
   LEFT OUTER JOIN program p ON pp.program_id = p.program_id
   LEFT OUTER JOIN concept codedConcept ON o.value_coded = codedConcept.concept_id
   LEFT OUTER JOIN concept_name value_concept_locale On value_concept_locale.concept_id = o.value_coded AND value_concept_locale.locale = :locale
