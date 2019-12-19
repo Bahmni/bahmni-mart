@@ -111,7 +111,7 @@ ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmn
 ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,lets_encrypt_ssl" -vv
 ```
 
-Note: Abvoe playbook deploys [bahmni-mart](https://github.com/bahmni-msf/bahmni-mart) along with [metabase](https://metabase.com)(docker container) and [spring cloud data flow server](https://cloud.spring.io/spring-cloud-dataflow/)(docker container)
+Note: Above playbook deploys [bahmni-mart](https://github.com/bahmni-msf/bahmni-mart) along with [metabase](https://metabase.com)(docker container) and [spring cloud data flow server](https://cloud.spring.io/spring-cloud-dataflow/)(docker container)
 * Update **bahmni-mart** config. The config will be present in **/var/www/bahmni_config/bahmni-mart/bahmni-mart.json** 
 
 ### Access the Application
