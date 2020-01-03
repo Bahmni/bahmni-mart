@@ -38,4 +38,4 @@ SELECT
  FROM person_details_default pd
   LEFT JOIN person_attributes pa ON pa.person_id = pd.person_id
   LEFT JOIN medication_data_default md ON md.patient_id = pd.person_id
-  LEFT OUTER JOIN patient_program_data_default ppd ON ppd.patient_id = md.patient_id
+  LEFT OUTER JOIN patient_program_data_default ppd ON ppd.patient_id = md.patient_id and ppd.patient_program_id = md.patient_program_id
