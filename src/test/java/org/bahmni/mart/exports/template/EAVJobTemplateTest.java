@@ -106,7 +106,7 @@ public class EAVJobTemplateTest {
         verify(spyEAVJobTemplate, times(1)).buildJob(jobDefinition, listener, readerSql);
         verify(listener, times(1)).getTableDataForMart(jobName);
         verify(freeMarkerEvaluator, times(1)).evaluate(eq("attribute.ftl"), any(EAV.class));
-        verify(eavAttributes, times(1)).getAttributeTypeTableName();
+        verify(eavAttributes, times(2)).getAttributeTypeTableName();
         verify(incrementalStrategyContext).getStrategy(JOB_TYPE);
         verify(eavIncrementalUpdateStrategy).setListener(listener);
         verify(jobDefinition).getType();
