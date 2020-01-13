@@ -8,7 +8,7 @@ SELECT
         MAX(if( name =  '${getProcessedName(column.name)}' AND value_table.voided = 0,
                     if  (value_table.${getProcessedName(input.eavAttributes.valueColumnName)} REGEXP '^[[:digit:]]*$' AND
             ${getType('${getProcessedName(column.name)}', '${getProcessedName(input.eavAttributes.attributeTypeTableName)}',
-            '${getProcessedName(input.typeColumnName)}')} REGEXP '^org.openmrs.Concept$' AND
+            '${getProcessedName(input.typeColumnName)}')} REGEXP '${getProcessedName(input.dataTypeValue)}' AND
             ${getConceptName(input.eavAttributes.valueColumnName)} IS NOT NULL,
             ${getConceptName(input.eavAttributes.valueColumnName)},
                         value_table.${input.eavAttributes.valueColumnName})
