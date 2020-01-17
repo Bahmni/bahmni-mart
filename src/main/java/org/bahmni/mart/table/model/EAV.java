@@ -1,9 +1,8 @@
 package org.bahmni.mart.table.model;
 
 import org.bahmni.mart.config.job.model.EavAttributes;
-import org.bahmni.mart.helper.AttributeColumnName;
+import org.bahmni.mart.helper.AttributeData;
 import org.bahmni.mart.table.domain.TableData;
-import org.bahmni.mart.helper.AttributeColumnDataType;
 
 public class EAV {
 
@@ -15,8 +14,8 @@ public class EAV {
     public EAV(TableData tableData, EavAttributes eavAttributes) {
         this.tableData = tableData;
         this.eavAttributes = eavAttributes;
-        typeColumnName = AttributeColumnName.valueOf(eavAttributes.getAttributeTypeTableName()).getDatatype();
-        dataTypeValue = AttributeColumnDataType.valueOf(eavAttributes.getAttributeTypeTableName()).getDataTypeValue();
+        typeColumnName = AttributeData.valueOf(eavAttributes.getAttributeTypeTableName()).getColumnName();
+        dataTypeValue = AttributeData.valueOf(eavAttributes.getAttributeTypeTableName()).getDataType();
     }
 
     public TableData getTableData() {
