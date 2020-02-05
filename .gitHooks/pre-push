@@ -1,0 +1,12 @@
+#!/bin/sh
+lineCommit=`(git log  -L 26,26:build.gradle --max-count=1 --pretty=format:"%H" | head -n 1)`
+currentBranch=`git branch | sed -n '/\* /s///p'`
+git cherry -v origin/$currentBranch | cut -d' ' -f2 | tee localCommits.txt
+if [ `grep $lineCommit localCommits.txt`  ]; then
+        rm -rf localCommits.txt
+        exit 0;
+        else
+        echo "Please update bahmni-mart build version with every git push to master branch"
+        rm -rf localCommits.txt
+        exit 1;
+fi
