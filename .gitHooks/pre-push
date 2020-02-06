@@ -2,7 +2,11 @@
 versionLineNumber=`( grep -n "version =" build.gradle | cut -d' ' -f1 | sed 's/^\(..\).*/\1/')`
 lineCommit=`(git log  -L $versionLineNumber,$versionLineNumber:build.gradle --max-count=1 --pretty=format:"%H" | head -n 1)`
 currentBranch=`git branch | sed -n '/\* /s///p'`
-git cherry -v origin/$currentBranch | cut -d' ' -f2 | tee localCommits.txt
+if [ $currentBranch == "master" ]; then
+        git cherry -v origin/$currentBranch | cut -d' ' -f2 | tee localCommits.txt
+        else
+        exit 0;
+fi
 if [ `grep $lineCommit localCommits.txt`  ]; then
         rm -rf localCommits.txt
         exit 0;
