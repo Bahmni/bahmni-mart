@@ -52,6 +52,7 @@ public class RegViewDefinitionTest {
     public void shouldReturnViewDefinitionWithSql() {
         String sql = "SELECT COALESCE(reg_nutritional_values.patient_id,reg_fee_information.patient_id) AS patient_id" +
                 ", COALESCE(reg_nutritional_values.encounter_id,reg_fee_information.encounter_id) AS encounter_id," +
+                " COALESCE(reg_nutritional_values.visit_id,reg_fee_information.visit_id) AS visit_id," +
                 " COALESCE(reg_nutritional_values.location_id,reg_fee_information.location_id) AS location_id," +
                 " COALESCE(reg_nutritional_values.location_name,reg_fee_information.location_name) AS location_name," +
                 " LEAST(reg_nutritional_values.obs_datetime,reg_fee_information.obs_datetime) AS obs_datetime," +
@@ -59,6 +60,8 @@ public class RegViewDefinitionTest {
                 " GREATEST(reg_nutritional_values.date_modified,reg_fee_information.date_modified) AS date_modified," +
                 " COALESCE(reg_nutritional_values.program_id,reg_fee_information.program_id) AS program_id," +
                 " COALESCE(reg_nutritional_values.program_name,reg_fee_information.program_name) AS program_name," +
+                " COALESCE(reg_nutritional_values.patient_program_id,reg_fee_information.patient_program_id) " +
+                "AS patient_program_id," +
                 "   FROM reg_nutritional_values FULL OUTER JOIN reg_fee_information " +
                 "ON reg_fee_information.encounter_id = reg_nutritional_values.encounter_id";
         String viewName = "registration_second_page_view";
