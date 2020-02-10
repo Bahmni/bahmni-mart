@@ -38,9 +38,9 @@ public class Form2TableMetadataGeneratorTest {
         TableData tableData = form2TableMetadataGenerator.getTableData(form);
         assertEquals(formName.toLowerCase(), tableData.getName());
         assertTrue(tableData.getColumns().stream().map(TableColumn::getName).collect(Collectors.toList())
-                .containsAll(Arrays.asList("patient_id", "encounter_id", "obs_datetime", "date_created",
-                        "date_modified", "location_id", "location_name", "program_id", "program_name", "field1",
-                        "field2", "form_field_path")));
+                .containsAll(Arrays.asList("patient_id", "visit_id", "encounter_id", "obs_datetime", "date_created",
+                        "date_modified", "location_id", "location_name", "program_id", "program_name",
+                        "patient_program_id", "field1", "field2", "form_field_path" )));
     }
 
     @Test
@@ -68,7 +68,9 @@ public class Form2TableMetadataGeneratorTest {
         TableData actualTableData = form2TableMetadataGenerator.getTableData(child);
         assertEquals("formname", actualTableData.getName());
         List<String> expectedColumns = Arrays.asList("form_field_path", "reference_form_field_path",
-                "patient_id", "encounter_id", "field1");
+                "patient_id", "encounter_id", "visit_id", "obs_datetime", "date_created",
+                "date_modified", "location_id", "location_name", "program_id", "program_name",
+                "patient_program_id", "field1");
         List<String> actualColumns = actualTableData.getColumns().stream()
                 .map(TableColumn::getName).collect(Collectors.toList());
         assertTrue(actualColumns.containsAll(expectedColumns));

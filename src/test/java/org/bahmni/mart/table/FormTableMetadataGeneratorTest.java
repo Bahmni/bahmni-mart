@@ -43,9 +43,9 @@ public class FormTableMetadataGeneratorTest {
         assertEquals("formname", tableData.getName());
         List<String> actualColumnNames = tableData.getColumns().stream().map(TableColumn::getName)
                 .collect(Collectors.toList());
-        List<String> expectedColumnNames = Arrays.asList("id_formname", "patient_id", "encounter_id", "obs_datetime",
-                "date_created", "date_modified", "location_id", "location_name", "program_id", "program_name", "field1",
-                "field2");
+        List<String> expectedColumnNames = Arrays.asList("id_formname", "patient_id", "encounter_id",
+                "visit_id", "obs_datetime", "date_created", "date_modified", "location_id", "location_name",
+                "program_id", "program_name", "patient_program_id", "field1", "field2");
         assertTrue(actualColumnNames.containsAll(expectedColumnNames));
     }
 
@@ -72,6 +72,7 @@ public class FormTableMetadataGeneratorTest {
         tableData.addColumn(new TableColumn("id_formname", "Integer", true, null));
         tableData.addColumn(new TableColumn("patient_id", "Integer", false, null));
         tableData.addColumn(new TableColumn("encounter_id", "Integer", false, null));
+        tableData.addColumn(new TableColumn("visit_id", "Integer", false, null));
         tableData.addColumn(new TableColumn("field1", "Integer", false, null));
 
         HashMap<String, TableData> stringTableDataHashMap = new HashMap<>();
@@ -87,7 +88,8 @@ public class FormTableMetadataGeneratorTest {
         TableData expectedTableData = formTableMetadataGenerator.getTableData(child);
         assertEquals("formname", expectedTableData.getName());
         assertTrue(expectedTableData.getColumns().stream().map(TableColumn::getName).collect(Collectors.toList())
-                .containsAll(Arrays.asList("id_formname", "patient_id", "encounter_id", "field1", "id_parent_name")));
+                .containsAll(Arrays.asList("id_formname", "patient_id", "encounter_id", "visit_id", "field1",
+                        "id_parent_name")));
     }
 
     @Test
