@@ -25,7 +25,7 @@ if [ `grep $lineCommit localCommits.txt`  ]; then
         rm -rf localCommits.txt
         exit 0;
         else
-        echo "Please update bahmni-mart build version with every git push to master branch"
+        echo "Please update bahmni-mart build version in build.gradle(Eg: version = '2.0.1') with every git push to master branch"
         rm -rf localCommits.txt
         exit 1;
 fi
