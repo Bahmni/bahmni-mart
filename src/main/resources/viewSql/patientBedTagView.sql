@@ -2,6 +2,7 @@ SELECT *
 FROM (
        SELECT
          bpa.patient_id,
+         bpa.visit_id,
          bpa.encounter_id,
          bpa.bed_number,
          bpa.location,
