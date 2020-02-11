@@ -1,5 +1,6 @@
 SELECT
   patient_id,
+  visit_id,
   bed_patient_info.bed_number,
   date_started,
   case when  (date_stopped = to_char(now(),'YYYY-MM-DD HH24:MI:SS')) then null
@@ -16,6 +17,7 @@ SELECT
 FROM (
        select
          bpad.patient_id,
+         bpad.visit_id,
          bpad.bed_id,
          bpad.bed_number,
          bpad.location,
@@ -33,6 +35,7 @@ FROM (
 
        SELECT
          bed_patient_assignment_info.patient_id,
+         bed_patient_assignment_info.visit_id,
          bed_patient_assignment_info.bed_id,
          bed_patient_assignment_info.bed_number,
          bed_patient_assignment_info.location,
@@ -41,6 +44,7 @@ FROM (
          ped.encounter_type_name
        FROM (SELECT
                patient_id,
+               visit_id,
                date_started,
                date_stopped,
                location,
