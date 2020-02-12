@@ -14,7 +14,9 @@ SELECT
   l.name                                                          AS locationName,
   p.program_id                                                    AS programId,
   p.name                                                          AS programName,
-  c.is_set                                                        AS isSet
+  c.is_set                                                        AS isSet,
+  e.visit_id                                                      AS visit_id,
+  pp.patient_program_id                                           AS patient_program_id
 FROM obs o
   JOIN concept_view obs_con ON o.concept_id = obs_con.concept_id
   LEFT OUTER JOIN concept_name fr_obs_con ON fr_obs_con.concept_id = o.concept_id AND fr_obs_con.locale = :locale
@@ -27,6 +29,7 @@ FROM obs o
   LEFT OUTER JOIN concept_name par_fr_obs_con
     ON par_fr_obs_con.concept_id = parent_obs.concept_id AND par_fr_obs_con.locale = :locale
        AND par_fr_obs_con.concept_name_type = 'FULLY_SPECIFIED' AND par_fr_obs_con.voided IS FALSE
+  LEFT OUTER JOIN encounter e on o.encounter_id = e.encounter_id
   LEFT OUTER JOIN episode_encounter ee ON ee.encounter_id = o.encounter_id
   LEFT OUTER JOIN episode_patient_program epp ON ee.episode_id = epp.episode_id
   LEFT OUTER JOIN patient_program pp ON epp.patient_program_id = pp.patient_program_id

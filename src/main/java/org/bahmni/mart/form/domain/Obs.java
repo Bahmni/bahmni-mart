@@ -16,6 +16,8 @@ public class Obs {
     private String programName;
     private String formFieldPath;
     private String referenceFormFieldPath;
+    private String visitId;
+    private String patientProgramId;
 
     public Obs() {
     }
@@ -146,5 +148,21 @@ public class Obs {
 
     public void setReferenceFormFieldPath(String referenceFormFieldPath) {
         this.referenceFormFieldPath = referenceFormFieldPath;
+    }
+
+    public String getVisitId() {
+        return visitId;
+    }
+
+    public void setVisitId(String visitId) {
+        this.visitId = visitId;
+    }
+
+    public String getPatientProgramId() {
+        return patientProgramId;
+    }
+
+    public void setPatientProgramId(String patientProgramId) {
+        this.patientProgramId = patientProgramId;
     }
 }

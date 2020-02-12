@@ -54,33 +54,33 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
 
         ArrayList<ArrayList<Obs>> items = new ArrayList<>();
         ArrayList<Obs> obsList1 = new ArrayList<>();
-        Obs obs1 = createObs("56", "23", 1, 2, fieldOne, "4", null,
-                "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+        Obs obs1 = createObs("56", "2", "23", 1, 2, fieldOne, "4",
+                null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
+                "test location 1", "1", "test program 1", "9",
                 null, null);
 
-        Obs obs2 = createObs("56", "23", 2, 2, fieldTwo, "test IT", null,
-                "2018-12-2 09:07:32", "2018-12-3 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+        Obs obs2 = createObs("56",  "2","23", 2, 2, fieldTwo, "test IT",
+                null, "2018-12-2 09:07:32", "2018-12-3 09:07:32", "1",
+                "test location 1", "1", "test program 1", "9",
                 null, null);
 
-        Obs obs5 = createObs("56", null, 23, 2, formName, null, null,
-                "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+        Obs obs5 = createObs("56", "2",null, 23, 2, formName, null,
+                null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
+                "test location 1", "1", "test program 1", "9",
                 null, null);
         obsList1.add(obs1);
         obsList1.add(obs2);
         obsList1.add(obs5);
 
         ArrayList<Obs> obsList2 = new ArrayList<>();
-        Obs obs3 = createObs("560", "3", 3, 2, fieldOne, "40", null,
-                "2018-12-2 09:07:42", "2018-12-2 09:07:42", "2",
-                "test location 2", "2", "test program 2",
+        Obs obs3 = createObs("560", "2","3", 3, 2, fieldOne, "40",
+                null, "2018-12-2 09:07:42", "2018-12-2 09:07:42", "2",
+                "test location 2", "2", "test program 2", "9",
                 null, null);
 
-        Obs obs4 = createObs("560", "3", 4, 2, fieldTwo, "test IT 2", null,
-                "2018-12-2 09:07:42", "2018-12-2 09:07:42", "2",
-                "test location 2", "2", "test program 2",
+        Obs obs4 = createObs("560", "2","3", 4, 2, fieldTwo, "test IT 2",
+                null, "2018-12-2 09:07:42", "2018-12-2 09:07:42", "2",
+                "test location 2", "2", "test program 2", "9",
                 null, null);
         obsList2.add(obs3);
         obsList2.add(obs4);
@@ -99,10 +99,11 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals(2, maps.size());
 
         Map<String, Object> actualObs1 = maps.get(0);
-        assertEquals(12, actualObs1.size());
+        assertEquals(14, actualObs1.size());
         assertEquals(1, actualObs1.get("id_test"));
         assertEquals(23, actualObs1.get("patient_id"));
         assertEquals(56, actualObs1.get("encounter_id"));
+        assertEquals(2, actualObs1.get("visit_id"));
         assertEquals(new BigDecimal(4), actualObs1.get("field_one"));
         assertEquals("test IT", actualObs1.get("field_two"));
         assertEquals(1, actualObs1.get("location_id"));
@@ -112,12 +113,14 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals("2018-12-03 09:07:32.0", actualObs1.get("date_modified").toString());
         assertEquals(1, actualObs1.get("program_id"));
         assertEquals("test program 1", actualObs1.get("program_name"));
+        assertEquals(9, actualObs1.get("patient_program_id"));
 
         Map<String, Object> actualObs2 = maps.get(1);
-        assertEquals(12, actualObs2.size());
+        assertEquals(14, actualObs2.size());
         assertEquals(3, actualObs2.get("id_test"));
         assertEquals(3, actualObs2.get("patient_id"));
         assertEquals(560, actualObs2.get("encounter_id"));
+        assertEquals(2, actualObs2.get("visit_id"));
         assertEquals(new BigDecimal(40), actualObs2.get("field_one"));
         assertEquals("test IT 2", actualObs2.get("field_two"));
         assertEquals(2, actualObs2.get("location_id"));
@@ -127,6 +130,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertNull(actualObs2.get("date_modified"));
         assertEquals(2, actualObs2.get("program_id"));
         assertEquals("test program 2", actualObs2.get("program_name"));
+        assertEquals(9, actualObs2.get("patient_program_id"));
     }
 
     @Test
@@ -155,24 +159,24 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         bahmniForm.addField(fieldTwo);
 
         List<List<Obs>> items = new ArrayList<>();
-        Obs obs1 = createObs("56", "23", 1, null, fieldOne, "4",
+        Obs obs1 = createObs("56", "2","23", 1, null, fieldOne, "4",
                 null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+                "test location 1", "1", "test program 1", "9",
                 "test", null);
 
-        Obs obs2 = createObs("56", "23", 2, null, fieldTwo, "test IT",
+        Obs obs2 = createObs("56", "2", "23", 2, null, fieldTwo, "test IT",
                 null, "2018-12-2 09:07:32", "2018-12-3 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+                "test location 1", "1", "test program 1", "9",
                 "test", null);
 
-        Obs obs3 = createObs("560", "3", 3, null, fieldOne, "40",
+        Obs obs3 = createObs("560", "2","3", 3, null, fieldOne, "40",
                 null, "2018-12-2 09:07:42", "2018-12-2 09:07:42", "2",
-                "test location 2", "2", "test program 2",
+                "test location 2", "2", "test program 2","9",
                 "test", null);
 
-        Obs obs4 = createObs("560", "3", 4, null, fieldTwo, "test IT 2",
+        Obs obs4 = createObs("560", "2","3", 4, null, fieldTwo, "test IT 2",
                 null, "2018-12-2 09:07:42", "2018-12-2 09:07:42", "2",
-                "test location 2", "2", "test program 2",
+                "test location 2", "2", "test program 2", "9",
                 "test", null);
 
         items.add(Arrays.asList(obs1, obs2));
@@ -189,10 +193,11 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals(2, maps.size());
 
         Map<String, Object> actualObs1 = maps.get(0);
-        assertEquals(12, actualObs1.size());
+        assertEquals(14, actualObs1.size());
         assertEquals("test", actualObs1.get("form_field_path"));
         assertEquals(23, actualObs1.get("patient_id"));
         assertEquals(56, actualObs1.get("encounter_id"));
+        assertEquals(2, actualObs1.get("visit_id"));
         assertEquals(new BigDecimal(4), actualObs1.get("field_one"));
         assertEquals("test IT", actualObs1.get("field_two"));
         assertEquals(1, actualObs1.get("location_id"));
@@ -202,12 +207,15 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals("2018-12-03 09:07:32.0", actualObs1.get("date_modified").toString());
         assertEquals(1, actualObs1.get("program_id"));
         assertEquals("test program 1", actualObs1.get("program_name"));
+        assertEquals(9, actualObs1.get("patient_program_id"));
+
 
         Map<String, Object> actualObs2 = maps.get(1);
-        assertEquals(12, actualObs2.size());
+        assertEquals(14, actualObs2.size());
         assertEquals("test", actualObs2.get("form_field_path"));
         assertEquals(3, actualObs2.get("patient_id"));
         assertEquals(560, actualObs2.get("encounter_id"));
+        assertEquals(2, actualObs2.get("visit_id"));
         assertEquals(new BigDecimal(40), actualObs2.get("field_one"));
         assertEquals("test IT 2", actualObs2.get("field_two"));
         assertEquals(2, actualObs2.get("location_id"));
@@ -217,6 +225,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertNull(actualObs2.get("date_modified"));
         assertEquals(2, actualObs2.get("program_id"));
         assertEquals("test program 2", actualObs2.get("program_name"));
+        assertEquals(9, actualObs2.get("patient_program_id"));
     }
 
     @Test
@@ -253,24 +262,24 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         bahmniForm.addField(fieldTwo);
 
         List<List<Obs>> items = new ArrayList<>();
-        Obs obs1 = createObs("56", "23", 1, null, fieldOne, "4",
+        Obs obs1 = createObs("56", "2","23", 1, null, fieldOne, "4",
                 null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+                "test location 1", "1", "test program 1", "9",
                 "test.1/2-0", "test");
 
-        Obs obs2 = createObs("56", "23", 2, null, fieldTwo, "test IT",
+        Obs obs2 = createObs("56", "2","23", 2, null, fieldTwo, "test IT",
                 null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+                "test location 1", "1", "test program 1", "9",
                 "test.1/2-0", "test");
 
-        Obs obs3 = createObs("560", "3", 3, null, fieldOne, "40",
+        Obs obs3 = createObs("560", "2","3", 3, null, fieldOne, "40",
                 null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+                "test location 1", "1", "test program 1", "9",
                 "test.1/2-1", "test");
 
-        Obs obs4 = createObs("560", "3", 4, null, fieldTwo, "test IT 2",
+        Obs obs4 = createObs("560", "2","3", 4, null, fieldTwo, "test IT 2",
                 null, "2018-12-2 09:07:32", "2018-12-2 09:07:32", "1",
-                "test location 1", "1", "test program 1",
+                "test location 1", "1", "test program 1", "9",
                 "test.1/2-1", "test");
 
         items.add(Arrays.asList(obs1, obs2));
@@ -287,11 +296,12 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertEquals(2, maps.size());
 
         Map<String, Object> actualObs1 = maps.get(0);
-        assertEquals(13, actualObs1.size());
+        assertEquals(15, actualObs1.size());
         assertEquals("test.1/2-0", actualObs1.get("form_field_path"));
         assertEquals("test", actualObs1.get("reference_form_field_path"));
         assertEquals(23, actualObs1.get("patient_id"));
         assertEquals(56, actualObs1.get("encounter_id"));
+        assertEquals(2, actualObs1.get("visit_id"));
         assertEquals(new BigDecimal(4), actualObs1.get("field_one"));
         assertEquals("test IT", actualObs1.get("field_two"));
         assertEquals(1, actualObs1.get("location_id"));
@@ -301,13 +311,15 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertNull(actualObs1.get("date_modified"));
         assertEquals(1, actualObs1.get("program_id"));
         assertEquals("test program 1", actualObs1.get("program_name"));
+        assertEquals(9, actualObs1.get("patient_program_id"));
 
         Map<String, Object> actualObs2 = maps.get(1);
-        assertEquals(13, actualObs2.size());
+        assertEquals(15, actualObs2.size());
         assertEquals("test.1/2-1", actualObs2.get("form_field_path"));
         assertEquals("test", actualObs2.get("reference_form_field_path"));
         assertEquals(3, actualObs2.get("patient_id"));
         assertEquals(560, actualObs2.get("encounter_id"));
+        assertEquals(2, actualObs2.get("visit_id"));
         assertEquals(new BigDecimal(40), actualObs2.get("field_one"));
         assertEquals("test IT 2", actualObs2.get("field_two"));
         assertEquals(1, actualObs2.get("location_id"));
@@ -317,14 +329,17 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         assertNull(actualObs2.get("date_modified"));
         assertEquals(1, actualObs2.get("program_id"));
         assertEquals("test program 1", actualObs2.get("program_name"));
+        assertEquals(9, actualObs2.get("patient_program_id"));
     }
 
-    private Obs createObs(String encounterId, String patientId, Integer id, Integer parentId,
+    private Obs createObs(String encounterId, String visitId, String patientId, Integer id, Integer parentId,
                           Concept field, String value, String parentName, String obsDateTime,
                           String dateCreated, String locationId, String locationName,
-                          String programId, String programName, String formFieldPath, String referenceFormFieldPath) {
+                          String programId, String programName, String patientProgramId, String formFieldPath,
+                          String referenceFormFieldPath) {
         Obs obs = new Obs();
         obs.setEncounterId(encounterId);
+        obs.setVisitId(visitId);
         obs.setPatientId(patientId);
         obs.setId(id);
         obs.setParentId(parentId);
@@ -337,6 +352,7 @@ public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
         obs.setLocationName(locationName);
         obs.setProgramId(programId);
         obs.setProgramName(programName);
+        obs.setPatientProgramId(patientProgramId);
         obs.setFormFieldPath(formFieldPath);
         obs.setReferenceFormFieldPath(referenceFormFieldPath);
         return obs;
