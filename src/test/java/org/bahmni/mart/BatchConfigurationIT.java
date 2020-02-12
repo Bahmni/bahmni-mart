@@ -613,8 +613,9 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         Set<String> columnNamesViewFromFile = viewFromFile.get(0).keySet();
         Set<String> regViewColumns = regView.get(0).keySet();
         List<String> regViewExpectedColumns = Arrays.asList("reg_fee_information_registration_fee",
-                "reg_nutritional_temp_height", "reg_nutritional_weight", "patient_id", "encounter_id", "obs_datetime",
-                "date_created", "date_modified", "location_id", "location_name", "program_id", "program_name");
+                "reg_nutritional_temp_height", "reg_nutritional_weight", "patient_id", "encounter_id", "visit_id",
+                "obs_datetime", "date_created", "date_modified", "location_id", "location_name", "program_id",
+                "program_name", "patient_program_id");
 
         assertEquals(2, columnNamesView.size());
         assertEquals(2, columnNamesViewFromFile.size());
@@ -623,7 +624,7 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
                 containsInAnyOrder(columnNamesViewFromFile.toArray()));
         assertEquals(10, view.size());
         assertEquals(10, viewFromFile.size());
-        assertEquals(12, regViewColumns.size());
+        assertEquals(14, regViewColumns.size());
         assertThat(regViewExpectedColumns, containsInAnyOrder(regViewColumns.toArray()));
         assertEquals(1, regView.size());
         verifyRecords(view);
@@ -643,41 +644,42 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         tableMap.put("patient_allergy_status_test_default", Arrays.asList("patient_id", "allergy_status"));
 
         tableMap.put("first_stage_validation",
-                Arrays.asList("id_first_stage_validation", "patient_id", "encounter_id",
+                Arrays.asList("id_first_stage_validation", "patient_id", "encounter_id", "visit_id",
                         "obs_datetime", "date_created", "date_modified", "location_id", "location_name", "program_id",
-                        "program_name"));
+                        "program_name", "patient_program_id"));
 
         tableMap.put("fstg_medical_files",
                 Arrays.asList("id_fstg_medical_files", "id_first_stage_validation", "patient_id", "encounter_id",
-                        "obs_datetime", "date_created", "date_modified", "location_id", "location_name", "program_id",
-                        "program_name"));
+                        "visit_id", "obs_datetime", "date_created", "date_modified", "location_id", "location_name",
+                        "program_id", "program_name", "patient_program_id"));
 
         tableMap.put("fstg_specialty_determined_by_mlo",
-                Arrays.asList("id_fstg_specialty_determined_by_mlo", "patient_id", "encounter_id",
+                Arrays.asList("id_fstg_specialty_determined_by_mlo", "patient_id", "encounter_id", "visit_id",
                         "fstg_specialty_determined_by_mlo", "obs_datetime", "date_created", "date_modified",
-                        "location_id", "location_name", "program_id", "program_name", "id_fstg_medical_files"));
+                        "location_id", "location_name", "program_id", "program_name", "patient_program_id",
+                        "id_fstg_medical_files"));
 
         tableMap.put("follow_up_validation", Arrays.asList("id_follow_up_validation", "patient_id", "encounter_id",
-                "obs_datetime", "date_created", "date_modified", "location_id", "location_name", "program_id",
-                "program_name"));
+                "visit_id", "obs_datetime", "date_created", "date_modified", "location_id", "location_name",
+                "program_id", "program_name", "patient_program_id"));
 
-        tableMap.put("stage", Arrays.asList("id_stage", "patient_id", "encounter_id", "id_fstg_medical_files",
-                "stage", "id_follow_up_validation", "obs_datetime", "date_created", "date_modified", "location_id",
-                "location_name", "program_id", "program_name"));
+        tableMap.put("stage", Arrays.asList("id_stage", "patient_id", "encounter_id", "visit_id",
+                "id_fstg_medical_files", "stage", "id_follow_up_validation", "obs_datetime", "date_created",
+                "date_modified", "location_id", "location_name", "program_id", "program_name", "patient_program_id"));
 
         tableMap.put("person_attributes", Arrays.asList("person_id", "givennamelocal", "familynamelocal",
                 "middlenamelocal", "viber", "phonenumber2"));
 
         tableMap.put("bacteriology_concept_set", Arrays.asList("id_bacteriology_concept_set", "patient_id",
-                "encounter_id", "specimen_sample_source", "specimen_id",
-                "obs_datetime", "date_created", "date_modified", "location_id", "location_name", "program_id",
-                "program_name"));
+                "encounter_id", "visit_id", "specimen_sample_source", "specimen_id", "obs_datetime", "date_created",
+                "date_modified", "location_id", "location_name", "program_id",
+                "program_name", "patient_program_id"));
 
         tableMap.put("visit_diagnoses", Arrays.asList("id_visit_diagnoses", "patient_id", "encounter_id",
-                "non_coded_diagnosis", "coded_diagnosis", "diagnosis_certainty", "diagnosis_order",
+                "visit_id", "non_coded_diagnosis", "coded_diagnosis", "diagnosis_certainty", "diagnosis_order",
                 "bahmni_initial_diagnosis", "bahmni_diagnosis_revised", "bahmni_diagnosis_status",
                 "obs_datetime", "date_created", "date_modified", "location_id", "location_name", "program_id",
-                "program_name"));
+                "program_name", "patient_program_id"));
 
         for (String tableName : tableMap.keySet()) {
             String sql = String.format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '%s' " +
@@ -820,8 +822,8 @@ public class BatchConfigurationIT extends AbstractBaseBatchIT {
         Map<String, Object> firstRow = bacteriologyRows.get(0);
         Map<String, Object> secondRow = bacteriologyRows.get(1);
 
-        assertEquals(12, firstRow.size());
-        assertEquals(12, secondRow.size());
+        assertEquals(14, firstRow.size());
+        assertEquals(14, secondRow.size());
 
         assertEquals(1, firstRow.get("specimen_sample_source"));
         assertEquals(2, secondRow.get("specimen_sample_source"));

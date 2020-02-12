@@ -271,6 +271,32 @@ public class ObsRecordExtractorForTableTest {
     }
 
     @Test
+    public void shouldGiveRecordsGivenTableDataWithVisitIdAndPatientProgramId() {
+        TableData tableData = new TableData();
+        tableData.setName("tableName");
+        TableColumn visitIdColumn = new TableColumn("visit_id", "integer", true, null);
+        TableColumn patientProgramIdColumn = new TableColumn("patient_program_id", "integer", true, null);
+        tableData.setColumns(Arrays.asList(visitIdColumn, patientProgramIdColumn));
+        Obs obs1 = new Obs();
+        obs1.setField(new Concept(123, "visit", 1));
+        obs1.setVisitId("123");
+        obs1.setPatientProgramId("321");
+
+        when(SpecialCharacterResolver.getActualColumnName(tableData, visitIdColumn)).thenReturn("visit_id");
+        when(SpecialCharacterResolver.getActualColumnName(tableData, patientProgramIdColumn))
+                .thenReturn("patient_program_id");
+
+        obsRecordExtractorForTable.execute(Arrays.asList(Arrays.asList(obs1)), tableData);
+
+        assertNotNull(obsRecordExtractorForTable.getRecordList());
+        assertThat(obsRecordExtractorForTable.getRecordList().size(), is(1));
+        assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("visit_id"));
+        assertTrue(obsRecordExtractorForTable.getRecordList().get(0).keySet().contains("patient_program_id"));
+        assertEquals("123", obsRecordExtractorForTable.getRecordList().get(0).get("visit_id"));
+        assertEquals("321", obsRecordExtractorForTable.getRecordList().get(0).get("patient_program_id"));
+    }
+
+    @Test
     public void shouldGiveRecordsGivenTableDataWithPatientId() {
         TableData tableData = new TableData();
         tableData.setName("tableName");

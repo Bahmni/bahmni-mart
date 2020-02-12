@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.bahmni.mart.table.FormTableMetadataGenerator.addPrefixToName;
 import static org.bahmni.mart.table.FormTableMetadataGenerator.getProcessedName;
@@ -149,32 +150,30 @@ public class ObsRecordExtractorForTable {
 
     private String getValue(String columnName, List<Obs> record) {
         Obs obs = record.get(0);
-        switch (columnName) {
-          case "encounter_id":
-              return obs.getEncounterId();
-          case "patient_id":
-              return obs.getPatientId();
-          case "obs_datetime":
-              return getObsDateTime(record);
-          case "date_created":
-              return getDateCreated(record);
-          case "date_modified":
-              return getDateModified(record);
-          case "location_id":
-              return obs.getLocationId();
-          case "location_name":
-              return obs.getLocationName();
-          case "program_id":
-              return obs.getProgramId();
-          case "program_name":
-              return obs.getProgramName();
-          case "form_field_path":
-              return obs.getFormFieldPath();
-          case "reference_form_field_path":
-              return obs.getReferenceFormFieldPath();
-          default:
-              return null;
+        Map<String, Supplier<String>> obsValueMap = getObsValueMap(record, obs);
+
+        if (!obsValueMap.containsKey(columnName)) {
+            return null;
         }
+        return obsValueMap.get(columnName).get();
+    }
+
+    private Map<String, Supplier<String>> getObsValueMap(List<Obs> record, Obs obs) {
+        Map<String, Supplier<String>> valueMap = new HashMap<>();
+        valueMap.put("encounter_id", obs::getEncounterId);
+        valueMap.put("patient_id", obs::getPatientId);
+        valueMap.put("obs_datetime", () -> getObsDateTime(record));
+        valueMap.put("date_created", () -> getDateCreated(record));
+        valueMap.put("date_modified", () -> getDateModified(record));
+        valueMap.put("location_id", obs::getLocationId);
+        valueMap.put("location_name", obs::getLocationName);
+        valueMap.put("program_id", obs::getProgramId);
+        valueMap.put("program_name", obs::getProgramName);
+        valueMap.put("form_field_path", obs::getFormFieldPath);
+        valueMap.put("reference_form_field_path",obs::getReferenceFormFieldPath);
+        valueMap.put("visit_id",obs::getVisitId);
+        valueMap.put("patient_program_id",obs::getPatientProgramId);
+        return valueMap;
     }
 
     public List<Map<String, String>> getRecordList() {

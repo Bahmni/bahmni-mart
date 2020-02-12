@@ -40,7 +40,7 @@ public class Form2TableMetadataGeneratorTest {
         assertTrue(tableData.getColumns().stream().map(TableColumn::getName).collect(Collectors.toList())
                 .containsAll(Arrays.asList("patient_id", "visit_id", "encounter_id", "obs_datetime", "date_created",
                         "date_modified", "location_id", "location_name", "program_id", "program_name",
-                        "patient_program_id", "field1", "field2", "form_field_path" )));
+                        "patient_program_id", "field1", "field2", "form_field_path")));
     }
 
     @Test

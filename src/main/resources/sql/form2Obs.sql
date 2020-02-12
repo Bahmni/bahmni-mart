@@ -13,7 +13,9 @@ SELECT
   l.name                                                                          AS locationName,
   p.program_id                                                                    AS programId,
   p.name                                                                          AS programName,
-  SUBSTRING(o.form_namespace_and_path, INSTR(o.form_namespace_and_path, '^') + 1) AS formFieldPath
+  SUBSTRING(o.form_namespace_and_path, INSTR(o.form_namespace_and_path, '^') + 1) AS formFieldPath,
+  e.visit_id                                                                      AS visit_id,
+  pp.patient_program_id                                                           AS patient_program_id
 FROM obs o
   JOIN concept_name obs_con ON o.form_namespace_and_path LIKE CONCAT('%', :formName, '.%')
                                AND (o.voided IS FALSE)
@@ -22,6 +24,7 @@ FROM obs o
                                                           (:conceptNames)
                                AND obs_con.concept_name_type = 'FULLY_SPECIFIED'
   LEFT OUTER JOIN location l ON o.location_id = l.location_id
+  LEFT OUTER JOIN encounter e on o.encounter_id = e.encounter_id
   LEFT OUTER JOIN episode_encounter ee ON ee.encounter_id = o.encounter_id
   LEFT OUTER JOIN episode_patient_program epp ON ee.episode_id = epp.episode_id
   LEFT OUTER JOIN patient_program pp ON epp.patient_program_id = pp.patient_program_id
