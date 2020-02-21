@@ -22,7 +22,7 @@ GROUP BY ${primary_key}
 </@compress>
 
 <#function getConceptName conceptId>
-    <#assign conceptName = "(select COALESCE(c2.name, c1.name) as 'name' from concept_name c1 left join concept_name c2 on c1.concept_id = c2.concept_id AND c1.concept_name_id != c2.concept_name_id AND c2.voided != 1 where c1.concept_name_type = 'FULLY_SPECIFIED' and (c2.concept_name_type = 'SHORT' OR c2.concept_name_type IS NULL) and c1.voided = 0 and (c2.voided = 0 or c2.voided IS NULL) AND c1.concept_id = value_table.${conceptId})">
+    <#assign conceptName = "(select COALESCE(c2.name, c1.name) as 'name' from concept_name c1 left join concept_name c2 on c1.concept_id = c2.concept_id  AND c2.concept_name_type = 'SHORT' AND c2.voided = 0 where c1.concept_name_type = 'FULLY_SPECIFIED' and c1.voided = 0 AND c1.concept_id = value_table.${conceptId} and c2.locale = 'en' and c1.locale = 'en')">
     <#return conceptName>
 </#function>
 
