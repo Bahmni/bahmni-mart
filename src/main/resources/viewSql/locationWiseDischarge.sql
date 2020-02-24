@@ -7,4 +7,3 @@ SELECT
 FROM bed_patient_assignment_default bpam
 GROUP BY patient_id,visit_id,discharge_date,location
 ORDER BY start_date,discharge_date
-ORDER BY start_date,discharge_date
