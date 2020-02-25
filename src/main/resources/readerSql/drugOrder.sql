@@ -1,5 +1,6 @@
 SELECT
        o.patient_id              AS patient_id,
+       o.programId               AS program_id,
        o.patientProgramId        AS patient_program_id,
        o.programName             AS patient_program_name,
        o.order_id                AS order_id,
@@ -31,6 +32,7 @@ SELECT
 from
 (SELECT
        pp.patient_program_id                                                                   AS  patientProgramId ,
+       program.program_id                                                                      AS  programId,
        program.name                                                                            AS  programName ,
        orders.encounter_id                                                                     AS  encounterId ,
        drug.name                                                                               AS  codedDrugName ,
