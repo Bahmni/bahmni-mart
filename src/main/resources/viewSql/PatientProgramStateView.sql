@@ -12,6 +12,16 @@ SELECT
   pg.program_name,
   ppd.patient_program_id,
   ppd.program_outcome,
+  ps.state      AS patient_program_state,
+  ps.state_name AS patient_program_state_name,
+  ps.start_date AS patient_program_state_start_date,
+  ps.end_date AS patient_program_state_end_date,
+  ps.creator_id AS patient_state_creator_id,
+  ps.creator_name AS patient_state_creator_name,
+  ps.date_created  AS patient_state_date_created,
+  ps.date_changed  AS patient_state_date_changed,
+  ps.changed_by_id AS patient_state_changed_by_id,
+  ps.changed_by_name AS patient_state_changed_by,
   ppd.date_enrolled  AS program_date_enrolled,
   ppd.date_completed AS program_date_completed,
   ppd.location_id,
@@ -28,3 +38,4 @@ FROM person_details_default pd LEFT OUTER JOIN person_address_default pa ON pa.p
   LEFT OUTER JOIN person_attributes pat ON pat.person_id = pd.person_id
   LEFT OUTER JOIN patient_program_data_default ppd ON ppd.patient_id = pd.person_id
   LEFT OUTER JOIN programs_default pg ON pg.program_id = ppd.program_id
+  LEFT OUTER JOIN patient_state_default ps ON ps.patient_program_id = ppd.patient_program_id

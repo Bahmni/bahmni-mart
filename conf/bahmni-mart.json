@@ -191,6 +191,10 @@
       "sourceFilePath": "classpath:viewSql/patientProgramView.sql"
     },
     {
+      "name": "patient_program_state_view",
+      "sourceFilePath": "classpath:viewSql/patientProgramStateView.sql"
+    },
+    {
       "name": "patient_visits_encounters_view",
       "sourceFilePath": "classpath:viewSql/patientVisitsEncountersView.sql"
     },
