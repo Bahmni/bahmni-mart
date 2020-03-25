@@ -1,5 +1,7 @@
 package org.bahmni.mart.exports.updatestrategy;
 
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.TableMetadataGenerator;
 import org.bahmni.mart.table.domain.TableData;
@@ -11,6 +13,7 @@ import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static org.bahmni.mart.table.SpecialCharacterResolver.getActualTableName;
 
 @Component
@@ -24,6 +27,9 @@ public class ObsIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrat
 
     @Autowired
     private TableMetadataGenerator tableMetadataGenerator;
+
+    @Autowired
+    private JobDefinitionReader jobDefinitionReader;
 
     @Override
     public String updateReaderSql(String readerSql, String jobName, String updateOn) {
@@ -51,6 +57,10 @@ public class ObsIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrat
 
     @Override
     public boolean getMetaDataChangeStatus(String processedName, String jobName) {
+        JobDefinition obsJobDefinition = jobDefinitionReader.getJobDefinitionByName(jobName);
+        if (isNull(obsJobDefinition) || isNull(obsJobDefinition.getIncrementalUpdateConfig())) {
+            return true;
+        }
         TableData currentTableData = tableMetadataGenerator.getTableDataByName(getActualTableName(processedName));
         SpecialCharacterResolver.resolveTableData(currentTableData);
 

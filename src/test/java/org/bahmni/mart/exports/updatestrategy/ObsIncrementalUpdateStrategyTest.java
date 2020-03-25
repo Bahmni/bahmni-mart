@@ -1,5 +1,8 @@
 package org.bahmni.mart.exports.updatestrategy;
 
+import org.bahmni.mart.config.job.JobDefinitionReader;
+import org.bahmni.mart.config.job.model.IncrementalUpdateConfig;
+import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.helper.MarkerManager;
 import org.bahmni.mart.helper.TableDataGenerator;
 import org.bahmni.mart.table.SpecialCharacterResolver;
@@ -37,6 +40,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -63,6 +67,12 @@ public class ObsIncrementalUpdateStrategyTest {
 
     @Mock
     private TableMetadataGenerator tableMetadataGenerator;
+
+    @Mock
+    private JobDefinitionReader jobDefinitionReader;
+
+    @Mock
+    private JobDefinition jobDefinition;
 
     @Mock
     private Map markerMap;
@@ -102,6 +112,7 @@ public class ObsIncrementalUpdateStrategyTest {
         setValuesForSuperClassMemberFields(obsIncrementalUpdater, "maxEventRecordId",
                                             Integer.parseInt(MAX_EVENT_RECORD_ID));
         setValuesForMemberFields(obsIncrementalUpdater, "maxObsId", maxObsId);
+        setValuesForMemberFields(obsIncrementalUpdater, "jobDefinitionReader", jobDefinitionReader);
 
         mockStatic(SpecialCharacterResolver.class);
 
@@ -109,6 +120,8 @@ public class ObsIncrementalUpdateStrategyTest {
         when(markerMap.get("category")).thenReturn(CATEGORY);
         when(markerMap.get("table_name")).thenReturn(TABLE_NAME);
         when(markerManager.getJobMarkerMap(JOB_NAME)).thenReturn(Optional.of(markerMap));
+        when(jobDefinitionReader.getJobDefinitionByName(anyString())).thenReturn(jobDefinition);
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(mock(IncrementalUpdateConfig.class));
     }
 
     @Test
@@ -411,4 +424,59 @@ public class ObsIncrementalUpdateStrategyTest {
         verify(obsIncrementalUpdateStrategySpy).updateReaderSql("some sql", "obs job", "encounter_id");
         assertEquals(String.format("some sql AND obs_id <=%d", maxObsId), updateReaderSql);
     }
+
+    @Test
+    public void shouldReturnTrueWhenJobDefinitionIsNull() throws Exception {
+        Mockito.doReturn(null).when(jobDefinitionReader).getJobDefinitionByName("jobName");
+
+        assertTrue(obsIncrementalUpdater.getMetaDataChangeStatus("table_name","jobName"));
+    }
+
+    @Test
+    public void shouldReturnTrueWhenIncrementalUpdateConfigurationIsNull() throws Exception {
+        when(jobDefinition.getIncrementalUpdateConfig()).thenReturn(null);
+
+        assertTrue(obsIncrementalUpdater.getMetaDataChangeStatus("table_name","jobName"));
+    }
+
+
+    @Test
+    public void shouldReturnFalseWhenThereIsNoMetadataChange() throws Exception {
+        String tableName = "table_name";
+        String jobName = "Orders Data";
+        TableData tableData = new TableData(tableName);
+        when(tableMetadataGenerator.getTableDataByName(tableName)).thenReturn(tableData);
+        when(tableDataGenerator.getTableDataFromMart(eq(tableName), anyString())).thenReturn(tableData);
+        when(SpecialCharacterResolver.getActualTableName(anyString())).thenReturn(tableName);
+        when(SpecialCharacterResolver.getUpdatedTableNameIfExist(anyString())).thenReturn(tableName);
+
+
+        boolean metaDataChangeStatus = obsIncrementalUpdater.getMetaDataChangeStatus(tableName, jobName);
+
+        verify(tableMetadataGenerator).getTableDataByName(tableName);
+        verify(tableDataGenerator).getTableDataFromMart(eq(tableName), anyString());
+        assertFalse(metaDataChangeStatus);
+        verifyStatic();
+        SpecialCharacterResolver.resolveTableData(tableData);
+    }
+
+    @Test
+    public void shouldReturnTrueWhenThereIsAMetadataChange() throws Exception {
+        String tableName = "table_name";
+        String jobName = "Orders Data";
+        TableData tableData = new TableData(tableName);
+        when(tableDataGenerator.getTableDataFromMart(eq(tableName), anyString())).thenReturn(new TableData());
+        when(tableMetadataGenerator.getTableDataByName(tableName)).thenReturn(tableData);
+        when(SpecialCharacterResolver.getActualTableName(anyString())).thenReturn(tableName);
+        when(SpecialCharacterResolver.getUpdatedTableNameIfExist(anyString())).thenReturn(tableName);
+
+        boolean metaDataChangeStatus = obsIncrementalUpdater.getMetaDataChangeStatus(tableName, jobName);
+
+        verify(tableMetadataGenerator).getTableDataByName(tableName);
+        verify(tableDataGenerator).getTableDataFromMart(eq(tableName), anyString());
+        assertTrue(metaDataChangeStatus);
+        verifyStatic();
+        SpecialCharacterResolver.resolveTableData(tableData);
+    }
+
 }
