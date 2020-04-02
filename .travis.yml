@@ -22,10 +22,10 @@ jobs:
       script: ./scripts/travis/compile.sh
     - stage : test
       before_install:
-        - sudo mysql -e "use mysql; SET PASSWORD FOR 'root'@'localhost' = PASSWORD('password');FLUSH PRIVILEGES;"
-        - sudo mysql -ppassword -e "create database test_openmrs;"
-        - sudo mysql -ppassword -e "CREATE USER 'test_user'@'localhost' IDENTIFIED BY 'password';"
-        - sudo mysql -ppassword -e "GRANT ALL ON test_openmrs.* to 'test_user'@'localhost';FLUSH PRIVILEGES;"
+        - sudo mysql -e "use mysql; SET PASSWORD FOR 'root'@'localhost' = PASSWORD('P@ssw0rd123');FLUSH PRIVILEGES;"
+        - sudo mysql -pP@ssw0rd123 -e "create database test_openmrs;"
+        - sudo mysql -pP@ssw0rd123 -e "CREATE USER 'test_user'@'localhost' IDENTIFIED BY 'P@ssw0rd123';"
+        - sudo mysql -pP@ssw0rd123 -e "GRANT ALL ON test_openmrs.* to 'test_user'@'localhost';FLUSH PRIVILEGES;"
         - sudo service mysql restart
         - psql -c "CREATE USER test_user WITH PASSWORD 'password' NOCREATEROLE SUPERUSER;" -U postgres
         - psql -c "CREATE DATABASE test_analytics WITH OWNER test_user;" -U postgres
