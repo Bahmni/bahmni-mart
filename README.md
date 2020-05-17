@@ -15,6 +15,9 @@ To setup git hooks please run the following command
 ```bash
 sh scripts/dev/setup.sh
 ```
+We have 2 githooks configured so far
+1. pre-commit hook to check the message formatting
+2. pre-push hook to prompt developer to increment the build version on master branch with every new feature change
 
 ---
 ### Build 
