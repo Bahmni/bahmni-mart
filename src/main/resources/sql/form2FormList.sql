@@ -4,7 +4,7 @@ SELECT
   form.version,
   fr.value_reference
 FROM form
-  INNER JOIN form_resource fr ON form.form_id = fr.form_id
+  INNER JOIN form_resource fr ON form.form_id = fr.form_id and form.name = fr.name
   INNER JOIN (select
                 name,
                 MAX(version) as version
