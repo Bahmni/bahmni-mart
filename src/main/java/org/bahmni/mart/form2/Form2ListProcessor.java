@@ -40,6 +40,8 @@ public class Form2ListProcessor {
     private Form2MetadataReader form2MetadataReader;
     @Autowired
     private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
+    @Autowired
+    private FormService formService;
 
     private Form2TranslationsReader form2TranslationsReader;
     private Map<String, Form2Translation> formToTranslationsMap = new HashMap<>();
@@ -55,7 +57,7 @@ public class Form2ListProcessor {
         this.jobDefinition = jobDefinition;
         ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
         ArrayList<BahmniForm> allBahmniForms = allLatestFormPaths.keySet().stream().map(formName ->
-                getBahmniForm(formName, allLatestFormPaths.get(formName)))
+                getBahmniForm(formService.getTranslated(formName), allLatestFormPaths.get(formName)))
                 .collect(Collectors.toCollection(ArrayList::new));
         return FormListHelper.filterFormsWithOutDuplicateSectionsAndConcepts(allBahmniForms);
     }

@@ -1,6 +1,10 @@
 package org.bahmni.mart.form2.service;
 
+import com.google.gson.Gson;
 import org.bahmni.mart.BatchUtils;
+import org.bahmni.mart.form2.model.FormNameJsonMetadata;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,10 +12,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Type;
+import java.util.*;
 
 @Component
 public class FormService {
@@ -52,5 +54,28 @@ public class FormService {
 
     private List<Map<String, Object>> getLatestFormNamesWithVersion() {
         return openmrsDbTemplate.queryForList("SELECT name , MAX(version) as version FROM form GROUP BY name");
+    }
+
+    public String getTranslated(String formName) {
+        LinkedHashMap<String, String> formNameAndTranslationMap = new LinkedHashMap<>();
+        List<Map<String, Object>> forms = getFormNameTranslation();
+        for (Map<String, Object> form : forms) {
+            String name = (String) form.get(FORM_NAME);
+            String value_reference = (String) form.get("value_reference");
+            Gson gson = new Gson();
+            List<FormNameJsonMetadata> list = Arrays.asList(gson.fromJson(value_reference, FormNameJsonMetadata[].class));
+
+            String translation = list.stream().filter(nam -> (nam.getLocale().equals("fr")))
+                    .map(FormNameJsonMetadata::getDisplay).findFirst().toString();
+             translation = translation != null ? translation :  list.stream().filter(nam -> (nam.getLocale().equals("en")))
+                    .map(FormNameJsonMetadata::getDisplay).findFirst().toString();
+        formNameAndTranslationMap.put(name, translation);
+        }
+
+        return formNameAndTranslationMap.get(formName) != null ? formNameAndTranslationMap.get(formName) : formName;
+    }
+
+    private List<Map<String, Object>> getFormNameTranslation() {
+        return openmrsDbTemplate.queryForList("select f.name, fr.value_reference from form f, form_resource fr where fr.form_id = f.form_id and fr.name like '%FormName_Translation'");
     }
 }
