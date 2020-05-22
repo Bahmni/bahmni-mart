@@ -1,0 +1,120 @@
+diff --git a/conf/app.json b/conf/app.json
+index 5545826..788fb9f 100644
+--- a/conf/app.json
++++ b/conf/app.json
+@@ -19,6 +19,13 @@
+       "FSTG, Priority": {
+         "dropdown": true
+       },
++      "SA, Clindamycin":{
++        "multiSelect":true
++      },
++      "SA, Ciprofloxacin":{
++        "multiSelect":true
++      },
++
+       "OR, Operation performed": {
+         "autocomplete": true,
+         "codedConceptName": "OR, Operation performed coded",
+diff --git a/conf/bahmni-mart.json b/conf/bahmni-mart.json
+index 643efe8..ed8bbf5 100644
+--- a/conf/bahmni-mart.json
++++ b/conf/bahmni-mart.json
+@@ -40,6 +40,11 @@
+         }
+       ]
+     },
++    {
++      "name": "Provider",
++      "type": "provider",
++      "chunkSizeToRead": "500"
++    },
+     {
+       "name": "Visits And Encounters",
+       "type": "visitsAndEncounters",
+diff --git a/src/main/java/org/bahmni/mart/form2/Form2ListProcessor.java b/src/main/java/org/bahmni/mart/form2/Form2ListProcessor.java
+index ab50e54..d941657 100644
+--- a/src/main/java/org/bahmni/mart/form2/Form2ListProcessor.java
++++ b/src/main/java/org/bahmni/mart/form2/Form2ListProcessor.java
+@@ -40,8 +40,6 @@ public class Form2ListProcessor {
+     private Form2MetadataReader form2MetadataReader;
+     @Autowired
+     private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
+-    @Autowired
+-    private FormService formService;
+ 
+     private Form2TranslationsReader form2TranslationsReader;
+     private Map<String, Form2Translation> formToTranslationsMap = new HashMap<>();
+@@ -57,7 +55,7 @@ public class Form2ListProcessor {
+         this.jobDefinition = jobDefinition;
+         ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
+         ArrayList<BahmniForm> allBahmniForms = allLatestFormPaths.keySet().stream().map(formName ->
+-                getBahmniForm(formService.getTranslated(formName), allLatestFormPaths.get(formName)))
++                getBahmniForm(formName, allLatestFormPaths.get(formName)))
+                 .collect(Collectors.toCollection(ArrayList::new));
+         return FormListHelper.filterFormsWithOutDuplicateSectionsAndConcepts(allBahmniForms);
+     }
+diff --git a/src/main/java/org/bahmni/mart/form2/service/FormService.java b/src/main/java/org/bahmni/mart/form2/service/FormService.java
+index 4d05c5f..a5af623 100644
+--- a/src/main/java/org/bahmni/mart/form2/service/FormService.java
++++ b/src/main/java/org/bahmni/mart/form2/service/FormService.java
+@@ -66,9 +66,9 @@ public class FormService {
+             List<FormNameJsonMetadata> list = Arrays.asList(gson.fromJson(value_reference, FormNameJsonMetadata[].class));
+ 
+             String translation = list.stream().filter(nam -> (nam.getLocale().equals("fr")))
+-                    .map(FormNameJsonMetadata::getDisplay).findFirst().toString();
++                    .map(formNameJsonMetadata1 -> formNameJsonMetadata1.getDisplay()).findFirst().get();
+              translation = translation != null ? translation :  list.stream().filter(nam -> (nam.getLocale().equals("en")))
+-                    .map(FormNameJsonMetadata::getDisplay).findFirst().toString();
++                    .map(formNameJsonMetadata -> formNameJsonMetadata.getDisplay()).findFirst().get();
+         formNameAndTranslationMap.put(name, translation);
+         }
+ 
+diff --git a/src/main/java/org/bahmni/mart/table/TableMetadataGenerator.java b/src/main/java/org/bahmni/mart/table/TableMetadataGenerator.java
+index 1022a4f..6c5b70d 100644
+--- a/src/main/java/org/bahmni/mart/table/TableMetadataGenerator.java
++++ b/src/main/java/org/bahmni/mart/table/TableMetadataGenerator.java
+@@ -2,9 +2,11 @@ package org.bahmni.mart.table;
+ 
+ import org.bahmni.mart.form.domain.BahmniForm;
+ import org.bahmni.mart.form.domain.Concept;
++import org.bahmni.mart.form2.service.FormService;
+ import org.bahmni.mart.helper.Constants;
+ import org.bahmni.mart.table.domain.TableColumn;
+ import org.bahmni.mart.table.domain.TableData;
++import org.springframework.beans.factory.annotation.Autowired;
+ 
+ import java.util.ArrayList;
+ import java.util.LinkedHashMap;
+@@ -15,6 +17,9 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
+ 
+ public abstract class TableMetadataGenerator implements TableMetadataGeneratorContract {
+ 
++    @Autowired
++    private FormService formService;
++
+     protected Map<String, TableData> tableDataMap = new LinkedHashMap<>();
+ 
+     public List<TableData> getTableDataList() {
+@@ -41,17 +46,18 @@ public abstract class TableMetadataGenerator implements TableMetadataGeneratorCo
+ 
+     public void addMetadataForForm(BahmniForm form) {
+         TableData tableData = getTableData(form);
+-        String formName = getProcessedName(form.getFormName().getName());
++        String formName = formService.getTranslated(form.getFormName().getName());
++        String processedFormName = getProcessedName(formName);
+         if (tableData != null) {
+             tableDataMap.remove(formName);
+             List<TableColumn> foreignKeyColumns = getForeignKeyColumns(form);
+             if (isNotEmpty(foreignKeyColumns) && !tableData.getColumns().containsAll(foreignKeyColumns))
+                 tableData.addAllColumns(foreignKeyColumns);
+         } else {
+-            tableData = new TableData(formName);
++            tableData = new TableData(processedFormName);
+             tableData.addAllColumns(getColumns(form));
+         }
+-        tableDataMap.put(formName, tableData);
++        tableDataMap.put(processedFormName, tableData);
+     }
+ 
+     public int getTableDataMapSize() {

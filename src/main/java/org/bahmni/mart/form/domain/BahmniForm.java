@@ -10,6 +10,7 @@ public class BahmniForm {
     private BahmniForm parent;
     private BahmniForm rootForm;
     private Concept formName;
+    private String translatedFormName;
     private int depthToParent;
     private List<Concept> fields = new ArrayList<>();
     private boolean isNonConceptForm = false;
@@ -82,5 +83,13 @@ public class BahmniForm {
 
     public Map<String, String> getFieldNameAndFullySpecifiedNameMap() {
         return fieldNameAndFullySpecifiedNameMap;
+    }
+
+    public String getTranslatedFormName() {
+        return translatedFormName;
+    }
+
+    public void setTranslatedFormName(String translatedFormName) {
+        this.translatedFormName = translatedFormName;
     }
 }

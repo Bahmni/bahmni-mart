@@ -1,5 +1,6 @@
 package org.bahmni.mart.exports.updatestrategy;
 
+import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.table.Form2TableMetadataGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

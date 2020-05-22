@@ -24,10 +24,12 @@ public class FormService {
     JdbcTemplate openmrsDbTemplate;
     @Value("classpath:sql/form2FormList.sql")
     private Resource form2FormListResource;
+    @Value("classpath:sql/form2FormNameTranslationsList.sql")
+    private Resource form2FormNameTranslationsListResource;
 
     public Map<String, String> getAllLatestFormPaths() {
         Map<String, String> formPaths = new HashMap<>();
-        List<Map<String, Object>> forms = executeFormListQuery();
+        List<Map<String, Object>> forms = executeFormListQuery(form2FormListResource);
         for (Map<String, Object> form : forms) {
             String name = (String) form.get(FORM_NAME);
             String valueReference = (String) form.get("value_reference");
@@ -36,8 +38,8 @@ public class FormService {
         return formPaths;
     }
 
-    private List<Map<String, Object>> executeFormListQuery() {
-        final String form2FormListQuery = BatchUtils.convertResourceOutputToString(form2FormListResource);
+    private List<Map<String, Object>> executeFormListQuery(Resource resource) {
+        final String form2FormListQuery = BatchUtils.convertResourceOutputToString(resource);
         return openmrsDbTemplate.queryForList(form2FormListQuery);
     }
 
@@ -56,26 +58,22 @@ public class FormService {
         return openmrsDbTemplate.queryForList("SELECT name , MAX(version) as version FROM form GROUP BY name");
     }
 
-    public String getTranslated(String formName) {
+    public Map<String, String> getFormNameTranslations( String locale) {
         LinkedHashMap<String, String> formNameAndTranslationMap = new LinkedHashMap<>();
-        List<Map<String, Object>> forms = getFormNameTranslation();
+        List<Map<String, Object>> forms = executeFormListQuery(form2FormNameTranslationsListResource);
         for (Map<String, Object> form : forms) {
             String name = (String) form.get(FORM_NAME);
             String value_reference = (String) form.get("value_reference");
             Gson gson = new Gson();
             List<FormNameJsonMetadata> list = Arrays.asList(gson.fromJson(value_reference, FormNameJsonMetadata[].class));
 
-            String translation = list.stream().filter(nam -> (nam.getLocale().equals("fr")))
-                    .map(FormNameJsonMetadata::getDisplay).findFirst().toString();
-             translation = translation != null ? translation :  list.stream().filter(nam -> (nam.getLocale().equals("en")))
-                    .map(FormNameJsonMetadata::getDisplay).findFirst().toString();
-        formNameAndTranslationMap.put(name, translation);
+            String translation = list.stream().filter(nam -> (nam.getLocale().equals(locale)))
+                    .map(formNameJsonMetadata1 -> formNameJsonMetadata1.getDisplay()).findFirst().get();
+            translation = translation != null ? translation : list.stream().filter(nam -> (nam.getLocale().equals("en")))
+                    .map(formNameJsonMetadata -> formNameJsonMetadata.getDisplay()).findFirst().get();
+            formNameAndTranslationMap.put(name, translation);
         }
+        return formNameAndTranslationMap;
 
-        return formNameAndTranslationMap.get(formName) != null ? formNameAndTranslationMap.get(formName) : formName;
-    }
-
-    private List<Map<String, Object>> getFormNameTranslation() {
-        return openmrsDbTemplate.queryForList("select f.name, fr.value_reference from form f, form_resource fr where fr.form_id = f.form_id and fr.name like '%FormName_Translation'");
     }
 }

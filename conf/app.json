@@ -19,6 +19,13 @@
       "FSTG, Priority": {
         "dropdown": true
       },
+      "SA, Clindamycin":{
+        "multiSelect":true
+      },
+      "SA, Ciprofloxacin":{
+        "multiSelect":true
+      },
+
       "OR, Operation performed": {
         "autocomplete": true,
         "codedConceptName": "OR, Operation performed coded",

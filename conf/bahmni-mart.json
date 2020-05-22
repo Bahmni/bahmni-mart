@@ -41,6 +41,11 @@
       ]
     },
     {
+      "name": "Provider",
+      "type": "provider",
+      "chunkSizeToRead": "500"
+    },
+    {
       "name": "Visits And Encounters",
       "type": "visitsAndEncounters",
       "chunkSizeToRead": "500"
@@ -63,6 +68,7 @@
         "separateTables": [
         ]
       },
+      "locale": "fr",
       "conceptReferenceSource": "",
       "ignoreAllFreeTextConcepts": true,
       "columnsToIgnore": [

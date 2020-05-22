@@ -33,6 +33,7 @@ public class Form2StepConfigurer extends StepConfigurer {
     protected List<BahmniForm> getAllForms() {
         JobDefinition jobDefinition = getJobDefinitionByType(jobDefinitionReader.getJobDefinitions(), TYPE);
         Map<String, String> allLatestFormPaths = formService.getAllLatestFormPaths();
-        return FormListHelper.flattenFormList(form2ListProcessor.getAllForms(allLatestFormPaths, jobDefinition));
+        Map<String, String> formNameTranslations = formService.getFormNameTranslations(jobDefinition.getLocale());
+        return FormListHelper.flattenFormList(form2ListProcessor.getAllForms(allLatestFormPaths, jobDefinition, formNameTranslations));
     }
 }
