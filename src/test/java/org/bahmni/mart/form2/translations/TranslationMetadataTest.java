@@ -8,7 +8,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
@@ -55,12 +54,15 @@ public class TranslationMetadataTest {
     @Test
     public void shouldReturnTranslationsFilePathWithFormUuidWhenFormNameAndVersionAreGiven() {
 
-        String queryForUUID = String.format("SELECT form.uuid FROM form WHERE version = %d AND form.name = \"%s\"", 2, "Vitals");
+        String queryForUUID = String.format("SELECT form.uuid FROM form WHERE version = %d AND form.name = \"%s\"",
+                2, "Vitals");
 
-        when(openmrsJdbcTemplate.queryForObject(queryForUUID, String.class)).thenReturn("91770617-a6d0-4ad4-a0a2-c77bd5926bd2");
+        when(openmrsJdbcTemplate.queryForObject(queryForUUID, String.class))
+                .thenReturn("91770617-a6d0-4ad4-a0a2-c77bd5926bd2");
 
         String formTranslationsPath = translationMetadata.getTranslationsFilePathWithUuid("Vitals", 2);
-        assertEquals("/home/bahmni/clinical_forms/translations/91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json", formTranslationsPath);
+        assertEquals("/home/bahmni/clinical_forms/translations/91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json",
+                formTranslationsPath);
     }
 
     private TranslationMetadata getTranslationMetadata() {

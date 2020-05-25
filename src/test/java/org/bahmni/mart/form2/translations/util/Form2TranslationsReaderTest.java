@@ -100,7 +100,7 @@ public class Form2TranslationsReaderTest {
                 "  }\n" +
                 "}";
         when(translationMetadata.getTranslationsFilePathWithUuid(formName, formVersion))
-                .thenReturn(tempTranslationFolderPath+"/"+".json");
+                .thenReturn(tempTranslationFolderPath + "/" + ".json");
         when(translationMetadata.getTranslationsFilePath(formName, formVersion))
                 .thenReturn(tempTranslationFolderPath + "/" + formName);
         when(readFileToString(any(File.class))).thenReturn(translationsAsString);
@@ -142,7 +142,7 @@ public class Form2TranslationsReaderTest {
                 "  }\n" +
                 "}";
         when(translationMetadata.getTranslationsFilePathWithUuid(formNameWithSpecialCharacters, formVersion))
-                .thenReturn(tempTranslationFolderPath+"/"+".json");
+                .thenReturn(tempTranslationFolderPath + "/" + ".json");
         when(translationMetadata.getTranslationsFilePath(formNameWithSpecialCharacters, formVersion))
                 .thenReturn(tempTranslationFolderPath + "/" + formNameWithSpecialCharacters);
         when(translationMetadata.getNormalizedTranslationsFilePath(formNameWithSpecialCharacters, formVersion))
@@ -168,7 +168,8 @@ public class Form2TranslationsReaderTest {
     }
 
     @Test
-    public void shouldReturnForm2TranslationsForGivenFormNameVersionAndLocaleWhenTranslationsFileNameIsUuid() throws IOException {
+    public void shouldReturnForm2TranslationsForGivenFormNameVersionAndLocaleWhenTranslationsFileNameIsUuid()
+            throws IOException {
 
         String formName = "Vitals_2.json";
         String uuidFileName = "\"91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json\"";

@@ -86,7 +86,7 @@ public class Form2ObservationExportStep implements ObservationExportStep {
     private JdbcCursorItemReader<Map<String, Object>> obsReader() {
         String sql = getProcessedSql();
         sql = obsIncrementalUpdater.updateReaderSql(sql, jobDefinition.getName(), "encounter_id",
-                form.getFormName().getName());
+                form.getTranslatedFormName() != null ? form.getTranslatedFormName() : form.getFormName().getName());
         JdbcCursorItemReader<Map<String, Object>> reader = new JdbcCursorItemReader<>();
         reader.setDataSource(dataSource);
         reader.setSql(sql);
