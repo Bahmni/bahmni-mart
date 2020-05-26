@@ -53,7 +53,8 @@ public class Form2ListProcessor {
         this.form2TranslationsReader = form2TranslationsReader;
     }
 
-    public List<BahmniForm> getAllForms(Map<String, String> allLatestFormPaths, JobDefinition jobDefinition, Map<String, String> formNameTranslationsMap) {
+    public List<BahmniForm> getAllForms(Map<String, String> allLatestFormPaths,
+                                        JobDefinition jobDefinition, Map<String, String> formNameTranslationsMap) {
         this.jobDefinition = jobDefinition;
         ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
         ArrayList<BahmniForm> allBahmniForms = allLatestFormPaths.keySet().stream().map(formName ->
@@ -83,7 +84,8 @@ public class Form2ListProcessor {
 
     private Concept createConcept(Control control, BahmniForm bahmniForm) {
         String rootformName = getRootForm(bahmniForm).getFormName().getName();
-        String translatedFormName = getRootForm(bahmniForm).getTranslatedFormName() != null ? getRootForm(bahmniForm).getTranslatedFormName() : rootformName;
+        String translatedFormName = getRootForm(bahmniForm).getTranslatedFormName() != null ?
+                getRootForm(bahmniForm).getTranslatedFormName() : rootformName;
         String conceptName = "";
         Concept concept = null;
         final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();

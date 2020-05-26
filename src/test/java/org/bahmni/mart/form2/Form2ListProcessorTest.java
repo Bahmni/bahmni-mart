@@ -1040,6 +1040,6 @@ public class Form2ListProcessorTest {
         assertEquals(1, bahmniFormChildren.size());
         assertEquals("ComplexForm Section", bahmniFormChildren.get(0).getFormName().getName());
         assertNull(bahmniForm.getTranslatedFormName());
-        assertEquals(obsConceptName, bahmniFormChildren.get(0).getFields().get(0).getName() );
+        assertEquals(obsConceptName, bahmniFormChildren.get(0).getFields().get(0).getName());
     }
 }

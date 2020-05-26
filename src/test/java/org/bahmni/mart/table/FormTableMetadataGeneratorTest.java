@@ -139,4 +139,27 @@ public class FormTableMetadataGeneratorTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void shouldReturnTranslatedFormNameAsTableNameAfterUpdatingMetadata() {
+        BahmniForm form = new BahmniForm();
+        form.setFormName(new Concept(123, "formName", 1));
+        form.setTranslatedFormName("FormNameFrench");
+
+        formTableMetadataGenerator.addMetadataForForm(form);
+
+        TableData tableData = formTableMetadataGenerator.getTableData(form);
+        assertEquals("formnamefrench", tableData.getName());
+    }
+
+    @Test
+    public void shouldReturnFormNameAsTableNameWhenTranslatedNameIsNotAvailable() {
+        BahmniForm form = new BahmniForm();
+        form.setFormName(new Concept(123, "formName", 1));
+
+        formTableMetadataGenerator.addMetadataForForm(form);
+
+        TableData tableData = formTableMetadataGenerator.getTableData(form);
+        assertEquals("formname", tableData.getName());
+    }
 }

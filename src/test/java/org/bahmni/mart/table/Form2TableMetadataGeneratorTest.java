@@ -92,6 +92,29 @@ public class Form2TableMetadataGeneratorTest {
 
     }
 
+    @Test
+    public void shouldReturnTranslatedFormNameAsTableNameAfterUpdatingMetadata() {
+        BahmniForm form = new BahmniForm();
+        form.setFormName(new Concept(123, "Form Two Name", 1));
+        form.setTranslatedFormName("Form Two Name French");
+
+        form2TableMetadataGenerator.addMetadataForForm(form);
+
+        TableData tableData = form2TableMetadataGenerator.getTableData(form);
+        assertEquals("form_two_name_french", tableData.getName());
+    }
+
+    @Test
+    public void shouldReturnFormNameAsTableNameWhenTranslatedNameIsNotAvailable() {
+        BahmniForm form = new BahmniForm();
+        form.setFormName(new Concept(123, "Form Two Name", 1));
+
+        form2TableMetadataGenerator.addMetadataForForm(form);
+
+        TableData tableData = form2TableMetadataGenerator.getTableData(form);
+        assertEquals("form_two_name", tableData.getName());
+    }
+
     private Concept createConcept(String conceptName) {
         Concept concept = new Concept();
         concept.setName(conceptName);
