@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Component
 public class FormService {
@@ -78,11 +79,11 @@ public class FormService {
     }
 
     private String getTranslatedFormName(String locale, List<FormNameJsonMetadata> formNameTranslations) {
-        return formNameTranslations.stream().filter(nam -> (nam.getLocale().equals(locale)))
-                .map(FormNameJsonMetadata::getDisplay).findFirst().isPresent() ?
-                formNameTranslations.stream().filter(nam -> (nam.getLocale().equals(locale)))
-                        .map(FormNameJsonMetadata::getDisplay).findFirst().get() :
-                formNameTranslations.stream().filter(nam -> (nam.getLocale().equals("en")))
-                        .map(FormNameJsonMetadata::getDisplay).findFirst().get();
+        Optional<String> localeSpecificTranslation = formNameTranslations.stream()
+                .filter(nam -> (nam.getLocale().equals(locale)))
+                .map(FormNameJsonMetadata::getDisplay).findFirst();
+        String englishTranslation = formNameTranslations.stream().filter(nam -> (nam.getLocale().equals("en")))
+                .map(FormNameJsonMetadata::getDisplay).findFirst().get();
+        return localeSpecificTranslation.orElseGet(() -> englishTranslation);
     }
 }
