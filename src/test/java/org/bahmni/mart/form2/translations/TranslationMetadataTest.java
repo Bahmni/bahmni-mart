@@ -2,15 +2,21 @@ package org.bahmni.mart.form2.translations;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@RunWith(PowerMockRunner.class)
 public class TranslationMetadataTest {
 
     private TranslationMetadata translationMetadata;
+
+    @Mock
+    private JdbcTemplate openmrsJdbcTemplate;
 
     @Before
     public void setup() {
@@ -45,8 +51,22 @@ public class TranslationMetadataTest {
                 fileName);
     }
 
+    @Test
+    public void shouldReturnTranslationsFilePathWithFormUuidWhenFormNameAndVersionAreGiven() {
+
+        String queryForUUID = String.format("SELECT form.uuid FROM form WHERE version = %d AND form.name = \"%s\"",
+                2, "Vitals");
+
+        when(openmrsJdbcTemplate.queryForObject(queryForUUID, String.class))
+                .thenReturn("91770617-a6d0-4ad4-a0a2-c77bd5926bd2");
+
+        String formTranslationsPath = translationMetadata.getTranslationsFilePathWithUuid("Vitals", 2);
+        assertEquals("/home/bahmni/clinical_forms/translations/91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json",
+                formTranslationsPath);
+    }
+
     private TranslationMetadata getTranslationMetadata() {
-        JdbcTemplate openmrsJdbcTemplate = mock(JdbcTemplate.class);
+
         String formTranslationsFileLocation = "/home/bahmni/clinical_forms/translations";
         when(openmrsJdbcTemplate.queryForObject("SELECT property_value FROM global_property " +
                 "WHERE property = 'bahmni.formTranslations.directory'", String.class))
@@ -54,5 +74,4 @@ public class TranslationMetadataTest {
 
         return new TranslationMetadata(openmrsJdbcTemplate);
     }
-
 }

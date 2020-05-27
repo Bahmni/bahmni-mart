@@ -64,4 +64,91 @@ public class FormServiceTest {
 
         assertEquals(0, formNameAndVersionMap.size());
     }
+
+    @Test
+    public void shouldReturnLocaleSpecificTranslationsMapForAllFormNames() {
+        Map<String, Object> formName1 = new LinkedHashMap<>();
+        formName1.put("name","Vitals");
+        formName1.put("value_reference",
+                "[{\"display\":\"Vitals\",\"locale\":\"en\"},{\"display\":\"VitalsFrench\",\"locale\":\"fr\"}]");
+        Map<String, Object> formName2 = new LinkedHashMap<>();
+        formName2.put("name","History");
+        formName2.put("value_reference",
+                "[{\"display\":\"History\",\"locale\":\"en\"},{\"display\":\"HistoryFrench\",\"locale\":\"fr\"}]");
+        Map<String, Object> formName3 = new LinkedHashMap<>();
+        formName3.put("name","Surgery");
+        formName3.put("value_reference",
+                "[{\"display\":\"Surgery\",\"locale\":\"en\"},{\"display\":\"SurgeryFrench\",\"locale\":\"fr\"}]");
+        List<Map<String, Object>> formNames = new ArrayList<>();
+        formNames.add(formName1);
+        formNames.add(formName2);
+        formNames.add(formName3);
+
+        when(jdbcTemplate.queryForList(sql)).thenReturn(formNames);
+
+        Map<String, String> formNamesTranslationsMap = formService.getFormNameTranslations("fr");
+
+        assertEquals(3, formNamesTranslationsMap.size());
+        assertEquals("VitalsFrench", formNamesTranslationsMap.get("Vitals"));
+        assertEquals("HistoryFrench", formNamesTranslationsMap.get("History"));
+        assertEquals("SurgeryFrench", formNamesTranslationsMap.get("Surgery"));
+    }
+
+    @Test
+    public void shouldReturnEnglishTranslationsForAllFormNamesWhenLocaleIsNotConfigured() {
+        Map<String, Object> formName1 = new LinkedHashMap<>();
+        formName1.put("name","Vitals");
+        formName1.put("value_reference",
+                "[{\"display\":\"Vitals\",\"locale\":\"en\"},{\"display\":\"VitalsFrench\",\"locale\":\"fr\"}]");
+        Map<String, Object> formName2 = new LinkedHashMap<>();
+        formName2.put("name","History");
+        formName2.put("value_reference",
+                "[{\"display\":\"History\",\"locale\":\"en\"},{\"display\":\"HistoryFrench\",\"locale\":\"fr\"}]");
+        Map<String, Object> formName3 = new LinkedHashMap<>();
+        formName3.put("name","Surgery");
+        formName3.put("value_reference",
+                "[{\"display\":\"Surgery\",\"locale\":\"en\"},{\"display\":\"SurgeryFrench\",\"locale\":\"fr\"}]");
+        List<Map<String, Object>> formNames = new ArrayList<>();
+        formNames.add(formName1);
+        formNames.add(formName2);
+        formNames.add(formName3);
+
+        when(jdbcTemplate.queryForList(sql)).thenReturn(formNames);
+
+        Map<String, String> formNamesTranslationsMap = formService.getFormNameTranslations(null);
+
+        assertEquals(3, formNamesTranslationsMap.size());
+        assertEquals("Vitals", formNamesTranslationsMap.get("Vitals"));
+        assertEquals("History", formNamesTranslationsMap.get("History"));
+        assertEquals("Surgery", formNamesTranslationsMap.get("Surgery"));
+    }
+
+    @Test
+    public void shouldReturnEnglishTranslationForAFormWhenLocaleSpecificTranslationIsNotAvailable() {
+        Map<String, Object> formName1 = new LinkedHashMap<>();
+        formName1.put("name","Vitals");
+        formName1.put("value_reference",
+                "[{\"display\":\"Vitals\",\"locale\":\"en\"}]");
+        Map<String, Object> formName2 = new LinkedHashMap<>();
+        formName2.put("name","History");
+        formName2.put("value_reference",
+                "[{\"display\":\"History\",\"locale\":\"en\"},{\"display\":\"HistoryFrench\",\"locale\":\"fr\"}]");
+        Map<String, Object> formName3 = new LinkedHashMap<>();
+        formName3.put("name","Surgery");
+        formName3.put("value_reference",
+                "[{\"display\":\"Surgery\",\"locale\":\"en\"}]");
+        List<Map<String, Object>> formNames = new ArrayList<>();
+        formNames.add(formName1);
+        formNames.add(formName2);
+        formNames.add(formName3);
+
+        when(jdbcTemplate.queryForList(sql)).thenReturn(formNames);
+
+        Map<String, String> formNamesTranslationsMap = formService.getFormNameTranslations("fr");
+
+        assertEquals(3, formNamesTranslationsMap.size());
+        assertEquals("Vitals", formNamesTranslationsMap.get("Vitals"));
+        assertEquals("HistoryFrench", formNamesTranslationsMap.get("History"));
+        assertEquals("Surgery", formNamesTranslationsMap.get("Surgery"));
+    }
 }

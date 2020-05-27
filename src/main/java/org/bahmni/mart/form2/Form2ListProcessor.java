@@ -40,6 +40,8 @@ public class Form2ListProcessor {
     private Form2MetadataReader form2MetadataReader;
     @Autowired
     private IgnoreColumnsConfigHelper ignoreColumnsConfigHelper;
+    @Autowired
+    private FormService formService;
 
     private Form2TranslationsReader form2TranslationsReader;
     private Map<String, Form2Translation> formToTranslationsMap = new HashMap<>();
@@ -51,19 +53,21 @@ public class Form2ListProcessor {
         this.form2TranslationsReader = form2TranslationsReader;
     }
 
-    public List<BahmniForm> getAllForms(Map<String, String> allLatestFormPaths, JobDefinition jobDefinition) {
+    public List<BahmniForm> getAllForms(Map<String, String> allLatestFormPaths,
+                                        JobDefinition jobDefinition, Map<String, String> formNameTranslationsMap) {
         this.jobDefinition = jobDefinition;
         ignoreConcepts = ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition);
         ArrayList<BahmniForm> allBahmniForms = allLatestFormPaths.keySet().stream().map(formName ->
-                getBahmniForm(formName, allLatestFormPaths.get(formName)))
+                getBahmniForm(formName, allLatestFormPaths.get(formName), formNameTranslationsMap.get(formName)))
                 .collect(Collectors.toCollection(ArrayList::new));
         return FormListHelper.filterFormsWithOutDuplicateSectionsAndConcepts(allBahmniForms);
     }
 
-    private BahmniForm getBahmniForm(String formName, String formJsonPath) {
+    private BahmniForm getBahmniForm(String formName, String formJsonPath, String translatedFormName) {
         BahmniForm bahmniForm = new BahmniForm();
         Concept concept = createConcept(formName);
         bahmniForm.setFormName(concept);
+        bahmniForm.setTranslatedFormName(translatedFormName);
         bahmniForm.setDepthToParent(0);
         Form2JsonMetadata form2JsonMetadata = form2MetadataReader.read(formJsonPath);
         form2JsonMetadata.getControls().forEach(control -> {
@@ -78,7 +82,10 @@ public class Form2ListProcessor {
         return concept;
     }
 
-    private Concept createConcept(Control control, String rootformName) {
+    private Concept createConcept(Control control, BahmniForm bahmniForm) {
+        String rootformName = getRootForm(bahmniForm).getFormName().getName();
+        String translatedFormName = getRootForm(bahmniForm).getTranslatedFormName() != null ?
+                getRootForm(bahmniForm).getTranslatedFormName() : rootformName;
         String conceptName = "";
         Concept concept = null;
         final org.bahmni.mart.form2.model.Concept form2Concept = control.getConcept();
@@ -99,7 +106,7 @@ public class Form2ListProcessor {
             }
         }
         if (control.getType() != null && control.getType().toLowerCase().equals("section"))
-            concept.setName(rootformName + " " + concept.getName());
+            concept.setName(translatedFormName + " " + concept.getName());
         return concept;
     }
 
@@ -138,7 +145,7 @@ public class Form2ListProcessor {
     }
 
     private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent, boolean isParentAddMore) {
-        Concept concept = createConcept(control, getRootForm(bahmniForm).getFormName().getName());
+        Concept concept = createConcept(control, bahmniForm);
         String conceptFullySpecifiedName = getConceptNameFromFormJson(control);
         if (isNull(concept)) {
             return;

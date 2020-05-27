@@ -34,4 +34,16 @@ public class TranslationMetadata {
                 formName.replaceAll(VALID_FILE_NAME_CHAR_REGEX,"_"),
                 formVersion);
     }
+
+    public String getTranslationsFilePathWithUuid(String formName, int formVersion) {
+
+        String formTranslationsPath = openmrsJdbcTemplate.queryForObject(TRANSLATION_FILES_LOCATION_SQL, String.class);
+
+        String queryForUUID = String.format("SELECT form.uuid FROM form WHERE version = %d AND form.name = \"%s\"",
+                formVersion, formName);
+
+        String formUuid = openmrsJdbcTemplate.queryForObject(queryForUUID, String.class);
+
+        return String.format("%s/%s.json", formTranslationsPath, formUuid);
+    }
 }

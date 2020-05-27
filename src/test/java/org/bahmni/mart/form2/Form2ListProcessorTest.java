@@ -46,6 +46,7 @@ public class Form2ListProcessorTest {
     private static final String FORM_PATH = "/ComplexForm_1.json";
     private static final String COMPLEX_FORM = "ComplexForm";
     Map<String, Integer> formNamesWithLatestVersionNumber;
+    Map<String, String> formNameTranslationsMap;
     private Form2ListProcessor form2ListProcessor;
     private Map<String, String> allForms = new HashMap<String, String>();
     @Mock
@@ -70,6 +71,7 @@ public class Form2ListProcessorTest {
     public void setUp() throws Exception {
         formNamesWithLatestVersionNumber = new HashMap<>();
         formNamesWithLatestVersionNumber.put(COMPLEX_FORM, 1);
+        formNameTranslationsMap = new HashMap<>();
         when(formService.getFormNamesWithLatestVersionNumber()).thenReturn(formNamesWithLatestVersionNumber);
         when(form2TranslationsReader.read(COMPLEX_FORM, 1, "en")).thenReturn(form2Translation);
         form2ListProcessor = new Form2ListProcessor(formService, form2TranslationsReader);
@@ -95,7 +97,8 @@ public class Form2ListProcessorTest {
 
         when(form2TranslationsReader.getTranslation(form2Translation, translationKey)).thenReturn(obsConceptName);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -119,7 +122,8 @@ public class Form2ListProcessorTest {
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
         when(form2TranslationsReader.getTranslation(form2Translation, translationKey)).thenReturn(obsConceptName);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -154,7 +158,8 @@ public class Form2ListProcessorTest {
                 .thenReturn(obsConceptName);
         when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey)).thenReturn(sectionName);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -188,7 +193,8 @@ public class Form2ListProcessorTest {
                 .thenReturn(obsConceptName);
         when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey)).thenReturn(sectionName);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -224,7 +230,8 @@ public class Form2ListProcessorTest {
                 .thenReturn(obsConceptName);
         when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey)).thenReturn(sectionName);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -276,7 +283,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey))
                 .thenReturn(sectionName);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -333,7 +341,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey))
                 .thenReturn(sectionName);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -369,7 +378,8 @@ public class Form2ListProcessorTest {
         form2JsonMetadata.setControls(singletonList(tableControl));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -423,7 +433,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, section2TranslationKey))
                 .thenReturn(section);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(0, allForms.size());
     }
@@ -466,7 +477,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, section1TranslationKey))
                 .thenReturn(section);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final List<Concept> fields = allForms.get(0).getFields();
@@ -499,7 +511,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, addMoreConceptTranslationKey))
                 .thenReturn(addMoreConceptName);
 
-        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         List<Concept> fields = allForms.get(0).getFields();
@@ -572,7 +585,8 @@ public class Form2ListProcessorTest {
                 .thenReturn(section);
 
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(allForms.size(), 1);
         final BahmniForm bahmniForm = allForms.get(0);
@@ -617,7 +631,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, obsConcept2TranslationKey))
                 .thenReturn(obsConceptName2);
 
-        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         BahmniForm bahmniForm = allForms.get(0);
@@ -658,7 +673,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, obsConcept2TranslationKey))
                 .thenReturn(obsConceptName2);
 
-        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         BahmniForm bahmniForm = allForms.get(0);
@@ -693,7 +709,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, obsConcept2TranslationKey))
                 .thenReturn(obsConceptName2InGivenLocale);
 
-        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         BahmniForm bahmniForm = allForms.get(0);
@@ -740,7 +757,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, obsConcept2TranslationKey))
                 .thenReturn(obsConceptName2InGivenLocale);
 
-        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         BahmniForm bahmniForm = allForms.get(0);
@@ -781,7 +799,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, obsConceptAnswerTranslationKey))
                 .thenReturn(obsConceptAnswerName);
 
-        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         verify(form2TranslationsReader, times(2)).getTranslation(any(), any());
         assertEquals(1, allForms.size());
@@ -814,7 +833,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, obsConcept2TranslationKey))
                 .thenReturn(obsConceptName2InGivenLocale);
 
-        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         BahmniForm bahmniForm = allForms.get(0);
@@ -865,7 +885,8 @@ public class Form2ListProcessorTest {
         when(form2TranslationsReader.getTranslation(form2Translation, obsConceptAnswer2TranslationKey))
                 .thenReturn(null);
 
-        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         verify(form2TranslationsReader, times(3)).getTranslation(any(), any());
         assertEquals(1, allForms.size());
@@ -902,7 +923,8 @@ public class Form2ListProcessorTest {
                 .thenReturn(obsConceptName);
         when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey)).thenReturn(null);
 
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         assertEquals(1, allForms.size());
         final BahmniForm bahmniForm = allForms.get(0);
@@ -910,7 +932,7 @@ public class Form2ListProcessorTest {
         final List<Concept> bahmniFormFields = bahmniForm.getFields();
         assertEquals(0, bahmniFormFields.size());
         assertEquals(obsConceptName, bahmniForm.getChildren().get(0).getFields().get(0).getName());
-        assertEquals(COMPLEX_FORM + " " + sectionName, bahmniForm.getChildren().get(0).getFormName().getName());
+        assertEquals("ComplexForm" + " " + sectionName, bahmniForm.getChildren().get(0).getFormName().getName());
     }
 
     @Test
@@ -928,7 +950,8 @@ public class Form2ListProcessorTest {
         when(ignoreColumnsConfigHelper.getIgnoreConceptsForJob(jobDefinition))
                 .thenReturn(new HashSet<>(Collections.singletonList(ignoreConcept)));
         when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
-        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms, jobDefinition);
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
 
         verify(ignoreColumnsConfigHelper).getIgnoreConceptsForJob(any());
         verify(form2MetadataReader).read(any());
@@ -938,5 +961,85 @@ public class Form2ListProcessorTest {
         assertEquals(0, bahmniForm.getChildren().size());
         final List<Concept> bahmniFormFields = bahmniForm.getFields();
         assertEquals(0, bahmniFormFields.size());
+    }
+
+    @Test
+    public void shouldHaveTranslatedChildBahmniFormForSectionAddMore() {
+        formNameTranslationsMap.put("ComplexForm","ComplexFormFr");
+        when(formService.getFormNameTranslations("fr")).thenReturn(formNameTranslationsMap);
+        when(form2TranslationsReader.read("ComplexForm", 1, "fr")).thenReturn(form2Translation);
+
+        final String obsConceptName = "ObsConcept";
+        final String conceptTranslationKey = "OBS_CONCEPT_1";
+        String sectionName = "Section";
+        final String sectionTranslationKey = "SECTION_1";
+
+        Control obsControl = new ControlBuilder()
+                .withPropertyAddMore(false)
+                .withConcept(obsConceptName, "obs_concept_1")
+                .withLabel(obsConceptName, conceptTranslationKey).build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        Control sectionControl = new ControlBuilder()
+                .withLabel(sectionName, sectionTranslationKey)
+                .withControls(singletonList(obsControl))
+                .withType("section")
+                .withPropertyAddMore(true)
+                .build();
+        form2JsonMetadata.setControls(singletonList(sectionControl));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        when(form2TranslationsReader.getTranslation(form2Translation, conceptTranslationKey))
+                .thenReturn(obsConceptName);
+        when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey)).thenReturn(sectionName);
+
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
+
+        assertEquals(1, allForms.size());
+        final BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
+        assertEquals("ComplexFormFr", bahmniForm.getTranslatedFormName());
+        final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
+        assertEquals(0, bahmniForm.getFields().size());
+        assertEquals(1, bahmniFormChildren.size());
+        assertEquals("ComplexFormFr Section", bahmniFormChildren.get(0).getFormName().getName());
+        assertEquals(obsConceptName, bahmniFormChildren.get(0).getFields().get(0).getName());
+    }
+
+    @Test
+    public void shouldHaveChildBahmniFormForSectionAddMore() {
+        final String obsConceptName = "ObsConcept";
+        final String conceptTranslationKey = "OBS_CONCEPT_1";
+        String sectionName = "Section";
+        final String sectionTranslationKey = "SECTION_1";
+
+        Control obsControl = new ControlBuilder()
+                .withPropertyAddMore(false)
+                .withConcept(obsConceptName, "obs_concept_1")
+                .withLabel(obsConceptName, conceptTranslationKey).build();
+        Form2JsonMetadata form2JsonMetadata = new Form2JsonMetadata();
+        Control sectionControl = new ControlBuilder()
+                .withLabel(sectionName, sectionTranslationKey)
+                .withControls(singletonList(obsControl))
+                .withType("section")
+                .withPropertyAddMore(true)
+                .build();
+        form2JsonMetadata.setControls(singletonList(sectionControl));
+        when(form2MetadataReader.read(FORM_PATH)).thenReturn(form2JsonMetadata);
+        when(form2TranslationsReader.getTranslation(form2Translation, conceptTranslationKey))
+                .thenReturn(obsConceptName);
+        when(form2TranslationsReader.getTranslation(form2Translation, sectionTranslationKey)).thenReturn(sectionName);
+
+        final List<BahmniForm> allForms = form2ListProcessor.getAllForms(this.allForms,
+                jobDefinition, formNameTranslationsMap);
+
+        assertEquals(1, allForms.size());
+        final BahmniForm bahmniForm = allForms.get(0);
+        assertEquals(COMPLEX_FORM, bahmniForm.getFormName().getName());
+        final List<BahmniForm> bahmniFormChildren = bahmniForm.getChildren();
+        assertEquals(0, bahmniForm.getFields().size());
+        assertEquals(1, bahmniFormChildren.size());
+        assertEquals("ComplexForm Section", bahmniFormChildren.get(0).getFormName().getName());
+        assertNull(bahmniForm.getTranslatedFormName());
+        assertEquals(obsConceptName, bahmniFormChildren.get(0).getFields().get(0).getName());
     }
 }
