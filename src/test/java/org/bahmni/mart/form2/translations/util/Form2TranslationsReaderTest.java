@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -63,22 +61,11 @@ public class Form2TranslationsReaderTest {
         tempTranslationFolderPath = translationsPath;
     }
 
-    private void createFile(String fileName) throws IOException {
-        File file = new File(tempTranslationFolderPath + "/" + fileName);
-        file.createNewFile();
-    }
-
-    private void createFileWithUuid(String uuidFileName) throws IOException {
-        File file = new File(tempTranslationFolderPath + "/" + uuidFileName);
-        file.createNewFile();
-    }
-
-
     @Test
     public void shouldReturnForm2TranslationsForGivenFormNameVersionAndLocale() throws IOException {
 
         String formName = "Vitals_2.json";
-        createFile(formName);
+        File file = new File(formName);
         String translationsAsString = "{\n" +
                 "  \"en\": {\n" +
                 "    \"concepts\": {\n" +
@@ -99,105 +86,8 @@ public class Form2TranslationsReaderTest {
                 "    }\n" +
                 "  }\n" +
                 "}";
-        when(translationMetadata.getTranslationsFilePathWithUuid(formName, formVersion))
-                .thenReturn(tempTranslationFolderPath + "/" + ".json");
-        when(translationMetadata.getTranslationsFilePath(formName, formVersion))
-                .thenReturn(tempTranslationFolderPath + "/" + formName);
-        when(readFileToString(any(File.class))).thenReturn(translationsAsString);
-
-        Form2Translation form2Translations = form2TranslationsReader.read(formName, formVersion, locale);
-
-        assertEquals(2, form2Translations.getConcepts().size());
-        assertEquals(1, form2Translations.getLabels().size());
-        assertEquals("la taille", form2Translations.getConcepts().get("HEIGHT_1"));
-        assertEquals("Poids", form2Translations.getConcepts().get("WEIGHT_1"));
-        assertEquals("Lectures", form2Translations.getLabels().get("SECTION_1"));
-
-    }
-
-    @Test
-    public void shouldReturnForm2TranslationsForGivenSpecialCharacterFormNameVersionAndLocaleWithNormalizedFilePath()
-            throws IOException {
-        String formNameWithSpecialCharacters = "2 Vitãls spéciælity_2.json";
-        String normalizedFileName = "2_Vit_ls_sp_ci_lity_2.json";
-        createFile(normalizedFileName);
-        String translationsAsString = "{\n" +
-                "  \"en\": {\n" +
-                "    \"concepts\": {\n" +
-                "      \"HEIGHT_1\": \"Height\",\n" +
-                "      \"WEIGHT_1\": \"Weight\",\n" +
-                "    },\n" +
-                "    \"labels\": {\n" +
-                "      \"SECTION_1\": \"Readings\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"fr\": {\n" +
-                "    \"concepts\": {\n" +
-                "      \"HEIGHT_1\": \"la taille\",\n" +
-                "      \"WEIGHT_1\": \"Poids\",\n" +
-                "    },\n" +
-                "    \"labels\": {\n" +
-                "      \"SECTION_1\": \"Lectures\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-        when(translationMetadata.getTranslationsFilePathWithUuid(formNameWithSpecialCharacters, formVersion))
-                .thenReturn(tempTranslationFolderPath + "/" + ".json");
-        when(translationMetadata.getTranslationsFilePath(formNameWithSpecialCharacters, formVersion))
-                .thenReturn(tempTranslationFolderPath + "/" + formNameWithSpecialCharacters);
-        when(translationMetadata.getNormalizedTranslationsFilePath(formNameWithSpecialCharacters, formVersion))
-                .thenReturn(tempTranslationFolderPath + "/" + normalizedFileName);
-        when(readFileToString(any(File.class))).thenReturn(translationsAsString);
-
-        Form2Translation form2Translations = form2TranslationsReader.read(formNameWithSpecialCharacters,
-                formVersion, locale);
-
-        assertEquals(2, form2Translations.getConcepts().size());
-        assertEquals(1, form2Translations.getLabels().size());
-        assertEquals("la taille", form2Translations.getConcepts().get("HEIGHT_1"));
-        assertEquals("Poids", form2Translations.getConcepts().get("WEIGHT_1"));
-        assertEquals("Lectures", form2Translations.getLabels().get("SECTION_1"));
-
-        InOrder inOrder = inOrder(translationMetadata);
-        inOrder.verify(translationMetadata, times(1))
-                .getTranslationsFilePathWithUuid(formNameWithSpecialCharacters, formVersion);
-        inOrder.verify(translationMetadata, times(1))
-                .getTranslationsFilePath(formNameWithSpecialCharacters, formVersion);
-        inOrder.verify(translationMetadata, times(1))
-                .getNormalizedTranslationsFilePath(formNameWithSpecialCharacters, formVersion);
-    }
-
-    @Test
-    public void shouldReturnForm2TranslationsForGivenFormNameVersionAndLocaleWhenTranslationsFileNameIsUuid()
-            throws IOException {
-
-        String formName = "Vitals_2.json";
-        String uuidFileName = "\"91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json\"";
-        createFileWithUuid(uuidFileName);
-        String translationsAsString = "{\n" +
-                "  \"en\": {\n" +
-                "    \"concepts\": {\n" +
-                "      \"HEIGHT_1\": \"Height\",\n" +
-                "      \"WEIGHT_1\": \"Weight\",\n" +
-                "    },\n" +
-                "    \"labels\": {\n" +
-                "      \"SECTION_1\": \"Readings\"\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"fr\": {\n" +
-                "    \"concepts\": {\n" +
-                "      \"HEIGHT_1\": \"la taille\",\n" +
-                "      \"WEIGHT_1\": \"Poids\",\n" +
-                "    },\n" +
-                "    \"labels\": {\n" +
-                "      \"SECTION_1\": \"Lectures\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
-
-
-        when(translationMetadata.getTranslationsFilePathWithUuid(formName, formVersion))
-                .thenReturn(tempTranslationFolderPath + "/" + uuidFileName);
+        when(translationMetadata.getTransaltionsFile(formName, formVersion))
+                .thenReturn(file);
         when(readFileToString(any(File.class))).thenReturn(translationsAsString);
 
         Form2Translation form2Translations = form2TranslationsReader.read(formName, formVersion, locale);
@@ -213,14 +103,10 @@ public class Form2TranslationsReaderTest {
     @Test
     public void shouldLogWarningIfTranslationsFileNotFound() throws Exception {
         String invalidFilePath = "abc/Vitals_2.json";
-        String invalidFilePathWithUuid = "abc/91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json";
+        File file = new File(invalidFilePath);
 
-        when(translationMetadata.getTranslationsFilePathWithUuid(formName, formVersion))
-                .thenReturn(invalidFilePathWithUuid);
-        when(translationMetadata.getTranslationsFilePath(formName, formVersion))
-                .thenReturn(invalidFilePath);
-        when(translationMetadata.getNormalizedTranslationsFilePath(formName, formVersion))
-                .thenReturn(invalidFilePath);
+        when(translationMetadata.getTransaltionsFile(formName, formVersion))
+                .thenReturn(file);
         when(readFileToString(any(File.class))).thenThrow(FileNotFoundException.class);
         Logger logger = mock(Logger.class);
         setValueForFinalStaticField(Form2TranslationsReader.class, "logger", logger);
@@ -234,15 +120,11 @@ public class Form2TranslationsReaderTest {
     @Test
     public void shouldLogWarningForAnyIOException() throws Exception {
         String translationFilePath = tempTranslationFolderPath + "/Vitals_2.json";
-        String translationFilePathWithUuid = tempTranslationFolderPath + "/91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json";
+        File file = new File(translationFilePath);
 
 
-        when(translationMetadata.getTranslationsFilePathWithUuid(formName, formVersion))
-                .thenReturn(translationFilePathWithUuid);
-        when(translationMetadata.getTranslationsFilePath(formName, formVersion))
-                .thenReturn(translationFilePath);
-        when(translationMetadata.getNormalizedTranslationsFilePath(formName,formVersion))
-                .thenReturn(translationFilePath);
+        when(translationMetadata.getTransaltionsFile(formName, formVersion))
+                .thenReturn(file);
         when(readFileToString(any(File.class))).thenThrow(IOException.class);
         Logger logger = mock(Logger.class);
         setValueForFinalStaticField(Form2TranslationsReader.class, "logger", logger);
