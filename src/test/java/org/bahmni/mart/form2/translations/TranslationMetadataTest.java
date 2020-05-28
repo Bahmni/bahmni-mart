@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.io.File;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -27,17 +29,20 @@ public class TranslationMetadataTest {
     public void shouldReturnTranslationsFilePathWhenFormNameAndVersionAreGiven() {
 
         TranslationMetadata translationMetadata = getTranslationMetadata();
-        String formTranslationsPath = translationMetadata.getTranslationsFilePath("Vitals", 2);
+        File formTranslationsFile = translationMetadata.getTranslationsFileWithFormName("Vitals", 2);
 
-        assertEquals("/home/bahmni/clinical_forms/translations/Vitals_2.json", formTranslationsPath);
+        assertEquals("/home/bahmni/clinical_forms/translations/Vitals_2.json", formTranslationsFile.getPath());
+        assertEquals("Vitals_2.json", formTranslationsFile.getName());
     }
 
     @Test
     public void shouldReturnTranslationsFilePathEnsureThatReplaceAllSpacesToUnderlineOfTheFileName() {
 
         String fileName = " Test It    abcdefg ";
-        fileName = translationMetadata.getNormalizedTranslationsFilePath(fileName, 1);
-        assertEquals("/home/bahmni/clinical_forms/translations/_Test_It____abcdefg__1.json", fileName);
+        File translationsFile = translationMetadata.getNormalizedTranslationsFile(fileName, 1);
+        assertEquals("/home/bahmni/clinical_forms/translations/_Test_It____abcdefg__1.json",
+                translationsFile.getPath());
+        assertEquals("_Test_It____abcdefg__1.json", translationsFile.getName());
     }
 
     @Test
@@ -45,10 +50,12 @@ public class TranslationMetadataTest {
 
         String fileName = "Test&a*b@c%d111(8`9。，；'｀。.～！＃$^)-=+\\/\":啊";
 
-        fileName = translationMetadata.getNormalizedTranslationsFilePath(fileName, 1);
+        File translationsFile = translationMetadata.getNormalizedTranslationsFile(fileName, 1);
 
         assertEquals("/home/bahmni/clinical_forms/translations/Test_a_b_c_d111_8_9______.______-________1.json",
-                fileName);
+                translationsFile.getPath());
+        assertEquals("Test_a_b_c_d111_8_9______.______-________1.json",
+                translationsFile.getName());
     }
 
     @Test
@@ -60,9 +67,11 @@ public class TranslationMetadataTest {
         when(openmrsJdbcTemplate.queryForObject(queryForUUID, String.class))
                 .thenReturn("91770617-a6d0-4ad4-a0a2-c77bd5926bd2");
 
-        String formTranslationsPath = translationMetadata.getTranslationsFilePathWithUuid("Vitals", 2);
+        File translationsFileWithUuid = translationMetadata.getTranslationsFileWithUuid("Vitals", 2);
         assertEquals("/home/bahmni/clinical_forms/translations/91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json",
-                formTranslationsPath);
+                translationsFileWithUuid.getPath());
+        assertEquals("91770617-a6d0-4ad4-a0a2-c77bd5926bd2.json",
+                translationsFileWithUuid.getName());
     }
 
     private TranslationMetadata getTranslationMetadata() {
