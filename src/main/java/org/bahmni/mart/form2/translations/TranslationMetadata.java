@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 @Component
 public class TranslationMetadata {
 
@@ -11,31 +13,33 @@ public class TranslationMetadata {
             "WHERE property = 'bahmni.formTranslations.directory'";
 
     private final JdbcTemplate openmrsJdbcTemplate;
+    private int formVersion;
+    private String formName;
 
     @Autowired
     public TranslationMetadata(JdbcTemplate openmrsJdbcTemplate) {
         this.openmrsJdbcTemplate = openmrsJdbcTemplate;
     }
 
-    public String getTranslationsFilePath(String formName, int formVersion) {
+    public File getTranslationsFileWithFormName(String formName, int formVersion) {
 
         String fromTranslationsPath = openmrsJdbcTemplate.queryForObject(TRANSLATION_FILES_LOCATION_SQL, String.class);
 
-        return String.format("%s/%s_%s.json", fromTranslationsPath, formName, formVersion);
+        return new File(String.format("%s/%s_%s.json", fromTranslationsPath, formName, formVersion));
     }
 
-    public String getNormalizedTranslationsFilePath(String formName, int formVersion) {
+    public File getNormalizedTranslationsFile(String formName, int formVersion) {
 
         final String VALID_FILE_NAME_CHAR_REGEX = "[^a-zA-Z0-9_\\-.]";
 
         String fromTranslationsPath = openmrsJdbcTemplate.queryForObject(TRANSLATION_FILES_LOCATION_SQL, String.class);
 
-        return String.format("%s/%s_%s.json", fromTranslationsPath,
+        return new File(String.format("%s/%s_%s.json", fromTranslationsPath,
                 formName.replaceAll(VALID_FILE_NAME_CHAR_REGEX,"_"),
-                formVersion);
+                formVersion));
     }
 
-    public String getTranslationsFilePathWithUuid(String formName, int formVersion) {
+    public File getTranslationsFileWithUuid(String formName, int formVersion) {
 
         String formTranslationsPath = openmrsJdbcTemplate.queryForObject(TRANSLATION_FILES_LOCATION_SQL, String.class);
 
@@ -44,6 +48,7 @@ public class TranslationMetadata {
 
         String formUuid = openmrsJdbcTemplate.queryForObject(queryForUUID, String.class);
 
-        return String.format("%s/%s.json", formTranslationsPath, formUuid);
+        return new File(String.format("%s/%s.json", formTranslationsPath, formUuid));
     }
+
 }

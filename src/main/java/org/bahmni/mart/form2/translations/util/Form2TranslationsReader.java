@@ -44,14 +44,17 @@ public class Form2TranslationsReader {
     }
 
     private JSONObject getTranslationsAsJSONObject(String formName, int version) {
-
-        String translationsFilePathWithUuid = translationMetadata.getTranslationsFilePathWithUuid(formName, version);
-        File translationsFile = new File(translationsFilePathWithUuid);
-        if (!translationsFile.exists())
-            translationsFile = new File(translationMetadata.getTranslationsFilePath(formName, version));
-        if (!translationsFile.exists())
-            translationsFile = new File(translationMetadata.getNormalizedTranslationsFilePath(formName, version));
+        File translationsFile = getTranslationFile(formName, version);
         return new JSONObject(getTranslationsAsString(translationsFile));
+    }
+
+    private File getTranslationFile(String formName, int version) {
+        if (translationMetadata.getTranslationsFileWithUuid(formName, version).exists())
+            return translationMetadata.getTranslationsFileWithUuid(formName, version);
+        else if (translationMetadata.getTranslationsFileWithFormName(formName, version).exists())
+            return translationMetadata.getTranslationsFileWithFormName(formName, version);
+        else
+            return translationMetadata.getNormalizedTranslationsFile(formName, version);
     }
 
     private String getTranslationsAsString(File translationsFile) {
