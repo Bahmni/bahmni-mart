@@ -111,7 +111,7 @@ FROM
              LEFT JOIN concept_name quantityUnitcn ON quantityUnitcn.concept_id = drug_order.quantity_units AND
                                                       quantityUnitcn.concept_name_type = "FULLY_SPECIFIED" AND
                                                       quantityUnitcn.voided = 0
-             LEFT JOIN drug ON drug.concept_id = orders.concept_id
+             LEFT JOIN drug ON drug.concept_id = orders.concept_id AND drug.drug_id = drug_order.drug_inventory_id
              LEFT JOIN concept_name dosecn
                ON dosecn.concept_id = drug_order.dose_units AND dosecn.concept_name_type = "FULLY_SPECIFIED" AND
                   dosecn.voided = 0
