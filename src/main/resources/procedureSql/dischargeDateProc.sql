@@ -12,7 +12,7 @@ FROM bed_patient_assignment_default bpam
 WHERE bpam.location = locationName
       AND patient_id = patientId AND date_started = dateStopped
 LIMIT 1;
-if current_patient = patientId  AND curr_start_date = dateStopped THEN
+if current_patient = patientId  AND curr_start_date = dateStopped AND curr_start_date != curr_stop_date THEN
 RETURN discharge_date(current_patient, locationName, curr_stop_date);
 ELSE
 RETURN dateStopped;
