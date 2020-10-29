@@ -43,8 +43,8 @@ public class TranslationMetadata {
 
         String formTranslationsPath = openmrsJdbcTemplate.queryForObject(TRANSLATION_FILES_LOCATION_SQL, String.class);
 
-        String queryForUUID = String.format("SELECT form.uuid FROM form WHERE version = %d AND form.name = \"%s\"",
-                formVersion, formName);
+        String queryForUUID = String.format("SELECT form.uuid FROM form WHERE version = %d AND " +
+                        "form.name = \"%s\" AND published = true", formVersion, formName);
 
         String formUuid = openmrsJdbcTemplate.queryForObject(queryForUUID, String.class);
 

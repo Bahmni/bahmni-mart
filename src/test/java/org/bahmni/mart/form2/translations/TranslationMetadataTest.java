@@ -61,7 +61,8 @@ public class TranslationMetadataTest {
     @Test
     public void shouldReturnTranslationsFilePathWithFormUuidWhenFormNameAndVersionAreGiven() {
 
-        String queryForUUID = String.format("SELECT form.uuid FROM form WHERE version = %d AND form.name = \"%s\"",
+        String queryForUUID = String.format("SELECT form.uuid FROM form WHERE version = %d " +
+                        "AND form.name = \"%s\" AND published = true",
                 2, "Vitals");
 
         when(openmrsJdbcTemplate.queryForObject(queryForUUID, String.class))
