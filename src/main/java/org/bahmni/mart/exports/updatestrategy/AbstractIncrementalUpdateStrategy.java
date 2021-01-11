@@ -109,7 +109,7 @@ public abstract class AbstractIncrementalUpdateStrategy implements IncrementalUp
         return metaDataChanged;
     }
 
-    private String getJoinedIds(Map<String, Object> markerMap) {
+     String getJoinedIds(Map<String, Object> markerMap) {
         String eventRecordId = String.valueOf(markerMap.get(EVENT_RECORD_ID));
         String category = (String) markerMap.get(CATEGORY);
         return getIds((String) markerMap.get(TABLE_NAME), getEventRecordUuids(eventRecordId, category));
