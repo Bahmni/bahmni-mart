@@ -2,22 +2,17 @@ package org.bahmni.mart.exports.updatestrategy;
 
 import org.bahmni.mart.config.job.JobDefinitionReader;
 import org.bahmni.mart.config.job.model.JobDefinition;
-import org.bahmni.mart.helper.Constants;
 import org.bahmni.mart.table.SpecialCharacterResolver;
 import org.bahmni.mart.table.domain.TableData;
 import org.bahmni.mart.table.listener.AbstractJobListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -55,10 +50,10 @@ public class CustomSqlIncrementalUpdateStrategy extends AbstractIncrementalUpdat
                                       Optional<Map<String, Object>> optionalMarkerMap) {
         String joinedIds = getJoinedIds(optionalMarkerMap.get());
         if(readerSql.contains("orders")) {
-            String Sql = "Select distinct o1.encounter_id from orders o1, orders o2 where o1.order_id = o2.previous_order_id " +
-                    "and o2.order_action='DISCONTINUE' and o2.encounter_id IN (%s)";
-            String encounterIdsToAppend = openmrsJdbcTemplate.queryForList(String.format(Sql, joinedIds)).stream()
-                    .map(ids -> ids.get("encounter_id").toString()).collect(Collectors.joining(","));
+            String queryForPreviousOrderEncounterIds = "Select distinct o1.encounter_id from orders o1, orders o2 where o1.order_id = o2.previous_order_id " +
+                    "and o2.order_action='DISCONTINUE' and o1.order_id != o2.order_id and o2.encounter_id IN (%s)";
+            String encounterIdsToAppend = openmrsJdbcTemplate.queryForList(String.format(queryForPreviousOrderEncounterIds, joinedIds), String.class).stream()
+                    .collect(Collectors.joining(","));
             if(!encounterIdsToAppend.isEmpty()){
                 joinedIds = String.join(",", joinedIds, encounterIdsToAppend);
             }
