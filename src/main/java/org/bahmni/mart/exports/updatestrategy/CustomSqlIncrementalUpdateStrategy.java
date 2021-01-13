@@ -54,7 +54,8 @@ public class CustomSqlIncrementalUpdateStrategy extends AbstractIncrementalUpdat
             String queryForPreviousOrderEncounterIds = "Select distinct o1.encounter_id from orders o1, orders o2 " +
                     "where o1.order_id = o2.previous_order_id and o2.order_action='DISCONTINUE' " +
                     "and o1.order_id != o2.order_id and o2.encounter_id IN (%s)";
-            String encounterIdsToAppend = openmrsJdbcTemplate.queryForList(String.format(queryForPreviousOrderEncounterIds, joinedIds), String.class).stream()
+            String encounterIdsToAppend = openmrsJdbcTemplate.queryForList(
+                    String.format(queryForPreviousOrderEncounterIds, joinedIds), String.class).stream()
                     .collect(Collectors.joining(","));
             if (!encounterIdsToAppend.isEmpty()) {
                 joinedIds = String.join(",", joinedIds, encounterIdsToAppend);

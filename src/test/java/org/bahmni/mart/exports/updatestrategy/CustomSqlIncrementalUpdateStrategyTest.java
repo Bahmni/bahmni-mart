@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -48,8 +49,9 @@ public class CustomSqlIncrementalUpdateStrategyTest {
     private static final String QUERY_FOR_EVENT_URLS = "SELECT DISTINCT object " +
             "FROM event_records WHERE id > %s AND id <= %s AND binary category = '%s'";
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
-    private static final String queryForPreviousOrderEncounterIds = "Select distinct o1.encounter_id from orders o1, orders o2 " +
-            "where o1.order_id = o2.previous_order_id and o2.order_action='DISCONTINUE' and o1.order_id != o2.order_id and o2.encounter_id IN (%s)";
+    private static final String queryForPreviousOrderEncounterIds = "Select distinct o1.encounter_id " +
+            "from orders o1, orders o2 where o1.order_id = o2.previous_order_id and o2.order_action='DISCONTINUE' " +
+            "and o1.order_id != o2.order_id and o2.encounter_id IN (%s)";
     private static final String eventRecordedForJob = "10";
     private static final String MAX_EVENT_RECORD_ID = "20";
     private static final String CATEGORY = "CategoryName";
@@ -200,10 +202,12 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         setUpForIncrementalUpdateSql();
 
         String queryForPrvOrderEncounterIds = format(queryForPreviousOrderEncounterIds, "-1");
-        when(openmrsJdbcTemplate.queryForList(queryForPrvOrderEncounterIds, String.class)).thenReturn(Arrays.asList(""));
+        when(openmrsJdbcTemplate.queryForList(queryForPrvOrderEncounterIds, String.class))
+                .thenReturn(Arrays.asList(""));
 
         Optional<Map<String, Object>> optionalMarkerMap = spyCustomSqlIncrementalUpdater.getJobMarkerMap(JOB_NAME);
-        String actualUpdateReaderSql = spyCustomSqlIncrementalUpdater.getSqlForIncrementalUpdate(READER_SQL, UPDATE_ON, optionalMarkerMap);
+        String actualUpdateReaderSql = spyCustomSqlIncrementalUpdater.getSqlForIncrementalUpdate(READER_SQL,
+                UPDATE_ON, optionalMarkerMap);
         String expectedUpdatedReaderSql = format(UPDATED_READER_SQL, READER_SQL, UPDATE_ON, "-1");
 
         verify(openmrsJdbcTemplate, never()).queryForList(queryForPrvOrderEncounterIds, String.class);
@@ -215,10 +219,12 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         setUpForIncrementalUpdateSql();
 
         String queryForPrvOrderEncounterIds = format(queryForPreviousOrderEncounterIds, "-1");
-        when(openmrsJdbcTemplate.queryForList(queryForPrvOrderEncounterIds, String.class)).thenReturn(Arrays.asList(""));
+        when(openmrsJdbcTemplate.queryForList(queryForPrvOrderEncounterIds, String.class))
+                .thenReturn(Arrays.asList(""));
 
         Optional<Map<String, Object>> optionalMarkerMap = spyCustomSqlIncrementalUpdater.getJobMarkerMap(JOB_NAME);
-        String actualUpdateReaderSql = spyCustomSqlIncrementalUpdater.getSqlForIncrementalUpdate(ORDERS_READER_SQL, UPDATE_ON, optionalMarkerMap);
+        String actualUpdateReaderSql = spyCustomSqlIncrementalUpdater.getSqlForIncrementalUpdate(ORDERS_READER_SQL,
+                UPDATE_ON, optionalMarkerMap);
         String expectedUpdatedReaderSql = format(UPDATED_READER_SQL, ORDERS_READER_SQL, UPDATE_ON, "-1");
 
         verify(openmrsJdbcTemplate).queryForList(queryForPrvOrderEncounterIds, String.class);
@@ -230,10 +236,12 @@ public class CustomSqlIncrementalUpdateStrategyTest {
         setUpForIncrementalUpdateSql();
 
         String queryForPrvOrderEncounterIds = format(queryForPreviousOrderEncounterIds, "-1");
-        when(openmrsJdbcTemplate.queryForList(queryForPrvOrderEncounterIds, String.class)).thenReturn(Arrays.asList("1","2"));
+        when(openmrsJdbcTemplate.queryForList(queryForPrvOrderEncounterIds, String.class))
+                .thenReturn(Arrays.asList("1","2"));
 
         Optional<Map<String, Object>> optionalMarkerMap = spyCustomSqlIncrementalUpdater.getJobMarkerMap(JOB_NAME);
-        String actualUpdateReaderSql = spyCustomSqlIncrementalUpdater.getSqlForIncrementalUpdate(ORDERS_READER_SQL, UPDATE_ON, optionalMarkerMap);
+        String actualUpdateReaderSql = spyCustomSqlIncrementalUpdater.getSqlForIncrementalUpdate(ORDERS_READER_SQL,
+                UPDATE_ON, optionalMarkerMap);
         String expectedUpdatedReaderSql = format(UPDATED_READER_SQL, ORDERS_READER_SQL, UPDATE_ON, "-1,1,2");
 
         verify(openmrsJdbcTemplate).queryForList(queryForPrvOrderEncounterIds, String.class);
