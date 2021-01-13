@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
@@ -49,12 +50,13 @@ public class CustomSqlIncrementalUpdateStrategy extends AbstractIncrementalUpdat
     String getSqlForIncrementalUpdate(String readerSql, String updateOn,
                                       Optional<Map<String, Object>> optionalMarkerMap) {
         String joinedIds = getJoinedIds(optionalMarkerMap.get());
-        if(readerSql.contains("orders")) {
-            String queryForPreviousOrderEncounterIds = "Select distinct o1.encounter_id from orders o1, orders o2 where o1.order_id = o2.previous_order_id " +
-                    "and o2.order_action='DISCONTINUE' and o1.order_id != o2.order_id and o2.encounter_id IN (%s)";
+        if (readerSql.contains("orders")) {
+            String queryForPreviousOrderEncounterIds = "Select distinct o1.encounter_id from orders o1, orders o2 " +
+                    "where o1.order_id = o2.previous_order_id and o2.order_action='DISCONTINUE' " +
+                    "and o1.order_id != o2.order_id and o2.encounter_id IN (%s)";
             String encounterIdsToAppend = openmrsJdbcTemplate.queryForList(String.format(queryForPreviousOrderEncounterIds, joinedIds), String.class).stream()
                     .collect(Collectors.joining(","));
-            if(!encounterIdsToAppend.isEmpty()){
+            if (!encounterIdsToAppend.isEmpty()) {
                 joinedIds = String.join(",", joinedIds, encounterIdsToAppend);
             }
         }
