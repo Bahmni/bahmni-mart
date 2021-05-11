@@ -51,7 +51,7 @@ public class CustomSqlIncrementalUpdateStrategyTest {
     private static final String QUERY_FOR_ID_EXTRACTION = "SELECT %s_id FROM %s WHERE uuid in (%s)";
     private static final String queryForPreviousOrderEncounterIds = "Select distinct o1.encounter_id " +
             "from orders o1, orders o2 where o1.order_id = o2.previous_order_id and " +
-            "o2.order_action IN ('DISCONTINUE','REVISE')" +
+            "o2.order_action IN ('DISCONTINUE','REVISE') " +
             "and o1.order_id != o2.order_id and o2.encounter_id IN (%s)";
     private static final String eventRecordedForJob = "10";
     private static final String MAX_EVENT_RECORD_ID = "20";
