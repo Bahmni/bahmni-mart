@@ -8,6 +8,7 @@ import org.bahmni.mart.form.domain.Obs;
 import org.bahmni.mart.table.Form2TableMetadataGenerator;
 import org.bahmni.mart.table.FormTableMetadataGenerator;
 import org.bahmni.mart.table.TableGeneratorStep;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,7 +20,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-
+@Ignore
 public class DatabaseObsWriterIT extends AbstractBaseBatchIT {
 
     @Autowired

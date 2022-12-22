@@ -5,6 +5,7 @@ import org.bahmni.mart.AbstractBaseBatchIT;
 import org.bahmni.mart.config.job.model.JobDefinition;
 import org.bahmni.mart.form.domain.Concept;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+@Ignore
 public class SeparateTableConfigHelperIT extends AbstractBaseBatchIT {
 
     @Autowired
