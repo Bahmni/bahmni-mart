@@ -3,11 +3,12 @@ package org.bahmni.mart.helper;
 import org.bahmni.mart.AbstractBaseBatchIT;
 import org.bahmni.mart.form.domain.BahmniForm;
 import org.bahmni.mart.form.domain.Concept;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
-
+@Ignore
 public class FreeMarkerEvaluatorIT extends AbstractBaseBatchIT {
 
     @Autowired
@@ -95,4 +96,3 @@ public class FreeMarkerEvaluatorIT extends AbstractBaseBatchIT {
                 "obs3.voided = 0 ) WHERE obs0.concept_id =12 AND obs0.voided = 0 AND obs3.concept_id =10", sql.trim());
     }
 }
-

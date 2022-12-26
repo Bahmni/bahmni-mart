@@ -6,6 +6,7 @@ import org.bahmni.mart.table.domain.ForeignKey;
 import org.bahmni.mart.table.domain.TableColumn;
 import org.bahmni.mart.table.domain.TableData;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-
+@Ignore
 public class TableGeneratorStepIT extends AbstractBaseBatchIT {
 
     @Autowired
