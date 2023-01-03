@@ -141,7 +141,7 @@ public class Form2ListProcessor {
     }
 
     private boolean isInIgnoreConcepts(String conceptName) {
-        return this.ignoreConcepts.stream().anyMatch(o -> o.getName().equals(conceptName));
+        return this.ignoreConcepts.stream().anyMatch(o -> conceptName.equals(o.getName()));
     }
 
     private void parseControl(Control control, BahmniForm bahmniForm, int depthToParent, boolean isParentAddMore) {
