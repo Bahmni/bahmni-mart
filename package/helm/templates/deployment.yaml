@@ -60,7 +60,11 @@ spec:
                  optional: false
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-
+          volumeMounts:
+            - mountPath: /home/bahmni/clinical_forms
+              name: openmrs-clinical-forms
       restartPolicy: Always
-    
-    
+      volumes:
+        - name: openmrs-clinical-forms
+          persistentVolumeClaim:
+            claimName: openmrs-clinical-forms-pvc
