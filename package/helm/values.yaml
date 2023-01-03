@@ -1,0 +1,38 @@
+replicaCount: 1
+
+global:
+  storageClass: ""
+  nodeSelector: {}
+  affinity: {}
+  tolerations: {}
+
+metadata:
+  labels:
+    environment: dev
+
+image:
+  repository: bahmni
+  name: bahmni-mart
+  tag: latest
+
+config:
+  CRON_TIME: "*/10 * * * *"
+  MART_DB_NAME: mart-db
+  OPENMRS_DB_NAME: ""
+
+secrets:
+  MART_DB_HOST: ""
+  MART_DB_USERNAME: ""
+  MART_DB_PASSWORD: ""
+  OPENMRS_DB_HOST: ""
+  OPENMRS_DB_USERNAME: ""
+  OPENMRS_DB_PASSWORD: "" 
+
+resources: {}
+
+autoscaling:
+  enabled: false
+
+nodeSelector: {}
+affinity: {}
+tolerations: {}
