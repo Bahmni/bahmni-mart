@@ -2,7 +2,7 @@ name: Build and Publish bahmni-mart Image and Helm Chart
 on:
   push:
     branches: 
-      - main
+      - master
 
 jobs:
   
