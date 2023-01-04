@@ -62,7 +62,7 @@ public class ObsIncrementalUpdateStrategy extends AbstractIncrementalUpdateStrat
             return true;
         }
         TableData currentTableData = tableMetadataGenerator.getTableDataByName(getActualTableName(processedName));
-        if(currentTableData == null) return false;
+        if (currentTableData == null) return false;
         SpecialCharacterResolver.resolveTableData(currentTableData);
 
         TableData existingTableData = getExistingTableData(processedName);
