@@ -79,18 +79,14 @@ public class ViewExecutorTest {
     }
 
     @Test
-    public void shouldLogTheErrorIfViewSQLIsEmpty() throws Exception {
+    public void shouldNotExecuteTheViewIfViewSQLIsEmpty() {
         ViewDefinition viewDefinition = new ViewDefinition();
         viewDefinition.setName("view1");
         viewDefinition.setSql("");
 
-        doThrow(Exception.class).when(martJdbcTemplate).execute("drop view if exists view1;create view view1 as ");
-        Logger logger = mock(Logger.class);
-        setValuesForMemberFields(viewExecutor, "logger", logger);
-
         viewExecutor.execute(Arrays.asList(viewDefinition));
-        verify(logger, times(1)).error(eq("Unable to execute the view view1."),
-                any(Exception.class));
+
+        verify(martJdbcTemplate, times(0)).execute(anyString());
     }
 
     @Test
@@ -119,14 +115,13 @@ public class ViewExecutorTest {
     }
 
     @Test
-    public void shouldExecuteEmptySqlAsViewWhenSqlAndSourceFilePathAreEmpty() throws Exception {
+    public void shouldNotExecuteEmptySqlAsViewWhenSqlAndSourceFilePathAreEmpty() {
         ViewDefinition viewDefinition = mock(ViewDefinition.class);
         when(viewDefinition.getName()).thenReturn("invalid_view");
 
         viewExecutor.execute(Arrays.asList(viewDefinition));
 
-        verify(martJdbcTemplate, times(1)).execute("drop view if exists invalid_view;" +
-                "create view invalid_view as ");
+        verify(martJdbcTemplate, times(0)).execute(anyString());
     }
 
     @Test
