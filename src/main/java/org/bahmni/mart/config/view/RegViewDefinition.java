@@ -55,15 +55,21 @@ public class RegViewDefinition {
                 "location_name", "obs_datetime", "date_created", "date_modified", "program_id", "program_name",
                 "patient_program_id");
 
-        String sql = format("SELECT %s %s FROM %s", createCoalesceQueries(excludedColumns, tableNames),
-                getSelectClause(getTablesMetaData(tableNames), excludedColumns), tableNames.get(0));
+        List<Map<String, Object>> tablesMetaData = getTablesMetaData(tableNames);
+        long actualTablesCount = tablesMetaData.stream().map(tableData -> tableData.get("table_name").toString())
+                .distinct().count();
+        if (actualTablesCount == tableNames.size()) {
+            String sql = format("SELECT %s %s FROM %s", createCoalesceQueries(excludedColumns, tableNames),
+                    getSelectClause(tablesMetaData, excludedColumns), tableNames.get(0));
 
-        for (int index = 1; index < tableNames.size(); index++) {
-            sql = sql.concat(format(" FULL OUTER JOIN %s ON %s", tableNames.get(index),
-                    getJoining(tableNames.get(index - 1), tableNames.get(index))));
+            for (int index = 1; index < tableNames.size(); index++) {
+                sql = sql.concat(format(" FULL OUTER JOIN %s ON %s", tableNames.get(index),
+                        getJoining(tableNames.get(index - 1), tableNames.get(index))));
+            }
+            return sql;
         }
+        return "";
 
-        return sql;
     }
 
     private String createCoalesceQueries(List<String> columnNames, List<String> tableNames) {

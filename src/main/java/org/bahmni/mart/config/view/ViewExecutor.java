@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.bahmni.mart.BatchUtils.convertResourceOutputToString;
 import static org.bahmni.mart.config.job.SQLFileLoader.loadResource;
@@ -29,8 +30,11 @@ public class ViewExecutor {
     public void execute(List<ViewDefinition> viewDefinitions) {
         viewDefinitions.forEach(viewDefinition -> {
             try {
-                logger.info(String.format("Executing the view '%s'.", viewDefinition.getName()));
-                martJdbcTemplate.execute(getUpdatedViewSQL(viewDefinition));
+                String viewSql = getUpdatedViewSQL(viewDefinition);
+                if (viewSql != null) {
+                    logger.info(String.format("Executing the view '%s'.", viewDefinition.getName()));
+                    martJdbcTemplate.execute(viewSql);
+                }
             } catch (Exception e) {
                 failedViews.add(viewDefinition.getName());
                 logger.error(String.format("Unable to execute the view %s.", viewDefinition.getName()), e);
@@ -43,8 +47,12 @@ public class ViewExecutor {
     }
 
     private String getUpdatedViewSQL(ViewDefinition viewDefinition) {
+        String sqlView = getSql(viewDefinition);
+        if (isEmpty(sqlView)) {
+            return null;
+        }
         return String.format("drop view if exists %s;create view %s as %s",
-                viewDefinition.getName(), viewDefinition.getName(), getSql(viewDefinition));
+                viewDefinition.getName(), viewDefinition.getName(), sqlView);
     }
 
     private String getSql(ViewDefinition viewDefinition) {
