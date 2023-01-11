@@ -77,13 +77,16 @@ dependencies {
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.9'
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.32'
     compile("org.springframework.boot:spring-boot-starter-batch")
+    compile group: 'org.springframework', name: 'spring-beans', version: '5.3.20'
+    compile group: 'org.springframework', name: 'spring-core', version: '5.3.20'
+    compile group: 'org.springframework', name: 'spring-expression', version: '5.3.20'
     compile group: 'org.codehaus.jettison', name: 'jettison', version: '1.5.2'
     compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.21.7'
     compile("org.springframework.batch:spring-batch-test")
     compile group: 'junit', name: 'junit', version: '4.13.1'
-    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.5.1'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.35'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.3.0'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
