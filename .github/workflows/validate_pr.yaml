@@ -1,6 +1,6 @@
 name: Validate_PR
 on:
-  push:
+  pull_request:
     branches: 
       - master
 
