@@ -23,7 +23,7 @@ apply plugin: 'checkstyle'
 apply plugin: 'org.owasp.dependencycheck'
 
 group = 'org.bahmni.mart'
-version = '2.0.5'
+version = '2.0.6'
 
 description = "Batch job for Bahmni Mart"
 
@@ -85,8 +85,8 @@ dependencies {
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.21.7'
     compile("org.springframework.batch:spring-batch-test")
     compile group: 'junit', name: 'junit', version: '4.13.1'
-    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.35'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.41'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.3.2'
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.3.0'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
