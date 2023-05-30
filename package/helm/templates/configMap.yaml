@@ -6,3 +6,4 @@ data:
   CRON_TIME: "{{ .Values.config.CRON_TIME }}"
   MART_DB_NAME: "{{ .Values.config.MART_DB_NAME }}"
   OPENMRS_DB_NAME: "{{ .Values.config.OPENMRS_DB_NAME }}"
+  TZ: "{{ .Values.global.TZ }}"

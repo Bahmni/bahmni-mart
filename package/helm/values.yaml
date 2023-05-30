@@ -5,6 +5,7 @@ global:
   nodeSelector: {}
   affinity: {}
   tolerations: {}
+  TZ: "UTC"
 
 metadata:
   labels:
