@@ -73,8 +73,8 @@ check.dependsOn jacocoTestCoverageVerification
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter')
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.0'
-    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.9'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
     compile group: 'org.yaml', name: 'snakeyaml', version: '2.0'
     compile("org.springframework.boot:spring-boot-starter-batch")
     compile group: 'org.springframework', name: 'spring-beans', version: '5.3.20'
@@ -85,8 +85,8 @@ dependencies {
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.21.7'
     compile("org.springframework.batch:spring-batch-test")
     compile group: 'junit', name: 'junit', version: '4.13.1'
-    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.3.8'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.42'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.28'
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.3.0'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
