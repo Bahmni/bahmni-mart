@@ -86,7 +86,7 @@ dependencies {
     compile("org.springframework.batch:spring-batch-test")
     compile group: 'junit', name: 'junit', version: '4.13.1'
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.42'
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.28'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.3.9'
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.3.0'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
@@ -95,7 +95,7 @@ dependencies {
     compile "com.github.jsqlparser:jsqlparser:1.1"
     compile 'org.springframework.cloud:spring-cloud-starter-task:1.2.2.RELEASE'
     compile group: 'org.liquibase', name: 'liquibase-core', version: '4.8.0'
-    compile group: 'org.json', name: 'json', version: '20230227'
+    compile group: 'org.json', name: 'json', version: '20231013'
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile group: 'junit', name: 'junit', version: '4.13.1'
