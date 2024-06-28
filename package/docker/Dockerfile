@@ -1,4 +1,4 @@
-FROM amazoncorretto:11
+FROM amazoncorretto:8
 
 COPY build/libs/bahmni-mart*.jar /bahmni-mart/app.jar
 COPY package/docker/files/ /bahmni-mart
