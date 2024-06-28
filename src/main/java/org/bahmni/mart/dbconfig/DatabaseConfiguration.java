@@ -4,9 +4,9 @@ import org.postgresql.PGConnection;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.batch.BatchDatabaseInitializer;
+import org.springframework.boot.autoconfigure.batch.BatchDataSourceInitializer;
 import org.springframework.boot.autoconfigure.batch.BatchProperties;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ public class DatabaseConfiguration {
 
     @Primary
     @Bean(name = "openmrsDb")
-    @ConfigurationProperties(prefix = "spring.ds_openmrs")
+    @ConfigurationProperties(prefix = "spring.ds-openmrs")
     public DataSource openmrsDataSource() {
         return DataSourceBuilder.create().build();
     }
@@ -34,7 +34,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean(name = "martDb")
-    @ConfigurationProperties(prefix = "spring.ds_mart")
+    @ConfigurationProperties(prefix = "spring.ds-mart")
     public DataSource martDataSource() {
         return DataSourceBuilder.create().build();
     }
@@ -66,9 +66,9 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public BatchDatabaseInitializer batchDatabaseInitializer(final BatchProperties properties,
-                                                             @Qualifier("scdfDb") final DataSource dataSource,
-                                                             final ResourceLoader resourceLoader) {
-        return new BatchDatabaseInitializer(dataSource, resourceLoader, properties);
+    public BatchDataSourceInitializer batchDataSourceInitializer(final BatchProperties properties,
+                                                                           @Qualifier("scdfDb") final DataSource dataSource,
+                                                                           final ResourceLoader resourceLoader) {
+        return new BatchDataSourceInitializer(dataSource, resourceLoader, properties);
     }
 }
