@@ -22,6 +22,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.ObjectFactory;
 
 import javax.sql.DataSource;
@@ -131,7 +132,7 @@ public class Form2ObservationExportStepTest {
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
         when(observationProcessorFactory.getObject()).thenReturn(new Form2ObservationProcessor());
         when(obsWriterObjectFactory.getObject()).thenReturn(new DatabaseObsWriter());
-        when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.processor(any(ItemProcessor.class))).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
 
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
@@ -278,7 +279,7 @@ public class Form2ObservationExportStepTest {
         when(stepBuilderFactory.get("Insertion Step-1 " + formName)).thenReturn(stepBuilder);
         when(stepBuilder.chunk(500)).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
-        when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.processor(any(ItemProcessor.class))).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
     }
 }

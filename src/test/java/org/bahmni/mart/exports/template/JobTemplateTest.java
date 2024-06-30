@@ -24,6 +24,7 @@ import org.springframework.batch.core.job.builder.JobFlowBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.ObjectFactory;
 
@@ -130,7 +131,7 @@ public class JobTemplateTest {
         when(stepBuilderFactory.get(any())).thenReturn(stepBuilder);
         when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
-        when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilderWithProcessor);
+        when(simpleStepBuilder.processor(any(ItemProcessor.class))).thenReturn(simpleStepBuilderWithProcessor);
         when(simpleStepBuilderWithProcessor.writer(any())).thenReturn(simpleStepBuilderWithProcessor);
 
         when(flowJobBuilder.build()).thenReturn(job);
@@ -173,7 +174,7 @@ public class JobTemplateTest {
         verify(incrementalUpdateStrategy).isMetaDataChanged(TABLE_NAME, TEST_JOB_NAME);
 
         verify(simpleStepBuilder).reader(any());
-        verify(simpleStepBuilder).processor(any());
+        verify(simpleStepBuilder).processor(any(ItemProcessor.class));
         verify(simpleStepBuilder, never()).writer(any());
         verify(simpleStepBuilderWithProcessor).writer(any());
         verifyNew(JdbcCursorItemReader.class).withNoArguments();
@@ -216,7 +217,7 @@ public class JobTemplateTest {
 
 
         verify(simpleStepBuilder, times(2)).reader(any());
-        verify(simpleStepBuilder).processor(any());
+        verify(simpleStepBuilder).processor(any(ItemProcessor.class));
         verify(simpleStepBuilder).writer(any());
         verify(simpleStepBuilderWithProcessor).writer(any());
         verifyNew(JdbcCursorItemReader.class, times(2)).withNoArguments();

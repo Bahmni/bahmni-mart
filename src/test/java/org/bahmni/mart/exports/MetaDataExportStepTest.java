@@ -16,6 +16,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.core.io.ByteArrayResource;
 
@@ -68,7 +69,7 @@ public class MetaDataExportStepTest {
         when(stepBuilder.chunk(100)).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
         when(recordWriterObjectFactory.getObject()).thenReturn(new TableRecordWriter());
-        when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.processor(any(ItemProcessor.class))).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
 
