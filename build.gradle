@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.1.18.RELEASE'
+        springBootVersion = '2.2.0.RELEASE'
         dependencyCheckVersion = '3.1.2'
     }
     repositories {
@@ -168,7 +168,7 @@ buildRpm {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.5.1'
+    gradleVersion = '4.10'
 }
 
 checkstyle {
