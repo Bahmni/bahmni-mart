@@ -25,6 +25,7 @@ public class Constants {
             put("int", "integer");
             put("float8", "double precision");
             put("bigint", "integer");
+            put("mediumtext", "text");
         }
     };
 

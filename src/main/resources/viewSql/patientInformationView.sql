@@ -34,4 +34,4 @@ SELECT
   pa.*
 FROM person_details_default pd
   LEFT JOIN person_attributes pa ON pa.person_id = pd.person_id
-  LEFT JOIN person_address_default pad ON pad.person_id = pd.person_id and pad.preferred = 'true'
+  LEFT JOIN person_address_default pad ON pad.person_id = pd.person_id and pad.preferred = B'1'

@@ -33,6 +33,12 @@ public class BatchUtils {
           case "timestamp":
           case "time":
               return getStringForPsql(value);
+          case "BIT":
+              if ("true".equalsIgnoreCase(value)) {
+                  return "B'1'";
+              } else {
+                  return "B'0'";
+              }
           default:
               return value;
         }
