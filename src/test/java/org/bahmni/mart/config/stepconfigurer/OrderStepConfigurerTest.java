@@ -27,6 +27,7 @@ import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.step.builder.SimpleStepBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.ObjectFactory;
 
 import java.util.ArrayList;
@@ -258,7 +259,7 @@ public class OrderStepConfigurerTest {
         when(simpleStepBuilder.reader(any())).thenReturn(simpleStepBuilder);
 
         when(tableDataGenerator.getTableDataFromOpenmrs(orderable, sql)).thenReturn(tableData);
-        when(simpleStepBuilder.processor(any())).thenReturn(simpleStepBuilder);
+        when(simpleStepBuilder.processor(any(ItemProcessor.class))).thenReturn(simpleStepBuilder);
         when(recordWriterObjectFactory.getObject()).thenReturn(new TableRecordWriter());
         when(simpleStepBuilder.writer(any())).thenReturn(simpleStepBuilder);
         when(simpleStepBuilder.build()).thenReturn(expectedBaseExportStep);
@@ -279,7 +280,7 @@ public class OrderStepConfigurerTest {
         BatchUtils.constructSqlWithParameter(sql, "orderTypeId", "1");
         verify(simpleStepBuilder, times(1)).reader(any());
         verify(tableDataGenerator, times(2)).getTableDataFromOpenmrs(orderable, sql);
-        verify(simpleStepBuilder, times(1)).processor(any());
+        verify(simpleStepBuilder, times(1)).processor(any(ItemProcessor.class));
         verify(recordWriterObjectFactory, times(1)).getObject();
         verify(simpleStepBuilder, times(1)).writer(any());
         verify(simpleStepBuilder, times(1)).build();
