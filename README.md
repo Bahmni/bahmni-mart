@@ -5,68 +5,96 @@
 Standalone Batch Application based on spring-batch. This application will create various table in **analytics** DB like Patient Information, Program Enrollment Information, Drug Orders (TB and Non-TB), Various forms filled by the users (Observation Templates), Bacteriology forms information
 
 ---
+
 ## Setting up Dev Environment
 
 ### Prerequisites
+
 * **java 8**
 
 ### Setting up Git Hooks and Test DB
+
 To setup git hooks please run the following command
+
 ```bash
 sh scripts/dev/setup.sh
 ```
+
 We have 2 githooks configured so far
+
 1. pre-commit hook to check the message formatting
 2. pre-push hook to prompt developer to increment the build version on master branch with every new feature change
 
 ---
-### Build 
+
+### Build
+
 #### JAR
+
 To build JAR run the following command
+
 ```bash
 ./gradlew clean build
 ```
 
 ---
+
 ### Checks/ Verifications
+
 #### Test
+
 To run tests run the following command
+
 ```bash
 ./gradlew test
 ```
 
 #### Coverage
+
 To check code coverage run the following command
+
 ```bash
 ./gradlew clean jacocoTestCoverageVerification
 ```
- 
+
 #### Style
+
 To check code style run the following command
+
 ```bash
 ./gradlew clean checkstyleMain checkstyleTest
 ```
 
 #### All
+
 To run all chesks present in bahmni mart run the following command
+
 ```bash
 ./gradlew clean check
 ```
 
 ---
+
 ## Deployment Steps
+
 ### Prerequisites
-* **Ansible Playbook (v2.2)**. To install it, run the following command 
+
+* **Ansible Playbook (v2.2)**. To install it, run the following command
+
     ```bash
     yum install ansible-2.2.0.0
     ```
+
 ### Installation Steps
 
 To install bahmni-mart follow the steps given below
+
 * Download Bahmni-mart playbook from Github
+
     ```bash
     wget -O /tmp/bahmni-mart-playbook.zip https://github.com/bahmni-msf/bahmni-mart-playbook/archive/master.zip && unzip -o /tmp/bahmni-mart-playbook.zip -d /tmp && sudo rm -rf /etc/bahmni-mart-playbook && sudo mv /tmp/bahmni-mart-playbook-master /etc/bahmni-mart-playbook && rm -rf /tmp/bahmni-mart-playbook.zip
     ```
+
 * Update **/etc/bahmni-mart-playbook/inventories/bahmni-mart** inventory file as per your requirement
 * Update the values presents in **/etc/bahmni-mart-playbook/setup.yml** inventory file as per your requirement
 * Before running the installtion please add the following parameters in setup.yml file
@@ -75,60 +103,72 @@ To install bahmni-mart follow the steps given below
   * openmrs_db_password
   * metabase_db_password
   
-  **Note** : Password should be a Non Empty string. 
+  **Note** : Password should be a Non Empty string.
 * HTTPS for metabase (optional)
   * Let's encrypt
     * Certificates generated from [let's encrypt](https://bahmni.atlassian.net/wiki/spaces/BAH/pages/35586093/Configure+Valid+SSL+Certificates) can be used for metabase by converting them into jks format.
     Update the following properties in setup.yml to run metabase with https.
-    
+
     |Property | Comment |
     |:-----------|:---------|
-    | metabase_with_ssl | Set to true to add ssl certificate for metabase. When this is true, the properties **bahmni_lets_encrypt_cert_dir, metabase_keystore_password** should be provided. Default value is 'false'
-    | bahmni_lets_encrypt_cert_dir | Let's encrypt certificates directory, it is mandatory if **metabase_with_ssl** set to true. Eg: /etc/letsencrypt/live/demo.bahmni.org
-    | metabase_keystore_password | Some password to generate jks file, it is mandatory if **metabase_with_ssl** set to true
-   
+    | metabase_with_ssl | Set to true to add ssl certificate for metabase. When this is true, the properties **bahmni_lets_encrypt_cert_dir, metabase_keystore_password** should be provided. Default value is 'false' |
+    | bahmni_lets_encrypt_cert_dir | Let's encrypt certificates directory, it is mandatory if **metabase_with_ssl** set to true. Eg: /etc/letsencrypt/live/demo.bahmni.org |
+    | metabase_keystore_password | Some password to generate jks file, it is mandatory if **metabase_with_ssl** set to true |
+
    Since let's encrypt certificates expires after 90 days, you need to regenerate jks file after renewing bahmni certificates. Use following command to regenerate jks file
-    
+
     ```bash
     /opt/bahmni-mart/bin/pemtojks.sh <bahmni_lets_encrypt_cert_dir> <metabase_keystore_password>
     ```
-    
+
     Stop metabase container and update metabase docker container
-    
+
     ```bash
     docker-compose -f /opt/bahmni-mart/metabase-ssl-docker-compose.yml up -d
     ```
-  * Custom ssl 
+
+  * Custom ssl
     * If you use other than let's encrypt certificates, generate jks(Java Key Store) file from your ssl certificate and provide jks file path in **custom_keystore_location** and provide the **metabase_keystore_password**(password which was used to generating jks file)  
+
 ### Command to deploy mart
- #### Metabase without ssl
-```bash 
+
+#### Metabase without ssl
+
+```bash
 ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "custom_ssl,lets_encrypt_ssl,authentication" -vv
 ```
+
 #### Metabase with let's encrypt ssl(optional)
+
 ```bash
 ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,custom_ssl,authentication" -vv
 ```
+
 #### Metabase with custom ssl(optional)
+
 ```bash
 ansible-playbook -i /etc/bahmni-mart-playbook/inventories/bahmni-mart /etc/bahmni-mart-playbook/all.yml --extra-vars '@/etc/bahmni-mart-playbook/setup.yml' --skip-tags "without_ssl,lets_encrypt_ssl,authentication" -vv
 ```
 
 Note: Above playbook deploys [bahmni-mart](https://github.com/bahmni-msf/bahmni-mart) along with [metabase](https://metabase.com)(docker container) and [spring cloud data flow server](https://cloud.spring.io/spring-cloud-dataflow/)(docker container)
-* Update **bahmni-mart** config. The config will be present in **/var/www/bahmni_config/bahmni-mart/bahmni-mart.json** 
+
+* Update **bahmni-mart** config. The config will be present in **/var/www/bahmni_config/bahmni-mart/bahmni-mart.json**
 
 ### Access the Application
+
 **Bahmni-mart** application should be installed on you system. To create flattened DB from CLI, run ```bahmni-mart``` command.
 
 You can access **Bahmni-mart** and other application from browser also.
 
-|Application | URL | Comment | 
+|Application | URL | Comment |
 |:-----------|:------|:---------|
 |Bahmni mart  |http://\<HOST NAME>:9393/dashboard/#/tasks/definitions/launch/create-bahmni-mart| Only if bahmni-mart-scdf is installed|
 |Metabase|http://\<HOST NAME>:9003|Only if metabase is installed|
 
 ---
+
 ### Commands to Remember
+
 * ```docker ps -a``` (Check status of docker containers)
 * ```docker logs -f metabase``` (Check logs of metabase container)
 * ```docker logs -f dataflow-server``` (Check logs of dataflow-server container)
@@ -138,4 +178,5 @@ You can access **Bahmni-mart** and other application from browser also.
 * ```tail -100f /var/log/bahmni-mart/bahmmni-mart.log``` (Log of **create-bahmni-mart** task will be present in **/var/log/bahmni-mart/bahmni-mart.log** of your host machine. Use this command to get last 100 lines of the file)
 
 ### Implementers Note
+
 For implementers note please check [here](https://docs.google.com/document/d/1NClHML9rabkS6KwXXUMOgLhJmo9kOvJkMTgewXLyPTo/edit?usp=sharing).
