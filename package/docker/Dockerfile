@@ -6,6 +6,6 @@ COPY conf /bahmni-mart/conf
 
 RUN chmod +x /bahmni-mart/setup.sh
 
-RUN yum -y install crontabs
+RUN yum -y update && yum -y install crontabs && yum clean all
 
 CMD ["sh", "./bahmni-mart/setup.sh"]
