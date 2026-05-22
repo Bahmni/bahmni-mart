@@ -86,7 +86,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.15.4'
     implementation("org.springframework.batch:spring-batch-test")
     implementation group: 'junit', name: 'junit', version: '4.13.1'
-    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
+    implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.3.0'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
     implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.9.0'
     implementation group: 'commons-io', name: 'commons-io', version: '2.14.0'
