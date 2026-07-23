@@ -1,3 +1,37 @@
+WITH all_diagnoses AS (
+  SELECT
+    patient_id,
+    encounter_id,
+    coded_diagnosis,
+    non_coded_diagnosis,
+    diagnosis_certainty,
+    diagnosis_order,
+    obs_datetime AS diagnosis_date,
+    'legacy' AS diagnosis_source
+  FROM visit_diagnoses
+
+  UNION ALL
+
+  SELECT
+    patient_id,
+    encounter_id,
+    coded_diagnosis,
+    non_coded_diagnosis,
+    CASE diagnosis_certainty
+      WHEN 'CONFIRMED' THEN 'Confirmed'
+      WHEN 'PROVISIONAL' THEN 'Provisional'
+      ELSE diagnosis_certainty
+    END AS diagnosis_certainty,
+    CASE diagnosis_order
+      WHEN 1 THEN 'Primary'
+      WHEN 2 THEN 'Secondary'
+      ELSE diagnosis_order::text
+    END AS diagnosis_order,
+    date_created AS diagnosis_date,
+    'new_ui' AS diagnosis_source
+  FROM encounter_diagnosis_default
+)
+
 SELECT
   pd.person_id AS patient_id,
   pd.gender,
@@ -14,21 +48,15 @@ SELECT
   c.end_date AS condition_end_date,
   c.date_created AS condition_date_created,
   c.creator_name AS creator,
-  vd.encounter_id,
-  vd.coded_diagnosis,
-  vd.non_coded_diagnosis,
-  vd.diagnosis_certainty,
-  vd.diagnosis_order,
-  vd.obs_datetime,
-  ed.encounter_id AS encounter_diagnosis_encounter_id,
-  ed.coded_diagnosis AS encounter_coded_diagnosis,
-  ed.non_coded_diagnosis AS encounter_non_coded_diagnosis,
-  ed.diagnosis_certainty AS encounter_diagnosis_certainty,
-  ed.diagnosis_order AS encounter_diagnosis_order,
-  ed.date_created AS encounter_diagnosis_date_created
+  d.encounter_id,
+  d.coded_diagnosis,
+  d.non_coded_diagnosis,
+  d.diagnosis_certainty,
+  d.diagnosis_order,
+  d.diagnosis_date,
+  d.diagnosis_source
 
 FROM person_details_default pd
   LEFT JOIN person_attributes pa ON pa.person_id = pd.person_id
   LEFT JOIN conditions_default c ON c.patient_id = pd.person_id
-  LEFT JOIN visit_diagnoses vd ON vd.patient_id = pd.person_id
-  LEFT JOIN encounter_diagnosis_default ed ON ed.patient_id = pd.person_id
+  LEFT JOIN all_diagnoses d ON d.patient_id = pd.person_id
