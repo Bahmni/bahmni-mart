@@ -19,9 +19,16 @@ SELECT
   vd.non_coded_diagnosis,
   vd.diagnosis_certainty,
   vd.diagnosis_order,
-  vd.obs_datetime
+  vd.obs_datetime,
+  ed.encounter_id AS encounter_diagnosis_encounter_id,
+  ed.coded_diagnosis AS encounter_coded_diagnosis,
+  ed.non_coded_diagnosis AS encounter_non_coded_diagnosis,
+  ed.diagnosis_certainty AS encounter_diagnosis_certainty,
+  ed.diagnosis_order AS encounter_diagnosis_order,
+  ed.date_created AS encounter_diagnosis_date_created
 
 FROM person_details_default pd
   LEFT JOIN person_attributes pa ON pa.person_id = pd.person_id
   LEFT JOIN conditions_default c ON c.patient_id = pd.person_id
   LEFT JOIN visit_diagnoses vd ON vd.patient_id = pd.person_id
+  LEFT JOIN encounter_diagnosis_default ed ON ed.patient_id = pd.person_id
