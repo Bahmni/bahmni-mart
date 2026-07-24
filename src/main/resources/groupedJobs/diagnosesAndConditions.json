@@ -14,6 +14,12 @@
       "type": "customSql",
       "readerSql": "SELECT condition_id, previous_version, patient_id, clinical_status, coalesce(condition_non_coded, cv.concept_full_name) AS condition_name, CASE WHEN condition_non_coded IS NULL THEN TRUE ELSE FALSE END AS is_coded_condition_name, onset_date, additional_detail, end_date, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name, conditions.date_created FROM conditions INNER JOIN concept_view cv ON cv.concept_id = conditions.condition_coded AND conditions.voided = 0 AND cv.retired = 0 INNER JOIN users ON users.user_id = conditions.creator INNER JOIN person_name pn ON pn.person_id = users.person_id",
       "tableName": "conditions_default"
+    },
+    {
+      "name": "Encounter Diagnoses",
+      "type": "customSql",
+      "readerSql": "SELECT ed.diagnosis_id, ed.uuid, ed.patient_id, ed.encounter_id, e.visit_id, coalesce(ed.diagnosis_non_coded, cv.concept_full_name) AS coded_diagnosis, ed.diagnosis_non_coded AS non_coded_diagnosis, CASE WHEN ed.diagnosis_non_coded IS NULL THEN TRUE ELSE FALSE END AS is_coded_diagnosis, ed.certainty AS diagnosis_certainty, ed.dx_rank AS diagnosis_order, ed.date_created, concat_ws(' ', ifnull(pn.given_name, ''), ifnull(pn.family_name, '')) AS creator_name FROM encounter_diagnosis ed INNER JOIN encounter e ON e.encounter_id = ed.encounter_id LEFT JOIN concept_view cv ON cv.concept_id = ed.diagnosis_coded AND cv.retired = 0 INNER JOIN users u ON u.user_id = ed.creator INNER JOIN person_name pn ON pn.person_id = u.person_id WHERE ed.voided = 0",
+      "tableName": "encounter_diagnosis_default"
     }
   ]
 }
