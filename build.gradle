@@ -120,12 +120,15 @@ checkstyle {
     project.ext.sevntuChecksVersion = '1.27.0'
     ignoreFailures = false
     configFile = file("src/main/resources/checkStyle.xml")
+    configProperties = [methodLengthMax: 30]
 
     checkstyleMain {
         source = sourceSets.main.allSource
     }
 
-    checkstyleTest.enabled = false
+    checkstyleTest {
+        configProperties = [methodLengthMax: 120]
+    }
 
     configurations {
         checkstyle
