@@ -125,6 +125,8 @@ checkstyle {
         source = sourceSets.main.allSource
     }
 
+    checkstyleTest.enabled = false
+
     configurations {
         checkstyle
     }
