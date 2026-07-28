@@ -126,6 +126,10 @@ checkstyle {
         source = sourceSets.main.allSource
     }
 
+    checkstyleTest {
+        configProperties = [methodLengthMax: 120]
+    }
+
     configurations {
         checkstyle
     }
